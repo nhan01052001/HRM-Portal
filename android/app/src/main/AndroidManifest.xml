@@ -1,0 +1,147 @@
+<manifest 
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  package="com.hrmeportal"
+  
+  >
+
+    <uses-permission android:name="android.permission.NFC" />
+    <!-- react-native-touch-id -->
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    
+    <!-- <uses-permission tools:node="remove" android:name="android.permission.READ_PHONE_STATE" /> -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- permission download file  -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- record screen -->
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+    
+    <!-- permission Get Location  -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- permission Get google places 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
+    
+    <!-- permission Image picker -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> -->
+
+    <!-- permission Camera -->
+    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> -->
+    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+      android:requestLegacyExternalStorage="true"
+      android:usesCleartextTraffic="true"
+      android:name=".MainApplication"
+      android:label="@string/app_name"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:allowBackup="false"
+      android:theme="@style/AppTheme">
+
+      
+      <!-- google map -->
+      <meta-data
+      android:name="com.google.android.geo.API_KEY"
+      android:value="AIzaSyB7ZRuoZ7h2bQryxkx5G8NgCpuuspn0X6Q"/>
+      <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
+
+      <activity
+        android:name=".MainActivity"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+        android:launchMode="singleTask"
+        android:exported="true"
+        android:windowSoftInputMode="adjustResize" > 
+        <intent-filter>
+             <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/> <!-- permission download file  -->
+        </intent-filter>
+
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW"/>
+            <category android:name="android.intent.category.DEFAULT"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="portal4hrm"
+                android:host="main"
+                android:pathPrefix="/" />
+        </intent-filter>
+      </activity>
+      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
+       <!-- firebase cấu hình icon cho notification ,, lưu ý : file image icon phải đầy dủ kích cở đặt ở thư mục  trong app/src/main/res -->
+      <meta-data
+          android:name="com.google.firebase.messaging.default_notification_icon"
+          android:resource="@drawable/ic_notification" />
+      <!-- firebase cấu hình color cho notification ,, lưu ý : file color là dạng xml đặt trong app/src/main/res/values/colors.xml -->
+      
+      
+      <!-- firebase -->
+      <!-- <service android:exported="true" android:name="io.invertase.firebase.messaging.RNFirebaseMessagingService">
+        <intent-filter>
+          <action android:name="com.google.firebase.MESSAGING_EVENT" />
+        </intent-filter>
+      </service>
+      <service android:exported="true" android:name="io.invertase.firebase.messaging.RNFirebaseInstanceIdService">
+        <intent-filter>
+          <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+        </intent-filter>
+      </service> -->
+
+
+      <!-- react-native-file-viewer config  -->
+      <provider
+        android:name="com.vinzscam.reactnativefileviewer.FileProvider"
+        android:authorities="${applicationId}.provider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+          android:name="android.support.FILE_PROVIDER_PATHS"
+          android:resource="@xml/file_viewer_provider_paths"
+        />
+      </provider>
+
+      <activity-alias
+        android:name=".MainActivityDefault"
+        android:enabled="true"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:targetActivity=".MainActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+      </activity-alias>
+
+      <activity-alias
+        android:name=".MainActivityLOTTE"
+        android:enabled="false"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher_lotte"
+        android:targetActivity=".MainActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+      </activity-alias>
+
+    </application>
+
+      <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="*/*" />
+            <!-- <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" /> -->
+        </intent>
+      </queries>
+
+</manifest>

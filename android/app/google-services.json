@@ -1,0 +1,107 @@
+{
+    "project_info": {
+        "project_number": "11275015743",
+        "firebase_url": "https://portal4hrm.firebaseio.com",
+        "project_id": "portal4hrm",
+        "storage_bucket": "portal4hrm.appspot.com"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:11275015743:android:16ce4b8cabe1de3bf5ca8a",
+                "android_client_info": {
+                    "package_name": "com.hrmeportal"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "11275015743-gchs09b938dfb313ni1be028ahq8esg6.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyDTtt7gaHlUzSb-2-R_sTjFUvuw-k_Ph0E"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "11275015743-gchs09b938dfb313ni1be028ahq8esg6.apps.googleusercontent.com",
+                            "client_type": 3
+                        },
+                        {
+                            "client_id": "11275015743-mervlv9s7toedj9qck84esgn9c9revj0.apps.googleusercontent.com",
+                            "client_type": 2,
+                            "ios_info": {
+                                "bundle_id": "app.Vnresource.vn.Portal4HRM"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:11275015743:android:abb8f82535b6068af5ca8a",
+                "android_client_info": {
+                    "package_name": "com.portal4hrm"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "11275015743-1uilis59itu2ghpgf7211ojo8m89e5r9.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.portal4hrm",
+                        "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+                    }
+                },
+                {
+                    "client_id": "11275015743-8ehg4v89uiga567024bjiunteepd346d.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.portal4hrm",
+                        "certificate_hash": "148b74d8e7ce2f133774bf159161c358041d09e3"
+                    }
+                },
+                {
+                    "client_id": "11275015743-q7v40527562ntopvpdmalgdojgp48in5.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "com.portal4hrm",
+                        "certificate_hash": "5ea89d793d8c918fa73c0a5e429188800190688b"
+                    }
+                },
+                {
+                    "client_id": "11275015743-gchs09b938dfb313ni1be028ahq8esg6.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyDTtt7gaHlUzSb-2-R_sTjFUvuw-k_Ph0E"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "11275015743-gchs09b938dfb313ni1be028ahq8esg6.apps.googleusercontent.com",
+                            "client_type": 3
+                        },
+                        {
+                            "client_id": "11275015743-mervlv9s7toedj9qck84esgn9c9revj0.apps.googleusercontent.com",
+                            "client_type": 2,
+                            "ios_info": {
+                                "bundle_id": "app.Vnresource.vn.Portal4HRM"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}

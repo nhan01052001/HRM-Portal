@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>11275015743-r850t8l588ooo750ksr580og1ohao3q3.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.11275015743-r850t8l588ooo750ksr580og1ohao3q3</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>11275015743-1uilis59itu2ghpgf7211ojo8m89e5r9.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBf5hidOCDZ_3GnZGkMXAF5lo1PIUmsjyo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>11275015743</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>app.Vnresource.vn.HRMePortal</string>
+	<key>PROJECT_ID</key>
+	<string>portal4hrm</string>
+	<key>STORAGE_BUCKET</key>
+	<string>portal4hrm.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:11275015743:ios:8636f78f2ec087f8f5ca8a</string>
+	<key>DATABASE_URL</key>
+	<string>https://portal4hrm.firebaseio.com</string>
+</dict>
+</plist>

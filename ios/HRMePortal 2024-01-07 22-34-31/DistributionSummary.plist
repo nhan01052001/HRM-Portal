@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>HRMePortal.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>2</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>3611F137B3E8E1ABB6EA956566E2B09B7416D3B9</string>
+				<key>dateExpires</key>
+				<string>27/04/2024</string>
+				<key>type</key>
+				<string>Apple Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>3611F137B3E8E1ABB6EA956566E2B09B7416D3B9</string>
+						<key>dateExpires</key>
+						<string>27/04/2024</string>
+						<key>type</key>
+						<string>Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>OpenSSL.framework</string>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>KC4AHW89F6</string>
+						<key>name</key>
+						<string>VIET NANG KNOWLEDGE RESOURCES CORPORATION</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>1.1.180</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>KC4AHW89F6.app.Vnresource.vn.HRMePortal</string>
+				<key>aps-environment</key>
+				<string>production</string>
+				<key>com.apple.developer.networking.wifi-info</key>
+				<true/>
+				<key>com.apple.developer.nfc.readersession.formats</key>
+				<array>
+					<string>TAG</string>
+					<string>NDEF</string>
+				</array>
+				<key>com.apple.developer.team-identifier</key>
+				<string>KC4AHW89F6</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>HRMePortal.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>88265796-d6db-4204-8763-39b4e01ed171</string>
+				<key>dateExpires</key>
+				<string>27/04/2024</string>
+				<key>name</key>
+				<string>AdHoc_HRM_EX_Portal</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>KC4AHW89F6</string>
+				<key>name</key>
+				<string>VIET NANG KNOWLEDGE RESOURCES CORPORATION</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>0.6.4</string>
+		</dict>
+	</array>
+</dict>
+</plist>

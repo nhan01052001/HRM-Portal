@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">HRM EX Portal</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">HA0uXClkxHARzm9pEa6_XtarFr0LNkXpwAKVbg</string>
+    <string moduleConfig="true" name="CodePushServerUrl">https://codepush.vnresource.net:2080/</string>
+</resources>

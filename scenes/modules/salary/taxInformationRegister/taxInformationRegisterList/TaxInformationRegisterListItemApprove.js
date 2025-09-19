@@ -1,0 +1,421 @@
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { Colors, CustomStyleSheet, Size, styleSheets } from '../../../../../constants/styleConfig';
+import moment from 'moment';
+import format from 'number-format.js';
+import Vnr_Function from '../../../../../utils/Vnr_Function';
+import { translate } from '../../../../../i18n/translate';
+import { IconInfo, IconBack, IconCheckCirlceo } from '../../../../../constants/Icons';
+import Color from 'color';
+import RightActions from '../../../../../components/ListButtonMenuRight/RightActions';
+export default class TaxInformationRegisterListItemApprove extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            widthIconBack: new Animated.Value(Size.defineSpace),
+            heightIconNext: new Animated.Value(0),
+            springIconBack: new Animated.Value(1),
+            springIconNext: new Animated.Value(0)
+        };
+        this.formatStringType = this.formatStringType.bind(this);
+        this.setRightAction(props);
+        this.Swipe = null;
+    }
+
+    setRightAction = (thisProps) => {
+        const { dataItem } = thisProps;
+        dataItem.BusinessAllowAction = dataItem.BusinessAllowAction + ',E_LIMIT_OT';
+        this.sheetActions = [
+            {
+                title: translate('HRM_Common_Close'),
+                onPress: null
+            }
+        ];
+        if (!Vnr_Function.CheckIsNullOrEmpty(thisProps.rowActions)) {
+            this.rightListActions = thisProps.rowActions.filter((item) => {
+                return (
+                    !Vnr_Function.CheckIsNullOrEmpty(dataItem.BusinessAllowAction) &&
+                    dataItem.BusinessAllowAction.indexOf(item.type) >= 0
+                );
+            });
+        }
+    };
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        if (nextProps.isPullToRefresh !== this.props.isPullToRefresh) {
+            this.setRightAction(nextProps);
+        }
+    }
+
+    shouldComponentUpdate(nextProps) {
+        if (
+            nextProps.isPullToRefresh !== this.props.isPullToRefresh ||
+            nextProps.isSelect !== this.props.isSelect ||
+            nextProps.isOpenAction !== this.props.isOpenAction ||
+            nextProps.isDisable !== this.props.isDisable
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    formatStringType = (data, col) => {
+        if (data[col.Name]) {
+            if (col.DataType && col.DataType.toLowerCase() == 'datetime') {
+                return moment(data[col.Name]).format(col.DataFormat);
+            }
+            if (col.DataType && col.DataType.toLowerCase() == 'double') {
+                return format(col.DataFormat, data[col.Name]);
+            } else {
+                return data[col.Name];
+            }
+        } else {
+            return '';
+        }
+    };
+
+    openActionSheet = () => {
+        this.ActionSheet.show();
+    };
+
+    actionSheetOnCLick = (index) => {
+        const { dataItem } = this.props;
+        !Vnr_Function.CheckIsNullOrEmpty(this.sheetActions[index].onPress) &&
+            this.sheetActions[index].onPress(dataItem);
+    };
+
+    rightActionsEmpty = () => {
+        return <View style={CustomStyleSheet.width(0)} />;
+    };
+
+    convertTextToColor = (value) => {
+        const [num1, num2, num3, opacity] = value.split(',');
+        return Color.rgb(parseFloat(num1), parseFloat(num2), parseFloat(num3), parseFloat(opacity));
+    };
+
+    render() {
+        const { dataItem, isSelect, index, listItemOpenSwipeOut, rowActions, isOpenAction, isDisable } = this.props;
+
+        let textFieldSalary = '',
+            colorStatusView = null,
+            borderStatusView = null,
+            bgStatusView = null;
+
+        // xử lý color
+        if (dataItem.itemStatus) {
+            const { colorStatus, borderStatus, bgStatus } = dataItem.itemStatus;
+            colorStatusView = colorStatus ? colorStatus : null;
+            borderStatusView = borderStatus ? borderStatus : null;
+            bgStatusView = bgStatus ? bgStatus : null;
+        }
+
+        // if (dataItem.udLimitColorDay) {
+        //   colorTextOTLimit = dataItem.udLimitColorDay;
+        // } else if (dataItem.udLimitColorWeek) {
+        //   colorTextOTLimit = dataItem.udLimitColorWeek;
+        // } else if (dataItem.udLimitColorMonth) {
+        //   colorTextOTLimit = dataItem.udLimitColorMonth;
+        // } else if (dataItem.udLimitColorYear) {
+        //   colorTextOTLimit = dataItem.udLimitColorYear;
+        // }
+
+        if (dataItem.SalaryClassName) {
+            textFieldSalary = `${dataItem.SalaryClassName}`;
+        }
+        if (dataItem.PositionName) {
+            if (textFieldSalary != '') {
+                textFieldSalary = `${textFieldSalary} | ${dataItem.PositionName}`;
+            } else {
+                textFieldSalary = `${dataItem.PositionName}`;
+            }
+        }
+
+        return (
+            <Swipeable
+                ref={(ref) => {
+                    this.Swipe = ref;
+                    if (
+                        listItemOpenSwipeOut.findIndex((value) => {
+                            return value['ID'] == index;
+                        }) < 0
+                    ) {
+                        listItemOpenSwipeOut.push({ ID: index, value: ref });
+                    } else {
+                        listItemOpenSwipeOut[index].value = ref;
+                    }
+                }}
+                overshootRight={false}
+                renderRightActions={
+                    rowActions != null && !isOpenAction
+                        ? () => <RightActions rowActions={rowActions} dataItem={dataItem} />
+                        : this.rightActionsEmpty
+                }
+                friction={0.6}
+                containerStyle={[styles.swipeable]}
+            >
+                <View
+                    style={[
+                        styles.swipeableLayout,
+                        isSelect && { backgroundColor: Colors.Secondary95 },
+                        dataItem.WarningViolation && { borderColor: Colors.red }
+                    ]}
+                >
+                    {isOpenAction && (
+                        <View style={[styles.selectView, isDisable ? styleSheets.opacity05 : styleSheets.opacity1]}>
+                            <TouchableOpacity
+                                activeOpacity={isDisable ? 1 : 0.8}
+                                onPress={() => {
+                                    !isDisable ? this.props.onClick() : null;
+                                }}
+                            >
+                                <View
+                                    style={[styles.selectViewCircle, !this.props.isSelect && styles.styViewIsSelected]}
+                                >
+                                    {this.props.isSelect && (
+                                        <IconCheckCirlceo size={Size.iconSize - 4} color={Colors.primary} />
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    <View style={styles.container}>
+                        <View style={styles.Line}>
+                            <View style={[styles.contentMain, CustomStyleSheet.paddingTop(0)]} key={index}>
+                                <View style={styles.flR_AliCenter}>
+                                    <View style={styles.w40}>
+                                        <Text numberOfLines={1} style={[styleSheets.text, styles.line_lable]}>
+                                            {translate('HRM_Tra_CreateDetailedTrainingRequirement_ProfileID')}:{' '}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.w60}>
+                                        <Text
+                                            numberOfLines={1}
+                                            style={[styleSheets.text, styles.line_text, styles.styTextAlignRight]}
+                                        >
+                                            {dataItem.Hre_Profile_ProfileName}
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                <View style={[styles.flR_AliCenter, CustomStyleSheet.marginVertical(2)]}>
+                                    <View style={styles.w40}>
+                                        <Text numberOfLines={1} style={[styleSheets.text, styles.line_lable]}>
+                                            {translate('HRM_Payroll_Sal_TaxInformationRegister_CodeTax')}:{' '}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.w60}>
+                                        <Text
+                                            numberOfLines={1}
+                                            style={[styleSheets.text, styles.line_text, styles.styTextAlignRight]}
+                                        >
+                                            {dataItem.CodeTax}
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.flR_AliCenter}>
+                                    <View style={styles.w40}>
+                                        <Text numberOfLines={1} style={[styleSheets.text, styles.line_lable]}>
+                                            {translate('HRM_Payroll_Sal_TaxInformationRegister_strType')}:{' '}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.w60}>
+                                        <Text
+                                            numberOfLines={1}
+                                            style={[styleSheets.text, styles.line_text, styles.styTextAlignRight]}
+                                        >
+                                            {dataItem.TypeView}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={styles.viewStatusBottom}>
+                            <View style={styles.dateTimeSubmit}>
+                                <Text style={[styleSheets.textItalic, styles.dateTimeSubmit_Text]} numberOfLines={1}>
+                                    {dataItem.DateCreate != null &&
+                                        dataItem.DateCreate != undefined &&
+                                        `${translate('E_AT_TIME')} ${moment(dataItem.DateCreate).format(
+                                            'HH:mm DD/MM/YYYY'
+                                        )}`}
+                                </Text>
+                            </View>
+                            <View
+                                style={[
+                                    styles.lineSatus,
+                                    {
+                                        borderColor: borderStatusView
+                                            ? this.convertTextToColor(borderStatusView)
+                                            : Colors.gray_10,
+                                        backgroundColor: bgStatusView
+                                            ? this.convertTextToColor(bgStatusView)
+                                            : Colors.white
+                                    }
+                                ]}
+                            >
+                                <Text
+                                    numberOfLines={1}
+                                    style={[
+                                        styleSheets.text,
+                                        styles.lineSatus_text,
+                                        {
+                                            color: colorStatusView
+                                                ? this.convertTextToColor(colorStatusView)
+                                                : Colors.gray_10
+                                        }
+                                    ]}
+                                >
+                                    {dataItem.StatusView ? dataItem.StatusView : ''}
+                                </Text>
+                            </View>
+                        </View>
+                        {dataItem.WarningViolation && (
+                            <View style={styles.viewLimitTitle}>
+                                <IconInfo color={Colors.red} size={Size.text} />
+                                <Text numberOfLines={1} style={[styleSheets.lable, styles.viewReasoLimitTitle_text]}>
+                                    {translate('HRM_Attendance_Limit_Violation_Title')}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                    {/* </View> */}
+                </View>
+                {Array.isArray(this.rightListActions) && this.rightListActions.length > 0 && (
+                    <View style={styles.actionRight}>
+                        <IconBack color={Colors.gray_7} size={Size.defineSpace} />
+                    </View>
+                )}
+            </Swipeable>
+        );
+    }
+}
+
+const PADDING_DEFINE = Size.defineSpace;
+const styles = StyleSheet.create({
+    styTextAlignRight: { textAlign: 'right' },
+    styViewIsSelected: { borderColor: Colors.primary, borderWidth: 1 },
+    swipeable: {
+        flex: 1,
+        paddingHorizontal: Size.defineSpace
+    },
+    line_text: {
+        fontSize: Size.text - 1,
+        color: Colors.primary,
+        fontWeight: '500'
+    },
+    swipeableLayout: {
+        flex: 1,
+        borderRadius: 8,
+        backgroundColor: Colors.white,
+        borderWidth: 0.5,
+        borderColor: Colors.gray_5,
+        position: 'relative',
+        flexDirection: 'row'
+    },
+    container: {
+        flex: 1,
+        paddingTop: PADDING_DEFINE,
+        marginBottom: 4
+    },
+    viewStatusBottom: {
+        paddingVertical: PADDING_DEFINE / 2,
+        paddingHorizontal: PADDING_DEFINE,
+        borderTopColor: Colors.gray_5,
+        borderTopWidth: 0.5,
+        flexDirection: 'row'
+    },
+    lineSatus: {
+        borderRadius: styleSheets.radius_5,
+        alignItems: 'center',
+        borderWidth: 0.5,
+        paddingVertical: 2,
+        paddingHorizontal: PADDING_DEFINE
+    },
+    viewLimitTitle: {
+        width: '100%',
+        marginBottom: PADDING_DEFINE / 2,
+        paddingHorizontal: PADDING_DEFINE,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row'
+    },
+    viewReasoLimitTitle_text: {
+        fontSize: Size.text - 1,
+        color: Colors.red,
+        marginLeft: 5
+    },
+    lineSatus_text: {
+        fontSize: Size.text - 3,
+        fontWeight: '500'
+    },
+    selectView: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopLeftRadius: 8,
+        borderBottomLeftRadius: 8,
+        paddingLeft: 5,
+        paddingRight: 5,
+        borderRightColor: Colors.gray_5,
+        borderRightWidth: 0.5
+    },
+    selectViewCircle: {
+        borderColor: Colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: Size.iconSize - 4,
+        height: Size.iconSize - 4,
+        borderRadius: (Size.iconSize - 4) / 2
+    },
+    dateTimeSubmit: {
+        alignSelf: 'flex-end',
+        paddingRight: 5,
+        flex: 1
+    },
+    dateTimeSubmit_Text: {
+        fontSize: Size.text - 4,
+        color: Colors.gray_10
+    },
+    contentMain: {
+        flex: 1,
+        paddingTop: Size.defineSpace,
+        // marginBottom: Size.defineSpace / 2,
+        paddingHorizontal: Size.defineHalfSpace
+    },
+    actionRight: {
+        position: 'absolute',
+        top: 0,
+        right: -Size.defineSpace,
+        height: '100%',
+        justifyContent: 'center'
+    },
+    Line: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: Colors.primary_transparent_8,
+        paddingHorizontal: PADDING_DEFINE / 2,
+        paddingVertical: PADDING_DEFINE / 2,
+        borderRadius: 8,
+        marginHorizontal: Size.defineSpace,
+        marginBottom: Size.defineHalfSpace
+    },
+
+    flR_AliCenter: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+
+    w40: {
+        width: '40%'
+    },
+
+    w60: {
+        width: '60%'
+    },
+
+    line_lable: {
+        fontSize: Size.text - 1,
+        color: Colors.gray_8
+    }
+});
