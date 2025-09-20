@@ -390,6 +390,7 @@ export const Colors = {
     red: '#F5222D', // overtime
 
     blue: '#0971DC',
+    blue_transparent: '#ecf4fd',
     blue_1: '#CEE5FD',
     blue_3: '#9DCBFB',
     blue_5: '#6CB1F9',
@@ -2682,6 +2683,15 @@ export const stylesVnrPickerV3 = StyleSheet.create({
     onlyFlRowSpaceBetween: {
         flexDirection: 'row',
         justifyContent: 'space-between'
+    },
+
+    wrapRightLabel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.gray_3,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        borderRadius: 8
     }
 });
 

@@ -50,7 +50,7 @@ export default class VnrPickerQuickly extends React.Component {
         this.dataConfirm = { data: {}, index: null };
         this.isModalOpened = false;
     }
-    setDataConfirm = data => {
+    setDataConfirm = (data) => {
         this.dataConfirm = data;
     };
     getDataConfirm = () => {
@@ -69,7 +69,7 @@ export default class VnrPickerQuickly extends React.Component {
         this.setState({ isModalVisible: true, isVisibleLoading: isVisibleLoading });
     };
 
-    handelDataSelect = data => {
+    handelDataSelect = (data) => {
         const { valueField, textField, filter, filterServer, isAddEmptyItem } = this.state.stateProps,
             { value } = this.props,
             { searchText, itemSelected } = this.state;
@@ -86,7 +86,7 @@ export default class VnrPickerQuickly extends React.Component {
         if (!Vnr_Function.CheckIsNullOrEmpty(value) && Object.keys(value).length > 0) {
             itemSelected.length = 0; // dua mang ve rong
             if (
-                data.findIndex(item => {
+                data.findIndex((item) => {
                     return value[valueField] == item[valueField];
                 }) > -1
             ) {
@@ -108,7 +108,7 @@ export default class VnrPickerQuickly extends React.Component {
                 this.oldItemIndex = 0;
                 data = [
                     ...[value],
-                    ...data.map(item => {
+                    ...data.map((item) => {
                         item.isSelect = false;
                         return item;
                     })
@@ -116,7 +116,7 @@ export default class VnrPickerQuickly extends React.Component {
                 itemSelected.push(value);
             }
         } else {
-            data = data.map(item => {
+            data = data.map((item) => {
                 item.isSelect = false;
                 return item;
             });
@@ -168,7 +168,7 @@ export default class VnrPickerQuickly extends React.Component {
         }
 
         HttpFactory.getDataPicker(url)
-            .then(res => {
+            .then((res) => {
                 let data = [];
                 if (res.Status == EnumName.E_SUCCESS) {
                     data = res.Data;
@@ -179,7 +179,7 @@ export default class VnrPickerQuickly extends React.Component {
                 this.isModalOpened = true;
                 this.handelDataSelect(data);
             })
-            .catch(error => console.log(error));
+            .catch((error) => console.log(error));
     };
 
     closeModal = () => {
@@ -215,7 +215,7 @@ export default class VnrPickerQuickly extends React.Component {
         }
     };
 
-    addItemChecked = indexItem => {
+    addItemChecked = (indexItem) => {
         let { itemSelected, dataPicker } = this.state;
         itemSelected.length = 0; // dua mang ve rong
         let itemChecked = dataPicker[indexItem];
@@ -286,7 +286,7 @@ export default class VnrPickerQuickly extends React.Component {
     //     }
     // }
 
-    changeSearchBar = textValue => {
+    changeSearchBar = (textValue) => {
         const { autoFilter, filterServer } = this.props;
         let callBackFilter = null;
         if (!filterServer) {
@@ -314,7 +314,7 @@ export default class VnrPickerQuickly extends React.Component {
             { value } = this.props,
             { fullData, searchText, itemSelected } = this.state;
         if (filter && !filterServer && searchText != null && fullData) {
-            let data = fullData.filter(item => {
+            let data = fullData.filter((item) => {
                 if (!Vnr_Function.CheckIsNullOrEmpty(filterParams)) {
                     return Vnr_Function.CheckContains(item, filterParams, searchText);
                 } else {
@@ -324,7 +324,7 @@ export default class VnrPickerQuickly extends React.Component {
             if (!Vnr_Function.CheckIsNullOrEmpty(value) && Object.keys(value).length > 0) {
                 itemSelected.length = 0; // dua mang ve rong
                 if (
-                    data.findIndex(item => {
+                    data.findIndex((item) => {
                         return value[valueField] == item[valueField];
                     }) > -1
                 ) {
@@ -345,7 +345,7 @@ export default class VnrPickerQuickly extends React.Component {
                     this.oldItemIndex = 0;
                     data = [
                         ...[value],
-                        ...data.map(item => {
+                        ...data.map((item) => {
                             item.isSelect = false;
                             return item;
                         })
@@ -353,7 +353,7 @@ export default class VnrPickerQuickly extends React.Component {
                     itemSelected.push(value);
                 }
             } else {
-                data = data.map(item => {
+                data = data.map((item) => {
                     item.isSelect = false;
                     return item;
                 });
@@ -373,7 +373,7 @@ export default class VnrPickerQuickly extends React.Component {
         }
     }
 
-    onRefreshControl = nextProps => {
+    onRefreshControl = (nextProps) => {
         let _state = this.state;
         _state = defaultState;
         _state.stateProps = nextProps;
@@ -393,15 +393,8 @@ export default class VnrPickerQuickly extends React.Component {
     }
 
     render() {
-        const {
-            textInput,
-            headerSearch,
-            topModal,
-            ScroollviewModal,
-            bottomModal,
-            bntPickerDisable,
-            stylePlaceholder
-        } = stylesVnrPickerV3;
+        const { textInput, headerSearch, topModal, ScroollviewModal, bottomModal, bntPickerDisable, stylePlaceholder } =
+            stylesVnrPickerV3;
 
         const { searchText, isModalVisible, isVisibleLoading, dataPicker, itemSelected, stateProps } = this.state;
         let textValue = null;
@@ -490,7 +483,7 @@ export default class VnrPickerQuickly extends React.Component {
                         ]}
                     >
                         {stateProps.lable && (
-                            <View style={[stylesVnrPickerV3.styLbPicker, { width: '50%', maxHeight: '100%' }]}>
+                            <View style={[stylesVnrPickerV3.styLbPicker, { maxWidth: '50%', maxHeight: '100%' }]}>
                                 <VnrText
                                     numberOfLines={2}
                                     style={[
@@ -511,19 +504,40 @@ export default class VnrPickerQuickly extends React.Component {
                         <View
                             style={[
                                 stylesVnrPickerV3.styVlPicker,
-                                { width: '50%', justifyContent: 'flex-end', alignItems: 'center' }
+                                {
+                                    flex: 1,
+                                    minWidth: '50%',
+                                    maxWidth: '80%',
+                                    justifyContent: 'flex-end',
+                                    alignItems: 'center'
+                                }
                             ]}
                         >
                             <View
-                                style={[stylesVnrPickerV3.wrapRightLabel, !this.props?.isNewUIValue && CustomStyleSheet.backgroundColor('transparent')]}
+                                style={[
+                                    stylesVnrPickerV3.wrapRightLabel,
+                                    !this.props?.isNewUIValue && CustomStyleSheet.backgroundColor('transparent')
+                                ]}
                             >
                                 {textValue != null ? (
-                                    <Text style={[styleSheets.text, stylesVnrPickerV3.styLableValue]} numberOfLines={1}>
+                                    <Text
+                                        style={[
+                                            styleSheets.text,
+                                            stylesVnrPickerV3.styLableValue,
+                                            CustomStyleSheet.maxWidth('90%')
+                                        ]}
+                                        numberOfLines={1}
+                                    >
                                         {textValue}
                                     </Text>
                                 ) : (
                                     <VnrText
-                                        style={[styleSheets.text, CustomStyleSheet.color(Colors.gray_6), stylePlaceholder, this?.props?.stylePlaceholder]}
+                                        style={[
+                                            styleSheets.text,
+                                            CustomStyleSheet.color(Colors.gray_6),
+                                            stylePlaceholder,
+                                            this?.props?.stylePlaceholder
+                                        ]}
                                         i18nKey={
                                             !Vnr_Function.CheckIsNullOrEmpty(stateProps.placeholder)
                                                 ? stateProps.placeholder
@@ -539,11 +553,17 @@ export default class VnrPickerQuickly extends React.Component {
                                             <IconWarn color={Colors.red} size={Size.iconSize - 2} />
                                         </View>
                                     ) : stateProps.clearText == true && textValue != null ? (
-                                        <TouchableOpacity onPress={this.clearDate} style={stylesVnrPickerV3.styBtnClear}>
+                                        <TouchableOpacity
+                                            onPress={this.clearDate}
+                                            style={stylesVnrPickerV3.styBtnClear}
+                                        >
                                             <IconCancel size={Size.iconSize - 2} color={Colors.grey} />
                                         </TouchableOpacity>
                                     ) : (
-                                        <IconDown size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_6} />
+                                        <IconDown
+                                            size={Size.iconSize}
+                                            color={disable ? Colors.gray_7 : Colors.gray_6}
+                                        />
                                     )}
                                 </View>
                             </View>
@@ -573,7 +593,10 @@ export default class VnrPickerQuickly extends React.Component {
                     }
                     style={CustomStyleSheet.margin(0)}
                 >
-                    <TouchableWithoutFeedback onPress={() => this.closeModal()} accessibilityLabel={'VnrPicker-CloseModal'}>
+                    <TouchableWithoutFeedback
+                        onPress={() => this.closeModal()}
+                        accessibilityLabel={'VnrPicker-CloseModal'}
+                    >
                         <KeyboardAvoidingView style={CustomStyleSheet.flex(1)} behavior={'height'}>
                             <View
                                 style={
@@ -582,21 +605,14 @@ export default class VnrPickerQuickly extends React.Component {
                                             flex: 1,
                                             backgroundColor: Colors.white
                                         }
-                                        : [
-                                            stylesModalPopupBottom.viewEditModal
-                                        ]
+                                        : [stylesModalPopupBottom.viewEditModal]
                                 }
                             >
                                 <SafeAreaView style={ScroollviewModal}>
                                     {viewTitlePicker}
                                     {stateProps.filter === true && (
                                         <View style={topModal}>
-                                            <View
-                                                style={[
-                                                    headerSearch,
-                                                    CustomStyleSheet.marginVertical(10)
-                                                ]}
-                                            >
+                                            <View style={[headerSearch, CustomStyleSheet.marginVertical(10)]}>
                                                 <Icon name={iconNameSearch} size={Size.iconSize} color={Colors.grey} />
                                                 <VnrTextInput
                                                     accessibilityLabel={'VnrPicker-Filter'}
@@ -608,7 +624,7 @@ export default class VnrPickerQuickly extends React.Component {
                                                         )
                                                     }
                                                     placeholder={translate('HRM_Common_Search')}
-                                                    onChangeText={text => this.changeSearchBar(text)}
+                                                    onChangeText={(text) => this.changeSearchBar(text)}
                                                     value={searchText}
                                                     style={textInput}
                                                     returnKeyType="search"

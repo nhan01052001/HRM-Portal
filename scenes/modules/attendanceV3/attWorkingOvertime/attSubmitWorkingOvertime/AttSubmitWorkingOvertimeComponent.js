@@ -84,7 +84,7 @@ const initSateDefault = {
         value: null,
         data: [],
         visible: false,
-        visibleConfig: true
+        visibleConfig: false
     },
     TempShiftID: {
         disable: false,
@@ -888,11 +888,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     Profiles: {
                         ...Profiles,
                         ..._profile
-                    },
-                    WorkDate: {
-                        ...WorkDate,
-                        value: value ? value : null,
-                        refresh: !WorkDate.refresh
                     },
                     isRefreshState: !isRefreshState
                 },
@@ -1967,7 +1962,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
         const {
                 isShowDelete,
                 fieldConfig,
-                value,
                 onDeleteItemDay,
                 indexDay,
                 onScrollToInputIOS,
@@ -2064,7 +2058,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                         key={WorkDate.id}
                         lable={WorkDate.lable}
                         refresh={WorkDate.refresh}
-                        value={value}
+                        value={WorkDate.value ?? {}}
                         displayOptions={false}
                         onlyChooseEveryDay={false}
                         onlyChooseOneDay={true}

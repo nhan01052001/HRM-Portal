@@ -1646,11 +1646,12 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
                     <TouchableOpacity
                         onPress={() => {
                             if (Array.isArray(this.state?.listRenderData)) {
-                                if (this.state?.listRenderData.length > 1)
+                                if (this.state?.listRenderData.length > 0) {
+                                    let max = Math.max(...this.state?.listRenderData);
                                     this.setState({
-                                        listRenderData: [...this.state?.listRenderData, this.state?.listRenderData.length + 1]
+                                        listRenderData: [...this.state?.listRenderData, max + 1]
                                     });
-
+                                }
                             }
                         }}
                         activeOpacity={0.7}
@@ -2735,7 +2736,6 @@ const customStyles = StyleSheet.create({
 
     wrapApprovalProcess: {
         flex: 1,
-        backgroundColor: Colors.white,
-        padding: 12
+        backgroundColor: Colors.white
     }
 });
