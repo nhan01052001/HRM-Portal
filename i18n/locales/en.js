@@ -156,5 +156,21 @@ export default {
     'HRM_PortalApp_TakeBusinessTrip_ViewBy': 'View By',
     'HRM_PortalApp_TakeBusinessTrip_Plan': 'Plan',
     'HRM_PortalApp_TakeBusinessTrip_Result': 'Result',
-    'HRM_PortalApp_TakeBusinessTrip_EmployeeCount': 'Employee Count'
+    'HRM_PortalApp_TakeBusinessTrip_EmployeeCount': 'Employee Count',
+    
+    'HRM_PortalApp_LeaveDay_IsPermissionLeave': 'Is Permission Leave',
+    'HRM_PortalApp_LeaveDay_ RemainingLeaveBalance': 'Remaining leave balance',
+    'HRM_PortalApp_LeaveDay_TotalLeaveDaysTaken': 'Total number of leave days taken',
+
+    HRM_PortalApp_TakeBusinessTrip_HoursFrom: 'Hours from',
+    HRM_PortalApp_TakeBusinessTrip_HoursTo: 'Hours to',
+
+
+    HRM_PortalApp_TakeBusinessTrip_TotalBizTripDays: 'BizTrip Days',
+    HRM_PortalApp_TakeBusinessTrip_Time: 'Time',
+    HRM_PortalApp_TakeBusinessTrip_Location: 'Location',
+    HRM_PortalApp_TakeBusinessTrip_ContactInfo: 'Contact Info',
+    HRM_PortalApp_TakeBusinessTrip_Content: 'Content',
+    HRM_PortalApp_TakeBusinessTrip_PreparationWork: 'Preparation Work',
+    HRM_PortalApp_TakeBusinessTrip_Attachments: 'Attachments'
 };

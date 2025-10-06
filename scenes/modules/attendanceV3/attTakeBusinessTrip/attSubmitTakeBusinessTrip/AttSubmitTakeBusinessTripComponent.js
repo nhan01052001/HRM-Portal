@@ -1,6 +1,7 @@
+/* eslint-disable indent */
 import React from 'react';
-import { View, TouchableOpacity, Platform } from 'react-native';
-import { Colors, CustomStyleSheet, styleSheets, stylesVnrPickerV3 } from '../../../../../constants/styleConfig';
+import { View, TouchableOpacity, Text, Platform, StyleSheet } from 'react-native';
+import { styleSheets, stylesVnrPickerV3, Colors, styleValid, CustomStyleSheet } from '../../../../../constants/styleConfig';
 import VnrText from '../../../../../components/VnrText/VnrText';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import VnrDate from '../../../../../componentsV3/VnrDate/VnrDate';
@@ -14,15 +15,15 @@ import moment from 'moment';
 import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import { translate } from '../../../../../i18n/translate';
-// import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle';
 import styleComonAddOrEdit from '../../../../../constants/styleComonAddOrEdit';
 import DrawerServices from '../../../../../utils/DrawerServices';
+import CheckBox from 'react-native-check-box';
 import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle';
 
 const initSateDefault = {
     DateRage: {
         value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_TotalBizTripDays',
+        lable: 'HRM_PortalApp_TakeLeave_WorkDate',
         disable: false,
         refresh: false,
         visible: true,
@@ -30,88 +31,34 @@ const initSateDefault = {
     },
     HoursFrom: {
         value: null,
-        lable: 'Thời gian từ',
+        lable: 'HRM_PortalApp_TakeLeave_HoursFrom',
         disable: false,
         refresh: false,
-        visible: true,
+        visible: false,
         visibleConfig: true
     },
     HoursTo: {
         value: null,
-        lable: 'Thời gian đến',
+        valueConfigRegisterHours: null,
+        lable: 'HRM_PortalApp_TakeLeave_HoursTo',
+        data: [],
         disable: false,
         refresh: false,
-        visible: true,
+        visible: false,
         visibleConfig: true
     },
     DurationType: {
         value: null,
         data: [],
-        lable: 'HRM_PortalApp_TakeBusinessTrip_DurationType',
+        lable: 'HRM_PortalApp_TakeLeave_DurationType',
         disable: false,
         refresh: false,
         visible: false,
         visibleConfig: true
     },
-    BusinessTripTypeID: {
+    LeaveDayTypeID: {
         value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_LeaveDayTypeID',
-        disable: true,
-        refresh: false,
-        visible: false,
-        visibleConfig: true
-    },
-    PlaceFrom: {
-        value: null,
-        lable: 'PlaceFrom',
-        disable: true,
-        refresh: false,
-        visible: false,
-        visibleConfig: true
-    },
-    ContactInfo: {
-        value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_ContactInfo',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
-    PlaceInFromID: {
-        value: null,
-        lable: 'PlaceFrom',
-        disable: true,
-        refresh: false,
-        visible: false,
-        visibleConfig: true
-    },
-    PlaceInToID: {
-        value: null,
-        lable: 'ContactInfo',
-        disable: true,
-        refresh: false,
-        visible: false,
-        visibleConfig: true
-    },
-    PlaceOutToID: {
-        value: null,
-        lable: 'ContactInfo',
-        disable: true,
-        refresh: false,
-        visible: false,
-        visibleConfig: true
-    },
-    PlaceSendToID: {
-        value: null,
-        lable: 'PlaceSendToID',
-        disable: true,
-        refresh: false,
-        visible: false,
-        visibleConfig: true
-    },
-    BusinessTripReasonID: {
-        value: null,
-        lable: 'HRM_Attendance_BusinessTravel_BusinessTripReasonID',
+        lable: 'HRM_PortalApp_TakeLeave_LeaveDayTypeID',
         disable: true,
         refresh: false,
         visible: false,
@@ -119,136 +66,116 @@ const initSateDefault = {
     },
     LeaveDays: {
         value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_LeaveDays',
+        lable: 'HRM_PortalApp_TakeLeave_LeaveDays',
         visible: false,
         visibleConfig: true
     },
     LeaveHours: {
         value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_LeaveHours',
-        visible: false,
+        lable: 'HRM_PortalApp_TakeLeave_LeaveHours',
+        visible: true,
         visibleConfig: true
     },
     ShiftID: {
-        value: null
+        lable: 'HRM_Attendance_InOut_ShiftID',
+        value: null,
+        visible: false,
+        refresh: false,
+        visibleConfig: true,
+        disable: false
     },
-    BusinessReason: {
+    BirthType: {
+        data: null,
+        value: null,
+        lable: 'HRM_PortalApp_TakeLeave_BirthType',
+        disable: false,
+        refresh: false,
+        visible: false,
+        visibleConfig: true,
+        isValid: false
+    },
+    Children: {
         value: '',
-        lable: 'HRM_PortalApp_TSLRegister_Comment',
+        lable: 'HRM_PortalApp_TakeLeave_Children',
+        disable: false,
+        refresh: false,
+        visible: false,
+        visibleConfig: true,
+        isValid: false
+    },
+    ListLeaveDayTypeDefault: {
+        value: null,
+        data: null
+    },
+    Comment: {
+        value: '',
+        lable: 'HRM_PortalApp_TakeLeave_Comment',
         disable: true,
         refresh: false,
         visible: true,
         visibleConfig: true
     },
     FileAttachment: {
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Attachments',
+        lable: 'HRM_PortalApp_TakeLeave_FileAttachment',
         visible: true,
         visibleConfig: true,
         disable: true,
         refresh: false,
         value: null
     },
-
-    VehicleID: {
-        value: null,
-        api: {
-            urlApi: '[URI_CENTER]/api/Cat_GetData/GetMultiVehicle',
-            type: 'E_GET'
-        },
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Vehicles',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
-    MissionDistanceID: {
-        value: null,
-        api: {
-            urlApi: '[URI_CENTER]/api/Cat_GetData/GetMissionDistanceMulti',
-            type: 'E_GET'
-        },
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Distance',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
-    TravelWarrantID: {
-        value: null,
-        api: {
-            urlApi: '[URI_CENTER]/api/Cat_GetData/GetTravelWarrantMulti',
-            type: 'E_GET'
-        },
-        lable: 'HRM_PortalApp_TakeBusinessTrip_TravelPaper',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
-    NoNightStay: {
-        value: '',
-        lable: 'HRM_PortalApp_TakeBusinessTrip_HotelDays',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
-    TypeOfServiceID: {
-        value: null,
-        api: {
-            urlApi: '[URI_CENTER]/api/Cat_GetData/GetTypeOfServiceMulti',
-            type: 'E_GET'
-        },
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Service',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
-    OrtherInfo: {
-        value: '',
-        lable: 'HRM_PortalApp_TakeBusinessTrip_OrtherDetail',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
     timeRangeFromRoster: null,
     lstLeaveDaysHours: {},
-    SumDays: 1,
-
-    Location: {
-        value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Location',
-        disable: false,
-        refresh: false,
+    acIsCheckEmpty: false,
+    RequiredDocuments: '',
+    AddEmployee: {
+        lable: 'HRM_PortalApp_TakeLeave_ToNeedAReplacement',
+        subLable: 'HRM_PortalApp_TakeLeave_ChooseReplacementIfHave',
+        value: false,
         visible: true,
+        refresh: false,
         visibleConfig: true,
-        data: []
+        disable: false
     },
-    Content: {
-        value: '',
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Content',
+    Substitute: {
+        data: null,
+        value: null,
+        lable: 'HRM_PortalApp_TakeLeave_SubstituteID',
         disable: false,
         refresh: false,
-        visible: true,
-        visibleConfig: true
+        visible: false,
+        visibleConfig: true,
+        isValid: false
     },
-
-    PreparationWork: {
-        value: '',
-        lable: 'HRM_PortalApp_TakeBusinessTrip_PreparationWork',
+    FileAttach: {
+        lable: 'HRM_PortalApp_DocumentToSubmit',
+        visible: false,
+        visibleConfig: true,
         disable: false,
         refresh: false,
-        visible: true,
+        value: null
+    },
+    RelativeTypeID: {
+        value: null,
+        lable: 'HRM_HR_Relatives_RelativeTypeID',
+        disable: false,
+        refresh: false,
+        visible: false,
         visibleConfig: true
+    },
+    IsPermissionLeave: {
+        lable: 'HRM_PortalApp_LeaveDay_IsPermissionLeave',
+        value: false,
+        visible: true,
+        refresh: false,
+        visibleConfig: true,
+        disable: false
     }
 };
 
-const DATA_DURATION_FULL = ['E_FULLSHIFT', 'E_FIRSTHALFSHIFT', 'E_LASTHALFSHIFT', 'E_BYHOURS'],
+const DATA_DURATION_FULL = ['E_FULLSHIFT', 'E_FIRSTHALFSHIFT', 'E_LASTHALFSHIFT', 'E_MIDDLEOFSHIFT'],
     DATA_DURATION_HAlF = ['E_FULLSHIFT', 'E_FIRST', 'E_LAST', 'E_FIRST_AND_LAST'];
 
-class AttSubmitTakeBusinessTripComponent extends React.Component {
+class AttTakeLeaveDayComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -259,10 +186,12 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 disable: true
             },
             isConfigMultiTimeInOut: true,
-            isRefreshState: false,
-            isShowOrther: false
+            isRefreshState: false
         };
+
         this.layoutHeightItem = null;
+        this.ShiftIDByDate = null;
+        this.IsHaveListRegisterHours = null;
     }
 
     // Những trường hợp được phép render lại
@@ -273,27 +202,25 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             nextProps.acIsCheckEmpty !== this.props.acIsCheckEmpty ||
             // thay đổi state value thì mới render lại
             nextState.isRefreshState !== this.state.isRefreshState ||
-            nextState.isShowOrther !== this.state.isShowOrther ||
             // thay đổi state value thì mới render lại
             // nextState.DateStart.value !== this.state.DateStart.value ||
             // nextState.DateEnd.value !== this.state.DateEnd.value ||
             nextState.HoursFrom.value !== this.state.HoursFrom.value ||
             nextState.HoursTo.value !== this.state.HoursTo.value ||
             nextState.DurationType.value !== this.state.DurationType.value ||
-            nextState.BusinessReason.value !== this.state.BusinessReason.value ||
-            nextState.BusinessTripTypeID.value !== this.state.BusinessTripTypeID.value ||
+            nextState.Comment.value !== this.state.Comment.value ||
+            nextState.LeaveDayTypeID.value !== this.state.LeaveDayTypeID.value ||
             nextState.FileAttachment.value !== this.state.FileAttachment.value ||
             nextState.LeaveDays.value !== this.state.LeaveDays.value ||
             nextState.LeaveHours.value !== this.state.LeaveHours.value ||
-            nextState.PlaceFrom !== this.state.PlaceFrom ||
-            nextState.ContactInfo !== this.state.ContactInfo ||
-            nextState.PlaceInFromID !== this.state.PlaceInFromID ||
-            nextState.PlaceInToID !== this.state.PlaceInToID ||
-            nextState.PlaceOutToID !== this.state.PlaceOutToID ||
-            nextState.PlaceSendToID !== this.state.PlaceSendToID ||
-            nextState.BusinessTripReasonID !== this.state.BusinessTripReasonID ||
-            nextState.Content.value !== this.state.Content.value ||
-            nextState.PreparationWork.value !== this.state.PreparationWork.value
+            nextState.Children.value !== this.state.Children.value ||
+            nextState.BirthType.value !== this.state.BirthType.value ||
+            nextState.RequiredDocuments !== this.state.RequiredDocuments ||
+            nextState.acIsCheckEmpty !== this.state.acIsCheckEmpty.value ||
+            nextState.ShiftID.value !== this.state.ShiftID.value ||
+            nextState.AddEmployee.value !== this.state.AddEmployee.value ||
+            nextState.FileAttach.value !== this.state.FileAttach.value ||
+            nextState.RelativeTypeID.value !== this.state.RelativeTypeID.value
         ) {
             return true;
         } else {
@@ -314,7 +241,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             return {
                 dataDurationType: lstDurationType,
                 DateStart: DateRage.value[0],
-                DateEnd: DateRage.value[DateRage.value.length - 1]
+                DateEnd: DateRage.value[0]
             };
         } else if (
             DateRage.value &&
@@ -347,19 +274,20 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
     getTxtTotalCount = () => {
         const { LeaveDays, LeaveHours } = this.state;
-        if (LeaveDays.value != null && LeaveDays.value != null) {
-            if (LeaveDays.visible && LeaveHours.visible) {
-                return `${translate(LeaveDays.lable)}: (${Vnr_Function.mathRoundNumber(LeaveDays.value)} ${translate(
+        const { fieldConfig } = this.props;
+        if (LeaveDays.value != null && LeaveDays.value != undefined) {
+            if (LeaveDays.visible && fieldConfig?.LeaveHours?.visibleConfig && LeaveHours.visible) {
+                return `${translate(LeaveDays.lable)}: (${LeaveDays.value} ${translate(
                     'HRM_PortalApp_Day_Lowercase'
-                )}) - ${translate(LeaveHours.lable)}: (${Vnr_Function.mathRoundNumber(LeaveHours.value)} ${translate(
+                )}) - ${translate(LeaveHours.lable)}: (${LeaveHours.value} ${translate(
                     'HRM_PortalApp_Hour_Lowercase'
                 )})`;
             } else if (LeaveDays.visible) {
-                return `${translate(LeaveDays.lable)}: (${Vnr_Function.mathRoundNumber(LeaveDays.value)} ${translate(
+                return `${translate(LeaveDays.lable)}: (${LeaveDays.value} ${translate(
                     'HRM_PortalApp_Day_Lowercase'
                 )})`;
-            } else if (LeaveHours.visible) {
-                return `${translate(LeaveHours.lable)}: (${Vnr_Function.mathRoundNumber(LeaveHours.value)} ${translate(
+            } else if (fieldConfig?.LeaveHours?.visibleConfig && LeaveHours.visible) {
+                return `${translate(LeaveHours.lable)}: (${LeaveHours.value} ${translate(
                     'HRM_PortalApp_Hour_Lowercase'
                 )})`;
             } else {
@@ -419,18 +347,17 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 isRefreshState,
                 LeaveDays,
                 LeaveHours,
+                HoursFrom,
+                HoursTo,
                 DurationType,
-                BusinessTripTypeID,
-                PlaceFrom,
-                ContactInfo,
-                PlaceInFromID,
-                PlaceInToID,
-                // eslint-disable-next-line no-unused-vars
-                PlaceOutToID,
-                PlaceSendToID,
-                BusinessTripReasonID,
-                Content,
-                PreparationWork
+                LeaveDayTypeID,
+                BirthType,
+                Children,
+                AddEmployee,
+                Substitute,
+                FileAttach,
+                RelativeTypeID,
+                IsPermissionLeave
             } = this.state;
 
         const profileInfo = dataVnrStorage
@@ -442,7 +369,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
         const { E_ProfileID, E_FullName } = EnumName,
             _profile = { ID: profileInfo[E_ProfileID], ProfileName: profileInfo[E_FullName] };
 
-        const { DateRage, FileAttachment, BusinessReason } = this.state;
+        const { DateRage, FileAttachment, Comment } = this.state;
 
         if (record) {
             // Modify
@@ -482,6 +409,32 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         }
                     };
                 }
+
+                if (record.DurationType == EnumName.E_MIDDLEOFSHIFT) {
+                    nextState = {
+                        ...nextState,
+                        HoursFrom: {
+                            ...HoursFrom,
+                            visible: true
+                        },
+                        HoursTo: {
+                            ...HoursTo,
+                            visible: true
+                        }
+                    };
+                } else {
+                    nextState = {
+                        ...nextState,
+                        HoursFrom: {
+                            ...HoursFrom,
+                            visible: false
+                        },
+                        HoursTo: {
+                            ...HoursTo,
+                            visible: false
+                        }
+                    };
+                }
             }
 
             let nextState = {
@@ -495,14 +448,17 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     value: dayValue,
                     refresh: !DateRage.refresh
                 },
-                BusinessTripTypeID: {
-                    ...BusinessTripTypeID,
+                LeaveDayTypeID: {
+                    ...LeaveDayTypeID,
                     disable: false,
                     visible: true,
-                    value: record.BusinessTripTypeID
-                        ? { BusinessTravelName: record.BusinessTravelName, ID: record.BusinessTripTypeID }
+                    value: record.LeaveDayTypeID
+                        ? {
+                            LeaveDayTypeName: `${record.LeaveDayTypeCode} - ${record.LeaveDayTypeName}`,
+                            ID: record.LeaveDayTypeID
+                        }
                         : null,
-                    refresh: !BusinessTripTypeID.refresh
+                    refresh: !LeaveDayTypeID.refresh
                 },
                 DurationType: {
                     ...DurationType,
@@ -511,12 +467,12 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     value: record.DurationType ? { Text: record.DurationTypeView, Value: record.DurationType } : null,
                     refresh: !DurationType.refresh
                 },
-                BusinessReason: {
-                    ...BusinessReason,
+                Comment: {
+                    ...Comment,
                     disable: false,
                     visible: true,
-                    value: record.Note ? record.Note : null,
-                    refresh: !BusinessReason.refresh
+                    value: record.Comment ? record.Comment : null,
+                    refresh: !Comment.refresh
                 },
                 LeaveDays: {
                     ...nextState.LeaveDays,
@@ -528,89 +484,60 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 },
                 HoursFrom: {
                     ...nextState.HoursFrom,
-                    value: record.HourFrom ? moment(record.HourFrom) : null
+                    value: record.HoursFrom ? moment(record.HoursFrom) : null
                 },
                 HoursTo: {
                     ...nextState.HoursTo,
-                    value: record.HourTo ? moment(record.HourTo) : null
+                    valueConfigRegisterHours: record?.LeaveHours ? {
+                        'Value': record?.LeaveHours,
+                        'Text': `${record?.LeaveHours}`,
+                        'isSelect': true
+                    } : null,
+                    value: record.HoursTo ? moment(record.HoursTo) : null
                 },
-                PlaceSendToID: {
-                    ...PlaceSendToID,
+                BirthType: {
+                    ...BirthType,
+                    disable: false,
+                    visible: record.BirthType ? true : false,
+                    value: record.BirthType ? { Value: record.BirthType, Text: record.BirthTypeName } : null,
+                    refresh: !BirthType.refresh
+                },
+                Children: {
+                    ...Children,
+                    disable: false,
+                    visible: record.Children ? true : false,
+                    value: record.Children ? `${record.Children}` : null,
+                    refresh: !Children.refresh
+                },
+                AddEmployee: {
+                    ...AddEmployee,
                     disable: false,
                     visible: true,
-                    value: record.PlaceSendToID
-                        ? { WorkPlaceName: record.PlaceSendToName, ID: record.PlaceSendToID }
+                    value: record.IsSubstitute ? true : false,
+                    refresh: !AddEmployee.refresh
+                },
+                Substitute: {
+                    ...Substitute,
+                    visible: record.IsSubstitute ? true : false,
+                    value: record.SubstituteID
+                        ? { JoinProfileNameCode: record.SubstituteName, ID: record.SubstituteID }
                         : null,
-                    refresh: !PlaceSendToID.refresh
+                    refresh: !Substitute.refresh
                 },
-                BusinessTripReasonID: {
-                    ...BusinessTripReasonID,
-                    disable: false,
-                    value: record.BusinessTripReasonID
-                        ? { BusinessTripReasonName: record.BusinessTripReasonName, ID: record.BusinessTripReasonID }
+                RelativeTypeID: {
+                    ...RelativeTypeID,
+                    visible: record.RelativeTypeID ? true : false,
+                    value: record.RelativeTypeID
+                        ? { RelativeTypeName: `${record.RelativeTypeCode} - ${record.RelativeTypeName}`, ID: record.RelativeTypeID }
                         : null,
-                    visible: true,
-                    refresh: !BusinessTripReasonID.refresh
+                    refresh: !RelativeTypeID.refresh
                 },
-                Content: {
-                    ...Content,
-                    disable: false,
-                    visible: true,
-                    value: record.Content ? record.Content : null,
-                    refresh: !Content.refresh
-                },
-                PreparationWork: {
-                    ...PreparationWork,
-                    disable: false,
-                    visible: true,
-                    value: record.PreparationWork ? record.PreparationWork : null,
-                    refresh: !PreparationWork.refresh
+                IsPermissionLeave: {
+                    ...IsPermissionLeave,
+                    value: record.IsPermissionLeave ?? false,
+                    refresh: !IsPermissionLeave.refresh
                 }
             };
-
-            if (record.IsInTravel) {
-                nextState = {
-                    ...nextState,
-                    PlaceFrom: {
-                        ...PlaceFrom,
-                        disable: false,
-                        visible: true,
-                        value: record.PlaceFrom ? record.PlaceFrom : null,
-                        refresh: !PlaceFrom.refresh
-                    },
-                    ContactInfo: {
-                        ...ContactInfo,
-                        disable: false,
-                        visible: true,
-                        value: record.ContactInfo ? record.ContactInfo : null,
-                        refresh: !ContactInfo.refresh
-                    }
-                };
-            } else if (record.IsDomesticTravel) {
-                nextState = {
-                    ...nextState,
-                    PlaceInFromID: {
-                        ...PlaceInFromID,
-                        disable: false,
-                        visible: true,
-                        value: record.PlaceInFromID
-                            ? { ProvinceCodeName: record.PlaceInFromName, ID: record.PlaceInFromID }
-                            : null,
-                        refresh: !PlaceInFromID.refresh
-                    },
-                    PlaceInToID: {
-                        ...PlaceInToID,
-                        disable: false,
-                        visible: true,
-                        value: record.PlaceInToID
-                            ? { ProvinceCodeName: record.PlaceInToName, ID: record.PlaceInToID }
-                            : null,
-                        refresh: !PlaceInToID.refresh
-                    }
-                };
-            } else if (record.IsOutTravel) {
-                this.getDataPlaceOutTo(record);
-            }
 
             // Value Acttachment
             if (record.FileAttachment) {
@@ -637,10 +564,35 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 };
             }
 
+            // Value FileAttach
+            if (record.FileAttach) {
+                let valFile = ManageFileSevice.setFileAttachApp(record.FileAttach);
+
+                nextState = {
+                    ...nextState,
+                    FileAttach: {
+                        ...FileAttach,
+                        disable: false,
+                        value: (valFile && valFile.length > 0) ? valFile : null,
+                        refresh: !FileAttach.refresh
+                    }
+                };
+            }
+            else {
+                nextState = {
+                    ...nextState,
+                    FileAttach: {
+                        ...FileAttach,
+                        disable: false,
+                        value: null,
+                        refresh: !FileAttach.refresh
+                    }
+                };
+            }
+
             this.setState(nextState, () => {
                 this.getDataLeavedayType(true);
-                this.getDataBusinessTripReason();
-                this.getDataPlaceSend();
+                this.getRosterForCheckLeaveday();
             });
         } else {
             this.setState(
@@ -660,36 +612,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
         }
     };
 
-    getDataPlaceSend = async () => {
-        const { PlaceSendToID } = this.state;
-        const resPlaceSend = await HttpService.Get(
-            '[URI_CENTER]/api/Att_GetData/GetMultiWorkPlaceCodeNameWhichEmailNotNull?text=&TextField=SendToID'
-        );
-        this.setState({
-            PlaceSendToID: {
-                ...PlaceSendToID,
-                data: resPlaceSend.Data,
-                disable: false,
-                visible: true
-            }
-        });
-    };
-
-    getDataBusinessTripReason = async () => {
-        const { BusinessTripReasonID } = this.state;
-        const resBusinessTripReasonID = await HttpService.Get(
-            '[URI_CENTER]/api/Att_GetData/GetMultiBussinessTripReason?text=&TextField=BusinessTripReasonName'
-        );
-        this.setState({
-            BusinessTripReasonID: {
-                ...BusinessTripReasonID,
-                data: resBusinessTripReasonID.Data,
-                disable: false,
-                visible: true
-            }
-        });
-    };
-
     componentDidMount() {
         this.initState();
     }
@@ -701,7 +623,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
     //#region Step 2: Change DateRage. Lấy dữ liệu data leaveDayType và Duration
     onChangeDateRage = (item, isFromInit) => {
-        const { DateRage, FileAttachment, BusinessReason, isRefreshState } = this.state;
+        const { DateRage, FileAttachment, Comment, isRefreshState } = this.state;
         this.setState(
             {
                 DateRage: {
@@ -709,10 +631,10 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     value: item,
                     refresh: !DateRage.refresh
                 },
-                BusinessReason: {
-                    ...BusinessReason,
+                Comment: {
+                    ...Comment,
                     disable: false,
-                    refresh: !BusinessReason.refresh
+                    refresh: !Comment.refresh
                 },
                 FileAttachment: {
                     ...FileAttachment,
@@ -723,8 +645,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             },
             () => {
                 this.getDataLeavedayType();
-                this.getDataBusinessTripReason();
-                this.getDataPlaceSend();
+
                 // gọi từ componentsDidmount thì k cần gọi
                 if (!isFromInit) {
                     // Cập nhật lại ngày đăng ký bên ngoài
@@ -737,20 +658,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
         );
     };
 
-    getDataPlaceOutTo = async (record) => {
-        const { PlaceOutToID } = this.state;
-        const resCountry = await HttpService.Get('[URI_CENTER]/api/Cat_GetData/GetMultiCountry');
-        this.setState({
-            PlaceOutToID: {
-                ...PlaceOutToID,
-                disable: false,
-                data: resCountry.Data,
-                visible: true,
-                value: record.PlaceOutToID ? { CountryCodeName: record.PlaceOutToName, ID: record.PlaceOutToID } : null,
-                refresh: !PlaceOutToID.refresh
-            }
-        });
-    };
+    onChangeDateRageOnly = () => { };
 
     getDataLeavedayType = async (isFromModify) => {
         const {
@@ -758,13 +666,20 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             Profile,
             LeaveDays,
             LeaveHours,
-            BusinessTripTypeID,
+            LeaveDayTypeID,
             DurationType,
             ShiftID,
             HoursFrom,
             HoursTo,
-            isRefreshState
+            isRefreshState,
+            ListLeaveDayTypeDefault,
+            BirthType,
+            Children,
+            FileAttach,
+            FileAttachment
         } = this.state;
+        const { getHighSupervisor } = this.props;
+
         try {
             if (DateRage.value) {
                 if (DateRage.value && Array.isArray(DateRage.value) && DateRage.value.length > 1) {
@@ -776,12 +691,16 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         LeaveDays: 0,
                         LeaveHours: 0,
                         ListShift: {},
-                        lstLeaveDaysHours: {}
+                        lstLeaveDaysHours: {},
+                        DurationType: {
+                            value: null,
+                            data: []
+                        }
                     };
 
                     const dataDurationType = DATA_DURATION_FULL.map((key) => {
-                            return { Text: translate(key), Value: key };
-                        }),
+                        return { Text: translate(key), Value: key };
+                    }),
                         { DateStart, DateEnd } = this.getDate(),
                         dataBody = {
                             DateStart: Vnr_Function.formatDateAPI(DateStart),
@@ -790,37 +709,29 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             ListProfileID: [Profile.ID]
                         };
 
-                    const resLeaveType = await HttpService.Post(
-                        '[URI_CENTER]/api/Att_GetData/GetBussinessTravelTypeByDate',
-                        {
-                            // lấy cùng 1 ngày
-                            DateFrom: dataBody.DateStart,
-                            DateTo: dataBody.DateStart,
-                            // ...dataBody,
-                            // ProfileID: Profile.ID,
-                            MultiProfile: 1
-                        }
-                    );
+                    const resLeaveType = await HttpService.Post('[URI_CENTER]/api/Att_GetData/GetLeaveTypeByGrade', {
+                        ...dataBody,
+                        ProfileID: Profile.ID
+                    });
 
                     for (let index = 0; index < DateRage.value.length; index++) {
                         const item = DateRage.value[index];
 
                         const resRoster = await HttpService.Post(
-                            '[URI_CENTER]/api/Att_BussinessTravel/GetRosterForCheckBusinessTrip',
+                            '[URI_CENTER]/api/Att_LeaveDay/GetRosterForCheckLeaveDay',
                             {
                                 ...dataBody,
-                                DateStart: moment(item).format('YYYY/MM/DD'),
-                                DateEnd: moment(item).format('YYYY/MM/DD')
+                                DateStart: Vnr_Function.formatDateAPI(item),
+                                DateEnd: Vnr_Function.formatDateAPI(item)
                             }
                         );
 
                         const resData = resRoster.Data;
                         if (resData) {
                             if (resData.IsNonShift && resData.MessageError) {
-                                this.ToasterSevice().showWarning(
-                                    `${moment(item).format('DD/MM/YYYY')} ${resData.MessageError}`,
-                                    5000
-                                );
+                                this.props
+                                    .ToasterSevice()
+                                    .showWarning(`${moment(item).format('DD/MM/YYYY')} ${resData.MessageError}`, 5000);
                             }
 
                             // Cộng lại tổng giờ nghỉ và tổng ngày nghỉ lại
@@ -837,7 +748,61 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             if (resData.ListShift && resData.ListShift.length > 0)
                                 resData.ListShift.forEach((e) => {
                                     dataRoster.ListShift[e.ShiftID] = e;
+                                    //	0184782: [Hotfix_ KOG_v8.11. 21.01.10.217]: Lỗi hiển thị số giờ nghỉ không đúng khi đăng ký ngày nghỉ trên app.
+                                    this.ShiftIDByDate = {
+                                        ...this.ShiftIDByDate,
+                                        [`${item}`]: e.ShiftID
+                                    };
                                 });
+
+                            // nhan.nguyen: 0172432: [Hotfix_TBCBALL_v8.11.31.01.08] Modify áp dụng cấu hình "loại trừ ngày nghỉ" cho App
+                            if (
+                                Array.isArray(resData?.ListDurationTypeExclude) &&
+                                resData?.ListDurationTypeExclude.length > 0
+                            ) {
+                                let findDurationType = resData?.ListDurationTypeExclude.find(
+                                    (item) => item?.Value === resData?.DurationType
+                                );
+
+                                // default durationtype from resData
+                                let valueDuration = findDurationType
+                                    ? findDurationType
+                                    : resData?.ListDurationTypeExclude[0];
+
+                                dataRoster.DurationType.value = valueDuration;
+                                dataRoster.DurationType.data = resData?.ListDurationTypeExclude;
+                            }
+
+                            // 0185343: [hot fix OPA_v8.12.20.01.06] [App OPA] lỗi đăng ký ngày nghỉ không hiển thị field đính kèm chứng từ
+                            if (resRoster?.Data?.InsuranceType && !FileAttach?.visible) {
+                                nextState = {
+                                    ...nextState,
+                                    FileAttach: {
+                                        ...FileAttach,
+                                        visible: true,
+                                        refresh: !FileAttach.refresh
+                                    },
+                                    FileAttachment: {
+                                        ...FileAttachment,
+                                        visible: false,
+                                        refresh: !FileAttachment.refresh
+                                    }
+                                };
+                            } else if (!resRoster?.Data?.InsuranceType && FileAttach?.visible) {
+                                nextState = {
+                                    ...nextState,
+                                    FileAttach: {
+                                        ...FileAttach,
+                                        visible: false,
+                                        refresh: !FileAttach.refresh
+                                    },
+                                    FileAttachment: {
+                                        ...FileAttachment,
+                                        visible: true,
+                                        refresh: !FileAttachment.refresh
+                                    }
+                                };
+                            }
                         }
                     }
 
@@ -860,6 +825,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             value: dataRoster.LeaveHours ? dataRoster.LeaveHours : 0,
                             visible: false
                         },
+                        lstLeaveDaysHours: dataRoster.lstLeaveDaysHours,
                         DurationType: {
                             ...DurationType,
                             value: findValue ? findValue : null,
@@ -868,7 +834,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             visible: true,
                             disable: false
                         },
-                        lstLeaveDaysHours: dataRoster.lstLeaveDaysHours,
                         ShiftID: {
                             ...ShiftID,
                             value:
@@ -883,17 +848,36 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
                         nextState = {
                             ...nextState,
-                            BusinessTripTypeID: {
-                                ...BusinessTripTypeID,
+                            LeaveDayTypeID: {
+                                ...LeaveDayTypeID,
                                 value: null,
                                 data: dataLeaveType,
-                                refresh: !BusinessTripTypeID.refresh,
+                                refresh: !LeaveDayTypeID.refresh,
                                 visible: true,
                                 disable: false
                             }
                         };
                     }
-                    this.setState(nextState);
+
+                    // nhan.nguyen: 0172432: [Hotfix_TBCBALL_v8.11.31.01.08] Modify áp dụng cấu hình "loại trừ ngày nghỉ" cho App
+                    if (dataRoster.DurationType.value || dataRoster.DurationType.data.length > 0) {
+                        nextState = {
+                            ...nextState,
+                            DurationType: {
+                                ...DurationType,
+                                value: dataRoster.DurationType.value,
+                                data: dataRoster.DurationType.data,
+                                refresh: !DurationType.refresh
+                            }
+                        };
+                    }
+
+                    this.setState(nextState, () => {
+                        const { LeaveDays } = this.state;
+                        if (LeaveDays.value != null && !isFromModify) getHighSupervisor && getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
+                            Vnr_Function.formatDateAPI(DateStart),
+                            Vnr_Function.formatDateAPI(DateEnd));
+                    });
                 } else {
                     // từ ngày đến ngày và 1 ngày
                     this.showLoading(true);
@@ -902,21 +886,16 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     const dataBody = {
                         DateStart: moment(DateStart).format('YYYY/MM/DD'), //Vnr_Function.formatDateAPI(DateStart),
                         DateEnd: moment(DateEnd).format('YYYY/MM/DD'), //Vnr_Function.formatDateAPI(DateEnd),
-                        DurationType: EnumName.E_FULLSHIFT,
-                        ListProfileID: [Profile.ID]
+                        DurationType: isFromModify ? DurationType.value.Value : EnumName.E_FULLSHIFT,
+                        ListProfileID: [Profile.ID],
+                        LeaveDayTypeID: LeaveDayTypeID.value ? LeaveDayTypeID.value.ID : null
                     };
 
                     HttpService.MultiRequest([
-                        HttpService.Post(
-                            '[URI_CENTER]/api/Att_BussinessTravel/GetRosterForCheckBusinessTrip',
-                            dataBody
-                        ),
-                        HttpService.Post('[URI_CENTER]/api/Att_GetData/GetBussinessTravelTypeByDate', {
-                            DateFrom: dataBody.DateStart,
-                            DateTo: dataBody.DateEnd,
-                            // ...dataBody,
-                            // ProfileID: Profile.ID,
-                            MultiProfile: 1
+                        HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/GetRosterForCheckLeaveDay', dataBody),
+                        HttpService.Post('[URI_CENTER]/api/Att_GetData/GetLeaveTypeByGrade', {
+                            ...dataBody,
+                            ProfileID: Profile.ID
                         })
                     ]).then((resAll) => {
                         this.showLoading(false);
@@ -924,37 +903,135 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         const [resRoster, resLeaveType] = resAll;
                         let nextState = { isRefreshState: !isRefreshState };
                         if (isFromModify) {
-                            let valueDuration = DurationType.value?.Value;
-                            if (valueDuration) {
-                                valueDuration = dataDurationType.find((item) => item?.Value === valueDuration);
-                            }
-                            nextState = {
-                                ...nextState,
-                                DurationType: {
-                                    ...DurationType,
-                                    value: valueDuration,
-                                    data: dataDurationType,
-                                    refresh: !DurationType.refresh
+                            let valueDuration = DurationType.value;
+                            if (
+                                Array.isArray(resRoster?.Data?.ListDurationTypeExclude) &&
+                                resRoster?.Data?.ListDurationTypeExclude.length > 0
+                            ) {
+                                let findDurationType = resRoster?.Data?.ListDurationTypeExclude.find(
+                                    (item) => item?.Value === DurationType.value.Value
+                                );
+                                // default durationtype from resRoster
+                                if (findDurationType) {
+                                    valueDuration = findDurationType;
                                 }
-                            };
+
+                                nextState = {
+                                    ...nextState,
+                                    DurationType: {
+                                        ...DurationType,
+                                        value: valueDuration,
+                                        data: resRoster?.Data?.ListDurationTypeExclude,
+                                        refresh: !DurationType.refresh
+                                    }
+                                };
+                            } else {
+                                nextState = {
+                                    ...nextState,
+                                    DurationType: {
+                                        ...DurationType,
+                                        data: dataDurationType,
+                                        refresh: !DurationType.refresh
+                                    }
+                                };
+                            }
 
                             if (resLeaveType) {
                                 const dataLeaveType = resLeaveType.Data;
 
                                 nextState = {
                                     ...nextState,
-                                    BusinessTripTypeID: {
-                                        ...BusinessTripTypeID,
+                                    LeaveDayTypeID: {
+                                        ...LeaveDayTypeID,
                                         data: dataLeaveType,
-                                        refresh: !BusinessTripTypeID.refresh
+                                        refresh: !LeaveDayTypeID.refresh
+                                    }
+                                };
+                            }
+
+                            const dataRoster = resRoster.Data;
+
+                            // hieu.tran 171081
+                            if (dataRoster && dataRoster.ListEnumBirthType && dataRoster.ListEnumBirthType.length > 0) {
+                                nextState = {
+                                    ...nextState,
+                                    ListLeaveDayTypeDefault: {
+                                        ...ListLeaveDayTypeDefault,
+                                        data: dataRoster.ListLeaveDayTypeDefault,
+                                        value: null
+                                    },
+                                    BirthType: {
+                                        ...BirthType,
+                                        data: dataRoster.ListEnumBirthType,
+                                        value:
+                                            BirthType.value && dataRoster.ListEnumBirthType.length > 0
+                                                ? dataRoster.ListEnumBirthType.find(
+                                                    (item) => item.Value == BirthType.value.Value
+                                                )
+                                                : null,
+                                        visible: true,
+                                        refresh: BirthType.refresh
+                                    },
+                                    Children: {
+                                        ...Children,
+                                        visible: true,
+                                        refresh: Children.refresh
+                                    }
+                                };
+                            } else {
+                                nextState = {
+                                    ...nextState,
+                                    ListLeaveDayTypeDefault: {
+                                        ...ListLeaveDayTypeDefault,
+                                        data: dataRoster.ListLeaveDayTypeDefault,
+                                        value: null
+                                    },
+                                    BirthType: {
+                                        ...BirthType,
+                                        data: null,
+                                        value: null,
+                                        visible: false,
+                                        refresh: BirthType.refresh
+                                    },
+                                    Children: {
+                                        ...Children,
+                                        value: '',
+                                        visible: false,
+                                        refresh: Children.refresh
                                     }
                                 };
                             }
                         } else {
                             if (resRoster) {
                                 const dataRoster = resRoster.Data;
+                                if (dataRoster && dataRoster.ListShift && dataRoster.ListShift?.length > 1) {
+                                    dataRoster.ListShift.unshift({
+                                        ShiftName: translate('HRM_Att_TakeLeave_AllShift'),
+                                        ShiftID: null
+                                    });
+                                    nextState = {
+                                        ...nextState,
+                                        ShiftID: {
+                                            ...ShiftID,
+                                            data: dataRoster.ListShift,
+                                            visible: true,
+                                            value: { ...dataRoster.ListShift[0] }
+                                        }
+                                    };
+                                } else {
+                                    nextState = {
+                                        ...nextState,
+                                        ShiftID: {
+                                            ...ShiftID,
+                                            value:
+                                                dataRoster && dataRoster.ListShift && dataRoster.ListShift?.length > 0
+                                                    ? { ...dataRoster.ListShift[0] }
+                                                    : null
+                                        }
+                                    };
+                                }
                                 if (dataRoster && dataRoster.IsNonShift && dataRoster.MessageError) {
-                                    this.ToasterSevice().showWarning(dataRoster.MessageError, 5000);
+                                    this.props.ToasterSevice().showWarning(dataRoster.MessageError, 5000);
                                 }
 
                                 let findValue = null;
@@ -986,24 +1063,66 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                                         visible: true,
                                         disable: false
                                     },
-                                    ShiftID: {
-                                        ...ShiftID,
-                                        value:
-                                            dataRoster && dataRoster.ListShift && dataRoster.ListShift.length > 0
-                                                ? dataRoster.ListShift.map((e) => e.ShiftID).join(',')
-                                                : null
-                                    },
                                     HoursFrom: {
                                         ...HoursFrom,
                                         value: dataRoster && dataRoster.HoursFrom ? dataRoster.HoursFrom : null,
-                                        refresh: !HoursFrom.refresh
+                                        visible: false
                                     },
                                     HoursTo: {
                                         ...HoursTo,
                                         value: dataRoster && dataRoster.HoursTo ? dataRoster.HoursTo : null,
-                                        refresh: !HoursTo.refresh
+                                        visible: false
                                     }
                                 };
+
+                                // hieu.tran 171081
+                                if (
+                                    dataRoster &&
+                                    dataRoster.ListEnumBirthType &&
+                                    dataRoster.ListEnumBirthType.length > 0
+                                ) {
+                                    nextState = {
+                                        ...nextState,
+                                        ListLeaveDayTypeDefault: {
+                                            ...ListLeaveDayTypeDefault,
+                                            data: dataRoster.ListLeaveDayTypeDefault,
+                                            value: null
+                                        },
+                                        BirthType: {
+                                            ...BirthType,
+                                            data: dataRoster.ListEnumBirthType,
+                                            visible: true,
+                                            refresh: BirthType.refresh
+                                        },
+                                        Children: {
+                                            ...Children,
+                                            visible: true,
+                                            refresh: Children.refresh
+                                        }
+                                    };
+                                } else {
+                                    nextState = {
+                                        ...nextState,
+                                        ListLeaveDayTypeDefault: {
+                                            ...ListLeaveDayTypeDefault,
+                                            data: dataRoster.ListLeaveDayTypeDefault,
+                                            value: null
+                                        },
+                                        BirthType: {
+                                            ...BirthType,
+                                            data: null,
+                                            value: null,
+                                            visible: false,
+                                            refresh: BirthType.refresh
+                                        },
+                                        Children: {
+                                            ...Children,
+                                            value: '',
+                                            visible: false,
+                                            refresh: Children.refresh
+                                        }
+                                    };
+                                }
                             }
 
                             if (resLeaveType) {
@@ -1011,18 +1130,80 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
                                 nextState = {
                                     ...nextState,
-                                    BusinessTripTypeID: {
-                                        ...BusinessTripTypeID,
+                                    LeaveDayTypeID: {
+                                        ...LeaveDayTypeID,
                                         value: null,
                                         data: dataLeaveType,
-                                        refresh: !BusinessTripTypeID.refresh,
+                                        refresh: !LeaveDayTypeID.refresh,
                                         visible: true,
                                         disable: false
                                     }
                                 };
                             }
+
+                            // nhan.nguyen: 0172432: [Hotfix_TBCBALL_v8.11.31.01.08] Modify áp dụng cấu hình "loại trừ ngày nghỉ" cho App
+                            if (
+                                Array.isArray(resRoster?.Data?.ListDurationTypeExclude) &&
+                                resRoster?.Data?.ListDurationTypeExclude.length > 0
+                            ) {
+                                let findDurationType = resRoster?.Data?.ListDurationTypeExclude.find(
+                                    (item) => item?.Value === resRoster?.Data?.DurationType
+                                );
+
+                                // default durationtype from resRoster
+                                let valueDuration = findDurationType
+                                    ? findDurationType
+                                    : resRoster?.Data?.ListDurationTypeExclude[0];
+
+                                nextState = {
+                                    ...nextState,
+                                    DurationType: {
+                                        ...DurationType,
+                                        value: valueDuration,
+                                        data: resRoster?.Data?.ListDurationTypeExclude,
+                                        refresh: !DurationType.refresh
+                                    }
+                                };
+                            }
                         }
-                        this.setState(nextState);
+
+                        // 0185343: [hot fix OPA_v8.12.20.01.06] [App OPA] lỗi đăng ký ngày nghỉ không hiển thị field đính kèm chứng từ
+                        if (resRoster?.Data?.InsuranceType && !FileAttach?.visible) {
+                            nextState = {
+                                ...nextState,
+                                FileAttach: {
+                                    ...FileAttach,
+                                    visible: true,
+                                    refresh: !FileAttach.refresh
+                                },
+                                FileAttachment: {
+                                    ...FileAttachment,
+                                    visible: false,
+                                    refresh: !FileAttachment.refresh
+                                }
+                            };
+                        } else if (!resRoster?.Data?.InsuranceType && FileAttach?.visible) {
+                            nextState = {
+                                ...nextState,
+                                FileAttach: {
+                                    ...FileAttach,
+                                    visible: false,
+                                    refresh: !FileAttach.refresh
+                                },
+                                FileAttachment: {
+                                    ...FileAttachment,
+                                    visible: true,
+                                    refresh: !FileAttachment.refresh
+                                }
+                            };
+                        }
+
+                        this.setState(nextState, () => {
+                            const { LeaveDays } = this.state;
+                            if (LeaveDays.value != null && !isFromModify) getHighSupervisor && getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
+                                Vnr_Function.formatDateAPI(DateStart),
+                                Vnr_Function.formatDateAPI(DateEnd));
+                        });
                     });
                 }
             }
@@ -1034,7 +1215,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
     //#region Step 3: Change Loại ĐK
     onchangeDuration = (item) => {
-        const { DurationType, DateRage, LeaveDays, LeaveHours } = this.state;
+        const { DurationType, DateRage, LeaveDays, LeaveHours, HoursFrom, HoursTo } = this.state;
         let nextState = {
             DurationType: {
                 ...DurationType,
@@ -1077,19 +1258,71 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     }
                 };
             }
+
+            if (item.Value == EnumName.E_MIDDLEOFSHIFT) {
+                nextState = {
+                    ...nextState,
+                    HoursFrom: {
+                        ...HoursFrom,
+                        visible: true
+                    },
+                    HoursTo: {
+                        ...HoursTo,
+                        visible: true
+                    },
+                    LeaveDays: {
+                        ...LeaveDays,
+                        visible: true
+                    }
+                };
+            } else {
+                nextState = {
+                    ...nextState,
+                    HoursFrom: {
+                        ...HoursFrom,
+                        visible: false
+                    },
+                    HoursTo: {
+                        ...HoursTo,
+                        visible: false
+                    }
+                };
+            }
         }
 
         this.setState(nextState, () => {
-            this.getRosterAfterChangeDuration();
+            this.getRosterForCheckLeaveday();
         });
     };
 
-    getRosterAfterChangeDuration = async () => {
-        const { Profile, LeaveDays, LeaveHours, DurationType, ShiftID, DateRage, HoursFrom, HoursTo } = this.state;
+    getRosterForCheckLeaveday = async (isChangeBirthTypeOrChildren = false) => {
+        const {
+            Profile,
+            LeaveDays,
+            LeaveHours,
+            DurationType,
+            ShiftID,
+            DateRage,
+            HoursFrom,
+            HoursTo,
+            LeaveDayTypeID,
+            BirthType,
+            Children,
+            ListLeaveDayTypeDefault,
+            isRefreshState,
+            FileAttach,
+            FileAttachment,
+            RelativeTypeID
+        } = this.state;
+
+        const { getHighSupervisor } = this.props;
         if (DurationType.value) {
-            if (DateRage.value && Array.isArray(DateRage.value) && DateRage.value.length > 0) {
+            if (DateRage.value && Array.isArray(DateRage.value) && DateRage.value.length > 1) {
                 // Đăng ký nhiều ngày cùng lúc
                 let nextState = {};
+                const dataDurationType = DATA_DURATION_FULL.map((key) => {
+                    return { Text: translate(key), Value: key };
+                });
                 this.showLoading(true);
 
                 const dataRoster = {
@@ -1100,20 +1333,26 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     HoursTo: {},
                     listHoursFrom: [],
                     listHoursTo: [],
-                    lstLeaveDaysHours: {}
+                    lstLeaveDaysHours: {},
+                    DurationType: {
+                        value: null,
+                        data: []
+                    },
+                    listRegisterHours: []
                 };
 
                 const dataBody = {
                     DurationType: DurationType.value ? DurationType.value.Value : null,
                     ListProfileID: [Profile.ID],
-                    ShiftID: ShiftID.value ? ShiftID.value : null
+                    ShiftID: ShiftID.value ? ShiftID.value : null,
+                    LeaveDayTypeID: LeaveDayTypeID.value ? LeaveDayTypeID.value.ID : null
                 };
 
                 for (let index = 0; index < DateRage.value.length; index++) {
                     const item = DateRage.value[index];
 
                     const resRoster = await HttpService.Post(
-                        '[URI_CENTER]/api/Att_BussinessTravel/GetRosterForCheckBusinessTrip',
+                        '[URI_CENTER]/api/Att_LeaveDay/GetRosterForCheckLeaveDay',
                         {
                             ...dataBody,
                             DateStart: Vnr_Function.formatDateAPI(item),
@@ -1122,11 +1361,30 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     );
 
                     const resData = resRoster.Data;
+
+                    // 0185682: Tách từ task 0159195: Lỗi không chặn đăng ký nghỉ phép năm theo số giờ cho phép - APP
+                    if (resData?.IsHaveListRegisterHours && Array.isArray(resData?.ListRegisterHours)) {
+                        this.IsHaveListRegisterHours = resData?.IsHaveListRegisterHours;
+                        dataRoster.listRegisterHours = resData?.ListRegisterHours;
+                    }
+
+                    if (resData && resData.ListEnumBirthType && resData.ListEnumBirthType.length > 0) {
+                        this.props.ToasterSevice().showWarning('HRM_PortalApp_TakeLeave_BirthType_NoSP', 5000);
+
+                        this.setState({
+                            LeaveDayTypeID: {
+                                ...LeaveDayTypeID,
+                                value: null,
+                                refresh: LeaveDayTypeID.refresh
+                            }
+                        });
+                        return;
+                    }
+
                     if (resData.IsNonShift && resData.MessageError) {
-                        this.ToasterSevice().showWarning(
-                            `${moment(item).format('DD/MM/YYYY')} ${resData.MessageError}`,
-                            5000
-                        );
+                        this.props
+                            .ToasterSevice()
+                            .showWarning(`${moment(item).format('DD/MM/YYYY')} ${resData.MessageError}`, 5000);
                     }
 
                     // Cộng tổng giờ nghỉ và tổng ngày nghỉ lại
@@ -1143,6 +1401,11 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     if (resData.ListShift && resData.ListShift.length > 0)
                         resData.ListShift.forEach((e) => {
                             dataRoster.ListShift[e.ShiftID] = e;
+                            //	0184782: [Hotfix_ KOG_v8.11. 21.01.10.217]: Lỗi hiển thị số giờ nghỉ không đúng khi đăng ký ngày nghỉ trên app.
+                            this.ShiftIDByDate = {
+                                ...this.ShiftIDByDate,
+                                [`${item}`]: e.ShiftID
+                            };
                         });
 
                     if (resData.HoursFrom) {
@@ -1158,6 +1421,73 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         // giữ ca
                         dataRoster.listHoursTo.push(moment(resData.HoursTo));
                     }
+
+                    // nhan.nguyen: 0172432: [Hotfix_TBCBALL_v8.11.31.01.08] Modify áp dụng cấu hình "loại trừ ngày nghỉ" cho App
+                    if (
+                        Array.isArray(resData?.ListDurationTypeExclude) &&
+                        resData?.ListDurationTypeExclude.length > 0
+                    ) {
+                        let findDurationType = resData?.ListDurationTypeExclude.find(
+                            (item) => item?.Value === resData?.DurationType
+                        );
+
+                        // default durationtype from resData
+                        let valueDuration = findDurationType ? findDurationType : resData?.ListDurationTypeExclude[0];
+
+                        dataRoster.DurationType.value = valueDuration;
+                        dataRoster.DurationType.data = resData?.ListDurationTypeExclude;
+                    } else if (resData?.DurationType) {
+                        dataRoster.DurationType.value = dataDurationType.find((e) => e.Value === resData?.DurationType);
+                    }
+
+                    // 0185343: [hot fix OPA_v8.12.20.01.06] [App OPA] lỗi đăng ký ngày nghỉ không hiển thị field đính kèm chứng từ
+                    if (resRoster?.Data?.InsuranceType && !FileAttach?.visible) {
+                        nextState = {
+                            ...nextState,
+                            FileAttach: {
+                                ...FileAttach,
+                                visible: true,
+                                refresh: !FileAttach.refresh
+                            },
+                            FileAttachment: {
+                                ...FileAttachment,
+                                visible: false,
+                                refresh: !FileAttachment.refresh
+                            }
+                        };
+                    } else if (!resRoster?.Data?.InsuranceType && FileAttach?.visible) {
+                        nextState = {
+                            ...nextState,
+                            FileAttach: {
+                                ...FileAttach,
+                                visible: false,
+                                refresh: !FileAttach.refresh
+                            },
+                            FileAttachment: {
+                                ...FileAttachment,
+                                visible: true,
+                                refresh: !FileAttachment.refresh
+                            }
+                        };
+                    }
+                    if (resData?.IsFuneral) {
+                        nextState = {
+                            ...nextState,
+                            RelativeTypeID: {
+                                ...RelativeTypeID,
+                                visible: true
+                            }
+                        };
+                    } else {
+                        nextState = {
+                            ...nextState,
+                            RelativeTypeID: {
+                                ...RelativeTypeID,
+                                value: null,
+                                visible: false
+                            }
+                        };
+                    }
                 }
 
                 // giữ ca
@@ -1166,6 +1496,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     getTimeRages = this.findIntersectionTimeFrame(dataRoster.listHoursFrom, dataRoster.listHoursTo);
 
                 this.showLoading(false);
+
                 nextState = {
                     ...nextState,
                     LeaveDays: {
@@ -1185,6 +1516,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     },
                     HoursTo: {
                         ...HoursTo,
+                        data: dataRoster.listRegisterHours,
                         value: Object.keys(dataRoster.HoursTo).length == 1 ? Object.keys(dataRoster.HoursTo)[0] : null,
                         refresh: !HoursTo.refresh
                     },
@@ -1198,13 +1530,94 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     timeRangeFromRoster: getTimeRages
                 };
 
-                this.setState(nextState, () => {
-                    if (DurationType.value?.Value == EnumName.E_BYHOURS) {
-                        this.onChangeHourFromOrHourTo();
+                // nhan.nguyen: 0172432: [Hotfix_TBCBALL_v8.11.31.01.08] Modify áp dụng cấu hình "loại trừ ngày nghỉ" cho App
+                if (dataRoster.DurationType.value && dataRoster.DurationType.data.length > 0) {
+                    nextState = {
+                        ...nextState,
+                        DurationType: {
+                            ...DurationType,
+                            value: dataRoster.DurationType.value,
+                            data: dataRoster.DurationType.data,
+                            refresh: !DurationType.refresh
+                        }
+                    };
+                } else {
+                    let findValue = dataRoster.DurationType.value;
+                    if (
+                        dataDurationType &&
+                        Array.isArray(dataDurationType) &&
+                        dataDurationType.length > 0 &&
+                        findValue == null
+                    ) {
+                        findValue = dataDurationType.find((e) => e.Value === EnumName.E_FULLSHIFT);
                     }
+
+                    nextState = {
+                        ...nextState,
+                        DurationType: {
+                            ...DurationType,
+                            value: findValue ? findValue : null,
+                            data: dataDurationType,
+                            refresh: !DurationType.refresh,
+                            visible: true,
+                            disable: false
+                        }
+                    };
+                }
+
+                // hide controls HoursFrom and HoursTo
+                if (nextState?.DurationType?.value?.Value !== EnumName.E_MIDDLEOFSHIFT) {
+                    nextState = {
+                        ...nextState,
+                        HoursFrom: {
+                            ...HoursFrom,
+                            visible: false
+                        },
+                        HoursTo: {
+                            ...HoursTo,
+                            visible: false
+                        }
+                    };
+                } else {
+                    // không load giờ vào ra đã chọn khi bấm chọn Loại ngày nghỉ
+                    nextState = {
+                        ...nextState,
+                        HoursFrom: {
+                            ...HoursFrom,
+                            value: HoursFrom.value
+                                ? HoursFrom.value
+                                : Object.keys(dataRoster.HoursFrom).length == 1
+                                    ? Object.keys(dataRoster.HoursFrom)[0]
+                                    : null,
+                            refresh: !HoursTo.refresh
+                        },
+                        HoursTo: {
+                            ...HoursTo,
+                            data: dataRoster.listRegisterHours,
+                            value: HoursTo.value
+                                ? HoursTo.value
+                                : Object.keys(dataRoster.HoursTo).length == 1
+                                    ? Object.keys(dataRoster.HoursTo)[0]
+                                    : null,
+                            refresh: !HoursTo.refresh
+                        }
+                    };
+                }
+
+                this.setState(nextState, () => {
+                    // nhan.nguyen: tính số giờ nghỉ khi chọn loại giữa ca
+                    if (DurationType.value?.Value === EnumName.E_MIDDLEOFSHIFT) {
+                        this.handleGetLeaveHourMidleShift();
+                    }
+
+                    const { LeaveDays } = this.state;
+                    if (LeaveDays.value != null) getHighSupervisor && getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
+                        Vnr_Function.formatDateAPI(DateRage?.value[0]),
+                        Vnr_Function.formatDateAPI(DateRage?.value[0])
+                    );
                 });
             } else {
-                const { DateStart, DateEnd } = this.getDate();
+                const { DateStart, DateEnd, dataDurationType } = this.getDate();
                 this.showLoading(true);
 
                 const dataBody = {
@@ -1212,18 +1625,62 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     DateEnd: Vnr_Function.formatDateAPI(DateEnd),
                     DurationType: DurationType.value ? DurationType.value.Value : null,
                     ListProfileID: [Profile.ID],
-                    ShiftID: ShiftID.value ? ShiftID.value : null
+                    ShiftID: ShiftID.value ? ShiftID.value.ShiftID : null,
+                    LeaveDayTypeID: LeaveDayTypeID.value ? LeaveDayTypeID.value.ID : null
                 };
 
-                HttpService.Post('[URI_CENTER]/api/Att_BussinessTravel/GetRosterForCheckBusinessTrip', dataBody).then(
+                HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/GetRosterForCheckLeaveDay', dataBody).then(
                     (resRoster) => {
                         this.showLoading(false);
                         let nextState = {};
 
                         if (resRoster) {
                             const dataRoster = resRoster.Data;
+                            if (dataRoster && dataRoster.ListShift && dataRoster.ListShift?.length > 1) {
+                                dataRoster.ListShift.unshift({
+                                    ShiftName: translate('HRM_Att_TakeLeave_AllShift'),
+                                    ShiftID: null
+                                });
+                                nextState = {
+                                    ...nextState,
+                                    ShiftID: {
+                                        ...ShiftID,
+                                        value: { ...dataRoster.ListShift[0] }
+                                    }
+                                };
+                            } else {
+                                nextState = {
+                                    ...nextState,
+                                    ShiftID: {
+                                        ...ShiftID,
+                                        value:
+                                            dataRoster && dataRoster.ListShift && dataRoster.ListShift?.length > 0
+                                                ? { ...dataRoster.ListShift[0] }
+                                                : null
+                                    }
+                                };
+                            }
+                            if (dataRoster?.IsFuneral) {
+                                nextState = {
+                                    ...nextState,
+                                    RelativeTypeID: {
+                                        ...RelativeTypeID,
+                                        visible: true
+                                    }
+                                };
+                            } else {
+                                nextState = {
+                                    ...nextState,
+                                    RelativeTypeID: {
+                                        ...RelativeTypeID,
+                                        value: null,
+                                        visible: false
+                                    }
+                                };
+                            }
                             nextState = {
                                 ...nextState,
+                                isRefreshState: !isRefreshState,
                                 LeaveDays: {
                                     ...LeaveDays,
                                     value: dataRoster.LeaveDays ? dataRoster.LeaveDays : 0
@@ -1232,16 +1689,222 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                                     ...LeaveHours,
                                     value: dataRoster.LeaveHours ? dataRoster.LeaveHours : 0
                                 },
-                                ShiftID: {
-                                    ...ShiftID,
-                                    value: dataRoster.ListShift
-                                        ? dataRoster.ListShift.map((e) => e.ShiftID).join(',')
-                                        : null
+                                HoursFrom: {
+                                    ...HoursFrom,
+                                    value: dataRoster?.HoursFrom ? dataRoster?.HoursFrom : null,
+                                    refresh: !HoursFrom.refresh
+                                },
+                                HoursTo: {
+                                    ...HoursTo,
+                                    value: dataRoster?.HoursTo ? dataRoster?.HoursTo : null,
+                                    refresh: !HoursTo.refresh
                                 }
                             };
-                        }
 
-                        this.setState(nextState);
+                            let valueBirthType = null;
+                            // hieu.tran 171081
+                            if (!isChangeBirthTypeOrChildren) {
+                                if (
+                                    dataRoster &&
+                                    dataRoster.ListEnumBirthType &&
+                                    dataRoster.ListEnumBirthType.length > 0
+                                ) {
+                                    valueBirthType = dataRoster.ListEnumBirthType.find(
+                                        (item) => item.Value == 'E_NormalBirth'
+                                    );
+
+                                    if (valueBirthType == null && dataRoster.ListEnumBirthType.length == 1) {
+                                        valueBirthType = dataRoster.ListEnumBirthType[0];
+                                    }
+
+                                    nextState = {
+                                        ...nextState,
+                                        ListLeaveDayTypeDefault: {
+                                            ...ListLeaveDayTypeDefault,
+                                            data: dataRoster.ListLeaveDayTypeDefault,
+                                            value: null
+                                        },
+                                        BirthType: {
+                                            ...BirthType,
+                                            data: dataRoster.ListEnumBirthType,
+                                            value: valueBirthType ? valueBirthType : null,
+                                            visible: true,
+                                            isValid: true,
+                                            refresh: BirthType.refresh
+                                        },
+                                        Children: {
+                                            ...Children,
+                                            value: valueBirthType ? '1' : '',
+                                            isValid: true,
+                                            visible: true,
+                                            refresh: Children.refresh
+                                        }
+                                    };
+                                } else {
+                                    nextState = {
+                                        ...nextState,
+                                        ListLeaveDayTypeDefault: {
+                                            ...ListLeaveDayTypeDefault,
+                                            data: dataRoster.ListLeaveDayTypeDefault,
+                                            value: null
+                                        },
+                                        BirthType: {
+                                            ...BirthType,
+                                            data: null,
+                                            value: null,
+                                            visible: false,
+                                            isValid: false,
+                                            refresh: BirthType.refresh
+                                        },
+                                        Children: {
+                                            ...Children,
+                                            value: '',
+                                            visible: false,
+                                            isValid: false,
+                                            refresh: Children.refresh
+                                        }
+                                    };
+                                }
+                            }
+
+                            // nhan.nguyen: 0172432: [Hotfix_TBCBALL_v8.11.31.01.08] Modify áp dụng cấu hình "loại trừ ngày nghỉ" cho App
+                            if (
+                                Array.isArray(dataRoster?.ListDurationTypeExclude) &&
+                                dataRoster?.ListDurationTypeExclude.length > 0
+                            ) {
+                                let findDurationType = dataRoster?.ListDurationTypeExclude.find(
+                                    (item) => item?.Value === dataRoster?.DurationType
+                                );
+
+                                // default durationtype from dataRoster
+                                let valueDuration = findDurationType
+                                    ? findDurationType
+                                    : dataRoster?.ListDurationTypeExclude[0];
+
+                                nextState = {
+                                    ...nextState,
+                                    DurationType: {
+                                        ...DurationType,
+                                        value: valueDuration,
+                                        data: dataRoster?.ListDurationTypeExclude,
+                                        refresh: !DurationType.refresh
+                                    }
+                                };
+                            } else {
+                                let findValue = null;
+                                if (
+                                    dataDurationType &&
+                                    Array.isArray(dataDurationType) &&
+                                    dataDurationType.length > 0
+                                ) {
+                                    findValue = dataRoster?.DurationType
+                                        ? dataDurationType.find((e) => e.Value === dataRoster?.DurationType)
+                                        : dataDurationType.find((e) => e.Value === EnumName.E_FULLSHIFT);
+                                }
+
+                                nextState = {
+                                    ...nextState,
+                                    DurationType: {
+                                        ...DurationType,
+                                        value: findValue,
+                                        data: dataDurationType,
+                                        refresh: !DurationType.refresh
+                                    }
+                                };
+                            }
+                            // hide controls HoursFrom and HoursTo
+                            if (nextState?.DurationType?.value?.Value !== EnumName.E_MIDDLEOFSHIFT) {
+                                nextState = {
+                                    ...nextState,
+                                    HoursFrom: {
+                                        ...(nextState.HoursFrom ? nextState.HoursFrom : HoursFrom),
+                                        visible: false
+                                    },
+                                    HoursTo: {
+                                        ...(nextState.HoursTo ? nextState.HoursTo : HoursTo),
+                                        visible: false
+                                    }
+                                };
+                            } else {
+                                // không load giờ vào ra đã chọn khi bấm chọn Loại ngày nghỉ
+                                nextState = {
+                                    ...nextState,
+                                    HoursFrom: {
+                                        ...HoursFrom,
+                                        value: HoursFrom.value ? HoursFrom.value : dataRoster?.HoursFrom,
+                                        refresh: !HoursTo.refresh
+                                    },
+                                    HoursTo: {
+                                        ...HoursTo,
+                                        value: HoursTo.value ? HoursTo.value : dataRoster?.HoursTo,
+                                        refresh: !HoursTo.refresh
+                                    }
+                                };
+                            }
+
+                            // 0185343: [hot fix OPA_v8.12.20.01.06] [App OPA] lỗi đăng ký ngày nghỉ không hiển thị field đính kèm chứng từ
+                            if (resRoster?.Data?.InsuranceType && !FileAttach?.visible) {
+                                nextState = {
+                                    ...nextState,
+                                    FileAttach: {
+                                        ...FileAttach,
+                                        visible: true,
+                                        refresh: !FileAttach.refresh
+                                    },
+                                    FileAttachment: {
+                                        ...FileAttachment,
+                                        visible: false,
+                                        refresh: !FileAttachment.refresh
+                                    }
+                                };
+                            } else if (!resRoster?.Data?.InsuranceType && FileAttach?.visible) {
+                                nextState = {
+                                    ...nextState,
+                                    FileAttach: {
+                                        ...FileAttach,
+                                        visible: false,
+                                        refresh: !FileAttach.refresh
+                                    },
+                                    FileAttachment: {
+                                        ...FileAttachment,
+                                        visible: true,
+                                        refresh: !FileAttachment.refresh
+                                    }
+                                };
+                            }
+
+                            // 0185682: Tách từ task 0159195: Lỗi không chặn đăng ký nghỉ phép năm theo số giờ cho phép - APP
+                            if (dataRoster?.IsHaveListRegisterHours && Array.isArray(dataRoster?.ListRegisterHours)) {
+                                this.IsHaveListRegisterHours = dataRoster?.IsHaveListRegisterHours;
+                                nextState = {
+                                    ...nextState,
+                                    HoursTo: {
+                                        ...HoursTo,
+                                        data: dataRoster?.ListRegisterHours,
+                                        value: this.props?.record?.HoursTo ? moment(this.props?.record?.HoursTo) : null,
+                                        refresh: !HoursTo.refresh
+                                    }
+                                };
+                            }
+
+                            this.setState(nextState, () => {
+                                // Trường hợp loại sinh == 1, set số con == 1
+                                valueBirthType != null &&
+                                    !isChangeBirthTypeOrChildren &&
+                                    this.changeBirthTypeOrChildren();
+
+                                // nhan.nguyen: tính số giờ nghỉ khi chọn loại giữa ca
+                                if (DurationType.value?.Value === EnumName.E_MIDDLEOFSHIFT) {
+                                    this.handleGetLeaveHourMidleShift();
+                                }
+
+                                const { LeaveDays } = this.state;
+                                if (LeaveDays.value != null) getHighSupervisor &&
+                                    getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
+                                        Vnr_Function.formatDateAPI(DateStart),
+                                        Vnr_Function.formatDateAPI(DateEnd));
+                            });
+                        }
                     }
                 );
             }
@@ -1249,178 +1912,159 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
     };
 
     onChangeHourFromOrHourTo = () => {
-        try {
-            const { HoursFrom, HoursTo, Profile } = this.state;
-            const { DateStart, DateEnd } = this.getDate();
-            if (HoursFrom.value && HoursTo.value && DateStart && DateEnd) {
-                const payload = {
-                    DateFrom: moment(DateStart).format('YYYY/MM/DD'),
-                    DateTo: moment(DateEnd).format('YYYY/MM/DD'),
-                    DurationType: 'E_BYHOURS',
-                    HourFrom: Vnr_Function.formatDateAPI(HoursFrom.value),
-                    HourTo: Vnr_Function.formatDateAPI(HoursTo.value),
+        const { HoursFrom, HoursTo, timeRangeFromRoster } = this.state;
+        if ((HoursFrom.value && HoursTo.value, timeRangeFromRoster)) {
+            // check Giờ có nằm trong ca
+            const timeChange = [moment(HoursFrom), moment(HoursTo)];
+            const isValid = this.doTimeRangesOverlap(timeChange, timeRangeFromRoster);
+            if (!isValid) {
+                this.props.ToasterSevice().showWarning('HRM_PortalApp_TakeLeave_OutoffShift');
+            }
+        }
+    };
+
+    onChangeLeaveDayType = (item) => {
+        const { LeaveDayTypeID } = this.state;
+        this.setState(
+            {
+                LeaveDayTypeID: {
+                    ...LeaveDayTypeID,
+                    value: item,
+                    refresh: !LeaveDayTypeID.refresh
+                }
+            },
+            () => {
+                this.getDataRequiredDocuments();
+                this.getRemainFromLeaveDayType();
+                this.getRosterForCheckLeaveday();
+            }
+        );
+    };
+
+    getDataRequiredDocuments = () => {
+        const { LeaveDayTypeID, Profile } = this.state;
+        if (LeaveDayTypeID.value) {
+            const { DateStart, DateEnd } = this.getDate(),
+                dataBody = {
+                    DateStart: Vnr_Function.formatDateAPI(DateStart),
+                    DateEnd: Vnr_Function.formatDateAPI(DateEnd),
                     ProfileID: Profile.ID
                 };
-                HttpService.Post('[URI_CENTER]/api/Att_BussinessTravel/TotalBusinesDayByBusinessTripType', {
-                    ...payload
-                })
-                    .then((res) => {
-                        if (res?.Status !== EnumName.E_SUCCESS) {
-                            this.ToasterSevice().showWarning(res?.Message);
-                            return;
+            this.showLoading(true);
+            HttpService.Post('[URI_CENTER]/api/Att_GetData/GetLeaveTypeByGrade', {
+                ...dataBody
+            })
+                .then((res) => {
+                    this.showLoading(false);
+                    if (res.Status === EnumName.E_SUCCESS && res.Data) {
+                        for (let i = 0; i < res.Data.length; i++) {
+                            let item = res.Data[i];
+                            if (item.ID === LeaveDayTypeID.value.ID) {
+                                this.setState({
+                                    RequiredDocuments: item.RequiredDocuments ? item.RequiredDocuments : ''
+                                });
+                                break;
+                            }
                         }
-                        this.setState({
-                            SumDays: res?.Data ? res.Data : 0
-                        });
-                    })
-                    .catch((err) => {
-                        DrawerServices.navigate('ErrorScreen', { ErrorDisplay: err });
-                    });
+                    }
+                    // eslint-disable-next-line no-console
+                })
+                .catch(() => { });
+        } else {
+            this.setState({
+                RequiredDocuments: ''
+            });
+        }
+    };
+
+    changeBirthTypeOrChildren = () => {
+        // Hieu.Tran 171081
+        const { BirthType, Children, ListLeaveDayTypeDefault, DateRage, isRefreshState } = this.state;
+        const { DateStart } = this.getDate();
+
+        if (
+            BirthType.value &&
+            Children.value !== null &&
+            Children.value !== '' &&
+            ListLeaveDayTypeDefault.data &&
+            ListLeaveDayTypeDefault.data.length > 0
+        ) {
+            const birthValue = BirthType.value.Value,
+                children = parseInt(Children.value);
+
+            const findDays = ListLeaveDayTypeDefault.data.find((item) => {
+                return item.BirthType == birthValue && item.Children == children;
+            });
+
+            if (findDays && findDays.Days) {
+                if (findDays.Days > 1) {
+                    // const dateRage = [DateStart,];
+                    const dateRage = {
+                        startDate: DateStart,
+                        endDate: moment(DateStart)
+                            .add(findDays.Days - 1, 'day')
+                            .format('YYYY-MM-DD')
+                    };
+
+                    this.setState(
+                        {
+                            ListLeaveDayTypeDefault: {
+                                ...ListLeaveDayTypeDefault,
+                                value: findDays
+                            },
+                            DateRage: {
+                                ...DateRage,
+                                value: dateRage,
+                                refresh: !DateRage.refresh
+                            },
+                            isRefreshState: !isRefreshState
+                        },
+                        () => {
+                            this.getRosterForCheckLeaveday(true);
+                        }
+                    );
+                }
+            } else {
+                const listEnum = ListLeaveDayTypeDefault.data.filter((item) => item.BirthType == birthValue);
+                let maxDays = null;
+                listEnum.forEach((item) => {
+                    if (maxDays == null || (maxDays && item.Days > maxDays.Days)) {
+                        maxDays = item;
+                    }
+                });
+                if (maxDays && maxDays.Days > 1) {
+                    // const dateRage = [DateStart, moment(DateStart).add(maxDays.Days - 1, 'day').format("DD-MM-YYYY")];
+                    const dateRage = {
+                        startDate: DateStart,
+                        endDate: moment(DateStart)
+                            .add(maxDays.Days - 1, 'day')
+                            .format('YYYY-MM-DD')
+                    };
+                    this.setState(
+                        {
+                            ListLeaveDayTypeDefault: {
+                                ...ListLeaveDayTypeDefault,
+                                value: maxDays
+                            },
+                            DateRage: {
+                                ...DateRage,
+                                value: dateRage,
+                                refresh: !DateRage.refresh
+                            },
+                            isRefreshState: !isRefreshState
+                        },
+                        () => {
+                            this.getRosterForCheckLeaveday(true);
+                        }
+                    );
+                }
             }
-        } catch (error) {
-            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
         }
     };
     //#endregion
 
     //#region Step 4: Các xử lý còn lại
-    onChangeBusinessType = async () => {
-        const { BusinessTripTypeID, PlaceFrom, PlaceInFromID, PlaceInToID, PlaceOutToID } = this.state;
-        if (BusinessTripTypeID.value) {
-            let businessTripType = BusinessTripTypeID.value;
-            if (businessTripType.Location) {
-                if (businessTripType.Location === 'E_DOMESTIC') {
-                    const resProvince = await HttpService.Get('[URI_CENTER]/api/Cat_GetData/GetMultiProvince');
-                    this.setState({
-                        PlaceInFromID: {
-                            ...PlaceInFromID,
-                            disable: false,
-                            data: resProvince.Data,
-                            visible: true
-                        },
-                        PlaceInToID: {
-                            ...PlaceInToID,
-                            disable: false,
-                            data: resProvince.Data,
-                            visible: true
-                        },
-                        PlaceFrom: {
-                            ...PlaceFrom,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        },
-                        PlaceOutToID: {
-                            ...PlaceOutToID,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        }
-                    });
-                } else if (businessTripType.Location === 'E_IN') {
-                    this.setState({
-                        PlaceFrom: {
-                            ...PlaceFrom,
-                            disable: false,
-                            visible: true
-                        },
-                        PlaceInFromID: {
-                            ...PlaceInFromID,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        },
-                        PlaceInToID: {
-                            ...PlaceInToID,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        },
-                        PlaceOutToID: {
-                            ...PlaceOutToID,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        }
-                    });
-                } else if (businessTripType.Location === 'E_OUT') {
-                    const resCountry = await HttpService.Get('[URI_CENTER]/api/Cat_GetData/GetMultiCountry');
-                    this.setState({
-                        PlaceFrom: {
-                            ...PlaceFrom,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        },
-                        PlaceInFromID: {
-                            ...PlaceInFromID,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        },
-                        PlaceInToID: {
-                            ...PlaceInToID,
-                            value: null,
-                            disable: false,
-                            visible: false
-                        },
-                        PlaceOutToID: {
-                            ...PlaceOutToID,
-                            data: resCountry.Data,
-                            disable: false,
-                            visible: true
-                        }
-                    });
-                }
-            } else {
-                this.setState({
-                    PlaceFrom: {
-                        ...PlaceFrom,
-                        disable: false,
-                        visible: true
-                    },
-                    PlaceInFromID: {
-                        ...PlaceInFromID,
-                        disable: false,
-                        visible: false
-                    },
-                    PlaceInToID: {
-                        ...PlaceInToID,
-                        disable: false,
-                        visible: false
-                    },
-                    PlaceOutToID: {
-                        ...PlaceOutToID,
-                        disable: false,
-                        visible: false
-                    }
-                });
-            }
-        } else {
-            this.setState({
-                PlaceFrom: {
-                    ...PlaceFrom,
-                    disable: false,
-                    visible: false
-                },
-                PlaceInFromID: {
-                    ...PlaceInFromID,
-                    disable: false,
-                    visible: false
-                },
-                PlaceInToID: {
-                    ...PlaceInToID,
-                    disable: false,
-                    visible: false
-                },
-                PlaceOutToID: {
-                    ...PlaceOutToID,
-                    disable: false,
-                    visible: false
-                }
-            });
-        }
-    };
+
     renderWorkDate = () => {
         const { DateRage } = this.state,
             { record, fieldConfig } = this.props;
@@ -1430,7 +2074,8 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             // Đăng ký nhiều ngày cùng lúc
             return (
                 <VnrDateFromTo
-                    fieldValid={fieldConfig?.RegisterDate?.isValid}
+                    fieldValid={fieldConfig?.RegistrationDate?.isValid}
+                    isCheckEmpty={fieldConfig?.RegistrationDate?.isValid && !DateRage.value ? true : false}
                     isControll={true}
                     lable={DateRage.lable}
                     refresh={DateRage.refresh}
@@ -1450,7 +2095,8 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             // Đăng ký nhiều ngày liên tục
             return (
                 <VnrDateFromTo
-                    fieldValid={fieldConfig?.RegisterDate?.isValid}
+                    fieldValid={fieldConfig?.RegistrationDate?.isValid}
+                    isCheckEmpty={fieldConfig?.RegistrationDate?.isValid && !DateRage.value ? true : false}
                     isControll={true}
                     lable={DateRage.lable}
                     refresh={DateRage.refresh}
@@ -1465,13 +2111,11 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             // Đăng ký từng ngày, 1 ngày
             return (
                 <VnrDateFromTo
-                    fieldValid={fieldConfig?.RegisterDate?.isValid}
+                    fieldValid={fieldConfig?.RegistrationDate?.isValid}
+                    isCheckEmpty={fieldConfig?.RegistrationDate?.isValid && !DateRage.value ? true : false}
                     lable={DateRage.lable}
                     isControll={true}
                     refresh={DateRage.refresh}
-                    // value={
-                    //     isSimilarRegistration === false
-                    // }
                     value={DateRage.value === null ? {} : DateRage.value}
                     displayOptions={true}
                     onlyChooseEveryDay={false}
@@ -1483,133 +2127,324 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
         }
     };
 
-    getDataVisible = () => {
-        const { PlaceFrom, ContactInfo, PlaceInFromID, PlaceInToID, PlaceOutToID } = this.state;
+    getRemainFromLeaveDayType = () => {
+        const { Profile, LeaveDayTypeID } = this.state;
 
-        return {
-            PlaceFrom,
-            ContactInfo,
-            PlaceInFromID,
-            PlaceInToID,
-            PlaceOutToID
-        };
+        if (LeaveDayTypeID.value) {
+            const { DateStart } = this.getDate(),
+                { updateShowRemain } = this.props;
+
+            this.showLoading(true);
+            HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/GetRemainAnlDays', {
+                ProfileID: Profile.ID,
+                DateStart: DateStart ? Vnr_Function.parseDateTime(DateStart) : null,
+                LeavedayTypeID: LeaveDayTypeID.value ? LeaveDayTypeID.value.ID : null
+            }).then((res) => {
+                this.showLoading(false);
+                if (res.Status === EnumName.E_SUCCESS && res?.Data) {
+                    updateShowRemain && updateShowRemain(res?.Data);
+                }
+            });
+        }
     };
 
     getAllData = () => {
         const {
-                Profile,
-                FileAttachment,
-                BusinessReason,
-                BusinessTripTypeID,
-                DurationType,
-                HoursFrom,
-                HoursTo,
-                PlaceFrom,
-                ContactInfo,
-                PlaceInFromID,
-                PlaceInToID,
-                PlaceOutToID,
-                PlaceSendToID,
-                BusinessTripReasonID,
-                Location,
-                Content,
-                PreparationWork
-            } = this.state,
-            { levelApprove, record } = this.props;
-        const { DateStart, DateEnd } = this.getDate();
-        let SumDays = this.state.SumDays;
+            Profile,
+            FileAttachment,
+            Comment,
+            LeaveDays,
+            LeaveHours,
+            LeaveDayTypeID,
+            DurationType,
+            ShiftID,
+            HoursFrom,
+            HoursTo,
+            lstLeaveDaysHours,
+            ListLeaveDayTypeDefault,
+            BirthType,
+            Children,
+            AddEmployee,
+            Substitute,
+            FileAttach,
+            RelativeTypeID,
+            IsPermissionLeave
+        } = this.state,
+            { levelApprove, fieldConfig, record } = this.props;
 
-        if (DurationType?.value?.Value === 'E_FIRSTHALFSHIFT' || DurationType?.value?.Value === 'E_LASTHALFSHIFT') {
-            // nữa ca trước || nữa ca sau
-            SumDays = 0.5;
+        const { DateStart, DateEnd } = this.getDate();
+
+        if (
+            (!LeaveDayTypeID.value) ||
+            (fieldConfig.Comment.isValid && (Comment.value == null || Comment.value == '')) ||
+            (fieldConfig?.FileAttachment?.isValid && !FileAttachment.value) ||
+            !DurationType.value ||
+            (BirthType.visible && BirthType.isValid && !BirthType.value) ||
+            (RelativeTypeID.visible && !RelativeTypeID.value) ||
+            (Children.visible && Children.isValid && (Children.value == null || Children.value == '')) ||
+            (fieldConfig?.FileAttach?.isValid && !FileAttach.value)
+        ) {
+            this.setState({
+                acIsCheckEmpty: true
+            });
+            return;
         }
 
-        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = (Math.random() * 16) | 0,
-                v = c == 'x' ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
+        let nextPrams = {};
+
+        if (FileAttach.visible) {
+            nextPrams = {
+                ...nextPrams,
+                FileAttach: FileAttach.value ? FileAttach.value.map(item => item.fileName).join(',') : null
+            };
+        }
 
         return {
+            IsTwoShift: ShiftID.value?.ShiftID === null ? true : false,
+            ID: record && record.ID ? record.ID : null,
             ProfileID: Profile.ID,
             ListProfileID: [Profile.ID],
-            ID: record && record.ID ? record.ID : uuid,
-            DateFrom: DateStart ? moment(DateStart).format('YYYY/MM/DD') : null,
-            DateTo: DateEnd ? moment(DateEnd).format('YYYY/MM/DD') : null,
-            HourFrom: HoursFrom.value ? Vnr_Function.formatDateAPI(HoursFrom.value) : null,
-            HourTo: HoursTo.value ? Vnr_Function.formatDateAPI(HoursTo.value) : null,
-            BusinessTripTypeID: BusinessTripTypeID.value ? BusinessTripTypeID.value.ID : null,
+            DateStart: DateStart ? Vnr_Function.formatDateAPI(DateStart) : null,
+            DateEnd: DateEnd ? Vnr_Function.formatDateAPI(DateEnd) : null,
+            HoursFrom: HoursFrom.value ? Vnr_Function.formatDateAPI(HoursFrom.value) : null,
+            HoursTo: HoursTo.value ? Vnr_Function.formatDateAPI(HoursTo.value) : null,
+            LeaveDayTypeID: LeaveDayTypeID.value ? LeaveDayTypeID.value.ID : null,
             DurationType: DurationType.value ? DurationType.value.Value : null,
-            DateRange: null,
-            //IsDataError: true,
-            FileAttachment: FileAttachment.value ? FileAttachment.value.map((item) => item.fileName).join(',') : null,
-            Note: BusinessReason.value ? BusinessReason.value : null,
-            PlaceFrom: PlaceFrom.value ? PlaceFrom.value : null,
-            ContactInfo: ContactInfo.value ? ContactInfo.value : null,
-            PlaceFromCombobox: PlaceInFromID.value ? PlaceInFromID.value.ID : null,
-            PlaceToCombobox: PlaceInToID.value ? PlaceInToID.value.ID : null,
-            PlaceFromCountry: PlaceOutToID.value ? PlaceOutToID.value.ID : null,
-            PlaceSendToID: PlaceSendToID.value ? PlaceSendToID.value.ID : null,
-            BusinessTripReasonID: BusinessTripReasonID.value ? BusinessTripReasonID.value.ID : null,
+            ShiftID: ShiftID.value?.ShiftID ? ShiftID.value?.ShiftID : null,
+            LeaveDays: !isNaN(LeaveDays.value) ? LeaveDays.value : 0,
+            LeaveHours: !isNaN(LeaveHours.value) ? LeaveHours.value : 0,
             LevelApproved: levelApprove,
-            SumDays,
-            RegisterDate: DateStart ? moment(DateStart).format('YYYY/MM/DD') : null,
-            Content: Content.value ? Content.value : null,
-            Location: Location.value ? Location.value : null,
-            PreparationWork: PreparationWork.value ? PreparationWork.value : null
+            FileAttachment: FileAttachment.value ? FileAttachment.value.map((item) => item.fileName).join(',') : null,
+            Comment: Comment.value ? Comment.value : null,
+            LeaveBirth: ListLeaveDayTypeDefault.value ? ListLeaveDayTypeDefault.value.Days : null,
+            LeaveDayTypeDefaultID: ListLeaveDayTypeDefault.value ? ListLeaveDayTypeDefault.value.ID : null,
+            lstLeaveDaysHours: lstLeaveDaysHours,
+            IsSubstitute: AddEmployee.value,
+            SubstituteID: Substitute.value ? Substitute.value.ID : null,
+            ShiftIDByDate: this.ShiftIDByDate,
+            RelativeTypeID: RelativeTypeID.value ? RelativeTypeID.value.ID : null,
+            IsPermissionLeave: IsPermissionLeave.value,
+            ...nextPrams
         };
     };
 
+    GetLeaveHoursByShift = () => {
+        try {
+            const { LeaveDays, LeaveHours, DurationType, ShiftID, HoursFrom, HoursTo } = this.state;
+
+            if (ShiftID?.value?.ShiftID) {
+                let params = {
+                    DurationType: DurationType.value?.Value ? DurationType.value.Value : null,
+                    ShiftID: ShiftID.value?.ShiftID ? ShiftID.value?.ShiftID : null
+                };
+
+                HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/GetLeaveHoursByShift', params)
+                    .then((res) => {
+                        if (res?.Status === EnumName.E_SUCCESS) {
+                            this.setState({
+                                LeaveDays: {
+                                    ...LeaveDays,
+                                    value: !isNaN(res?.Data?.LeaveDays) ? res?.Data?.LeaveDays : LeaveDays?.value,
+                                    refresh: !LeaveDays?.refresh
+                                },
+                                LeaveHours: {
+                                    ...LeaveHours,
+                                    value: !isNaN(res?.Data?.LeaveHours) ? res?.Data?.LeaveHours : LeaveHours?.value,
+                                    refresh: !LeaveHours?.refresh
+                                },
+                                HoursFrom: {
+                                    ...HoursFrom,
+                                    value: res?.Data?.HoursFrom
+                                        ? Vnr_Function.formatDateAPI(res?.Data?.HoursFrom)
+                                        : null,
+                                    refresh: !HoursFrom?.refresh
+                                },
+                                HoursTo: {
+                                    ...HoursTo,
+                                    value: res?.Data?.HoursTo ? Vnr_Function.formatDateAPI(res?.Data?.HoursTo) : null,
+                                    refresh: !HoursTo?.refresh
+                                }
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        this.showLoading(false);
+                        DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
+                    });
+            }
+        } catch (error) {
+            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
+        }
+    };
+
+    handleNeedAReplacement = () => {
+        const { AddEmployee } = this.state;
+        this.setState(
+            {
+                AddEmployee: {
+                    ...AddEmployee,
+                    value: !AddEmployee.value,
+                    refresh: !AddEmployee.refresh
+                }
+            },
+            () => {
+                this.handleShowSubstituteID();
+            }
+        );
+    };
+
+    handleShowSubstituteID = async () => {
+        const { AddEmployee, Substitute } = this.state;
+        const res = await HttpService.Post('[URI_CENTER]/api/Att_GetData/GetProfileDetailForAttendance_App', {
+            page: 1,
+            pageSize: 100
+        });
+
+        if (AddEmployee.value) {
+            this.setState({
+                Substitute: {
+                    ...Substitute,
+                    data: res.Data,
+                    visible: true,
+                    refresh: !Substitute.refresh
+                }
+            });
+        } else {
+            this.setState({
+                Substitute: {
+                    ...Substitute,
+                    visible: false,
+                    value: null,
+                    refresh: !Substitute.refresh
+                }
+            });
+        }
+    };
+
+    //#endregion
+
+    //#region: change hours
+    handleGetLeaveHourMidleShift = () => {
+        try {
+            const { Profile, LeaveDays, LeaveHours, LeaveDayTypeID, DurationType, ShiftID, HoursFrom, HoursTo, DateRage } =
+                this.state;
+
+            const { DateStart, DateEnd } = this.getDate();
+
+            let tempShift = [];
+
+            if (this.ShiftIDByDate) {
+                if (this.ShiftIDByDate[DateStart]) {
+                    tempShift.push(this.ShiftIDByDate[DateStart]);
+                }
+            }
+
+            if (HoursFrom.value && HoursTo.value) {
+                if (Profile.ID && DateStart && DateEnd) {
+                    let params = {
+                        ListProfileID: [Profile.ID],
+                        DateStart: DateStart ? moment(DateStart).format('YYYY/MM/DD') : null,
+                        DateEnd: DateEnd ? moment(DateEnd).format('YYYY/MM/DD') : null,
+                        DurationType: DurationType.value?.Value ? DurationType.value.Value : null,
+                        HoursFrom: HoursFrom.value ? Vnr_Function.formatDateAPI(HoursFrom.value) : null,
+                        HoursTo: HoursTo.value ? Vnr_Function.formatDateAPI(HoursTo.value) : null,
+                        LeaveDayTypeID: LeaveDayTypeID.value?.ID ? LeaveDayTypeID.value.ID : null,
+                        ShiftID: tempShift.length > 0 ? tempShift[0] : ShiftID.value.ShiftID ? ShiftID.value.ShiftID : null
+                    };
+
+                    this.showLoading(true);
+
+                    HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/GetLeaveHourMidleShift', params)
+                        .then((res) => {
+                            this.showLoading(false);
+
+                            if (res?.Status === EnumName.E_SUCCESS) {
+                                if (res?.Data?.MessageError && typeof res?.Data?.MessageError === 'string' && res?.Data?.MessageError.length > 0) {
+                                    this.props
+                                        .ToasterSevice()
+                                        .showError(res?.Data?.MessageError);
+                                }
+                                let lstLeaveDaysHours = {};
+                                if (Array.isArray(DateRage.value) && DateRage.value.length > 0) {
+                                    DateRage.value.map((item) => {
+                                        lstLeaveDaysHours = {
+                                            ...lstLeaveDaysHours,
+                                            [item]: {
+                                                LeaveDays: !isNaN(res?.Data?.LeaveDays) ? res?.Data?.LeaveDays : LeaveDays?.value,
+                                                LeaveHours: !isNaN(res?.Data?.LeaveHours)
+                                                    ? res?.Data?.LeaveHours
+                                                    : LeaveHours?.value
+                                            }
+                                        };
+                                    });
+                                }
+
+                                this.setState({
+                                    lstLeaveDaysHours: { ...lstLeaveDaysHours },
+                                    LeaveDays: {
+                                        ...LeaveDays,
+                                        value: !isNaN(res?.Data?.LeaveDays) ? res?.Data?.LeaveDays : LeaveDays?.value,
+                                        refresh: !LeaveDays?.refresh
+                                    },
+
+                                    LeaveHours: {
+                                        ...LeaveHours,
+                                        value: !isNaN(res?.Data?.LeaveHours)
+                                            ? res?.Data?.LeaveHours
+                                            : LeaveHours?.value,
+                                        refresh: !LeaveHours?.refresh
+                                    }
+                                });
+                            }
+                        })
+                        .catch((error) => {
+                            this.showLoading(false);
+                            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
+                        });
+                }
+            }
+        } catch (error) {
+            this.showLoading(false);
+            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
+        }
+    };
     //#endregion
 
     render() {
         const {
             FileAttachment,
-            BusinessReason,
+            Comment,
             DurationType,
-            BusinessTripTypeID,
-            // LeaveDays,
+            LeaveDayTypeID,
+            LeaveDays,
             HoursFrom,
             HoursTo,
-            PlaceFrom,
-            ContactInfo,
-            PlaceInFromID,
-            PlaceInToID,
-            PlaceOutToID,
-            PlaceSendToID,
-            BusinessTripReasonID,
-            Location,
-            Content,
-            PreparationWork
+            Children,
+            BirthType,
+            acIsCheckEmpty,
+            RequiredDocuments,
+            ShiftID,
+            AddEmployee,
+            Substitute,
+            FileAttach,
+            RelativeTypeID,
+            IsPermissionLeave
         } = this.state;
 
-        const {
-                fieldConfig,
-                isShowDelete,
-                onDeleteItemDay,
-                indexDay,
-                acIsCheckEmpty,
-                onScrollToInputIOS,
-                isSimilarRegistration
-            } = this.props,
+        const { fieldConfig, isShowDelete, onDeleteItemDay, indexDay, onScrollToInputIOS, showRemain } = this.props,
             { viewInputMultiline } = stylesVnrPickerV3;
 
         return (
             <View
-                style={[styles.wrapItem, CustomStyleSheet.marginTop(0)]}
+                style={styles.wrapItem}
                 onLayout={(event) => {
                     const layout = event.nativeEvent.layout;
                     this.layoutHeightItem = layout.height;
                 }}
             >
+                {/* Thời gian */}
                 {/* Title group for time */}
-                <View
-                    style={[
-                        styles.flRowSpaceBetween,
-                        CustomStyleSheet.borderTopColor(Colors.gray_5),
-                        CustomStyleSheet.borderTopWidth(isSimilarRegistration ? 0.5 : 0)
-                    ]}
-                >
+                <View style={styles.flRowSpaceBetween}>
                     <VnrText style={[styleSheets.lable, styles.styLableGp]} i18nKey={'HRM_PortalApp_LableTime'} />
 
                     {isShowDelete && (
@@ -1625,11 +2460,39 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 {/* Ngày đăng ký */}
                 {this.renderWorkDate()}
 
+                {/* ca - ShiftID */}
+                {ShiftID.visible && ShiftID.visibleConfig && (
+                    <VnrPickerQuickly
+                        dataLocal={ShiftID.data}
+                        isCheckEmpty={true}
+                        refresh={ShiftID.refresh}
+                        textField="ShiftName"
+                        valueField="ShiftID"
+                        filter={false}
+                        value={ShiftID.value}
+                        disable={ShiftID.disable}
+                        lable={ShiftID.lable}
+                        onFinish={(item) => {
+                            this.setState(
+                                {
+                                    ShiftID: {
+                                        ...ShiftID,
+                                        value: item,
+                                        refresh: !ShiftID.refresh
+                                    }
+                                },
+                                () => this.GetLeaveHoursByShift()
+                            );
+                        }}
+                    />
+                )}
+
                 {/* Loại đăng ký */}
-                {DurationType.visible && fieldConfig?.DurationType?.visibleConfig && (
-                    <VnrPickerLittle
-                        fieldValid={fieldConfig?.DurationType?.isValid}
-                        isCheckEmpty={false}
+                {/* hard code */}
+                {DurationType.visible && fieldConfig?.DurationType.visibleConfig && (
+                    <VnrPickerQuickly
+                        fieldValid={true}
+                        isCheckEmpty={true}
                         refresh={DurationType.refresh}
                         value={DurationType.value}
                         dataLocal={DurationType.data}
@@ -1644,432 +2507,436 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
                 {/* Số giờ, giờ vào, giờ kết thúc */}
                 {HoursFrom.visible &&
-                    fieldConfig?.HoursFrom?.visibleConfig &&
+                    fieldConfig?.HoursFrom.visibleConfig &&
                     HoursTo.visible &&
                     HoursTo.visibleConfig && (
-                    <View style={styles.styRowDateFromTo}>
-                        {/* Giờ vào */}
-                        <View style={styles.styRowDate}>
-                            <VnrDate
-                                isHiddenIcon={true}
-                                fieldValid={fieldConfig?.HoursFrom?.isValid}
-                                refresh={HoursFrom.refresh}
-                                response={'string'}
-                                format={'HH:mm'}
-                                type={'time'}
-                                value={HoursFrom.value}
-                                lable={HoursFrom.lable}
-                                placeHolder={'HH:mm'}
-                                disable={HoursFrom.disable}
-                                onFinish={(item) => {
-                                    this.setState(
-                                        {
-                                            HoursFrom: {
-                                                ...HoursFrom,
-                                                value: item,
-                                                refresh: !HoursFrom.refresh
+                        <View style={styles.styRowDateFromTo}>
+                            {/* Giờ vào */}
+                            <View style={styles.styRowDate}>
+                                <VnrDate
+                                    fieldValid={fieldConfig?.HoursFrom?.isValid}
+                                    refresh={HoursFrom.refresh}
+                                    response={'string'}
+                                    format={'HH:mm'}
+                                    type={'time'}
+                                    value={HoursFrom.value}
+                                    lable={HoursFrom.lable}
+                                    placeHolder={'HRM_PortalApp_TSLRegister_Time'}
+                                    disable={HoursFrom.disable}
+                                    onFinish={(item) => {
+                                        this.setState(
+                                            {
+                                                HoursFrom: {
+                                                    ...HoursFrom,
+                                                    value: item,
+                                                    refresh: !HoursFrom.refresh
+                                                }
+                                            },
+                                            () => {
+                                                this.onChangeHourFromOrHourTo();
+                                                this.handleGetLeaveHourMidleShift();
                                             }
-                                        },
-                                        this.onChangeHourFromOrHourTo
-                                    );
-                                }}
-                            />
-                        </View>
+                                        );
+                                    }}
+                                />
+                            </View>
 
-                        <View style={styles.styRowDateLine} />
+                            <View style={styles.styRowDateLine} />
 
-                        {/* Giờ ra */}
-                        <View style={styles.styRowDate}>
-                            <VnrDate
-                                isHiddenIcon={true}
-                                isCheckEmpty={acIsCheckEmpty}
-                                fieldValid={fieldConfig?.HoursTo?.isValid}
-                                refresh={HoursTo.refresh}
-                                response={'string'}
-                                format={'HH:mm'}
-                                type={'time'}
-                                value={HoursTo.value}
-                                lable={HoursTo.lable}
-                                placeHolder={'HH:mm'}
-                                disable={HoursTo.disable}
-                                onFinish={(item) => {
-                                    this.setState(
-                                        {
-                                            HoursTo: {
-                                                ...HoursTo,
-                                                value: item,
-                                                refresh: !HoursTo.refresh
-                                            }
-                                        },
-                                        this.onChangeHourFromOrHourTo
-                                    );
-                                }}
-                            />
+                            {/* Giờ ra */}
+                            <View style={styles.styRowDate}>
+                                {
+                                    this.IsHaveListRegisterHours ? (
+                                        <VnrPickerLittle
+                                            fieldValid={fieldConfig?.HoursTo?.isValid}
+                                            refresh={HoursTo.refresh}
+                                            dataLocal={HoursTo.data}
+                                            value={HoursTo.valueConfigRegisterHours}
+                                            textField="Text"
+                                            valueField="Value"
+                                            disable={HoursTo.disable}
+                                            lable={'HRM_PortalApp_OnlyTime'}
+                                            stylePicker={[styles.resetBorder, CustomStyleSheet.borderBottomWidth(1)]}
+                                            placeholder={' '}
+                                            onFinish={(value) => {
+                                                if (value) {
+                                                    this.setState(
+                                                        {
+                                                            HoursTo: {
+                                                                ...HoursTo,
+                                                                valueConfigRegisterHours: value,
+                                                                value: moment(moment(this.state.HoursFrom.value).add(value?.Value, 'hours')),
+                                                                refresh: !HoursTo.refresh
+                                                            }
+                                                        }, () => {
+                                                            this.handleGetLeaveHourMidleShift();
+                                                        });
+                                                }
+                                            }}
+                                        />
+                                    ) : (
+                                        <VnrDate
+                                            isCheckEmpty={acIsCheckEmpty}
+                                            fieldValid={fieldConfig?.HoursTo?.isValid}
+                                            refresh={HoursTo.refresh}
+                                            response={'string'}
+                                            format={'HH:mm'}
+                                            type={'time'}
+                                            value={HoursTo.value}
+                                            lable={HoursTo.lable}
+                                            placeHolder={'HRM_PortalApp_TSLRegister_Time'}
+                                            disable={HoursTo.disable}
+                                            onFinish={(item) => {
+                                                this.setState(
+                                                    {
+                                                        HoursTo: {
+                                                            ...HoursTo,
+                                                            value: item,
+                                                            refresh: !HoursTo.refresh
+                                                        }
+                                                    },
+                                                    () => {
+                                                        this.onChangeHourFromOrHourTo();
+                                                        this.handleGetLeaveHourMidleShift();
+                                                    }
+                                                );
+                                            }}
+                                        />
+                                    )
+                                }
+                            </View>
                         </View>
-                    </View>
-                )}
+                    )}
 
                 {/* Tổng ngày nghỉ - Tổng giờ */}
-                {/* {(LeaveDays.visible || fieldConfig?.LeaveHours?.visible) && (
+                {((LeaveDays.visible || fieldConfig?.LeaveHours?.visible) && !this.IsHaveListRegisterHours) && (
                     <View style={styles.styViewLeaveDayCount}>
                         <Text style={[styleSheets.lable, styles.styViewLeaveDayCountLable]}>
                             {this.getTxtTotalCount()}
                         </Text>
                     </View>
-                )} */}
+                )}
+
+                {/* 0185682: Tách từ task 0159195: Lỗi không chặn đăng ký nghỉ phép năm theo số giờ cho phép - APP */}
+                {
+                    (HoursTo?.valueConfigRegisterHours && this.IsHaveListRegisterHours && HoursFrom.value && HoursTo?.valueConfigRegisterHours?.Value) && (
+                        <View style={styles.styViewLeaveDayCount}>
+                            <Text style={[styleSheets.lable, styles.styViewLeaveDayCountLable]}>
+                                {translate('HRM_PortalApp_EndTime')}: {moment(moment(HoursFrom.value).add(HoursTo?.valueConfigRegisterHours?.Value, 'hours')).format('HH:mm')}
+                            </Text>
+                        </View>
+                    )
+                }
 
                 {/* diễn giải */}
                 <View style={styles.styRowControl}>
                     {/* Title group for Explanation */}
                     <View style={styles.flRowSpaceBetween}>
-                        <VnrText
-                            style={[styleSheets.lable, styles.styLableGp, CustomStyleSheet.fontWeight('600')]}
-                            i18nKey={'HRM_PortalApp_Explanation'}
-                        />
+                        <VnrText style={[styleSheets.lable, styles.styLableGp]} i18nKey={'HRM_PortalApp_Explanation'} />
                     </View>
                 </View>
 
-                {/* Địa điểm */}
-                {((Location.visible && fieldConfig?.Location?.visibleConfig)) && (
+                {/* Loại ngày nghỉ */}
+                {LeaveDayTypeID.visible && fieldConfig?.LeaveDayTypeID.visibleConfig && (
                     <VnrPickerQuickly
-                        stylePlaceholder={{
-                            colors: Colors.gray_6
-                        }}
                         isCheckEmpty={acIsCheckEmpty}
-                        refresh={Location.refresh}
-                        dataLocal={Location.data}
-                        value={Location.value}
-                        textField="WorkPlaceName"
+                        fieldValid={true}
+                        refresh={LeaveDayTypeID.refresh}
+                        dataLocal={LeaveDayTypeID.data}
+                        value={LeaveDayTypeID.value}
+                        textField="LeaveDayTypeName"
                         valueField="ID"
                         filter={true}
                         filterLocal={true}
                         autoFilter={true}
-                        filterParams="WorkPlaceName"
-                        disable={Location.disable}
-                        lable={Location.lable}
+                        filterParams="LeaveDayTypeName"
+                        disable={LeaveDayTypeID.disable}
+                        lable={LeaveDayTypeID.lable}
+                        onFinish={(item) => this.onChangeLeaveDayType(item)}
+                    />
+                )}
+
+                {/* Loại ngày nghỉ */}
+                {RelativeTypeID.visible && fieldConfig?.RelativeTypeID.visibleConfig && (
+                    <VnrPickerQuickly
+                        api={{
+                            urlApi: '[URI_CENTER]/api/Cat_GetData/GetMultiRelativeType',
+                            type: 'E_GET'
+                        }}
+                        isCheckEmpty={acIsCheckEmpty}
+                        fieldValid={fieldConfig?.RelativeTypeID?.isValid}
+                        refresh={RelativeTypeID.refresh}
+                        value={RelativeTypeID.value}
+                        textField="RelativeTypeName"
+                        valueField="ID"
+                        fieldName={'Relationship'}
+                        filter={true}
+                        filterLocal={true}
+                        autoFilter={true}
+                        filterParams="RelativeTypeName"
+                        disable={RelativeTypeID.disable}
+                        lable={RelativeTypeID.lable}
                         onFinish={(item) => {
                             this.setState({
-                                Location: {
-                                    ...Location,
+                                RelativeTypeID: {
+                                    ...RelativeTypeID,
                                     value: item,
-                                    refresh: !Location.refresh
+                                    refresh: !RelativeTypeID.refresh
                                 }
                             });
                         }}
                     />
                 )}
 
-                {/* Thông tin liên hệ */}
-                {((ContactInfo.visible && fieldConfig?.ContactInfo?.visibleConfig)) && (
-                    <VnrTextInput
-                        isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.ContactInfo?.isValid}
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={ContactInfo.disable}
-                        lable={ContactInfo.lable}
-                        style={[styleSheets.text]}
-                        value={ContactInfo.value}
-                        isTextRow={true}
-                        onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
-                        }}
-                        onChangeText={(text) => {
-                            this.setState({
-                                ContactInfo: {
-                                    ...ContactInfo,
-                                    value: text,
-                                    refresh: !ContactInfo.refresh
-                                }
-                            });
-                        }}
-                        refresh={ContactInfo.refresh}
-                    />
+                {
+                    (showRemain?.isPrioritize && showRemain?.value) && (
+                        <View style={[styles.styViewLeaveDayCount, style.wrapShowRemain]}>
+                            {
+                                showRemain?.value?.MaxPerMonth && (
+                                    <Text style={[styleSheets.lable, styles.styViewLeaveDayCountLable]}>
+                                        {`${translate('HRM_PortalApp_MaximumLeave')} (${showRemain?.value?.MaxPerMonth + ' ' + translate('HRM_PortalApp_DayOnMonth')})`}
+                                        {showRemain?.value?.RemainPerMonth && ':'}
+                                        {
+                                            showRemain?.value?.RemainPerMonth && (
+                                                <Text style={{ color: Colors.blue }}>
+                                                    {` ${showRemain?.value?.RemainPerMonth} ${translate('HRM_PortalApp_Only_days')}`}
+                                                </Text>
+                                            )
+                                        }
+                                    </Text>
+                                )
+                            }
+                            {
+                                showRemain?.value?.MaxPerYear && (
+                                    <Text style={[styleSheets.lable, styles.styViewLeaveDayCountLable]}>
+                                        {`${translate('HRM_PortalApp_MaximumLeave')} (${showRemain?.value?.MaxPerYear + ' ' + translate('HRM_PortalApp_DayOnYear')})`}
+                                        {showRemain?.value?.RemainPerYear && ':'}
+                                        {
+                                            showRemain?.value?.RemainPerYear && (
+                                                <Text style={{ color: Colors.blue }}>
+                                                    {` ${showRemain?.value?.RemainPerYear} ${translate('HRM_PortalApp_Only_days')}`}
+                                                </Text>
+                                            )
+                                        }
+                                    </Text>
+                                )
+                            }
+                        </View>
+                    )
+                }
+
+                {RequiredDocuments != '' && (
+                    <View>
+                        <View style={styles.styRowControl}>
+                            {/* Title group for Explanation */}
+                            <View style={styles.flRowSpaceBetween}>
+                                <VnrText
+                                    style={[styleSheets.text, styles.styLableGp, stylesVnrPickerV3.styLbNoValuePicker]}
+                                    i18nKey={'CatLeaveDayType_RequiredDocuments'}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.flRowSpaceBetween}>
+                            <Text style={[styleSheets.text, styles.styLableGp]}>{RequiredDocuments}</Text>
+                        </View>
+                    </View>
                 )}
 
-                {/* Nội dung */}
-                {((Content.visible && fieldConfig?.Content?.visibleConfig)) && (
-                    <VnrTextInput
-                        isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.Content?.isValid}
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={Content.disable}
-                        lable={Content.lable}
-                        style={[styleSheets.text, viewInputMultiline]}
-                        multiline={true}
-                        value={Content.value}
-                        onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
-                        }}
-                        onChangeText={(text) => {
-                            this.setState({
-                                Content: {
-                                    ...Content,
-                                    value: text,
-                                    refresh: !Content.refresh
-                                }
-                            });
-                        }}
-                        refresh={Content.refresh}
-                    />
+                {AddEmployee.visible && fieldConfig?.AddEmployee?.visibleConfig && (
+                    <View style={stylesVnrPickerV3.styContentPicker}>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            style={[
+                                stylesVnrPickerV3.styBntPicker,
+                                stylesVnrPickerV3.onlyFlRowSpaceBetween
+                            ]}
+                            onPress={() => this.handleNeedAReplacement()}
+                        >
+                            <View style={[stylesVnrPickerV3.styLbPicker, CustomStyleSheet.width('50%'), CustomStyleSheet.maxHeight('100%')]}>
+                                <VnrText
+                                    numberOfLines={2}
+                                    style={[styleSheets.text, stylesVnrPickerV3.styLbNoValuePicker]}
+                                    i18nKey={AddEmployee.lable}
+                                />
+                                {fieldConfig?.AddEmployee?.isValid && (
+                                    <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
+                                )}
+                            </View>
+                            <CheckBox
+                                checkBoxColor={Colors.black}
+                                checkedCheckBoxColor={Colors.primary}
+                                onClick={this.handleNeedAReplacement}
+                                isChecked={AddEmployee.value}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 )}
 
-                {/* Công tác chuẩn bị */}
-                {((PreparationWork.visible && fieldConfig?.PreparationWork?.visibleConfig)) && (
-                    <VnrTextInput
-                        isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.PreparationWork?.isValid}
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={PreparationWork.disable}
-                        lable={PreparationWork.lable}
-                        style={[styleSheets.text, viewInputMultiline]}
-                        multiline={true}
-                        value={PreparationWork.value}
-                        onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
-                        }}
-                        onChangeText={(text) => {
-                            this.setState({
-                                PreparationWork: {
-                                    ...PreparationWork,
-                                    value: text,
-                                    refresh: !PreparationWork.refresh
-                                }
-                            });
-                        }}
-                        refresh={PreparationWork.refresh}
-                    />
+                {IsPermissionLeave.visible && fieldConfig?.IsPermissionLeave?.visibleConfig && (
+                    <View style={stylesVnrPickerV3.styContentPicker}>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            style={[
+                                stylesVnrPickerV3.styBntPicker,
+                                stylesVnrPickerV3.onlyFlRowSpaceBetween
+                            ]}
+                            onPress={() => {
+                                this.setState(
+                                    {
+                                        IsPermissionLeave: {
+                                            ...IsPermissionLeave,
+                                            value: !IsPermissionLeave.value,
+                                            refresh: !IsPermissionLeave.refresh
+                                        }
+                                    }
+                                );
+                            }}
+                        >
+                            <View style={[stylesVnrPickerV3.styLbPicker, CustomStyleSheet.width('50%'), CustomStyleSheet.maxHeight('100%')]}>
+                                <VnrText
+                                    numberOfLines={2}
+                                    style={[styleSheets.text, stylesVnrPickerV3.styLbNoValuePicker]}
+                                    i18nKey={IsPermissionLeave.lable}
+                                />
+                                {fieldConfig?.IsPermissionLeave?.isValid && (
+                                    <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
+                                )}
+                            </View>
+                            <CheckBox
+                                checkBoxColor={Colors.black}
+                                checkedCheckBoxColor={Colors.primary}
+                                onClick={() => {
+                                    this.setState(
+                                        {
+                                            IsPermissionLeave: {
+                                                ...IsPermissionLeave,
+                                                value: !IsPermissionLeave.value,
+                                                refresh: !IsPermissionLeave.refresh
+                                            }
+                                        }
+                                    );
+                                }}
+                                isChecked={IsPermissionLeave.value}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 )}
 
-                {/* Loại Công tác */}
-                {BusinessTripTypeID.visible && fieldConfig?.BusinessTripTypeID?.visibleConfig && (
+                {/* Loại ngày nghỉ Chông chăm vợ sinh - Loại sinh */}
+                {Substitute.visible && fieldConfig?.Substitute?.visibleConfig && (
                     <VnrPickerQuickly
                         isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.BusinessTripTypeID?.isValid}
-                        refresh={BusinessTripTypeID.refresh}
-                        dataLocal={BusinessTripTypeID.data}
-                        value={BusinessTripTypeID.value}
-                        textField="BusinessTravelName"
+                        fieldValid={Substitute.isValid}
+                        refresh={Substitute.refresh}
+                        dataLocal={Substitute.data}
+                        value={Substitute.value}
+                        textField="JoinProfileNameCode"
                         valueField="ID"
                         filter={true}
                         filterLocal={true}
                         autoFilter={true}
-                        filterParams="BusinessTravelName"
-                        disable={BusinessTripTypeID.disable}
-                        lable={BusinessTripTypeID.lable}
+                        filterParams="ProfileName"
+                        disable={Substitute.disable}
+                        lable={Substitute.lable}
+                        onFinish={(item) => {
+                            this.setState({
+                                Substitute: {
+                                    ...Substitute,
+                                    value: item,
+                                    refresh: !Substitute.refresh
+                                }
+                            });
+                        }}
+                    />
+                )}
+
+                {/* Loại ngày nghỉ Chông chăm vợ sinh - Loại sinh */}
+                {BirthType.visible && (
+                    <VnrPickerQuickly
+                        isCheckEmpty={acIsCheckEmpty}
+                        fieldValid={BirthType.isValid}
+                        refresh={BirthType.refresh}
+                        dataLocal={BirthType.data}
+                        value={BirthType.value}
+                        textField="Text"
+                        valueField="Value"
+                        filter={false}
+                        disable={BirthType.disable}
+                        lable={BirthType.lable}
                         onFinish={(item) => {
                             this.setState(
                                 {
-                                    BusinessTripTypeID: {
-                                        ...BusinessTripTypeID,
+                                    BirthType: {
+                                        ...BirthType,
                                         value: item,
-                                        refresh: !BusinessTripTypeID.refresh
+                                        refresh: !BirthType.refresh
                                     }
                                 },
-                                this.onChangeBusinessType
+                                this.changeBirthTypeOrChildren()
                             );
                         }}
                     />
                 )}
-                {/* Nơi đi */}
-                {PlaceFrom.visible && fieldConfig?.PlaceFrom?.visibleConfig && (
+
+                {/* Loại ngày nghỉ Chông chăm vợ sinh - Số con */}
+                {Children.visible && (
                     <VnrTextInput
                         isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.PlaceFrom?.isValid}
+                        fieldValid={Children.isValid}
                         placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={PlaceFrom.disable}
-                        lable={PlaceFrom.lable}
-                        style={[styleSheets.text, viewInputMultiline]}
+                        disable={Children.disable}
+                        lable={Children.lable}
+                        style={styleSheets.text}
                         multiline={true}
-                        value={PlaceFrom.value}
+                        value={Children.value}
+                        charType={'int'}
+                        keyboardType={'numeric'}
+                        onBlur={this.changeBirthTypeOrChildren}
+                        onSubmitEditing={this.changeBirthTypeOrChildren}
                         onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
+                            Platform.OS == 'ios' && onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
                         }}
                         onChangeText={(text) => {
                             this.setState({
-                                PlaceFrom: {
-                                    ...PlaceFrom,
+                                Children: {
+                                    ...Children,
                                     value: text,
-                                    refresh: !PlaceFrom.refresh
+                                    refresh: !Children.refresh
                                 }
                             });
                         }}
-                        refresh={PlaceFrom.refresh}
+                        refresh={Children.refresh}
                     />
                 )}
 
-                {/* Nơi đi */}
-                {PlaceInFromID.visible && fieldConfig?.PlaceFromCombobox?.visibleConfig && (
-                    <VnrPickerQuickly
-                        isCheckEmpty={acIsCheckEmpty}
-                        refresh={PlaceInFromID.refresh}
-                        dataLocal={PlaceInFromID.data}
-                        value={PlaceInFromID.value}
-                        textField="ProvinceCodeName"
-                        valueField="ID"
-                        filter={true}
-                        filterLocal={true}
-                        autoFilter={true}
-                        filterParams="ProvinceName"
-                        disable={PlaceInFromID.disable}
-                        lable={PlaceInFromID.lable}
-                        onFinish={(item) => {
-                            this.setState({
-                                PlaceInFromID: {
-                                    ...PlaceInFromID,
-                                    value: item,
-                                    refresh: !PlaceInFromID.refresh
-                                }
-                            });
-                        }}
-                    />
-                )}
-
-                {/* Nơi đến */}
-                {PlaceInToID.visible && fieldConfig?.PlaceToCombobox?.visibleConfig && (
-                    <VnrPickerQuickly
-                        isCheckEmpty={acIsCheckEmpty}
-                        refresh={PlaceInToID.refresh}
-                        dataLocal={PlaceInToID.data}
-                        value={PlaceInToID.value}
-                        textField="ProvinceCodeName"
-                        valueField="ID"
-                        filter={true}
-                        filterLocal={true}
-                        autoFilter={true}
-                        filterParams="ProvinceName"
-                        disable={PlaceInToID.disable}
-                        lable={PlaceInToID.lable}
-                        onFinish={(item) => {
-                            this.setState({
-                                PlaceInToID: {
-                                    ...PlaceInToID,
-                                    value: item,
-                                    refresh: !PlaceInToID.refresh
-                                }
-                            });
-                        }}
-                    />
-                )}
-
-                {/* Nơi đến */}
-                {PlaceOutToID.visible && fieldConfig?.PlaceOutToID?.visibleConfig && (
-                    <VnrPickerQuickly
-                        isCheckEmpty={acIsCheckEmpty}
-                        refresh={PlaceOutToID.refresh}
-                        dataLocal={PlaceOutToID.data}
-                        value={PlaceOutToID.value}
-                        textField="CountryCodeName"
-                        valueField="ID"
-                        filter={true}
-                        filterLocal={true}
-                        autoFilter={true}
-                        filterParams="CountryName"
-                        disable={PlaceOutToID.disable}
-                        lable={PlaceOutToID.lable}
-                        onFinish={(item) => {
-                            this.setState({
-                                PlaceOutToID: {
-                                    ...PlaceOutToID,
-                                    value: item,
-                                    refresh: !PlaceOutToID.refresh
-                                }
-                            });
-                        }}
-                    />
-                )}
-
-                {/* Nơi đưa đến */}
-                {PlaceSendToID.visible && fieldConfig?.PlaceSendToID?.visibleConfig && (
-                    <VnrPickerQuickly
-                        isCheckEmpty={acIsCheckEmpty}
-                        refresh={PlaceSendToID.refresh}
-                        dataLocal={PlaceSendToID.data}
-                        value={PlaceSendToID.value}
-                        textField="WorkPlaceName"
-                        valueField="ID"
-                        filter={true}
-                        filterLocal={true}
-                        autoFilter={true}
-                        filterParams="WorkPlaceName"
-                        disable={PlaceSendToID.disable}
-                        lable={PlaceSendToID.lable}
-                        onFinish={(item) => {
-                            this.setState({
-                                PlaceSendToID: {
-                                    ...PlaceSendToID,
-                                    value: item,
-                                    refresh: !PlaceSendToID.refresh
-                                }
-                            });
-                        }}
-                    />
-                )}
-
-                {/* Lý do đi công tác */}
-                {BusinessTripReasonID.visible && fieldConfig?.BusinessTripReasonID?.visibleConfig && (
-                    <VnrPickerQuickly
-                        isCheckEmpty={acIsCheckEmpty}
-                        refresh={BusinessTripReasonID.refresh}
-                        dataLocal={BusinessTripReasonID.data}
-                        value={BusinessTripReasonID.value}
-                        textField="BusinessTripReasonName"
-                        valueField="ID"
-                        filter={true}
-                        filterLocal={true}
-                        autoFilter={true}
-                        filterParams="BusinessTripReasonName"
-                        disable={BusinessTripReasonID.disable}
-                        lable={BusinessTripReasonID.lable}
-                        onFinish={(item) => {
-                            this.setState({
-                                BusinessTripReasonID: {
-                                    ...BusinessTripReasonID,
-                                    value: item,
-                                    refresh: !BusinessTripReasonID.refresh
-                                }
-                            });
-                        }}
-                    />
-                )}
-
-                {BusinessReason.visible && fieldConfig?.Note?.visibleConfig && (
+                {Comment.visible && fieldConfig?.Comment.visibleConfig && (
                     <VnrTextInput
                         isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.Note?.isValid}
+                        fieldValid={fieldConfig?.Comment?.isValid}
                         placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={BusinessReason.disable}
-                        lable={BusinessReason.lable}
+                        disable={Comment.disable}
+                        lable={Comment.lable}
                         style={[styleSheets.text, viewInputMultiline]}
                         multiline={true}
-                        value={BusinessReason.value}
+                        value={Comment.value}
                         onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
+                            Platform.OS == 'ios' && onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
                         }}
                         onChangeText={(text) => {
                             this.setState({
-                                BusinessReason: {
-                                    ...BusinessReason,
+                                Comment: {
+                                    ...Comment,
                                     value: text,
-                                    refresh: !BusinessReason.refresh
+                                    refresh: !Comment.refresh
                                 }
                             });
                         }}
-                        refresh={BusinessReason.refresh}
+                        refresh={Comment.refresh}
                     />
                 )}
 
                 {/* Tập tin đính kèm */}
-                {FileAttachment.visible && fieldConfig?.FileAttachment?.visibleConfig && (
+                {FileAttachment.visible && fieldConfig?.FileAttachment.visibleConfig && (
                     <View style={{}}>
                         <VnrAttachFile
                             fieldValid={fieldConfig?.FileAttachment?.isValid}
@@ -2078,7 +2945,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             disable={FileAttachment.disable}
                             refresh={FileAttachment.refresh}
                             value={FileAttachment.value}
-                            style
                             multiFile={true}
                             uri={'[URI_CENTER]/api/Sys_Common/saveFileFromApp'}
                             onFinish={(file) => {
@@ -2093,6 +2959,31 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         />
                     </View>
                 )}
+
+                {/* Tập tin đính kèm */}
+                {(FileAttach.visible && fieldConfig?.FileAttach.visibleConfig) && (
+                    <View style={{}}>
+                        <VnrAttachFile
+                            fieldValid={fieldConfig?.FileAttach?.isValid}
+                            isCheckEmpty={acIsCheckEmpty}
+                            lable={FileAttach.lable}
+                            disable={FileAttach.disable}
+                            refresh={FileAttach.refresh}
+                            value={FileAttach.value}
+                            multiFile={true}
+                            uri={'[URI_CENTER]/api/Sys_Common/saveFileFromApp'}
+                            onFinish={(file) => {
+                                this.setState({
+                                    FileAttach: {
+                                        ...FileAttach,
+                                        value: file,
+                                        refresh: !FileAttach.refresh
+                                    }
+                                });
+                            }}
+                        />
+                    </View>
+                )}
             </View>
         );
     }
@@ -2100,4 +2991,10 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
 const styles = styleComonAddOrEdit;
 
-export default AttSubmitTakeBusinessTripComponent;
+const style = StyleSheet.create({
+    wrapShowRemain: {
+        flexDirection: 'column', alignItems: 'flex-start'
+    }
+});
+
+export default AttTakeLeaveDayComponent;

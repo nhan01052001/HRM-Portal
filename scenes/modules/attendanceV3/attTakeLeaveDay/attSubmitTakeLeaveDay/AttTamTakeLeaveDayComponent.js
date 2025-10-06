@@ -161,6 +161,14 @@ const initSateDefault = {
         refresh: false,
         visible: false,
         visibleConfig: true
+    },
+    IsPermissionLeave: {
+        lable: 'HRM_PortalApp_LeaveDay_IsPermissionLeave',
+        value: false,
+        visible: true,
+        refresh: false,
+        visibleConfig: true,
+        disable: false
     }
 };
 
@@ -348,7 +356,8 @@ class AttTakeLeaveDayComponent extends React.Component {
                 AddEmployee,
                 Substitute,
                 FileAttach,
-                RelativeTypeID
+                RelativeTypeID,
+                IsPermissionLeave
             } = this.state;
 
         const profileInfo = dataVnrStorage
@@ -522,6 +531,11 @@ class AttTakeLeaveDayComponent extends React.Component {
                         ? { RelativeTypeName: `${record.RelativeTypeCode} - ${record.RelativeTypeName}`, ID: record.RelativeTypeID }
                         : null,
                     refresh: !RelativeTypeID.refresh
+                },
+                IsPermissionLeave: {
+                    ...IsPermissionLeave,
+                    value: record.IsPermissionLeave ?? false,
+                    refresh: !IsPermissionLeave.refresh
                 }
             };
 
@@ -2153,7 +2167,8 @@ class AttTakeLeaveDayComponent extends React.Component {
             AddEmployee,
             Substitute,
             FileAttach,
-            RelativeTypeID
+            RelativeTypeID,
+            IsPermissionLeave
         } = this.state,
             { levelApprove, fieldConfig, record } = this.props;
 
@@ -2208,6 +2223,7 @@ class AttTakeLeaveDayComponent extends React.Component {
             SubstituteID: Substitute.value ? Substitute.value.ID : null,
             ShiftIDByDate: this.ShiftIDByDate,
             RelativeTypeID: RelativeTypeID.value ? RelativeTypeID.value.ID : null,
+            IsPermissionLeave: IsPermissionLeave.value,
             ...nextPrams
         };
     };
@@ -2411,7 +2427,8 @@ class AttTakeLeaveDayComponent extends React.Component {
             AddEmployee,
             Substitute,
             FileAttach,
-            RelativeTypeID
+            RelativeTypeID,
+            IsPermissionLeave
         } = this.state;
 
         const { fieldConfig, isShowDelete, onDeleteItemDay, indexDay, onScrollToInputIOS, showRemain } = this.props,
@@ -2728,6 +2745,7 @@ class AttTakeLeaveDayComponent extends React.Component {
                 {AddEmployee.visible && fieldConfig?.AddEmployee?.visibleConfig && (
                     <View style={stylesVnrPickerV3.styContentPicker}>
                         <TouchableOpacity
+                            activeOpacity={0.7}
                             style={[
                                 stylesVnrPickerV3.styBntPicker,
                                 stylesVnrPickerV3.onlyFlRowSpaceBetween
@@ -2749,6 +2767,56 @@ class AttTakeLeaveDayComponent extends React.Component {
                                 checkedCheckBoxColor={Colors.primary}
                                 onClick={this.handleNeedAReplacement}
                                 isChecked={AddEmployee.value}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+                {IsPermissionLeave.visible && fieldConfig?.IsPermissionLeave?.visibleConfig && (
+                    <View style={stylesVnrPickerV3.styContentPicker}>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            style={[
+                                stylesVnrPickerV3.styBntPicker,
+                                stylesVnrPickerV3.onlyFlRowSpaceBetween
+                            ]}
+                            onPress={() => {
+                                this.setState(
+                                    {
+                                        IsPermissionLeave: {
+                                            ...IsPermissionLeave,
+                                            value: !IsPermissionLeave.value,
+                                            refresh: !IsPermissionLeave.refresh
+                                        }
+                                    }
+                                );
+                            }}
+                        >
+                            <View style={[stylesVnrPickerV3.styLbPicker, CustomStyleSheet.width('50%'), CustomStyleSheet.maxHeight('100%')]}>
+                                <VnrText
+                                    numberOfLines={2}
+                                    style={[styleSheets.text, stylesVnrPickerV3.styLbNoValuePicker]}
+                                    i18nKey={IsPermissionLeave.lable}
+                                />
+                                {fieldConfig?.IsPermissionLeave?.isValid && (
+                                    <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
+                                )}
+                            </View>
+                            <CheckBox
+                                checkBoxColor={Colors.black}
+                                checkedCheckBoxColor={Colors.primary}
+                                onClick={() => {
+                                    this.setState(
+                                        {
+                                            IsPermissionLeave: {
+                                                ...IsPermissionLeave,
+                                                value: !IsPermissionLeave.value,
+                                                refresh: !IsPermissionLeave.refresh
+                                            }
+                                        }
+                                    );
+                                }}
+                                isChecked={IsPermissionLeave.value}
                             />
                         </TouchableOpacity>
                     </View>

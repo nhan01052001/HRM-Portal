@@ -56,8 +56,8 @@ const initSateDefault = {
             isValid: false
         },
         BusinessTripTypeID: {
-            visibleConfig: true,
-            isValid: true
+            visibleConfig: false,
+            isValid: false
         },
         LeaveDays: {
             visibleConfig: true,
@@ -1332,6 +1332,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 }
                 this.isProcessing = true;
                 this.showLoading(true);
+
                 HttpService.Post('[URI_CENTER]/api/Att_BussinessTravel/CreateOrUpdateBusinessTrip', payload)
                     .then(
                         (res) => {

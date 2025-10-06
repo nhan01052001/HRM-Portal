@@ -88,18 +88,18 @@ export default class Vnr_Function {
                     resolve(DeviceInfo.getUniqueId());
                 } else {
                     resolve(DeviceInfo.getAndroidId());
-                // 1 số máy andorid không trả ra 1 uni ID nhất định nên tự tạo ID
-                // const uiniqueId = await SInfoService.getItem('E_SAVE_UNIQUEID_ANDROID');
-                // if (uiniqueId != null) {
-                //   resolve(uiniqueId);
-                // } else {
-                //   let makeUniqueId = this.MakeId(32);
-                //   SInfoService.setItem('E_SAVE_UNIQUEID_ANDROID', makeUniqueId);
-                //   resolve(makeUniqueId);
-                // }
+                    // 1 số máy andorid không trả ra 1 uni ID nhất định nên tự tạo ID
+                    // const uiniqueId = await SInfoService.getItem('E_SAVE_UNIQUEID_ANDROID');
+                    // if (uiniqueId != null) {
+                    //   resolve(uiniqueId);
+                    // } else {
+                    //   let makeUniqueId = this.MakeId(32);
+                    //   SInfoService.setItem('E_SAVE_UNIQUEID_ANDROID', makeUniqueId);
+                    //   resolve(makeUniqueId);
+                    // }
                 }
             } catch (error) {
-                reject(error)
+                reject(error);
             }
         });
     }
@@ -292,9 +292,7 @@ export default class Vnr_Function {
             }
         } catch (error) {
             console.log(error);
-
         }
-
     }
 
     static MakeId(length) {
@@ -553,7 +551,11 @@ export default class Vnr_Function {
 
         const styles = stylesScreenDetailV2;
         const { styTextValueInfo } = styles;
-        let styTextValue = { ...styleSheets.text, ...styTextValueInfo, ...(!isAlignLayout ? { textAlign: 'left' } : {}) },
+        let styTextValue = {
+                ...styleSheets.text,
+                ...styTextValueInfo,
+                ...(!isAlignLayout ? { textAlign: 'left' } : {})
+            },
             styTextLable = { ...styleSheets.lable, ...{ textAlign: 'left' } },
             styHideBorder = {};
         // styTextGroup = {};
@@ -1179,7 +1181,10 @@ export default class Vnr_Function {
                 viewValue = <Text />;
             }
             return (
-                <View key={col.Label} style={[styles.styItemContent, styHideBorder, col.isWrapLine && { flexDirection: 'column' }]}>
+                <View
+                    key={col.Label}
+                    style={[styles.styItemContent, styHideBorder, col.isWrapLine && { flexDirection: 'column' }]}
+                >
                     <View style={[styles.viewLable, !isAlignLayout && styles.viewLableLeft]}>
                         <VnrText
                             style={[styleSheets.lable, styTextLable]}
@@ -1187,11 +1192,13 @@ export default class Vnr_Function {
                             // numberOfLines={1}
                         />
                     </View>
-                    <View style={[
-                        styles.styViewValue,
-                        !isAlignLayout && styles.styViewValueLeft,
-                        col.isWrapLine && { paddingLeft: 0, paddingTop: Size.defineSpace }
-                    ]}>
+                    <View
+                        style={[
+                            styles.styViewValue,
+                            !isAlignLayout && styles.styViewValueLeft,
+                            col.isWrapLine && { paddingLeft: 0, paddingTop: Size.defineSpace }
+                        ]}
+                    >
                         {viewValue}
                         {/* </View> */}
                     </View>
@@ -1702,10 +1709,10 @@ export default class Vnr_Function {
                                                         {item?.Content
                                                             ? item?.Content
                                                             : item?.FieldName === 'UserReject'
-                                                                ? translate('HRM_PortalApp_Rejected')
-                                                                : item?.StatusProcess === EnumName.E_success
-                                                                    ? translate('HRM_PortalApp_Approved')
-                                                                    : ''}
+                                                              ? translate('HRM_PortalApp_Rejected')
+                                                              : item?.StatusProcess === EnumName.E_success
+                                                                ? translate('HRM_PortalApp_Approved')
+                                                                : ''}
                                                     </Text>
                                                 </View>
                                                 {sub && item[sub] && (
@@ -1912,4 +1919,12 @@ export default class Vnr_Function {
             }
         });
     };
+
+    static openSettings() {
+        if (Platform.OS === 'ios') {
+            Linking.openURL('app-settings:');
+        } else {
+            Linking.openSettings();
+        }
+    }
 }

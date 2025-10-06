@@ -143,7 +143,22 @@ export default {
     'HRM_PortalApp_CopyFailed': 'Copy thất bại!',
     'HRM_PortalApp_NoPermission': 'Xin lỗi, Bạn không có quyền truy cập vào trang này!',
     'HRM_PortalApp_NotLoggedIn': 'Bạn chưa đăng nhập',
-    'HRM_PortalApp_TakeBusinessTrip_EmployeeCount': 'SL nhân viên'
+    'HRM_PortalApp_TakeBusinessTrip_EmployeeCount': 'SL nhân viên',
+    'HRM_PortalApp_LeaveDay_IsPermissionLeave': 'Nghỉ về phép',
+    'HRM_PortalApp_LeaveDay_ RemainingLeaveBalance': 'Số ngày phép còn lại',
+    'HRM_PortalApp_LeaveDay_TotalLeaveDaysTaken': 'Tổng số ngày phép đã nghỉ',
+
+    HRM_PortalApp_TakeBusinessTrip_HoursFrom: 'Thời gian từ',
+    HRM_PortalApp_TakeBusinessTrip_HoursTo: 'Thời gian đến',
+
+
+    HRM_PortalApp_TakeBusinessTrip_TotalBizTripDays: 'Ngày đi công tác',
+    HRM_PortalApp_TakeBusinessTrip_Time: 'Thời gian',
+    HRM_PortalApp_TakeBusinessTrip_Location: 'Địa điểm',
+    HRM_PortalApp_TakeBusinessTrip_ContactInfo: 'Thông tin liên hệ',
+    HRM_PortalApp_TakeBusinessTrip_Content: 'Nội dung',
+    HRM_PortalApp_TakeBusinessTrip_PreparationWork: 'Công tác chuẩn bị',
+    HRM_PortalApp_TakeBusinessTrip_Attachments: 'Văn bản đính kèm'
 
 
 };

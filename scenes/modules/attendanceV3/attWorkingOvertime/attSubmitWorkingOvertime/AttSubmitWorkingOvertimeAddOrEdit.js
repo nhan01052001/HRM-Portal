@@ -216,7 +216,7 @@ const initSateDefault = {
             visibleConfig: false
         },
 
-        CouponCode: {
+        Code: {
             visibleConfig: true,
             isValid: true
         },
@@ -254,7 +254,7 @@ const initSateDefault = {
     IsHasFormulaTotal: false,
 
     isError: false,
-    CouponCode: {
+    Code: {
         lable: 'HRM_PortalApp_OT_CouponCode',
         visible: true,
         visibleConfig: true,
@@ -1925,7 +1925,7 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
             isPassRecord,
             IsHasFormulaTotal,
             isError,
-            CouponCode,
+            Code,
             MethodPayment,
             ReasonOT,
             FileAttachment
@@ -2017,24 +2017,24 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
                                     style={[CustomStyleSheet.flex(1), CustomStyleSheet.height(48)]}
                                 >
                                     <VnrTextInput
-                                        isCheckEmpty={isError && fieldConfig?.CouponCode?.isValid && CouponCode.value.length === 0 ? true : false}
-                                        fieldValid={fieldConfig?.CouponCode?.isValid}
+                                        isCheckEmpty={isError && fieldConfig?.Code?.isValid && Code.value.length === 0 ? true : false}
+                                        fieldValid={fieldConfig?.Code?.isValid}
                                         placeHolder={'HRM_PortalApp_PleaseInput'}
-                                        disable={CouponCode.disable}
-                                        lable={CouponCode.lable}
+                                        disable={Code.disable}
+                                        lable={Code.lable}
                                         style={[styleSheets.text]}
-                                        value={CouponCode.value}
+                                        value={Code.value}
                                         isTextRow={true}
                                         onChangeText={(text) => {
                                             this.setState({
-                                                CouponCode: {
-                                                    ...CouponCode,
+                                                Code: {
+                                                    ...Code,
                                                     value: text,
-                                                    refresh: !CouponCode.refresh
+                                                    refresh: !Code.refresh
                                                 }
                                             });
                                         }}
-                                        refresh={CouponCode.refresh}
+                                        refresh={Code.refresh}
                                     />
                                 </View>
 
@@ -2051,7 +2051,10 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
                                                 fieldConfig?.MethodPayment?.isValid && isError && !MethodPayment.value ? true : false
                                             }
                                             refresh={MethodPayment.refresh}
-                                            dataLocal={MethodPayment.data}
+                                            api={{
+                                                urlApi: '[URI_CENTER]/api/Att_GetData/GetEnum',
+                                                type: 'E_GET'
+                                            }}
                                             value={MethodPayment.value}
                                             textField="Text"
                                             valueField="Value"

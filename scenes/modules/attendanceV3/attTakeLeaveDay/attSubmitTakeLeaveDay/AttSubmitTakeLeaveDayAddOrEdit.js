@@ -114,6 +114,10 @@ const initSateDefault = {
         UserApprove2: {
             visibleConfig: true,
             isValid: false
+        },
+        IsPermissionLeave: {
+            visibleConfig: true,
+            isValid: false
         }
     },
     UserApprove: {
@@ -182,7 +186,8 @@ const initSateDefault = {
     isVisibleKeyboard: false,
     listRemainingLeaveFunds: [],
     isShowRemainLeavefunds: false,
-    isConfigRemainLeavefunds: false
+    isConfigRemainLeavefunds: false,
+    totalRemain: 0
 };
 
 const API_APPROVE = {
@@ -870,7 +875,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         }
                     };
 
-                    this.setState(nextState, () => { });
+                    this.setState(nextState, () => {});
                 }
             });
         }
@@ -941,10 +946,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove,
                 value: response.UserApproveID
                     ? {
-                        UserInfoName: response.UserApproveName,
-                        ID: response.UserApproveID,
-                        AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
-                    }
+                          UserInfoName: response.UserApproveName,
+                          ID: response.UserApproveID,
+                          AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove.refresh
@@ -953,10 +958,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove3,
                 value: response.UserApproveID3
                     ? {
-                        UserInfoName: response.UserApproveName3,
-                        ID: response.UserApproveID3,
-                        AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
-                    }
+                          UserInfoName: response.UserApproveName3,
+                          ID: response.UserApproveID3,
+                          AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove3.refresh
@@ -965,10 +970,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove4,
                 value: response.UserApproveID4
                     ? {
-                        UserInfoName: response.UserApproveName4,
-                        ID: response.UserApproveID4,
-                        AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
-                    }
+                          UserInfoName: response.UserApproveName4,
+                          ID: response.UserApproveID4,
+                          AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove4.refresh
@@ -977,10 +982,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove2,
                 value: response.UserApproveID
                     ? {
-                        UserInfoName: response.UserApproveName2,
-                        ID: response.UserApproveID2,
-                        AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
-                    }
+                          UserInfoName: response.UserApproveName2,
+                          ID: response.UserApproveID2,
+                          AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove2.refresh
@@ -1062,7 +1067,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnReset',
             message: 'HRM_PortalApp_OnReset_Message',
-            onCancel: () => { },
+            onCancel: () => {},
             onConfirm: () => {
                 const { DateFromTo, SimilarRegistration } = this.state;
                 if (DateFromTo.value && DateFromTo.value.length > 0) {
@@ -1132,7 +1137,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnDeleteItemDay',
             textRightButton: 'Confirm',
-            onCancel: () => { },
+            onCancel: () => {},
             onConfirm: () => {
                 const { DateFromTo } = this.state;
                 if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 1) {
@@ -1401,7 +1406,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                                 this.onSave(isSend);
                                             },
                                             //đóng
-                                            onCancel: () => { },
+                                            onCancel: () => {},
                                             //chi tiết lỗi
                                             textRightButton: translate('Button_Detail'),
                                             onConfirm: () => {
@@ -1428,7 +1433,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             ),
                                             textRightButton: translate('Button_Detail'),
                                             //đóng popup
-                                            onCancel: () => { },
+                                            onCancel: () => {},
                                             //chi tiết lỗi
                                             onConfirm: () => {
                                                 this.setState(
@@ -1462,7 +1467,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             this.onSave(isSend);
                                         },
                                         //đóng
-                                        onCancel: () => { },
+                                        onCancel: () => {},
                                         //chi tiết lỗi
                                         textRightButton: translate('Button_Detail'),
                                         onConfirm: () => {
@@ -1500,7 +1505,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     iconType: EnumIcon.E_CONFIRM,
                     title: 'HRM_PortalApp_OnSave_Temp',
                     message: 'HRM_PortalApp_OnSave_Temp_Message',
-                    onCancel: () => { },
+                    onCancel: () => {},
                     onConfirm: () => {
                         callSave();
                         AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttSubmitTakeLeaveDay] =
@@ -1635,6 +1640,8 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         const { Profile } = this.state;
         HttpService.Get(`[URI_CENTER]/api/Att_LeaveDay/GetLeaveDayFundsRemaining?profileID=${Profile.ID}`).then(
             (resGetRemaining) => {
+                console.log(resGetRemaining, 'resGetRemaining');
+
                 let nextState = {};
                 if (
                     resGetRemaining?.Status === 'SUCCESS' &&
@@ -1643,6 +1650,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ) {
                     nextState = {
                         ...nextState,
+                        totalRemain: resGetRemaining?.Data.reduce((sum, item) => sum + (item.Remain || 0), 0),
                         listRemainingLeaveFunds: [...resGetRemaining?.Data],
                         isConfigRemainLeavefunds: true,
                         isLoadingGetRemain: false
@@ -1650,6 +1658,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 } else {
                     nextState = {
                         ...nextState,
+                        totalRemain: 0,
                         listRemainingLeaveFunds: [],
                         isConfigRemainLeavefunds: false,
                         isLoadingGetRemain: false
@@ -1662,13 +1671,13 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     };
 
     renderRemain = () => {
-        const { listRemainingLeaveFunds } = this.state;
+        const { listRemainingLeaveFunds, totalRemain } = this.state;
         if (listRemainingLeaveFunds?.length > 0) {
             return (
                 <View style={customStyle.remainingLeaveContainer}>
                     <View style={customStyle.remainingLeaveHeader}>
                         <IconInfo size={Size.iconSize} color={Colors.blue} />
-                        <Text style={customStyle.remainingLeaveTitle}>Số ngày phép còn lại</Text>
+                        <Text style={customStyle.remainingLeaveTitle}>{translate('HRM_Total_Leave_Balance')}</Text>
                     </View>
 
                     <View style={CustomStyleSheet.marginLeft(12)}>
@@ -1676,7 +1685,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                             <View key={index} style={customStyle.row}>
                                 <View style={customStyle.dot} />
                                 <Text style={customStyle.text}>
-                                    {item?.TypeName ?? ''}: {item?.TotalLeave ?? '0.00'} ngày
+                                    {item?.TypeName ?? ''}: {item?.FundsRemainingDetail?.TotalRemain ?? '0.00'}
                                 </Text>
                             </View>
                         ))}
@@ -1684,14 +1693,12 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 
                     <View>
                         <Text style={[CustomStyleSheet.fontSize(14), CustomStyleSheet.fontWeight('700')]}>
-                            Tổng số ngày phép đã nghỉ: 0 ngày
+                            {translate('HRM_PortalApp_LeaveDay_TotalLeaveDaysTaken')}: {totalRemain} {translate('HRM_PortalApp_TSLRegister_day')}
                         </Text>
                     </View>
                 </View>
-
             );
-        } else
-            return <View />;
+        } else return <View />;
     };
 
     getErrorMessageRespone() {
@@ -1742,7 +1749,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         });
     };
 
-    componentDidMount() { }
+    componentDidMount() {}
 
     onScrollToInputIOS = (index, height) => {
         try {
@@ -2179,17 +2186,17 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 DateFromTo.value &&
                                 Array.isArray(DateFromTo.value) &&
                                 DateFromTo.value.length > 1 && (
-                                <View>
-                                    <VnrSwitch
-                                        lable={'HRM_PortalApp_TakeLeave_Similar'}
-                                        subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
-                                        value={SimilarRegistration.value}
-                                        onFinish={(value) => {
-                                            this.onChangeSimilarRegistration(value);
-                                        }}
-                                    />
-                                </View>
-                            )}
+                                    <View>
+                                        <VnrSwitch
+                                            lable={'HRM_PortalApp_TakeLeave_Similar'}
+                                            subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
+                                            value={SimilarRegistration.value}
+                                            onFinish={(value) => {
+                                                this.onChangeSimilarRegistration(value);
+                                            }}
+                                        />
+                                    </View>
+                                )}
 
                             <KeyboardAvoidingView
                                 scrollEnabled={true}

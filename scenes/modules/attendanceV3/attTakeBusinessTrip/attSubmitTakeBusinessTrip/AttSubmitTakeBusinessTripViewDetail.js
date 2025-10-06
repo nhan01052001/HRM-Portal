@@ -98,7 +98,7 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'BusinessTravelName',
+        Name: 'TimeHours',
         DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Time',
         DataType: 'string'
     },
@@ -110,19 +110,19 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'PlaceSendToName',
+        Name: 'ContactInfo',
         DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_ContactInfo',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'BusinessTripReasonName',
+        Name: 'Content',
         DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Content',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'PlaceFrom',
+        Name: 'PreparationWork',
         DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_PreparationWork',
         DataType: 'string'
     },
@@ -194,7 +194,7 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
         try {
             const _params = this.props.navigation.state.params,
                 { screenName, dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params),
-                _configListDetail = ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
+                _configListDetail = configDefault;//ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
 
             let id = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
             if (id) {
@@ -252,6 +252,8 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
     render() {
         const { dataItem, configListDetail, listActions } = this.state,
             { containerItemDetail, bottomActions } = styleScreenDetail;
+        console.log(dataItem, 'dataItem');
+
         let contentViewDetail = <VnrLoading size={'large'} />;
         if (dataItem && configListDetail) {
             contentViewDetail = (

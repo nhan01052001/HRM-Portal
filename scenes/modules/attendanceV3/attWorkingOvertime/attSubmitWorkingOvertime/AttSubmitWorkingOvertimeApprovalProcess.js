@@ -7,6 +7,8 @@ import { IconPlus, IconRemoveUser, IconUserSetting } from '../../../../../consta
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle';
 import VnrSuperFilterWithTextInput from '../../../../../componentsV3/VnrSuperFilterWithTextInput/VnrSuperFilterWithTextInput';
+import { AlertSevice } from '../../../../../components/Alert/Alert';
+import { EnumIcon } from '../../../../../assets/constant';
 
 const initSateDefault = {
     setUpProcess: {
@@ -26,7 +28,7 @@ const initSateDefault = {
         isValid: false
     },
     Template: {
-        lable: 'Chọn quy trình mẫu',
+        label: 'Chọn quy trình mẫu',
         visible: true,
         visibleConfig: true,
         refresh: false,
@@ -69,10 +71,13 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
         };
 
         this.refEmp = {};
+        this.refStep = {};
     }
 
     render() {
-        const { setUpProcess, Template, listApprove, ProfileID2 } = this.state;
+        const { setUpProcess, Template, listApprove } = this.state;
+        console.log(this.state, 'this.state');
+        
         return (
             <View style={[CustomStyleSheet.flex(1), CustomStyleSheet.backgroundColor(Colors.white)]}>
                 <View style={CustomStyleSheet.backgroundColor(Colors.white)}>
@@ -124,7 +129,7 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                             filterParams="text"
                             params="Template"
                             disable={Template.disable}
-                            lable={Template.lable}
+                            lable={Template.label}
                             stylePicker={styles.resetBorder}
                             isChooseQuickly={true}
                             onFinish={(item) => {
@@ -209,6 +214,48 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                             ]}
                                         />
                                     </View>
+                                    <View>
+                                        <VnrPickerLittle
+                                            ref={(ref) => {
+                                                this.refStep[`${item ?? index}`] = ref;
+                                            }}
+                                            isNewUIValue={true}
+                                            refresh={this.state[item]?.refresh}
+                                            dataLocal={[
+                                                {
+                                                    Text: 'Người xem xét/ Thẩm định',
+                                                    Value: 'E_REVIEWER'
+                                                },
+                                                {
+                                                    Text: 'Người phê duyệt',
+                                                    Value: 'E_APPROVER'
+                                                }
+                                            ]}
+                                            value={
+                                                this.state[item]?.enum
+                                                    ? {
+                                                          Text: this.state[item]?.label,
+                                                          Value: this.state[item]?.enum
+                                                      }
+                                                    : null
+                                            }
+                                            textField="Text"
+                                            valueField="Value"
+                                            lable={this.state[item]?.label}
+                                            stylePicker={styles.resetBorder}
+                                            isChooseQuickly={true}
+                                            onFinish={(value) => {
+                                                this.setState({
+                                                    [item]: {
+                                                        ...this.state[item],
+                                                        label: value?.Text ?? '',
+                                                        refresh: !this.state[item]?.refresh,
+                                                        enum: value?.Value
+                                                    }
+                                                });
+                                            }}
+                                        />
+                                    </View>
                                 </View>
                                 <View style={styles.proposerContainer}>
                                     <View style={styles.proposerHeader}>
@@ -219,11 +266,46 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                         </View>
 
                                         <View style={styles.actionButtons}>
-                                            <TouchableOpacity activeOpacity={0.7} style={styles.btnSetting}>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    if (
+                                                        typeof this.refStep?.[`${item ?? index}`]?.opentModal ===
+                                                        'function'
+                                                    ) {
+                                                        this.refStep?.[`${item ?? index}`]?.opentModal();
+                                                    }
+                                                }}
+                                                disabled={this.state[item]?.isProposer}
+                                                activeOpacity={0.7}
+                                                style={styles.btnSetting}
+                                            >
                                                 <IconUserSetting size={14} color={Colors.black} />
                                             </TouchableOpacity>
 
-                                            <TouchableOpacity activeOpacity={0.7} style={styles.btnRemove}>
+                                            <TouchableOpacity
+                                                disabled={this.state[item]?.isProposer}
+                                                onPress={() => {
+                                                    AlertSevice.alert({
+                                                        iconType: EnumIcon.E_WARNING,
+                                                        title: 'Bạn có chắc muốn xoá dữ liệu?',
+                                                        textLeftButton: 'Huỷ',
+                                                        textRightButton: 'Đồng ý xoá',
+                                                        message: null,
+                                                        onCancel: () => {},
+                                                        onConfirm: () => {
+                                                            this.setState({
+                                                                listApprove:
+                                                                    listApprove?.length > 0
+                                                                        ? listApprove.filter((value) => value !== item)
+                                                                        : [],
+                                                                [item]: null
+                                                            });
+                                                        }
+                                                    });
+                                                }}
+                                                activeOpacity={0.7}
+                                                style={styles.btnRemove}
+                                            >
                                                 <IconRemoveUser size={14} color={Colors.white} />
                                             </TouchableOpacity>
                                         </View>
@@ -269,21 +351,26 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                 {/* --- Add step button --- */}
                 <View style={[CustomStyleSheet.flex(1), CustomStyleSheet.paddingHorizontal(12)]}>
                     <TouchableOpacity
-                    onPress={() => {
-                        // this.setState({
-                        //     [item]: {
-                        //         ...this.state[item],
-                        //         value: [
-                        //             {
-                        //                 ...listItem[0],
-                        //                 Name: listItem[0]?.JoinProfileNameCode ?? ''
-                        //             }
-                        //         ],
-                        //         refresh: !this.state[item]?.refresh
-                        //     }
-                        // });
-                    }}
-                     activeOpacity={0.7} style={styles.buttonAddStep}>
+                        onPress={() => {
+                            const count = listApprove.filter((item) => item.startsWith('UserApprove')).length;
+                            const newItem = count === 0 ? 'UserApprove' : `UserApprove${count}`;
+                            this.setState({
+                                listApprove: [...listApprove, newItem],
+                                [newItem]: {
+                                    label: 'Người xem xét / Thẩm định',
+                                    disable: false,
+                                    refresh: false,
+                                    value: [],
+                                    visible: true,
+                                    visibleConfig: true,
+                                    refresh: false,
+                                    enum: 'E_REVIEWER'
+                                }
+                            });
+                        }}
+                        activeOpacity={0.7}
+                        style={styles.buttonAddStep}
+                    >
                         <IconPlus size={Size.iconSize} color={Colors.blue} />
                         <Text
                             style={[

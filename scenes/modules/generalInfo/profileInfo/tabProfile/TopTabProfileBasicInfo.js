@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, FlatList, RefreshControl } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import VnrText from '../../../../../components/VnrText/VnrText';
 import { connect } from 'react-redux';
 import { SafeAreaView } from 'react-navigation';
@@ -102,6 +102,7 @@ class TopTabProfileBasicInfo extends Component {
                 </View>
             );
         } else if (item['Name'] == 'ImagePath') {
+
             if (dataVnrStorage.apiConfig != null && dataVnrStorage.apiConfig.uriMain != undefined) {
                 // nhannguyen: case empty all data
                 let _imagePath = profile['ImagePath']
@@ -126,9 +127,9 @@ class TopTabProfileBasicInfo extends Component {
                             </View>
                         </View>
                         <View style={styles.viewAvatar}>
-                            <View style={styles.avatar}>
-                                <Image source={{ uri: _imagePath }} style={styles.imgAvatar} />
-                            </View>
+                            {
+                                Vnr_Function.renderAvatarCricleByName(_imagePath, profile?.ProfileName ?? 'A', 50)
+                            }
                         </View>
                     </View>
                 );
@@ -188,6 +189,8 @@ class TopTabProfileBasicInfo extends Component {
         const { keyQuery } = this.state;
         getDataLocal(EnumTask.KT_GeneralInfomation)
             .then((resData) => {
+                console.log(resData, 'resData');
+
                 const res = resData && resData[keyQuery] ? resData[keyQuery] : null;
                 let { showHidecontrol } = this.state;
                 if (res && res !== EnumName.E_EMPTYDATA) {
@@ -341,16 +344,5 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-end',
         alignItems: 'flex-end'
-    },
-    avatar: {
-        height: 50,
-        width: 50,
-        backgroundColor: Colors.borderColor,
-        borderRadius: 50 / 2
-    },
-    imgAvatar: {
-        height: 50,
-        width: 50,
-        borderRadius: 50 / 2
     }
 });
