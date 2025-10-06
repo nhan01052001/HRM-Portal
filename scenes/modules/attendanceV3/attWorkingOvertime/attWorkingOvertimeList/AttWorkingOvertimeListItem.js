@@ -137,7 +137,7 @@ export default class AttWorkingOvertimeListItem extends VnrRenderListItem {
                             <View style={[CustomStyleSheet.flex(1)]}>
                                 <View style={[styles.contentMain]} key={index}>
                                     {/* top */}
-                                    <View style={[styles.styViewTop, {alignItems: 'flex-start'}]}>
+                                    <View style={[styles.styViewTop, CustomStyleSheet.alignItems('flex-start')]}>
                                         {/* Top - left */}
                                         <View style={styles.wh69}>
                                             {/* flexible fontsize */}

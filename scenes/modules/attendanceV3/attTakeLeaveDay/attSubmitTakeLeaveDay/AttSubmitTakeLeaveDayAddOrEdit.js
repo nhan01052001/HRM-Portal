@@ -19,7 +19,7 @@ import VnrText from '../../../../../components/VnrText/VnrText';
 import { translate } from '../../../../../i18n/translate';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import AttTakeLeaveDayComponent from './AttTamTakeLeaveDayComponent';
-import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
+// import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
 import HttpService from '../../../../../utils/HttpService';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
 import { EnumIcon, EnumName, ScreenName } from '../../../../../assets/constant';
@@ -34,6 +34,7 @@ import DrawerServices from '../../../../../utils/DrawerServices';
 import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile';
 import ListButtonRegister from '../../../../../componentsV3/ListButtonRegister/ListButtonRegister';
 import { VnrLoadingSevices } from '../../../../../components/VnrLoading/VnrLoadingPages';
+import VnrApprovalProcess from '../../../../../componentsV3/VnrApprovalProcess/VnrApprovalProcess';
 
 const initSateDefault = {
     ID: null,
@@ -187,16 +188,8 @@ const initSateDefault = {
     listRemainingLeaveFunds: [],
     isShowRemainLeavefunds: false,
     isConfigRemainLeavefunds: false,
-    totalRemain: 0
-};
-
-const API_APPROVE = {
-    urlApi: '[URI_CENTER]/api/Att_GetData/GetMultiUserApproved',
-    type: 'E_POST',
-    dataBody: {
-        text: '',
-        Type: 'E_LEAVE_DAY'
-    }
+    totalRemain: 0,
+    dataApprovalProcess: []
 };
 
 class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
@@ -391,7 +384,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 },
                 () => {
                     this.getRemainLeave();
-                    this.getHighSupervisor();
+                    this.getApprovalProcess();
                 }
             );
         } else if (this.refVnrDateFromTo && this.refVnrDateFromTo.showModal) {
@@ -875,7 +868,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         }
                     };
 
-                    this.setState(nextState, () => {});
+                    this.setState(nextState, () => { });
                 }
             });
         }
@@ -946,10 +939,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove,
                 value: response.UserApproveID
                     ? {
-                          UserInfoName: response.UserApproveName,
-                          ID: response.UserApproveID,
-                          AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
-                      }
+                        UserInfoName: response.UserApproveName,
+                        ID: response.UserApproveID,
+                        AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove.refresh
@@ -958,10 +951,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove3,
                 value: response.UserApproveID3
                     ? {
-                          UserInfoName: response.UserApproveName3,
-                          ID: response.UserApproveID3,
-                          AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
-                      }
+                        UserInfoName: response.UserApproveName3,
+                        ID: response.UserApproveID3,
+                        AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove3.refresh
@@ -970,10 +963,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove4,
                 value: response.UserApproveID4
                     ? {
-                          UserInfoName: response.UserApproveName4,
-                          ID: response.UserApproveID4,
-                          AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
-                      }
+                        UserInfoName: response.UserApproveName4,
+                        ID: response.UserApproveID4,
+                        AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove4.refresh
@@ -982,10 +975,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove2,
                 value: response.UserApproveID
                     ? {
-                          UserInfoName: response.UserApproveName2,
-                          ID: response.UserApproveID2,
-                          AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
-                      }
+                        UserInfoName: response.UserApproveName2,
+                        ID: response.UserApproveID2,
+                        AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove2.refresh
@@ -1067,7 +1060,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnReset',
             message: 'HRM_PortalApp_OnReset_Message',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 const { DateFromTo, SimilarRegistration } = this.state;
                 if (DateFromTo.value && DateFromTo.value.length > 0) {
@@ -1077,7 +1070,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 
                     if (!record) {
                         // nếu bấm refresh lấy lại cấp duyệt
-                        this.getHighSupervisor();
+                        this.getApprovalProcess();
                     } else {
                         // Nếu bấm refresh khi Chỉnh sửa
                         this.isModify = true;
@@ -1137,7 +1130,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnDeleteItemDay',
             textRightButton: 'Confirm',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 const { DateFromTo } = this.state;
                 if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 1) {
@@ -1169,7 +1162,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         value: date,
                         refresh: !DateFromTo.refresh
                     }
-                });
+                }, () => this.getApprovalProcess());
             } else {
                 if (DateFromTo.value[index]) DateFromTo.value[index] = moment(new Date(date)).format('YYYY-MM-DD');
 
@@ -1179,7 +1172,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         value: DateFromTo.value,
                         refresh: !DateFromTo.refresh
                     }
-                });
+                }, () => this.getApprovalProcess());
             }
         } else if (date.endDate && date.startDate) {
             this.setState({
@@ -1188,7 +1181,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     value: date,
                     refresh: !DateFromTo.refresh
                 }
-            });
+            }, () => this.getApprovalProcess());
         }
     };
 
@@ -1206,7 +1199,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             },
             () => {
                 this.getRemainLeave();
-                this.getHighSupervisor();
+                this.getApprovalProcess();
             }
         );
     };
@@ -1244,17 +1237,15 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     };
 
     onSave = (isSend, isconfirm) => {
+        if (this.isProcessing) return;
         let lstLeaveDayItem = [];
         const {
                 DateFromTo,
                 Profile,
-                UserApprove,
-                UserApprove2,
-                UserApprove3,
-                UserApprove4,
                 modalErrorDetail,
                 params,
-                SimilarRegistration
+                SimilarRegistration,
+                dataApprovalProcess
             } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
@@ -1275,6 +1266,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 
                             lstLeaveDayItem.push({
                                 ...data,
+                                DataApprove: dataApprovalProcess,
                                 LeaveDays:
                                     dataLeaveDaysHours && dataLeaveDaysHours.LeaveDays
                                         ? dataLeaveDaysHours.LeaveDays
@@ -1297,7 +1289,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     if (this.listRefGetDataSave[item]) {
                         let data = this.listRefGetDataSave[item].getAllData();
                         if (data) {
-                            lstLeaveDayItem.push(data);
+                            lstLeaveDayItem.push({ ...data, DataApprove: dataApprovalProcess });
                         }
                     }
                 });
@@ -1308,7 +1300,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             if (this.listRefGetDataSave[key]) {
                 let data = this.listRefGetDataSave[key].getAllData();
                 if (data) {
-                    lstLeaveDayItem.push(data);
+                    lstLeaveDayItem.push({ ...data, DataApprove: dataApprovalProcess });
                 }
             }
         }
@@ -1341,11 +1333,6 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...payload,
                 ID: record && record.ID ? record.ID : null,
                 ProfileIDs: Profile.ID,
-                // Lý do gán lại cấp duyệt thứ tự 1.2.3.4 là do server tự gán lại theo thứ tự 1.3.4.2
-                UserApproveID: UserApprove && UserApprove.value ? UserApprove.value.ID : null,
-                UserApproveID2: UserApprove3 && UserApprove3.value ? UserApprove3.value.ID : null,
-                UserApproveID3: UserApprove4 && UserApprove4.value ? UserApprove4.value.ID : null,
-                UserApproveID4: UserApprove2 && UserApprove2.value ? UserApprove2.value.ID : null,
 
                 UserSubmit: Profile.ID,
                 Host: uriPor,
@@ -1369,7 +1356,6 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttApproveSubmitTakeLeaveDay] =
                     true;
             }
-
             const callSave = () => {
                 this.isProcessing = true;
                 this.showLoading(true);
@@ -1406,7 +1392,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                                 this.onSave(isSend);
                                             },
                                             //đóng
-                                            onCancel: () => {},
+                                            onCancel: () => { },
                                             //chi tiết lỗi
                                             textRightButton: translate('Button_Detail'),
                                             onConfirm: () => {
@@ -1433,7 +1419,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             ),
                                             textRightButton: translate('Button_Detail'),
                                             //đóng popup
-                                            onCancel: () => {},
+                                            onCancel: () => { },
                                             //chi tiết lỗi
                                             onConfirm: () => {
                                                 this.setState(
@@ -1467,7 +1453,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             this.onSave(isSend);
                                         },
                                         //đóng
-                                        onCancel: () => {},
+                                        onCancel: () => { },
                                         //chi tiết lỗi
                                         textRightButton: translate('Button_Detail'),
                                         onConfirm: () => {
@@ -1505,7 +1491,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     iconType: EnumIcon.E_CONFIRM,
                     title: 'HRM_PortalApp_OnSave_Temp',
                     message: 'HRM_PortalApp_OnSave_Temp_Message',
-                    onCancel: () => {},
+                    onCancel: () => { },
                     onConfirm: () => {
                         callSave();
                         AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttSubmitTakeLeaveDay] =
@@ -1640,7 +1626,6 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         const { Profile } = this.state;
         HttpService.Get(`[URI_CENTER]/api/Att_LeaveDay/GetLeaveDayFundsRemaining?profileID=${Profile.ID}`).then(
             (resGetRemaining) => {
-                console.log(resGetRemaining, 'resGetRemaining');
 
                 let nextState = {};
                 if (
@@ -1749,7 +1734,14 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         });
     };
 
-    componentDidMount() {}
+    componentDidMount() {
+        PermissionForAppMobile.value = {
+            ...PermissionForAppMobile.value,
+            Sys_ProcessApprove_ChangeProcess: {
+                View: true
+            }
+        };
+    }
 
     onScrollToInputIOS = (index, height) => {
         try {
@@ -1768,7 +1760,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     };
 
     renderItems = () => {
-        const { DateFromTo, SimilarRegistration, fieldConfig, params, isCheckEmpty } = this.state;
+        const { DateFromTo, SimilarRegistration, fieldConfig, params, isCheckEmpty, dataApprovalProcess } = this.state;
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value && DateFromTo.value.length > 1) {
                 // Đăng ký nhiều ngày cùng lúc
@@ -1805,7 +1797,9 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         )}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={this.renderApprove}
+                        ListFooterComponent={() => {
+                            return <VnrApprovalProcess ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                        }}
                         ListHeaderComponent={this.renderRemain}
                     />
                 );
@@ -1844,7 +1838,9 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         )}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={this.renderApprove}
+                        ListFooterComponent={() => {
+                            return <VnrApprovalProcess ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                        }}
                         ListHeaderComponent={this.renderRemain}
                     />
                 );
@@ -1884,7 +1880,9 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     )}
                     keyExtractor={(item, index) => index}
                     ItemSeparatorComponent={() => <View style={styles.separate} />}
-                    ListFooterComponent={this.renderApprove}
+                    ListFooterComponent={() => {
+                        return <VnrApprovalProcess ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                    }}
                     ListHeaderComponent={this.renderRemain}
                 />
             );
@@ -2096,15 +2094,38 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         this.setState(nextState);
     };
 
+    getApprovalProcess = () => {
+        const { Profile, DateFromTo } = this.state;
+        if (!Profile.ID || !DateFromTo.value) return;
+
+        this.showLoading(true);
+        const payload = {
+            'ProfileID': Profile.ID,
+            'WorkDate': Array.isArray(DateFromTo.value) ? moment(DateFromTo.value[0]).format('YYYY/MM/DD') : moment(DateFromTo.value).format('YYYY/MM/DD'),
+            'BusinessType': 'E_LEAVEDAY'
+        };
+
+        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload).then((res) => {
+            this.showLoading(false);
+            if (res?.Status === EnumName.E_SUCCESS) {
+                this.setState({
+                    dataApprovalProcess: res.Data
+                });
+            } else {
+                this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+            }
+
+        }).catch(() => {
+            this.showLoading(false);
+            this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+        });
+
+    }
+
     render() {
         const {
             DateFromTo,
             isShowModal,
-            isShowModalApprove,
-            UserApprove,
-            UserApprove3,
-            UserApprove4,
-            UserApprove2,
             SimilarRegistration,
             /// lỗi chi tiết
             modalErrorDetail,
@@ -2186,17 +2207,17 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 DateFromTo.value &&
                                 Array.isArray(DateFromTo.value) &&
                                 DateFromTo.value.length > 1 && (
-                                    <View>
-                                        <VnrSwitch
-                                            lable={'HRM_PortalApp_TakeLeave_Similar'}
-                                            subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
-                                            value={SimilarRegistration.value}
-                                            onFinish={(value) => {
-                                                this.onChangeSimilarRegistration(value);
-                                            }}
-                                        />
-                                    </View>
-                                )}
+                                <View>
+                                    <VnrSwitch
+                                        lable={'HRM_PortalApp_TakeLeave_Similar'}
+                                        subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
+                                        value={SimilarRegistration.value}
+                                        onFinish={(value) => {
+                                            this.onChangeSimilarRegistration(value);
+                                        }}
+                                    />
+                                </View>
+                            )}
 
                             <KeyboardAvoidingView
                                 scrollEnabled={true}
@@ -2212,133 +2233,6 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                     <ListButtonRegister listActions={listActions} />
                                 </View>
                             )}
-
-                            {/* modal cấp duyệt */}
-                            {isShowModalApprove ? ( //styles.wrapModalApprovaLevel
-                                <View style={styles.wrapModalApproval}>
-                                    <TouchableOpacity
-                                        style={[styles.bgOpacity]}
-                                        onPress={() => {
-                                            this.setState({
-                                                isShowModalApprove: false
-                                            });
-                                        }}
-                                    />
-                                    <View style={styles.modalApprover}>
-                                        <SafeAreaView style={styles.wrapContentModalApproval}>
-                                            <View style={styles.wrapTitileHeaderModalApprovaLevel}>
-                                                <VnrText
-                                                    style={[styleSheets.text, styles.styRegister, styles.fS16fW600]}
-                                                    i18nKey={'HRM_PortalApp_Approval_Process'}
-                                                />
-                                                <VnrText
-                                                    style={[styleSheets.text, styles.styApproveProcessTitle]}
-                                                    i18nKey={`${this.levelApprove} ${translate(
-                                                        'HRM_PortalApp_Approval_Level'
-                                                    )}`}
-                                                />
-                                            </View>
-                                            <View style={styles.wrapLevelApproval}>
-                                                <View style={styles.h90}>
-                                                    <VnrLoadApproval
-                                                        api={API_APPROVE}
-                                                        refresh={UserApprove.refresh}
-                                                        textField="UserInfoName"
-                                                        valueField="ID"
-                                                        nameApprovalLevel={UserApprove.label}
-                                                        levelApproval={UserApprove.levelApproval}
-                                                        filter={true}
-                                                        filterServer={true}
-                                                        filterParams={'Text'}
-                                                        autoFilter={true}
-                                                        status={UserApprove.status}
-                                                        value={UserApprove.value}
-                                                        disable={UserApprove.disable}
-                                                        onFinish={(item) => this.onChangeUserApprove(item)}
-                                                    />
-                                                </View>
-
-                                                {UserApprove3.visible && UserApprove3.visibleConfig && (
-                                                    <View style={styles.h90}>
-                                                        <VnrLoadApproval
-                                                            api={API_APPROVE}
-                                                            refresh={UserApprove3.refresh}
-                                                            textField="UserInfoName"
-                                                            nameApprovalLevel={UserApprove3.label}
-                                                            levelApproval={UserApprove3.levelApproval}
-                                                            valueField="ID"
-                                                            filter={true}
-                                                            filterServer={true}
-                                                            filterParams={'Text'}
-                                                            autoFilter={true}
-                                                            status={UserApprove3.status}
-                                                            value={UserApprove3.value}
-                                                            disable={UserApprove3.disable}
-                                                            onFinish={(item) => {
-                                                                this.setState({
-                                                                    UserApprove3: {
-                                                                        ...UserApprove3,
-                                                                        value: item,
-                                                                        refresh: !UserApprove3.refresh
-                                                                    }
-                                                                });
-                                                            }}
-                                                        />
-                                                    </View>
-                                                )}
-
-                                                {UserApprove4.visible && UserApprove4.visibleConfig && (
-                                                    <View style={styles.h90}>
-                                                        <VnrLoadApproval
-                                                            api={API_APPROVE}
-                                                            refresh={UserApprove4.refresh}
-                                                            textField="UserInfoName"
-                                                            nameApprovalLevel={UserApprove4.label}
-                                                            levelApproval={UserApprove4.levelApproval}
-                                                            valueField="ID"
-                                                            filter={true}
-                                                            filterServer={true}
-                                                            filterParams={'Text'}
-                                                            autoFilter={true}
-                                                            status={UserApprove4.status}
-                                                            value={UserApprove4.value}
-                                                            disable={UserApprove4.disable}
-                                                            onFinish={(item) => {
-                                                                this.setState({
-                                                                    UserApprove4: {
-                                                                        ...UserApprove4,
-                                                                        value: item,
-                                                                        refresh: !UserApprove4.refresh
-                                                                    }
-                                                                });
-                                                            }}
-                                                        />
-                                                    </View>
-                                                )}
-
-                                                <View style={styles.h90}>
-                                                    <VnrLoadApproval
-                                                        api={API_APPROVE}
-                                                        refresh={UserApprove2.refresh}
-                                                        textField="UserInfoName"
-                                                        nameApprovalLevel={UserApprove2.label}
-                                                        levelApproval={UserApprove2.levelApproval}
-                                                        valueField="ID"
-                                                        filter={true}
-                                                        filterServer={true}
-                                                        filterParams={'Text'}
-                                                        autoFilter={true}
-                                                        status={UserApprove2.status}
-                                                        value={UserApprove2.value}
-                                                        disable={UserApprove2.disable}
-                                                        onFinish={(item) => this.onChangeUserApprove2(item)}
-                                                    />
-                                                </View>
-                                            </View>
-                                        </SafeAreaView>
-                                    </View>
-                                </View>
-                            ) : null}
                         </SafeAreaView>
 
                         {modalErrorDetail.isModalVisible && (

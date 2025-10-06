@@ -76,8 +76,7 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
 
     render() {
         const { setUpProcess, Template, listApprove } = this.state;
-        console.log(this.state, 'this.state');
-        
+
         return (
             <View style={[CustomStyleSheet.flex(1), CustomStyleSheet.backgroundColor(Colors.white)]}>
                 <View style={CustomStyleSheet.backgroundColor(Colors.white)}>
@@ -234,9 +233,9 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                             value={
                                                 this.state[item]?.enum
                                                     ? {
-                                                          Text: this.state[item]?.label,
-                                                          Value: this.state[item]?.enum
-                                                      }
+                                                        Text: this.state[item]?.label,
+                                                        Value: this.state[item]?.enum
+                                                    }
                                                     : null
                                             }
                                             textField="Text"
@@ -363,7 +362,6 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                     value: [],
                                     visible: true,
                                     visibleConfig: true,
-                                    refresh: false,
                                     enum: 'E_REVIEWER'
                                 }
                             });

@@ -26,6 +26,7 @@ import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFrom
 import AttSubmitTakeLateEarlyAllowedComponent from './AttSubmitTakeLateEarlyAllowedComponent';
 import styleComonAddOrEdit from '../../../../../constants/styleComonAddOrEdit';
 import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
+import VnrApprovalProcess from '../../../../../componentsV3/VnrApprovalProcess/VnrApprovalProcess';
 import VnrIndeterminate from '../../../../../components/VnrLoading/VnrIndeterminate';
 import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile';
 import ListButtonRegister from '../../../../../componentsV3/ListButtonRegister/ListButtonRegister';
@@ -204,7 +205,8 @@ const initSateDefault = {
     },
 
     dayHaveShift: null,
-    dayNotHaveShift: null
+    dayNotHaveShift: null,
+    dataApprovalProcess: []
 };
 
 export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
@@ -263,6 +265,10 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
         this.IsRemoveAndContinue = null;
         this.CacheID = null;
         this.refFlatList = null;
+
+        this.ToasterSeviceCallBack = () => {
+            return this.ToasterSevice;
+        };
     };
 
     //#region [khởi tạo - check đăng ký hộ, lấy các dữ liệu cho control, lấy giá trị mặc đinh]
@@ -476,7 +482,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
         this.setState(nextState, () => {
             //[CREATE] Step 4: Lấy cấp duyệt .
             this.getConfigMultiShift();
-            this.GetHighSupervior();
+            this.getApprovalProcess();
             const { params, DateFromTo } = this.state;
             if (params && params.listItem && params.listItem.length > 0) {
                 let listday = params.listItem.map(item => moment(item.WorkDate).format('YYYY-MM-DD'));
@@ -974,7 +980,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
 
                     if (!record) {
                         // nếu bấm refresh lấy lại cấp duyệt
-                        this.GetHighSupervior();
+                        this.getApprovalProcess();
                     } else {
                         // Nếu bấm refresh khi Chỉnh sửa
                         this.isModify = true;
@@ -1015,12 +1021,9 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
         const {
                 DateFromTo,
                 Profile,
-                UserApprove,
-                UserApprove2,
-                UserApprove3,
-                UserApprove4,
                 modalErrorDetail,
-                params
+                params,
+                dataApprovalProcess
             } = this.state,
             { record } = params;
 
@@ -1030,7 +1033,8 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                     const data = this.listRefGetDataSave[item].getAllData();
                     if (data) {
                         lstLateEarlyItem.push({
-                            ...data
+                            ...data,
+                            DataApprove: dataApprovalProcess
                         });
                     }
                 }
@@ -1049,10 +1053,6 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
             payload = {
                 ...payload,
                 ProfileIds: Profile.ID,
-                UserApproveID: UserApprove.value ? UserApprove.value.ID : null,
-                UserApproveID2: UserApprove3.value ? UserApprove3.value.ID : null,
-                UserApproveID3: UserApprove4.value ? UserApprove4.value.ID : null,
-                UserApproveID4: UserApprove2.value ? UserApprove2.value.ID : null,
                 ListLateEarlyItem: lstLateEarlyItem
             };
 
@@ -1485,6 +1485,33 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
         }
     };
 
+    getApprovalProcess = () => {
+        const { Profile, DateFromTo } = this.state;
+        if (!Profile.ID || !DateFromTo.value || !Array.isArray(DateFromTo.value) || DateFromTo.value.length === 0) return;
+
+        this.showLoading(true);
+        const payload = {
+            'ProfileID': Profile.ID,
+            'WorkDate': moment(DateFromTo.value[0]).format('YYYY/MM/DD'),
+            'BusinessType': 'E_APPROVE_LATEEARLYALLOWED'
+        };
+
+        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload).then((res) => {
+            this.showLoading(false);
+            if (res?.Status === EnumName.E_SUCCESS) {
+                this.setState({
+                    dataApprovalProcess: res.Data
+                });
+            } else {
+                this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+            }
+
+        }).catch(() => {
+            this.showLoading(false);
+            this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+        });
+    };
+
     renderItems = () => {
         const { DateFromTo, isRefresh, fieldConfig, params } = this.state;
         if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
@@ -1517,7 +1544,10 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                     )}
                     keyExtractor={(item, index) => index}
                     ItemSeparatorComponent={() => <View style={styleComonAddOrEdit.separate} />}
-                    ListFooterComponent={this.renderApprove}
+                    ListFooterComponent={() => {
+                        const { dataApprovalProcess } = this.state;
+                        return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                    }}
                 />
             );
         }
@@ -1745,6 +1775,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                 },
                 () => {
                     this.getShiftByWorkDayLateEarly();
+                    this.getApprovalProcess();
                 }
             );
         } else {
@@ -1757,7 +1788,9 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                 isRefresh: !isRefresh,
                 isShowModal: true
             };
-            this.setState(nextState);
+            this.setState(nextState, () => {
+                this.getApprovalProcess();
+            });
         }
     };
 

@@ -233,7 +233,6 @@ export default class AttSubmitTakeLeaveDayViewDetail extends Component {
                 { screenName, dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params),
                 _configListDetail =
                     ConfigListDetail.value[screenName] !== null ? ConfigListDetail.value[screenName] : configDefault;
-console.log(_params, '_params');
 
             let id = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
             if (id) {
@@ -256,7 +255,11 @@ console.log(_params, '_params');
                         : dataItem?.ProfileInfo?.ImagePath;
 
                     const _listActions = await this.rowActionsHeaderRight(data);
-                    this.setState({ configListDetail: getDetailConfig, dataItem: data, listActions: _listActions });
+                    let configFinish = getDetailConfig;
+                    if (Array.isArray(configFinish) && configFinish.length > 0) {
+                        configFinish = configFinish.filter((item) => item !== null && item !== undefined);
+                    }
+                    this.setState({ configListDetail: configFinish, dataItem: data, listActions: _listActions });
                 } else {
                     this.setState({ dataItem: 'EmptyData' });
                 }

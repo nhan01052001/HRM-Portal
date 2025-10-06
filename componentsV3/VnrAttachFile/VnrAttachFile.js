@@ -593,7 +593,7 @@ export default class VnrAttachFile extends React.Component {
                                     ]}
                                 >
                                     <VnrText
-                                        numberOfLines={2}
+                                        numberOfLines={1}
                                         style={[
                                             styleSheets.text,
                                             stylePlaceholder,

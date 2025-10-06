@@ -678,7 +678,6 @@ class AttTakeLeaveDayComponent extends React.Component {
             FileAttach,
             FileAttachment
         } = this.state;
-        const { getHighSupervisor } = this.props;
 
         try {
             if (DateRage.value) {
@@ -872,12 +871,7 @@ class AttTakeLeaveDayComponent extends React.Component {
                         };
                     }
 
-                    this.setState(nextState, () => {
-                        const { LeaveDays } = this.state;
-                        if (LeaveDays.value != null && !isFromModify) getHighSupervisor && getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
-                            Vnr_Function.formatDateAPI(DateStart),
-                            Vnr_Function.formatDateAPI(DateEnd));
-                    });
+                    this.setState(nextState);
                 } else {
                     // từ ngày đến ngày và 1 ngày
                     this.showLoading(true);
@@ -1004,7 +998,7 @@ class AttTakeLeaveDayComponent extends React.Component {
                         } else {
                             if (resRoster) {
                                 const dataRoster = resRoster.Data;
-                                if (dataRoster && dataRoster.ListShift && dataRoster.ListShift?.length > 1) {
+                                if (dataRoster?.ListShift?.length > 1) {
                                     dataRoster.ListShift.unshift({
                                         ShiftName: translate('HRM_Att_TakeLeave_AllShift'),
                                         ShiftID: null
@@ -1198,12 +1192,7 @@ class AttTakeLeaveDayComponent extends React.Component {
                             };
                         }
 
-                        this.setState(nextState, () => {
-                            const { LeaveDays } = this.state;
-                            if (LeaveDays.value != null && !isFromModify) getHighSupervisor && getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
-                                Vnr_Function.formatDateAPI(DateStart),
-                                Vnr_Function.formatDateAPI(DateEnd));
-                        });
+                        this.setState(nextState);
                     });
                 }
             }
@@ -1314,8 +1303,6 @@ class AttTakeLeaveDayComponent extends React.Component {
             FileAttachment,
             RelativeTypeID
         } = this.state;
-
-        const { getHighSupervisor } = this.props;
         if (DurationType.value) {
             if (DateRage.value && Array.isArray(DateRage.value) && DateRage.value.length > 1) {
                 // Đăng ký nhiều ngày cùng lúc
@@ -1398,7 +1385,7 @@ class AttTakeLeaveDayComponent extends React.Component {
                         };
                     }
 
-                    if (resData.ListShift && resData.ListShift.length > 0)
+                    if (resData.ListShift && resData.ListShift?.length > 0)
                         resData.ListShift.forEach((e) => {
                             dataRoster.ListShift[e.ShiftID] = e;
                             //	0184782: [Hotfix_ KOG_v8.11. 21.01.10.217]: Lỗi hiển thị số giờ nghỉ không đúng khi đăng ký ngày nghỉ trên app.
@@ -1523,7 +1510,7 @@ class AttTakeLeaveDayComponent extends React.Component {
                     ShiftID: {
                         ...ShiftID,
                         value:
-                            dataRoster.ListShift && Object.keys(dataRoster.ListShift).length > 0
+                            dataRoster.ListShift && Object.keys(dataRoster.ListShift)?.length > 0
                                 ? Object.keys(dataRoster.ListShift).join(',')
                                 : null
                     },
@@ -1609,12 +1596,6 @@ class AttTakeLeaveDayComponent extends React.Component {
                     if (DurationType.value?.Value === EnumName.E_MIDDLEOFSHIFT) {
                         this.handleGetLeaveHourMidleShift();
                     }
-
-                    const { LeaveDays } = this.state;
-                    if (LeaveDays.value != null) getHighSupervisor && getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
-                        Vnr_Function.formatDateAPI(DateRage?.value[0]),
-                        Vnr_Function.formatDateAPI(DateRage?.value[0])
-                    );
                 });
             } else {
                 const { DateStart, DateEnd, dataDurationType } = this.getDate();
@@ -1636,8 +1617,8 @@ class AttTakeLeaveDayComponent extends React.Component {
 
                         if (resRoster) {
                             const dataRoster = resRoster.Data;
-                            if (dataRoster && dataRoster.ListShift && dataRoster.ListShift?.length > 1) {
-                                dataRoster.ListShift.unshift({
+                            if (dataRoster?.ListShift?.length > 1) {
+                                dataRoster?.ListShift?.unshift({
                                     ShiftName: translate('HRM_Att_TakeLeave_AllShift'),
                                     ShiftID: null
                                 });
@@ -1897,12 +1878,6 @@ class AttTakeLeaveDayComponent extends React.Component {
                                 if (DurationType.value?.Value === EnumName.E_MIDDLEOFSHIFT) {
                                     this.handleGetLeaveHourMidleShift();
                                 }
-
-                                const { LeaveDays } = this.state;
-                                if (LeaveDays.value != null) getHighSupervisor &&
-                                    getHighSupervisor(LeaveDays.value, LeaveDayTypeID.value,
-                                        Vnr_Function.formatDateAPI(DateStart),
-                                        Vnr_Function.formatDateAPI(DateEnd));
                             });
                         }
                     }

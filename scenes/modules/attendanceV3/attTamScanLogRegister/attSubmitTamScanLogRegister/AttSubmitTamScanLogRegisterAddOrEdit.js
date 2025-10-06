@@ -18,7 +18,7 @@ import VnrText from '../../../../../components/VnrText/VnrText';
 import { translate } from '../../../../../i18n/translate';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import AttTamScanLogRegisterComponent from './AttTamScanLogRegisterComponent';
-import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
+import VnrApprovalProcess from '../../../../../componentsV3/VnrApprovalProcess/VnrApprovalProcess';
 import HttpService from '../../../../../utils/HttpService';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
 import { EnumIcon, EnumName, ScreenName } from '../../../../../assets/constant';
@@ -123,7 +123,8 @@ const initSateDefault = {
     },
     isShowLoading: false,
     isShowModalApprove: false,
-    isKeyboardShowOrHide: false
+    isKeyboardShowOrHide: false,
+    dataApprovalProcess: []
 };
 
 const API_APPROVE = {
@@ -180,6 +181,10 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
 
         this.AlertSevice = {
             alert: null
+        };
+
+        this.ToasterSeviceCallBack = () => {
+            return this.ToasterSevice;
         };
     };
 
@@ -282,8 +287,6 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
         };
 
         this.setState(nextState, () => {
-            //[CREATE] Step 4: Lấy cấp duyệt .
-            this.getHighSupervisor();
             const { params, DateFromTo } = this.state;
             if (params.listItem && params.listItem.length > 0) {
                 // Trường hợp tạo mới từ ngày công
@@ -295,6 +298,8 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                         refresh: !DateFromTo.refresh
                     },
                     isShowModal: true
+                }, () => {
+                    this.getApprovalProcess();
                 });
             } else if (this.refVnrDateFromTo && this.refVnrDateFromTo.showModal) {
                 this.refVnrDateFromTo.showModal();
@@ -966,7 +971,7 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
 
                     if (!record) {
                         // nếu bấm refresh lấy lại cấp duyệt
-                        this.getHighSupervisor();
+                        this.getApprovalProcess();
                     } else {
                         // ếu bấm refresh khi Chỉnh sửa
                         this.isModify = true;
@@ -1063,6 +1068,8 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                 refresh: !DateFromTo.refresh
             },
             isShowModal: true
+        }, () => {
+            this.getApprovalProcess();
         });
     };
 
@@ -1103,12 +1110,9 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
         const {
                 DateFromTo,
                 Profile,
-                UserApprove,
-                UserApprove2,
-                UserApprove3,
-                UserApprove4,
                 modalErrorDetail,
-                params
+                params,
+                dataApprovalProcess
             } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
@@ -1119,7 +1123,10 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                 if (this.listRefGetDataSave[item]) {
                     let data = this.listRefGetDataSave[item].getAllData();
                     if (data) {
-                        lstMissSave.push(data);
+                        lstMissSave.push({
+                            ...data,
+                            DataApprove: dataApprovalProcess
+                        });
                     }
                 }
             });
@@ -1131,11 +1138,6 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                 ...payload,
                 ID: record && record.ID ? record.ID : null,
                 ProfileIDs: Profile.ID,
-                // Lý do gán lại cấp duyệt thứ tự 1.2.3.4 là do server tự gán lại theo thứ tự 1.3.4.2
-                UserApproveID: UserApprove && UserApprove.value ? UserApprove.value.ID : null,
-                UserApproveID2: UserApprove3 && UserApprove3.value ? UserApprove3.value.ID : null,
-                UserApproveID3: UserApprove4 && UserApprove4.value ? UserApprove4.value.ID : null,
-                UserApproveID4: UserApprove2 && UserApprove2.value ? UserApprove2.value.ID : null,
                 UserSubmit: Profile.ID,
                 Host: uriPor,
                 ListMissInOutSave: lstMissSave,
@@ -1679,6 +1681,33 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
         return this.ToasterSevice;
     };
 
+    getApprovalProcess = () => {
+        const { Profile, DateFromTo } = this.state;
+        if (!Profile.ID || !DateFromTo.value) return;
+
+        this.showLoading(true);
+        const payload = {
+            'ProfileID': Profile.ID,
+            'WorkDate': Array.isArray(DateFromTo.value) ? moment(DateFromTo.value[0]).format('YYYY/MM/DD') : moment(DateFromTo.value.startDate).format('YYYY/MM/DD'),
+            'BusinessType': 'E_TAMSCANLOGREGISTER'
+        };
+
+        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload).then((res) => {
+            this.showLoading(false);
+            if (res?.Status === EnumName.E_SUCCESS) {
+                this.setState({
+                    dataApprovalProcess: res.Data
+                });
+            } else {
+                this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+            }
+
+        }).catch(() => {
+            this.showLoading(false);
+            this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+        });
+    };
+
     UNSAFE_componentWillMount() {
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
@@ -1705,11 +1734,6 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
         const {
             DateFromTo,
             isShowModal,
-            isShowModalApprove,
-            UserApprove,
-            UserApprove3,
-            UserApprove4,
-            UserApprove2,
 
             params,
             /// lỗi chi tiết
@@ -1817,14 +1841,14 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                                                         ? false
                                                         : true
                                                 }
-                                                onGetHighSupervisorFromOrgStructureTransID={(OrgStructureTransID) => {
-                                                    this.getHighSupervisor(OrgStructureTransID);
-                                                }}
                                             />
                                         )}
                                         keyExtractor={(item, index) => index}
                                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                                        ListFooterComponent={this.renderApprove}
+                                        ListFooterComponent={() => {
+                                            const { dataApprovalProcess } = this.state;
+                                            return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                                        }}
                                     />
 
                                     {/* button */}
@@ -1833,133 +1857,6 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                                         isKeyboardShowOrHide={isKeyboardShowOrHide}
                                     />
                                 </KeyboardAvoidingView>
-
-                                {/* modal cấp duyệt */}
-                                {isShowModalApprove ? ( //styles.wrapModalApprovaLevel
-                                    <View style={styles.wrapModalApproval}>
-                                        <TouchableOpacity
-                                            style={[styles.bgOpacity]}
-                                            onPress={() => {
-                                                this.setState({
-                                                    isShowModalApprove: false
-                                                });
-                                            }}
-                                        />
-                                        <View style={styles.modalApprover}>
-                                            <SafeAreaView style={styles.wrapContentModalApproval}>
-                                                <View style={styles.wrapTitileHeaderModalApprovaLevel}>
-                                                    <VnrText
-                                                        style={[styleSheets.text, styles.styRegister, styles.fS16fW600]}
-                                                        i18nKey={'HRM_PortalApp_Approval_Process'}
-                                                    />
-                                                    <VnrText
-                                                        style={[styleSheets.text, styles.styApproveProcessTitle]}
-                                                        i18nKey={`${this.levelApprove} ${translate(
-                                                            'HRM_PortalApp_Approval_Level'
-                                                        )}`}
-                                                    />
-                                                </View>
-                                                <View style={styles.wrapLevelApproval}>
-                                                    <View style={styles.h90}>
-                                                        <VnrLoadApproval
-                                                            api={API_APPROVE}
-                                                            refresh={UserApprove.refresh}
-                                                            textField="UserInfoName"
-                                                            valueField="ID"
-                                                            nameApprovalLevel={UserApprove.label}
-                                                            levelApproval={UserApprove.levelApproval}
-                                                            filter={true}
-                                                            filterServer={true}
-                                                            filterParams={'Text'}
-                                                            autoFilter={true}
-                                                            status={UserApprove.status}
-                                                            value={UserApprove.value}
-                                                            disable={UserApprove.disable}
-                                                            onFinish={item => this.onChangeUserApprove(item)}
-                                                        />
-                                                    </View>
-
-                                                    {UserApprove3.visible && UserApprove3.visibleConfig && (
-                                                        <View style={styles.h90}>
-                                                            <VnrLoadApproval
-                                                                api={API_APPROVE}
-                                                                refresh={UserApprove3.refresh}
-                                                                textField="UserInfoName"
-                                                                nameApprovalLevel={UserApprove3.label}
-                                                                levelApproval={UserApprove3.levelApproval}
-                                                                valueField="ID"
-                                                                filter={true}
-                                                                filterServer={true}
-                                                                filterParams={'Text'}
-                                                                autoFilter={true}
-                                                                status={UserApprove3.status}
-                                                                value={UserApprove3.value}
-                                                                disable={UserApprove3.disable}
-                                                                onFinish={item => {
-                                                                    this.setState({
-                                                                        UserApprove3: {
-                                                                            ...UserApprove3,
-                                                                            value: item,
-                                                                            refresh: !UserApprove3.refresh
-                                                                        }
-                                                                    });
-                                                                }}
-                                                            />
-                                                        </View>
-                                                    )}
-
-                                                    {UserApprove4.visible && UserApprove4.visibleConfig && (
-                                                        <View style={styles.h90}>
-                                                            <VnrLoadApproval
-                                                                api={API_APPROVE}
-                                                                refresh={UserApprove4.refresh}
-                                                                textField="UserInfoName"
-                                                                nameApprovalLevel={UserApprove4.label}
-                                                                levelApproval={UserApprove4.levelApproval}
-                                                                valueField="ID"
-                                                                filter={true}
-                                                                filterServer={true}
-                                                                filterParams={'Text'}
-                                                                autoFilter={true}
-                                                                status={UserApprove4.status}
-                                                                value={UserApprove4.value}
-                                                                disable={UserApprove4.disable}
-                                                                onFinish={item => {
-                                                                    this.setState({
-                                                                        UserApprove4: {
-                                                                            ...UserApprove4,
-                                                                            value: item,
-                                                                            refresh: !UserApprove4.refresh
-                                                                        }
-                                                                    });
-                                                                }}
-                                                            />
-                                                        </View>
-                                                    )}
-
-                                                    <View style={styles.h90}>
-                                                        <VnrLoadApproval
-                                                            api={API_APPROVE}
-                                                            refresh={UserApprove2.refresh}
-                                                            textField="UserInfoName"
-                                                            nameApprovalLevel={UserApprove2.label}
-                                                            levelApproval={UserApprove2.levelApproval}
-                                                            valueField="ID"
-                                                            filter={true}
-                                                            filterServer={true}
-                                                            filterParams={'Text'}
-                                                            autoFilter={true}
-                                                            status={UserApprove2.status}
-                                                            value={UserApprove2.value}
-                                                            disable={UserApprove2.disable}
-                                                            onFinish={item => this.onChangeUserApprove2(item)}
-                                                        />
-                                                    </View>
-                                                </View>
-                                            </SafeAreaView>
-                                        </View>
-                                    </View>
-                                ) : null}
                             </SafeAreaView>
 
                             {modalErrorDetail.isModalVisible && (

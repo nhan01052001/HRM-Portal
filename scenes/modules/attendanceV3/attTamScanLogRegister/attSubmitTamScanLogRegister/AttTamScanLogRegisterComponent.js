@@ -754,7 +754,7 @@ class AttTamScanLogRegisterComponent extends React.Component {
             OrgStructureTransID
         } = this.state;
 
-        const { fieldConfig, isShowDelete, onDeleteItemDay, indexDay, onScrollToInputIOS, onGetHighSupervisorFromOrgStructureTransID } = this.props,
+        const { fieldConfig, isShowDelete, onDeleteItemDay, indexDay, onScrollToInputIOS } = this.props,
             { viewInputMultiline } = stylesVnrPickerV3;
 
         return (
@@ -996,9 +996,6 @@ class AttTamScanLogRegisterComponent extends React.Component {
                                         value: listItem,
                                         refresh: !OrgStructureTransID.refresh
                                     }
-                                }, () => {
-                                    if (typeof onGetHighSupervisorFromOrgStructureTransID === 'function')
-                                        onGetHighSupervisorFromOrgStructureTransID(listItem[0]?.id);
                                 });
                             }}
                         />

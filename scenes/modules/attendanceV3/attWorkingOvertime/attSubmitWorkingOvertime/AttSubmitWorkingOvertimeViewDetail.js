@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text } from 'react-native';
+import { View, ScrollView, Text, StyleSheet } from 'react-native';
 import {
     styleSheets,
     styleScreenDetail,
@@ -24,7 +24,6 @@ import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import AttSubmitWorkingOvertimeAddOrEdit from './AttSubmitWorkingOvertimeAddOrEdit';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import SafeAreaViewDetail from '../../../../../components/safeAreaView/SafeAreaViewDetail';
-import { translate } from '../../../../../i18n/translate';
 import VnrText from '../../../../../components/VnrText/VnrText';
 
 const configDefault = [
@@ -304,10 +303,9 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
         try {
             const _params = this.props.navigation.state.params,
                 { screenName, dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params),
-                // _configListDetail = ConfigListDetail.value[screenName]
-                //     ? ConfigListDetail.value[screenName]
-                //     : configDefault;
-                _configListDetail = configDefault;
+                _configListDetail = ConfigListDetail.value[screenName]
+                    ? ConfigListDetail.value[screenName]
+                    : configDefault;
 
             let id = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
             if (id) {
@@ -344,28 +342,28 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                         : dataItem?.ProfileInfo?.ImagePath;
                     data.AccumulateHour = dataItem?.AccumulateHour
                         ? [
-                              {
-                                  value: dataItem?.AccumulateHour?.UdHourByDate,
-                                  color:
+                            {
+                                value: dataItem?.AccumulateHour?.UdHourByDate,
+                                color:
                                       dataItem?.AccumulateHour?.UdLimitColorDate || dataItem?.UdLimitColorDay
                                           ? Colors.red
                                           : null
-                              },
-                              {
-                                  value: dataItem?.AccumulateHour?.UdHourByMonth,
-                                  color:
+                            },
+                            {
+                                value: dataItem?.AccumulateHour?.UdHourByMonth,
+                                color:
                                       dataItem?.AccumulateHour?.UdLimitColorMonth || dataItem?.UdLimitColorMonth
                                           ? Colors.red
                                           : null
-                              },
-                              {
-                                  value: dataItem?.AccumulateHour?.UdHourByYear,
-                                  color:
+                            },
+                            {
+                                value: dataItem?.AccumulateHour?.UdHourByYear,
+                                color:
                                       dataItem?.AccumulateHour?.UdLimitColorYear || dataItem?.UdLimitColorYear
                                           ? Colors.red
                                           : null
-                              }
-                          ]
+                            }
+                        ]
                         : null;
 
                     //0181592: [TB_W30][LTG] APP. Thêm điều kiện lọc để nhận biết Tự sinh tăng ca và tự đăng ký ở màn hình Tăng ca
@@ -459,26 +457,9 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                                 ) {
                                     return (
                                         <View>
-                                            <View
-                                                style={{
-                                                    flexShrink: 1,
-                                                    justifyContent: 'center',
-                                                    alignItems: 'flex-start',
-                                                    minWidth: 160 - Size.defineSpace * 2,
-                                                    backgroundColor: Colors.gray_3,
-                                                    paddingHorizontal: styleSheets.p_10,
-                                                    paddingVertical: 8
-                                                }}
-                                            >
+                                            <View style={styles.groupHeaderContainer}>
                                                 <VnrText
-                                                    style={[
-                                                        styleSheets.lable,
-                                                        {
-                                                            color: Colors.black,
-                                                            fontSize: Size.text + 2,
-                                                            fontWeight: '600'
-                                                        }
-                                                    ]}
+                                                    style={[styleSheets.lable, styles.groupHeaderText]}
                                                     i18nKey={e.DisplayKey}
                                                     value={e.DisplayKey}
                                                 />
@@ -492,40 +473,17 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                                                             CustomStyleSheet.marginVertical(6)
                                                         ]}
                                                     >
-                                                        <View
-                                                            style={{
-                                                                padding: 8,
-                                                                borderWidth: 1,
-                                                                borderColor: Colors.gray_5,
-                                                                borderRadius: 8
-                                                            }}
-                                                        >
+                                                        <View style={styles.itemContainer}>
                                                             {configOfRenderList.map((config) => {
                                                                 return (
                                                                     <View
                                                                         key={config.Label}
                                                                         style={[
-                                                                            {
-                                                                                flexDirection: 'row',
-                                                                                justifyContent: 'space-between',
-                                                                                alignItems: 'flex-start',
-                                                                                paddingVertical: 12
-                                                                            },
-                                                                            config.isWrapLine && {
-                                                                                flexDirection: 'column'
-                                                                            }
+                                                                            styles.configItemRow,
+                                                                            config.isWrapLine && styles.configItemColumn
                                                                         ]}
                                                                     >
-                                                                        <View
-                                                                            style={[
-                                                                                {
-                                                                                    flexShrink: 1,
-                                                                                    justifyContent: 'center',
-                                                                                    alignItems: 'flex-start',
-                                                                                    minWidth: 160 - Size.defineSpace * 2
-                                                                                }
-                                                                            ]}
-                                                                        >
+                                                                        <View style={styles.labelContainer}>
                                                                             <VnrText
                                                                                 style={[styleSheets.lable]}
                                                                                 i18nKey={config.DisplayKey}
@@ -534,28 +492,11 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                                                                         </View>
                                                                         <View
                                                                             style={[
-                                                                                {
-                                                                                    flexShrink: 1,
-                                                                                    justifyContent: 'center',
-                                                                                    alignItems: 'flex-end',
-                                                                                    paddingLeft: Size.defineHalfSpace,
-                                                                                    minWidth: 160 - Size.defineSpace * 2
-                                                                                },
-                                                                                config.isWrapLine && {
-                                                                                    paddingLeft: 0,
-                                                                                    paddingTop: Size.defineSpace
-                                                                                }
+                                                                                styles.valueContainer,
+                                                                                config.isWrapLine && styles.valueContainerWrapLine
                                                                             ]}
                                                                         >
-                                                                            <Text
-                                                                                style={{
-                                                                                    ...styleSheets.text,
-                                                                                    ...{
-                                                                                        color: Colors.gray_7,
-                                                                                        textAlign: 'right'
-                                                                                    }
-                                                                                }}
-                                                                            >
+                                                                            <Text style={[styleSheets.text, styles.valueText]}>
                                                                                 {dataItem[config.Name] ?? '-'}
                                                                             </Text>
                                                                         </View>
@@ -590,3 +531,56 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    groupHeaderContainer: {
+        flexShrink: 1,
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        minWidth: 160 - Size.defineSpace * 2,
+        backgroundColor: Colors.gray_3,
+        paddingHorizontal: styleSheets.p_10,
+        paddingVertical: 8
+    },
+    groupHeaderText: {
+        color: Colors.black,
+        fontSize: Size.text + 2,
+        fontWeight: '600'
+    },
+    itemContainer: {
+        padding: 8,
+        borderWidth: 1,
+        borderColor: Colors.gray_5,
+        borderRadius: 8
+    },
+    configItemRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        paddingVertical: 12
+    },
+    configItemColumn: {
+        flexDirection: 'column'
+    },
+    labelContainer: {
+        flexShrink: 1,
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        minWidth: 160 - Size.defineSpace * 2
+    },
+    valueContainer: {
+        flexShrink: 1,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        paddingLeft: Size.defineHalfSpace,
+        minWidth: 160 - Size.defineSpace * 2
+    },
+    valueContainerWrapLine: {
+        paddingLeft: 0,
+        paddingTop: Size.defineSpace
+    },
+    valueText: {
+        color: Colors.gray_7,
+        textAlign: 'right'
+    }
+});

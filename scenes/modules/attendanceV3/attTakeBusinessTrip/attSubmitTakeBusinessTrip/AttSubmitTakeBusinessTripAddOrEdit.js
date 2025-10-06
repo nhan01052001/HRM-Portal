@@ -19,6 +19,7 @@ import { translate } from '../../../../../i18n/translate';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import AttSubmitTakeBusinessTripComponent from './AttSubmitTakeBusinessTripComponent';
 import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
+import VnrApprovalProcess from '../../../../../componentsV3/VnrApprovalProcess/VnrApprovalProcess';
 import HttpService from '../../../../../utils/HttpService';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
 import { EnumIcon, EnumName } from '../../../../../assets/constant';
@@ -31,6 +32,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ListButtonRegister from '../../../../../componentsV3/ListButtonRegister/ListButtonRegister';
 import { AttSubmitTakeBusinessTripBusinessFunction } from './AttSubmitTakeBusinessTripBusiness';
 import { ScreenName } from '../../../../../assets/constant';
+import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile';
 const initSateDefault = {
     ID: null,
     Profile: {
@@ -100,7 +102,7 @@ const initSateDefault = {
             isValid: false
         },
         PlaceSendToID: {
-            visibleConfig: true,
+            visibleConfig: false,
             isValid: false
         },
         Note: {
@@ -120,6 +122,10 @@ const initSateDefault = {
             isValid: false
         },
         PreparationWork: {
+            visibleConfig: true,
+            isValid: false
+        },
+        Comment: {
             visibleConfig: true,
             isValid: false
         }
@@ -174,6 +180,7 @@ const initSateDefault = {
     },
     isShowLoading: false,
     isShowModalApprove: false,
+    dataApprovalProcess: [],
 
     SimilarRegistration: {
         value: true,
@@ -240,6 +247,37 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         this.AlertSevice = {
             alert: null
         };
+
+        this.ToasterSeviceCallBack = () => {
+            return this.ToasterSevice;
+        };
+    };
+
+    getApprovalProcess = () => {
+        const { Profile, DateFromTo } = this.state;
+        if (!Profile.ID || !DateFromTo.value) return;
+
+        this.showLoading(true);
+        const payload = {
+            'ProfileID': Profile.ID,
+            'WorkDate': Array.isArray(DateFromTo.value) ? moment(DateFromTo.value[0]).format('YYYY/MM/DD') : moment(DateFromTo.value.startDate).format('YYYY/MM/DD'),
+            'BusinessType': 'E_BUSINESSTRAVEL'
+        };
+
+        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload).then((res) => {
+            this.showLoading(false);
+            if (res?.Status === EnumName.E_SUCCESS) {
+                this.setState({
+                    dataApprovalProcess: res.Data
+                });
+            } else {
+                this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+            }
+
+        }).catch(() => {
+            this.showLoading(false);
+            this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+        });
     };
 
     getConfigValid = () => {
@@ -302,8 +340,6 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         };
 
         this.setState(nextState, () => {
-            //[CREATE] Step 4: Lấy cấp duyệt .
-            this.getHighSupervisor();
             const { params, DateFromTo, SimilarRegistration } = this.state;
             if (params.listItem && params.listItem.length > 0) {
                 // Trường hợp tạo mới từ ngày công
@@ -319,6 +355,8 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         refresh: !SimilarRegistration.refresh
                     },
                     isShowModal: true
+                }, () => {
+                    this.getApprovalProcess();
                 });
             } else if (this.refVnrDateFromTo && this.refVnrDateFromTo.showModal) {
                 this.refVnrDateFromTo.showModal();
@@ -968,7 +1006,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             };
         }
 
-        this.setState(nextState, () => this.getHighSupervisor());
+        this.setState(nextState, () => this.getApprovalProcess());
     };
 
     refreshForm = () => {
@@ -976,7 +1014,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnReset',
             message: 'HRM_PortalApp_OnReset_Message',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 const { DateFromTo, SimilarRegistration } = this.state;
                 if (DateFromTo.value && DateFromTo.value.length > 0) {
@@ -1047,7 +1085,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnDeleteItemDay',
             textRightButton: 'Confirm',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 const { DateFromTo } = this.state;
                 if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 1) {
@@ -1112,6 +1150,8 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 refresh: !DateFromTo.refresh
             },
             isShowModal: true
+        }, () => {
+            this.getApprovalProcess();
         });
     };
 
@@ -1153,14 +1193,11 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         const {
                 DateFromTo,
                 Profile,
-                UserApprove,
-                UserApprove2,
-                UserApprove3,
-                UserApprove4,
                 modalErrorDetail,
                 params,
                 SimilarRegistration,
-                fieldConfig
+                fieldConfig,
+                dataApprovalProcess
             } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
@@ -1179,6 +1216,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         DateFromTo.value.map((item) => {
                             ListBussinessTravelItem.push({
                                 ...data,
+                                DataApprove: dataApprovalProcess,
                                 DateFrom: item ? moment(item).format('YYYY/MM/DD') : null,
                                 DateTo: item ? moment(item).format('YYYY/MM/DD') : null,
                                 RegisterDate: item ? moment(item).format('YYYY/MM/DD') : null
@@ -1196,7 +1234,10 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                             dataExtend = dataVisible;
                         }
                         if (data) {
-                            ListBussinessTravelItem.push(data);
+                            ListBussinessTravelItem.push({
+                                ...data,
+                                DataApprove: dataApprovalProcess
+                            });
                         }
                     }
                 });
@@ -1220,6 +1261,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 if (data) {
                     ListBussinessTravelItem.push({
                         ...data,
+                        DataApprove: dataApprovalProcess,
                         DateRange
                     });
                 }
@@ -1306,11 +1348,6 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                     ...payload,
                     ID: record && record.ID ? record.ID : null,
                     ProfileIDs: Profile.ID,
-                    // Lý do gán lại cấp duyệt thứ tự 1.2.3.4 là do server tự gán lại theo thứ tự 1.3.4.2
-                    UserApproveID: UserApprove && UserApprove.value ? UserApprove.value.ID : null,
-                    UserApproveID2: UserApprove3 && UserApprove3.value ? UserApprove3.value.ID : null,
-                    UserApproveID3: UserApprove4 && UserApprove4.value ? UserApprove4.value.ID : null,
-                    UserApproveID4: UserApprove2 && UserApprove2.value ? UserApprove2.value.ID : null,
                     Host: uriPor,
                     ListBussinessTravelItem: ListBussinessTravelItem
                 };
@@ -1368,7 +1405,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                                                         this.onSave(isSend);
                                                     },
                                                     //đóng
-                                                    onCancel: () => {},
+                                                    onCancel: () => { },
                                                     //chi tiết lỗi
                                                     textRightButton: translate('Button_Detail'),
                                                     onConfirm: () => {
@@ -1395,7 +1432,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                                                     ),
                                                     textRightButton: translate('Button_Detail'),
                                                     //đóng popup
-                                                    onCancel: () => {},
+                                                    onCancel: () => { },
                                                     //chi tiết lỗi
                                                     onConfirm: () => {
                                                         this.setState(
@@ -1431,7 +1468,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                                                     this.onSave(isSend);
                                                 },
                                                 //đóng
-                                                onCancel: () => {},
+                                                onCancel: () => { },
                                                 //chi tiết lỗi
                                                 textRightButton: translate('Button_Detail'),
                                                 onConfirm: () => {
@@ -1462,7 +1499,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         }
                         // eslint-disable-next-line no-console
                     )
-                    .catch(() => {});
+                    .catch(() => { });
             }
         };
 
@@ -1471,7 +1508,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 iconType: EnumIcon.E_CONFIRM,
                 title: 'HRM_PortalApp_OnSave_Temp',
                 message: 'HRM_PortalApp_OnSave_Temp_Message',
-                onCancel: () => {},
+                onCancel: () => { },
                 onConfirm: () => {
                     callSave();
                 }
@@ -1645,16 +1682,12 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
 
     componentDidMount() {
-        // this.onShow({
-        //     reload: () => { },
-        //     record: null,
-        //     // {endDate: '2023-06-22', startDate: '2023-06-12'}
-        //     listItem: [
-        //         {
-        //             "WorkDate": new Date()
-        //         }
-        //     ]
-        // });
+        PermissionForAppMobile.value = {
+            ...PermissionForAppMobile.value,
+            Sys_ProcessApprove_ChangeProcess: {
+                View: true
+            }
+        };
     }
 
     onScrollToInputIOS = (index, height) => {
@@ -1708,7 +1741,10 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         )}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={this.renderApprove}
+                        ListFooterComponent={() => {
+                            const { dataApprovalProcess } = this.state;
+                            return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                        }}
                     />
                 );
             } else {
@@ -1752,7 +1788,10 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         }}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={this.renderApprove}
+                        ListFooterComponent={() => {
+                            const { dataApprovalProcess } = this.state;
+                            return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                        }}
                     />
                 );
             }
