@@ -158,7 +158,21 @@ export default {
     HRM_PortalApp_TakeBusinessTrip_ContactInfo: 'Thông tin liên hệ',
     HRM_PortalApp_TakeBusinessTrip_Content: 'Nội dung',
     HRM_PortalApp_TakeBusinessTrip_PreparationWork: 'Công tác chuẩn bị',
-    HRM_PortalApp_TakeBusinessTrip_Attachments: 'Văn bản đính kèm'
+    HRM_PortalApp_TakeBusinessTrip_Attachments: 'Văn bản đính kèm',
 
+    'HRM_PortalApp_ApprovalProcess': 'Quy trình phê duyệt',
+    'HRM_PortalApp_EditApprover': 'Chỉnh sửa người duyệt',
+    'HRM_PortalApp_ApprovalLevel': 'cấp phê duyệt',
+
+    // Approver Picker
+    'HRM_PortalApp_SelectApprover': 'Chọn người phê duyệt',
+    'HRM_PortalApp_SelectedUsers': 'Người được chọn',
+    'HRM_PortalApp_MainExecutors': 'Người thực hiện chính',
+    'HRM_PortalApp_UnselectedList': 'Danh sách chưa chọn',
+
+    'HRM_PortalApp_ApprovalProcess_Error': 'Có lỗi trong quá trình lấy dữ liệu người duyệt',
+    'HRM_PortalApp_CannotFetchApprovalProcess': 'Không thể lấy quá trình duyệt từ hệ thống',
+
+    'HRM_PortalApp_TaxCodeDependantOld': 'Mã số thuế NPT (cũ)'
 
 };

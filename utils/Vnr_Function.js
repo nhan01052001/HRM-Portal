@@ -23,7 +23,7 @@ import {
     stylesVnrFilter,
     styleApproveProcessHRE
 } from '../constants/styleConfig';
-import { IconCancel, IconCheck, IconCheckSquare, IconDown, IconUnCheckSquare } from '../constants/Icons';
+import { IconCancel, IconCheck, IconCheckSquare, IconDown, IconStar, IconUnCheckSquare } from '../constants/Icons';
 import Color from 'color';
 import { ToasterSevice } from '../components/Toaster/Toaster';
 import ManageFileSevice from './ManageFileSevice';
@@ -1207,7 +1207,7 @@ export default class Vnr_Function {
         }
     };
 
-    static renderAvatarCricleByName = (imageAvatar, name, size, isFixSize) => {
+    static renderAvatarCricleByName = (imageAvatar, name, size, isFixSize, isImportant = false) => {
         const randomColor = this.randomColorV3(name ? name : ''),
             { PrimaryColor, SecondaryColor, FirstCharName } = randomColor;
 
@@ -1229,6 +1229,27 @@ export default class Vnr_Function {
 
         return (
             <View style={[styles.styAvatar, { width: size, height: size }]}>
+                {isImportant && (
+                    <View
+                        style={{
+                            position: 'absolute',
+                            right: -8,
+                            top: -8,
+                            zIndex: 100,
+                            elevation: 100
+                        }}
+                    >
+                        <View
+                            style={{
+                                padding: 4,
+                                borderRadius: 100,
+                                backgroundColor: Colors.white
+                            }}
+                        >
+                            <IconStar size={14} color={Colors.yellow} />
+                        </View>
+                    </View>
+                )}
                 <ImageBackground
                     source={{ uri: imageAvatar ?? 'A' }}
                     resizeMode="cover"

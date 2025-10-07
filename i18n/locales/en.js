@@ -172,5 +172,14 @@ export default {
     HRM_PortalApp_TakeBusinessTrip_ContactInfo: 'Contact Info',
     HRM_PortalApp_TakeBusinessTrip_Content: 'Content',
     HRM_PortalApp_TakeBusinessTrip_PreparationWork: 'Preparation Work',
-    HRM_PortalApp_TakeBusinessTrip_Attachments: 'Attachments'
+    HRM_PortalApp_TakeBusinessTrip_Attachments: 'Attachments',
+
+    // Approval Process & Picker
+    'HRM_PortalApp_ApprovalProcess': 'Approval process',
+    'HRM_PortalApp_EditApprover': 'Edit approver',
+    'HRM_PortalApp_ApprovalLevel': 'approval level',
+    'HRM_PortalApp_SelectApprover': 'Select approver',
+    'HRM_PortalApp_SelectedUsers': 'Selected users',
+    'HRM_PortalApp_MainExecutors': 'Main executors',
+    'HRM_PortalApp_UnselectedList': 'Unselected list'
 };

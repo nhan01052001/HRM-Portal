@@ -854,7 +854,14 @@ export class IconUserFullColor extends Component {
 export class IconStar extends Component {
     render() {
         const { color, size } = this.props;
-        return <IconAntDesign name={'star'} size={size} color={color} />;
+        return <Ionicons name={'star-sharp'} size={size} color={color} />;
+    }
+}
+
+export class IconStarOutline extends Component {
+    render() {
+        const { color, size } = this.props;
+        return <Ionicons name={'star-outline'} size={size} color={color} />;
     }
 }
 
@@ -1108,5 +1115,22 @@ export class IconRemoveUser extends Component {
                 <Path d="M29.238 27.824A3.94 3.94 0 0 0 29.7 26c0-.19-.01-.38-.03-.57-.27-3.41-3-6.14-6.41-6.41-.19-.02-.38-.03-.57-.03h-2.286l-2.567-2.568a7.068 7.068 0 0 0 1.983-.842c2.1-1.28 3.51-3.6 3.51-6.25C23.33 5.29 20.04 2 16 2a7.27 7.27 0 0 0-6.24 3.52 6.83 6.83 0 0 0-.844 1.982L3.707 2.293a1 1 0 1 0-1.414 1.414l26 26a.997.997 0 0 0 1.414 0 1 1 0 0 0 0-1.414zM9.31 18.99c-3.86 0-7.01 3.14-7.01 7.01 0 2.21 1.79 4 4 4h19.46L14.75 18.99z" />
             </Svg>
         );
+    }
+}
+
+export class IconArrowDownSupperLong extends Component {
+    render() {
+        return <Svg width={7} height={40} viewBox="0 0 7 40" fill="none">
+            <Path d="M3.5 40L6.38675 35H0.613249L3.5 40ZM3 0V35.5H4V0H3Z" fill="#BFBFBF" />
+        </Svg>;
+    }
+}
+
+export class IconPencil extends Component {
+    render() {
+        const { color, size } = this.props;
+        return <Svg width={size} height={size} viewBox="0 0 15 15" fill={color}>
+            <Path d="M10.9258 0.769531C11.2904 0.441406 11.7005 0.277344 12.1562 0.277344C12.6302 0.277344 13.0404 0.441406 13.3867 0.769531L14.4805 1.86328C14.8086 2.22786 14.9727 2.63802 14.9727 3.09375C14.9727 3.56771 14.8086 3.97786 14.4805 4.32422L13.1406 5.66406L9.58594 2.10938L10.9258 0.769531ZM8.98438 2.71094L12.5391 6.26562L6.14062 12.6641C5.84896 12.9375 5.51172 13.138 5.12891 13.2656L2.42188 14.2383C2.24219 14.2852 2.08333 14.263 1.94531 14.1719C1.80729 14.0807 1.73438 13.9531 1.72656 13.7891C1.71094 13.6406 1.73438 13.5 1.79688 13.3672L2.76953 10.6602C2.88932 10.2943 3.08138 9.96419 3.3457 9.66992L8.98438 2.71094Z" fill={color} />
+        </Svg>;
     }
 }

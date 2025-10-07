@@ -223,6 +223,8 @@ export default class VnrSuperFilterWithTextInput extends Component {
 
         HttpFactory.getDataPicker(url)
             .then((res) => {
+                console.log(res, 'res');
+                
                 let data = [];
                 if (res.Status == EnumName.E_SUCCESS) {
                     data = res.Data;
@@ -788,10 +790,10 @@ export default class VnrSuperFilterWithTextInput extends Component {
                                 }}
                             >
                                 <Text
-                                    style={{
+                                    style={[styleSheets.lable, {
                                         fontSize: 16,
                                         fontWeight: '600'
-                                    }}
+                                    }]}
                                 >
                                     {stateProps?.lable}
                                 </Text>
@@ -805,7 +807,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
                                         backgroundColor: Colors.gray_4
                                     }}
                                 >
-                                    <IconCancel size={Size.iconSize} color={Colors.black} />
+                                    <IconCancel size={Size.iconSize - 4} color={Colors.black} />
                                 </TouchableOpacity>
                             </View>
                         )}

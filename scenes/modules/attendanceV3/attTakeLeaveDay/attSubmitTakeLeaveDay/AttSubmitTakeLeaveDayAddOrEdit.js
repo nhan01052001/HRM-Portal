@@ -208,6 +208,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         this.refVnrDateFromTo = null;
         this.listRefGetDataSave = {};
         this.refFlatList = null;
+        this.refApproval = null;
 
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
             this.setState({ isVisibleKeyboard: true });
@@ -1244,12 +1245,17 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 Profile,
                 modalErrorDetail,
                 params,
-                SimilarRegistration,
-                dataApprovalProcess
+                SimilarRegistration
             } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
             { record } = params;
+            let dataApprovalProcess = [];
+            console.log(this.refApproval, 'this.refApproval');
+            
+            if(typeof this.refApproval?.getData === 'function') {
+                dataApprovalProcess = this.refApproval?.getData();
+            }
 
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value && DateFromTo.value.length > 1) {
@@ -1359,6 +1365,8 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             const callSave = () => {
                 this.isProcessing = true;
                 this.showLoading(true);
+                console.log(payload, 'payload');
+                
                 HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/CreateOrUpdateLeaveday', payload).then((res) => {
                     this.isProcessing = false;
                     this.showLoading(false);
@@ -1798,7 +1806,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
                         ListFooterComponent={() => {
-                            return <VnrApprovalProcess ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
                         }}
                         ListHeaderComponent={this.renderRemain}
                     />
@@ -1839,7 +1847,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
                         ListFooterComponent={() => {
-                            return <VnrApprovalProcess ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
                         }}
                         ListHeaderComponent={this.renderRemain}
                     />
@@ -1881,7 +1889,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     keyExtractor={(item, index) => index}
                     ItemSeparatorComponent={() => <View style={styles.separate} />}
                     ListFooterComponent={() => {
-                        return <VnrApprovalProcess ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                        return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
                     }}
                     ListHeaderComponent={this.renderRemain}
                 />
