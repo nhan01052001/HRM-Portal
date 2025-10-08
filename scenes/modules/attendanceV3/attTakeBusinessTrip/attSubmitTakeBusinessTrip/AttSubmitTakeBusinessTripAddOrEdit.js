@@ -219,6 +219,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         this.refVnrDateFromTo = null;
         this.listRefGetDataSave = {};
         this.refFlatList = null;
+        this.refApproval = null;
     }
 
     //#region [khởi tạo - lấy các dữ liệu cho control, lấy giá trị mặc đinh]
@@ -1196,12 +1197,17 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 modalErrorDetail,
                 params,
                 SimilarRegistration,
-                fieldConfig,
-                dataApprovalProcess
+                fieldConfig
             } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
             { record } = params;
+        let dataApprovalProcess = [];
+
+        if (typeof this.refApproval?.getData === 'function') {
+            dataApprovalProcess = this.refApproval?.getData();
+        }
+
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value && DateFromTo.value.length > 1) {
                 // Đăng ký nhiều ngày cùng lúc
@@ -1743,7 +1749,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
                         ListFooterComponent={() => {
                             const { dataApprovalProcess } = this.state;
-                            return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
                         }}
                     />
                 );
@@ -1790,7 +1796,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
                         ListFooterComponent={() => {
                             const { dataApprovalProcess } = this.state;
-                            return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
                         }}
                     />
                 );

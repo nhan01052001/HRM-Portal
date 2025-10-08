@@ -26,7 +26,6 @@ import Vnr_Function from '../../../../../utils/Vnr_Function';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import AttSubmitWorkingOvertimeComponent from './AttSubmitWorkingOvertimeComponent.js';
 import styleComonAddOrEdit from '../../../../../constants/styleComonAddOrEdit';
-import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
 import VnrIndeterminate from '../../../../../components/VnrLoading/VnrIndeterminate';
 import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile.js';
 import ListButtonRegister from '../../../../../componentsV3/ListButtonRegister/ListButtonRegister.js';
@@ -35,15 +34,6 @@ import VnrTextInput from '../../../../../componentsV3/VnrTextInput/VnrTextInput.
 import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle.js';
 import VnrAttachFile from '../../../../../componentsV3/VnrAttachFile/VnrAttachFile.js';
 import AttSubmitWorkingOvertimeApprovalProcess from './AttSubmitWorkingOvertimeApprovalProcess.js';
-
-const API_APPROVE = {
-    urlApi: '[URI_CENTER]/api/Att_GetData/GetMultiUserApproved',
-    type: 'E_POST',
-    dataBody: {
-        text: '',
-        Type: 'E_LEAVE_DAY'
-    }
-};
 
 const initSateDefault = {
     isRefresh: false,
@@ -1923,7 +1913,6 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
             dayNotHaveShift,
             dayHaveShift,
             isPassRecord,
-            IsHasFormulaTotal,
             isError,
             Code,
             MethodPayment,

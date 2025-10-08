@@ -1250,12 +1250,11 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
             { record } = params;
-            let dataApprovalProcess = [];
-            console.log(this.refApproval, 'this.refApproval');
-            
-            if(typeof this.refApproval?.getData === 'function') {
-                dataApprovalProcess = this.refApproval?.getData();
-            }
+        let dataApprovalProcess = [];
+
+        if (typeof this.refApproval?.getData === 'function') {
+            dataApprovalProcess = this.refApproval?.getData();
+        }
 
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value && DateFromTo.value.length > 1) {
@@ -1365,8 +1364,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             const callSave = () => {
                 this.isProcessing = true;
                 this.showLoading(true);
-                console.log(payload, 'payload');
-                
+
                 HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/CreateOrUpdateLeaveday', payload).then((res) => {
                     this.isProcessing = false;
                     this.showLoading(false);

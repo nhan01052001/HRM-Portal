@@ -44,10 +44,10 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
                         if (res && (res.Data || res.data)) {
                             if (res.data) {
                                 if (Array.isArray(res.data)) data = [...res.data];
-                                else if(res?.data?.data) data = [...res.data.data];
+                                else if (res?.data?.data) data = [...res.data.data];
                             } else if (res.Data) {
                                 if (Array.isArray(res.Data)) data = [...res.Data];
-                                else if(res?.Data?.Data) data = [...res.Data.Data];
+                                else if (res?.Data?.Data) data = [...res.Data.Data];
                             }
                         } else if (res && Array.isArray(res)) {
                             data = [...res];
@@ -124,8 +124,8 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
                                     keyQuery && keyQuery === 'E_FILTER' && isRefreshList
                                         ? []
                                         : this.state.itemSelected.length > 0
-                                          ? this.state.itemSelected
-                                          : [],
+                                            ? this.state.itemSelected
+                                            : [],
                                 dataSource: data,
                                 dataNoGroup: dataNoGroup,
                                 totalRow: total,
@@ -262,8 +262,8 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
             { api, detail, rowActions, onCreate, scrollYAnimatedValue } = this.props,
             permissionBtnCreate =
                 PermissionForAppMobile &&
-                PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2'] &&
-                PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2']['Create']
+                    PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2'] &&
+                    PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2']['Create']
                     ? true
                     : false;
 
@@ -279,13 +279,12 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
             MethodPaymentView: Vnr_Function.checkIsHaveConfigListDetail(detail?.screenName, 'MethodPaymentView'),
             DataNote: Vnr_Function.checkIsHaveConfigListDetail(detail?.screenName, 'ReasonOT')
         };
-console.log(dataSource, 'dataSource');
 
         let contentList = <View />;
         if (isLoading) {
             let typeLoading =
                 detail.screenName == ScreenName.AttApproveWorkingOvertime ||
-                detail.screenName == ScreenName.AttApprovedTSLRegister
+                    detail.screenName == ScreenName.AttApprovedTSLRegister
                     ? EnumStatus.E_APPROVE
                     : EnumStatus.E_SUBMIT;
 
@@ -347,12 +346,12 @@ console.log(dataSource, 'dataSource');
                             </View>
                             {item?.isGroup ? (
                                 item?.dataGroupMaster &&
-                                Array.isArray(item.dataGroupMaster) &&
-                                item.dataGroupMaster.length > 0 ? (
-                                    this.renderDataOfGroup(item.dataGroupMaster, true, index)
-                                ) : (
-                                    <EmptyData messageEmptyData={'EmptyData'} />
-                                )
+                                    Array.isArray(item.dataGroupMaster) &&
+                                    item.dataGroupMaster.length > 0 ? (
+                                        this.renderDataOfGroup(item.dataGroupMaster, true, index)
+                                    ) : (
+                                        <EmptyData messageEmptyData={'EmptyData'} />
+                                    )
                             ) : (
                                 // render data when no group
                                 <View style={[styles.containBotton, CustomStyleSheet.marginBottom(8)]}>

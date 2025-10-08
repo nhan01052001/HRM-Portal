@@ -146,7 +146,9 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                 };
                 this.setState({ DataApprove: next });
             }
-        } catch (e) {}
+        } catch (e) {
+            //
+        }
     };
 
     GetManagementConfigMulti = () => {
@@ -335,14 +337,14 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                                             textLeftButton: 'Huỷ',
                                                             textRightButton: 'Đồng ý xoá',
                                                             message: null,
-                                                            onCancel: () => {},
+                                                            onCancel: () => { },
                                                             onConfirm: () => {
                                                                 this.setState({
                                                                     listApprove:
                                                                         listApprove?.length > 0
                                                                             ? listApprove.filter(
-                                                                                  (value) => value !== item
-                                                                              )
+                                                                                (value) => value !== item
+                                                                            )
                                                                             : [],
                                                                     [item]: null
                                                                 });
@@ -357,9 +359,10 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                             </View>
                                         </View>
                                         {item?.EmployeeInfo?.length > 0 ? (
-                                            item?.EmployeeInfo?.map((emp) => {
+                                            item?.EmployeeInfo?.map((emp, i) => {
                                                 return (
                                                     <TouchableOpacity
+                                                        key={i}
                                                         onPress={() => {
                                                             const ref = this.refEmp[index];
                                                             if (ref && typeof ref.opentModal === 'function') {
@@ -414,7 +417,7 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                                                 style={[
                                                                     styleSheets.detailNameApprover,
                                                                     !this.state[item]?.value[0]?.Name &&
-                                                                        styles.noValueText
+                                                                    styles.noValueText
                                                                 ]}
                                                             >
                                                                 {this.state[item]?.value[0]?.Name ??
@@ -432,10 +435,7 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                             </TouchableOpacity>
                                         )}
                                         <View
-                                            style={{
-                                                position: 'absolute',
-                                                bottom: -Size.deviceheight
-                                            }}
+                                            style={styles.hide}
                                         >
                                             <VnrSuperFilterWithTextInputUserApprover
                                                 ref={(ref) => (this.refEmp[index] = ref)}
@@ -596,6 +596,10 @@ const styles = StyleSheet.create({
     noValueText: {
         fontWeight: '400',
         color: Colors.gray_6
+    },
+    hide: {
+        position: 'absolute',
+        bottom: -Size.deviceheight
     }
     // wrapCurrentShift: {
     //     paddingHorizontal: Size.defineSpace,

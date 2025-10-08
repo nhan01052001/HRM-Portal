@@ -215,6 +215,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
         this.state = initSateDefault;
         this.refVnrDateFromTo = null;
         this.listRefGetDataSave = {};
+        this.refApproval = null;
         // khai báo các biến this trong hàm setVariable
         this.setVariable();
     }
@@ -316,7 +317,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
         });
     };
 
-    componentDidMount() {}
+    componentDidMount() { }
 
     handleSetState = response => {
         const { DateFromTo, UserApprove, UserApprove3, UserApprove4, UserApprove2 } = this.state;
@@ -959,7 +960,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                     }
                 };
 
-                this.setState(nextState, () => {});
+                this.setState(nextState, () => { });
             }
             this.showLoading(false);
         });
@@ -970,7 +971,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnReset',
             message: 'HRM_PortalApp_OnReset_Message',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 const { DateFromTo } = this.state;
                 if (DateFromTo.value && DateFromTo.value.length > 0) {
@@ -1009,7 +1010,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnSave_Temp',
             message: 'HRM_PortalApp_OnSave_Temp_Message',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 this.onSave();
             }
@@ -1022,10 +1023,14 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                 DateFromTo,
                 Profile,
                 modalErrorDetail,
-                params,
-                dataApprovalProcess
+                params
             } = this.state,
             { record } = params;
+        let dataApprovalProcess = [];
+
+        if (typeof this.refApproval?.getData === 'function') {
+            dataApprovalProcess = this.refApproval?.getData();
+        }
 
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             DateFromTo.value.map(item => {
@@ -1109,7 +1114,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                                                 this.onSave(isSend);
                                             },
                                             //đóng
-                                            onCancel: () => {},
+                                            onCancel: () => { },
                                             //chi tiết lỗi
                                             textRightButton: translate('Button_Detail'),
                                             onConfirm: () => {
@@ -1136,7 +1141,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                                             ),
                                             textRightButton: translate('Button_Detail'),
                                             //đóng popup
-                                            onCancel: () => {},
+                                            onCancel: () => { },
                                             //chi tiết lỗi
                                             onConfirm: () => {
                                                 this.setState(
@@ -1170,7 +1175,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                                             this.onSave(isSend);
                                         },
                                         //đóng
-                                        onCancel: () => {},
+                                        onCancel: () => { },
                                         //chi tiết lỗi
                                         textRightButton: translate('Button_Detail'),
                                         onConfirm: () => {
@@ -1283,7 +1288,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnDeleteItemDay',
             textRightButton: 'Confirm',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 const { DateFromTo } = this.state;
                 if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 1) {
@@ -1546,7 +1551,7 @@ export default class AttSubmitTakeLateEarlyAllowedAddOrEdit extends Component {
                     ItemSeparatorComponent={() => <View style={styleComonAddOrEdit.separate} />}
                     ListFooterComponent={() => {
                         const { dataApprovalProcess } = this.state;
-                        return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                        return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
                     }}
                 />
             );

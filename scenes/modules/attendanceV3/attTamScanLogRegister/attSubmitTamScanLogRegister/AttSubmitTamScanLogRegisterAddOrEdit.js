@@ -127,15 +127,6 @@ const initSateDefault = {
     dataApprovalProcess: []
 };
 
-const API_APPROVE = {
-    urlApi: '[URI_CENTER]/api/Att_GetData/GetMultiUserApproved',
-    type: 'E_POST',
-    dataBody: {
-        text: '',
-        Type: 'E_TAMSCANLOGREGISTER'
-    }
-};
-
 class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
     constructor(props) {
         super(props);
@@ -154,6 +145,7 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
         this.refFlatList = null;
         this.keyboardDidShowListener = null;
         this.keyboardDidHideListener = null;
+        this.refApproval = null;
     }
 
     //#region [khởi tạo - lấy các dữ liệu cho control, lấy giá trị mặc đinh]
@@ -1111,12 +1103,16 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                 DateFromTo,
                 Profile,
                 modalErrorDetail,
-                params,
-                dataApprovalProcess
+                params
             } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
             { record } = params;
+        let dataApprovalProcess = [];
+
+        if (typeof this.refApproval?.getData === 'function') {
+            dataApprovalProcess = this.refApproval?.getData();
+        }
 
         if (DateFromTo.value && DateFromTo.value.length > 0) {
             DateFromTo.value.map(item => {
@@ -1847,7 +1843,7 @@ class AttSubmitTamScanLogRegisterAddOrEdit extends React.Component {
                                         ItemSeparatorComponent={() => <View style={styles.separate} />}
                                         ListFooterComponent={() => {
                                             const { dataApprovalProcess } = this.state;
-                                            return <VnrApprovalProcess ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
                                         }}
                                     />
 
