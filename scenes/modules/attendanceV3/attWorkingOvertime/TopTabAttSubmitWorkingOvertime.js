@@ -30,17 +30,17 @@ const data = [
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_SaveTemporary',
         screenName: ScreenName.AttSaveTempSubmitWorkingOvertime,
-        fieldCount: 'CountSubmitTemp'
+        fieldCount: 'Total_E_TEMP'
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_WaitingApproval',
         screenName: ScreenName.AttApproveSubmitWorkingOvertime,
-        fieldCount: 'CountWaitApprove'
+        fieldCount: 'Total_E_PROGRESSING'
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Approved',
         screenName: ScreenName.AttApprovedSubmitWorkingOvertime,
-        fieldCount: 'CountApproved'
+        fieldCount: 'Total_E_PROCESSED'
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Confirmed',
@@ -50,12 +50,12 @@ const data = [
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Rejected',
         screenName: ScreenName.AttRejectSubmitWorkingOvertime,
-        fieldCount: 'CountRejected'
+        fieldCount: 'Total_E_REJECTED'
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Canceled',
         screenName: ScreenName.AttCanceledSubmitWorkingOvertime,
-        fieldCount: 'CountCancelled'
+        fieldCount: 'Total_E_CANCELD'
     }
 ];
 

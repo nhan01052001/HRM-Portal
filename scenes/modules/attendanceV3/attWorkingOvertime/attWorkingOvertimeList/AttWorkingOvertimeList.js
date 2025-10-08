@@ -36,7 +36,6 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
             getDataLocal(keyDataLocal)
                 .then((resData) => {
                     const res = resData && resData[keyQuery] ? resData[keyQuery] : null;
-
                     if (res && res !== EnumName.E_EMPTYDATA) {
                         let data = [],
                             dataNoGroup = [],
@@ -44,9 +43,11 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
 
                         if (res && (res.Data || res.data)) {
                             if (res.data) {
-                                data = [...res.data];
+                                if (Array.isArray(res.data)) data = [...res.data];
+                                else if(res?.data?.data) data = [...res.data.data];
                             } else if (res.Data) {
-                                data = [...res.Data];
+                                if (Array.isArray(res.Data)) data = [...res.Data];
+                                else if(res?.Data?.Data) data = [...res.Data.Data];
                             }
                         } else if (res && Array.isArray(res)) {
                             data = [...res];
@@ -55,7 +56,7 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
                         data.map((item) => {
                             item.isSelect = false;
                             item.itemStatus = Vnr_Services.formatStyleStatusApp(
-                                item?.DataStatus?.Status ? item?.DataStatus?.Status : item.Status
+                                item?.Status ? item?.Status : item.Status
                             );
                             item.lstFileAttach = ManageFileSevice.setFileAttachApp(item.FileAttachment);
                             if (detail?.screenName.includes('Approved')) {
@@ -65,7 +66,7 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
                                 );
                             } else if (detail?.screenName.includes('Approve')) {
                                 item.BusinessAllowAction = Vnr_Services.handleStatusApprove(
-                                    item?.DataStatus?.Status ? item?.DataStatus?.Status : item.Status,
+                                    item?.Status ? item?.Status : item.Status,
                                     item?.TypeApprove
                                 );
                             } else {
@@ -278,6 +279,7 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
             MethodPaymentView: Vnr_Function.checkIsHaveConfigListDetail(detail?.screenName, 'MethodPaymentView'),
             DataNote: Vnr_Function.checkIsHaveConfigListDetail(detail?.screenName, 'ReasonOT')
         };
+console.log(dataSource, 'dataSource');
 
         let contentList = <View />;
         if (isLoading) {
@@ -353,12 +355,7 @@ export default class AttWorkingOvertimeList extends VnrRenderList {
                                 )
                             ) : (
                                 // render data when no group
-                                <View
-                                    style={[
-                                        styles.containBotton,
-                                        CustomStyleSheet.marginBottom(8)
-                                    ]}
-                                >
+                                <View style={[styles.containBotton, CustomStyleSheet.marginBottom(8)]}>
                                     <View style={styles.styleViewBorderButtom}>
                                         <View style={CustomStyleSheet.flex(1)}>
                                             {detail.screenName !== ScreenName.AttSubmitWorkingOvertime ? (

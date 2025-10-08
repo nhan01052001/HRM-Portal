@@ -1989,14 +1989,6 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
                             onUpdateDateRegister={(value, index) => {
                                 this.handleUpdateDateOvertime(value, index);
                             }}
-                            onChangeGetHighSupervior={(ID) => {
-                                this.GetHighSupervior(ID);
-                            }}
-                            onGetHighSupervisorFromOrgStructureTransID={(OrgStructureTransID) => {
-                                if (IsHasFormulaTotal) {
-                                    this.GetHighSupervior(null, OrgStructureTransID);
-                                }
-                            }}
                         />
                     )}
                     keyExtractor={(item, index) => index}
@@ -2406,12 +2398,7 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
 
     render() {
         const {
-            UserApprove,
-            UserApprove3,
-            UserApprove4,
-            UserApprove2,
             DateFromTo,
-            isShowModalApprove,
             modalErrorDetail
         } = this.state;
 
@@ -2499,20 +2486,6 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
 
                         {this._renderHeaderLoading()}
 
-                        {/* Đăng ký tương tự */}
-                        {/* {SimilarRegistration.visible && SimilarRegistration.visibleConfig && (
-                                <View style={CustomStyleSheet.backgroundColor(Colors.white)}>
-                                    <VnrSwitch
-                                        lable={'HRM_PortalApp_TakeLeave_Similar'}
-                                        subLable={translate('HRM_PortalApp_TakeLeave_Similar_Detail')}
-                                        value={SimilarRegistration.value}
-                                        onFinish={(value) => {
-                                            this.onChangeSimilarRegistration(value);
-                                        }}
-                                    />
-                                </View>
-                            )} */}
-
                         <KeyboardAvoidingView
                             scrollEnabled={true}
                             style={[styleComonAddOrEdit.styAvoiding, { backgroundColor: Colors.white }]}
@@ -2523,144 +2496,6 @@ export default class AttSubmitWorkingOvertimeAddOrEdit extends Component {
 
                         {/* button */}
                         <ListButtonRegister listActions={listActions} />
-
-                        {/* modal cấp duyệt */}
-                        {isShowModalApprove ? ( //styles.wrapModalApprovaLevel
-                            <View style={styleComonAddOrEdit.wrapModalApproval}>
-                                <TouchableOpacity
-                                    style={[styleComonAddOrEdit.bgOpacity]}
-                                    onPress={() => {
-                                        this.setState({
-                                            isShowModalApprove: false
-                                        });
-                                    }}
-                                />
-                                <View style={styleComonAddOrEdit.wrapFullScreen}>
-                                    <SafeAreaView style={styleComonAddOrEdit.wrapContentModalApproval}>
-                                        <View style={styleComonAddOrEdit.wrapTitileHeaderModalApprovaLevel}>
-                                            <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    styleComonAddOrEdit.styRegister,
-                                                    styleComonAddOrEdit.fS16fW600
-                                                ]}
-                                                i18nKey={'HRM_PortalApp_Approval_Process'}
-                                            />
-                                            <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    styleComonAddOrEdit.styApproveProcessTitle
-                                                ]}
-                                                i18nKey={`${this.levelApprove} ${translate(
-                                                    'HRM_PortalApp_Approval_Level'
-                                                )}`}
-                                            />
-                                        </View>
-                                        <View style={styleComonAddOrEdit.wrapLevelApproval}>
-                                            <View style={styleComonAddOrEdit.h90}>
-                                                <VnrLoadApproval
-                                                    api={API_APPROVE}
-                                                    refresh={UserApprove.refresh}
-                                                    textField="UserInfoName"
-                                                    valueField="ID"
-                                                    nameApprovalLevel={UserApprove.label}
-                                                    levelApproval={UserApprove.levelApproval}
-                                                    filter={true}
-                                                    filterServer={true}
-                                                    filterParams={'Text'}
-                                                    autoFilter={true}
-                                                    status={UserApprove.status}
-                                                    value={UserApprove.value}
-                                                    disable={UserApprove.disable}
-                                                    onFinish={(item) => {
-                                                        this.onChangeUserApprove(item);
-                                                    }}
-                                                />
-                                            </View>
-
-                                            {UserApprove3.visible && UserApprove3.visibleConfig && (
-                                                <View style={styleComonAddOrEdit.h90}>
-                                                    <VnrLoadApproval
-                                                        api={API_APPROVE}
-                                                        refresh={UserApprove3.refresh}
-                                                        textField="UserInfoName"
-                                                        nameApprovalLevel={UserApprove3.label}
-                                                        levelApproval={UserApprove3.levelApproval}
-                                                        valueField="ID"
-                                                        filter={true}
-                                                        filterServer={true}
-                                                        filterParams={'Text'}
-                                                        autoFilter={true}
-                                                        status={UserApprove3.status}
-                                                        value={UserApprove3.value}
-                                                        disable={UserApprove3.disable}
-                                                        onFinish={(item) => {
-                                                            this.setState({
-                                                                UserApprove3: {
-                                                                    ...UserApprove3,
-                                                                    value: item,
-                                                                    refresh: !UserApprove3.refresh
-                                                                }
-                                                            });
-                                                        }}
-                                                    />
-                                                </View>
-                                            )}
-
-                                            {UserApprove4.visible && UserApprove4.visibleConfig && (
-                                                <View style={styleComonAddOrEdit.h90}>
-                                                    <VnrLoadApproval
-                                                        api={API_APPROVE}
-                                                        refresh={UserApprove4.refresh}
-                                                        textField="UserInfoName"
-                                                        nameApprovalLevel={UserApprove4.label}
-                                                        levelApproval={UserApprove4.levelApproval}
-                                                        valueField="ID"
-                                                        filter={true}
-                                                        filterServer={true}
-                                                        filterParams={'Text'}
-                                                        autoFilter={true}
-                                                        status={UserApprove4.status}
-                                                        value={UserApprove4.value}
-                                                        disable={UserApprove4.disable}
-                                                        onFinish={(item) => {
-                                                            this.setState({
-                                                                UserApprove4: {
-                                                                    ...UserApprove4,
-                                                                    value: item,
-                                                                    refresh: !UserApprove4.refresh
-                                                                }
-                                                            });
-                                                        }}
-                                                    />
-                                                </View>
-                                            )}
-
-                                            <View style={styleComonAddOrEdit.h90}>
-                                                <VnrLoadApproval
-                                                    api={API_APPROVE}
-                                                    refresh={UserApprove2.refresh}
-                                                    textField="UserInfoName"
-                                                    nameApprovalLevel={UserApprove2.label}
-                                                    levelApproval={UserApprove2.levelApproval}
-                                                    valueField="ID"
-                                                    filter={true}
-                                                    filterServer={true}
-                                                    filterParams={'Text'}
-                                                    autoFilter={true}
-                                                    status={UserApprove2.status}
-                                                    value={UserApprove2.value}
-                                                    disable={UserApprove2.disable}
-                                                    onFinish={(item) => {
-                                                        this.onChangeUserApprove2(item);
-                                                    }}
-                                                />
-                                            </View>
-                                        </View>
-                                    </SafeAreaView>
-                                </View>
-                            </View>
-                        ) : null}
                     </SafeAreaView>
                     {modalErrorDetail.isModalVisible && (
                         <Modal animationType="slide" transparent={true} isVisible={true}>

@@ -267,6 +267,12 @@ class AttApproveWorkingOvertime extends Component {
         });
     }
 
+    componentWillUnmount() {
+        if (this.willFocusScreen) {
+            this.willFocusScreen.remove();
+        }
+    }
+
     onShowModalError = (data, cacheID) => {
         if (this.refModalError && this.refModalError.show) {
             this.refModalError.show(data, cacheID);

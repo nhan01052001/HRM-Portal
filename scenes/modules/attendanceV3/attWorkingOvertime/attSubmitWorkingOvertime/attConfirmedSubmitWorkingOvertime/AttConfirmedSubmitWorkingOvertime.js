@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Animated } from 'react-native';
+import { View, Animated, DeviceEventEmitter } from 'react-native';
+import PlanResultState from '../../PlanResultState';
 import AttWorkingOvertimeList from '../../attWorkingOvertimeList/AttWorkingOvertimeList';
 import {
     styleSheets,
@@ -60,6 +61,10 @@ class AttConfirmedSubmitWorkingOvertime extends Component {
     componentWillUnmount() {
         if (this.willFocusScreen) {
             this.willFocusScreen.remove();
+        }
+        if (this.planResultListener) {
+            this.planResultListener.remove();
+            this.planResultListener = null;
         }
     }
 
@@ -159,7 +164,8 @@ class AttConfirmedSubmitWorkingOvertime extends Component {
             IsPortalNew: true,
             filter: filter,
             pageSize: pageSizeList,
-            Status: 'E_CONFIRM'
+            Status: 'E_CONFIRM',
+            IsPlan: PlanResultState.isPlan === true
         };
 
         return {
@@ -245,6 +251,18 @@ class AttConfirmedSubmitWorkingOvertime extends Component {
         let _paramsDefault = this.paramsDefault();
         this.storeParamsDefault = _paramsDefault;
         this.setState(_paramsDefault);
+
+        // Listen plan/result toggle to reload with status
+        this.planResultListener = DeviceEventEmitter.addListener(
+            'ATT_WO_PLAN_RESULT_CHANGED',
+            ({ isPlan }) => {
+                const nextFilter = {
+                    ...(this.paramsFilter || {}),
+                    IsPlan: isPlan
+                };
+                this.reload(nextFilter);
+            }
+        );
 
         startTask({
             keyTask: attConfirmedSubmitWorkingOvertimeKeyTask,

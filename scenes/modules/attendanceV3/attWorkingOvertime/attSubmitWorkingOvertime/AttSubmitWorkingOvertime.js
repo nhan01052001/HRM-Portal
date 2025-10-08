@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Animated } from 'react-native';
+import { View, Animated, DeviceEventEmitter } from 'react-native';
+import PlanResultState from '../PlanResultState';
 import AttWorkingOvertimeList from '../attWorkingOvertimeList/AttWorkingOvertimeList';
 import {
     styleSheets,
@@ -65,6 +66,10 @@ class AttSubmitWorkingOvertime extends Component {
         if (this.willFocusScreen) {
             this.willFocusScreen.remove();
         }
+        if (this.planResultListener) {
+            this.planResultListener.remove();
+            this.planResultListener = null;
+        }
     }
 
     onCreate = () => {
@@ -76,7 +81,7 @@ class AttSubmitWorkingOvertime extends Component {
         }
     };
 
-    onEdit = item => {
+    onEdit = (item) => {
         if (item) {
             if (this.AttSubmitWorkingOvertimeAddOrEdit && this.AttSubmitWorkingOvertimeAddOrEdit.onShow) {
                 this.AttSubmitWorkingOvertimeAddOrEdit.onShow({
@@ -87,7 +92,7 @@ class AttSubmitWorkingOvertime extends Component {
         }
     };
 
-    reload = paramsFilter => {
+    reload = (paramsFilter) => {
         if (paramsFilter === 'E_KEEP_FILTER') {
             paramsFilter = { ...this.paramsFilter };
         } else {
@@ -119,7 +124,10 @@ class AttSubmitWorkingOvertime extends Component {
                     ...dataBody,
                     keyQuery: keyQuery,
                     isCompare: false,
-                    reload: this.reload
+                    reload: this.reload,
+                    api: paramsFilter?.IsPlan
+                        ? '[URI_CENTER]/api/Att_OvertimeForm/New_OvertimeFormRegister'
+                        : '[URI_CENTER]/api/Att_OvertimeForm/New_OvertimeFormRegister'
                 }
             });
         });
@@ -217,7 +225,8 @@ class AttSubmitWorkingOvertime extends Component {
             IsPortalNew: true,
             filter: filter,
             pageSize: pageSizeList,
-            Status: null
+            Status: null,
+            IsPlan: PlanResultState.isPlan === true
         };
 
         return {
@@ -241,7 +250,8 @@ class AttSubmitWorkingOvertime extends Component {
                         ...dataBody,
                         keyQuery: keyQuery == EnumName.E_FILTER ? keyQuery : EnumName.E_PRIMARY_DATA,
                         isCompare: false,
-                        reload: this.reload
+                        reload: this.reload,
+                        api: '[URI_CENTER]/api/Att_OvertimeForm/New_OvertimeFormRegister'
                     }
                 });
             }
@@ -265,7 +275,8 @@ class AttSubmitWorkingOvertime extends Component {
                         isCompare: false,
                         reload: this.reload,
                         dataSourceRequestString: `page=${page}&pageSize=20`,
-                        take: 20
+                        take: 20,
+                        api: '[URI_CENTER]/api/Att_OvertimeForm/New_OvertimeFormRegister'
                     }
                 });
             }
@@ -303,6 +314,15 @@ class AttSubmitWorkingOvertime extends Component {
         this.storeParamsDefault = _paramsDefault;
         this.setState(_paramsDefault);
 
+        // Listen plan/result toggle to reload with status
+        this.planResultListener = DeviceEventEmitter.addListener('ATT_WO_PLAN_RESULT_CHANGED', ({ isPlan }) => {
+            const nextFilter = {
+                ...(this.paramsFilter || {}),
+                IsPlan: isPlan
+            };
+            this.reload(nextFilter);
+        });
+
         startTask({
             keyTask: attSubmitWorkingOvertimeKeyTask,
             payload: {
@@ -313,29 +333,20 @@ class AttSubmitWorkingOvertime extends Component {
                 reload: this.reload,
                 Status: null,
                 skip: 0,
-                take: 20
+                take: 20,
+                api: '[URI_CENTER]/api/Att_OvertimeForm/New_OvertimeFormRegister'
             }
         });
     }
 
     render() {
-        const {
-            dataBody,
-            rowActions,
-            selected,
-            isLazyLoading,
-            isRefreshList,
-            keyQuery,
-            dataChange
-        } = this.state;
+        const { dataBody, rowActions, selected, isLazyLoading, isRefreshList, keyQuery, dataChange } = this.state;
 
         return (
             <SafeAreaViewDetail style={styleSafeAreaView.style}>
                 {attSubmitWorkingOvertime && attSubmitWorkingOvertimeViewDetail && enumName && (
                     <View style={[styleSheets.containerGrey]}>
-                        <View
-                            style={styleComonAddOrEdit.container}
-                        >
+                        <View style={styleComonAddOrEdit.container}>
                             <VnrFilterCommon
                                 ref={(ref) => (this.refFilter = ref)}
                                 dataBody={dataBody}
@@ -383,7 +394,7 @@ class AttSubmitWorkingOvertime extends Component {
                         </View>
 
                         <AttSubmitWorkingOvertimeAddOrEdit
-                            ref={refs => (this.AttSubmitWorkingOvertimeAddOrEdit = refs)}
+                            ref={(refs) => (this.AttSubmitWorkingOvertimeAddOrEdit = refs)}
                         />
                     </View>
                 )}
@@ -392,7 +403,7 @@ class AttSubmitWorkingOvertime extends Component {
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         reloadScreenName: state.lazyLoadingReducer.reloadScreenName,
         isChange: state.lazyLoadingReducer.isChange,
@@ -400,7 +411,4 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(
-    mapStateToProps,
-    null
-)(AttSubmitWorkingOvertime);
+export default connect(mapStateToProps, null)(AttSubmitWorkingOvertime);

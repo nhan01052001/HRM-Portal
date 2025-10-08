@@ -2052,8 +2052,9 @@ const handleGetDataSubmitWorkingOvertime = ({ keyTask, payload }) => {
             ],
             getDataList: (dataBody, payload) => {
                 console.log(dataBody, 'dataBody');
+                
                 return HttpService.Post(
-                    '[URI_CENTER]/api/Att_OvertimePlan/New_PlanOvertimeByFilterHandle_App',
+                    dataBody.api ?? '[URI_CENTER]/api/Att_OvertimePlan/New_PlanOvertimeByFilterHandle_App',
                     dataBody,
                     null,
                     payload.reload ? payload.reload : null

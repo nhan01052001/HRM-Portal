@@ -1527,10 +1527,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     // }
                     this.setState(nextState, () => {
                         this.getRegistHourOrEndHourOT();
-
-                        const { onChangeGetHighSupervior } = this.props;
-                        if (typeof onChangeGetHighSupervior === 'function')
-                            onChangeGetHighSupervior(valueDurationDefault?.ID);
                     });
                 }
             })
@@ -1964,8 +1960,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                 fieldConfig,
                 onDeleteItemDay,
                 indexDay,
-                onScrollToInputIOS,
-                onGetHighSupervisorFromOrgStructureTransID
+                onScrollToInputIOS
             } = this.props,
             {
                 WorkDate,
@@ -2236,11 +2231,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                 },
                                 () => {
                                     this.getRegistHourOrEndHourOT();
-                                    if (item?.ID !== DurationType?.value?.ID) {
-                                        const { onChangeGetHighSupervior } = this.props;
-                                        if (typeof onChangeGetHighSupervior === 'function')
-                                            onChangeGetHighSupervior(item?.ID);
-                                    }
                                 }
                             );
                         }}
@@ -2647,9 +2637,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                         value: listItem,
                                         refresh: !TransferDepartment.refresh
                                     }
-                                }, () => {
-                                    if (typeof onGetHighSupervisorFromOrgStructureTransID === 'function')
-                                        onGetHighSupervisorFromOrgStructureTransID(listItem[0]?.id);
                                 });
                             }}
                         />

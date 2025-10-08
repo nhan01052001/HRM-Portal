@@ -42,13 +42,11 @@ export default class AttWorkingOvertimeListItem extends VnrRenderListItem {
                 }
             });
 
-        const { DataStatus, Status } = dataItem;
-
         // xử lý color
         if (dataItem.itemStatus) {
             const { colorStatus, bgStatus } = dataItem.itemStatus;
-            if (Status === 'E_CONFIRM') {
-                let itemStatus = Vnr_Services.formatStyleStatusApp(Status);
+            if (dataItem?.Status === 'E_CONFIRM') {
+                let itemStatus = Vnr_Services.formatStyleStatusApp(dataItem?.Status);
                 colorStatusView = itemStatus.colorStatus;
                 bgStatusView = itemStatus.bgStatus;
             } else {
@@ -148,14 +146,14 @@ export default class AttWorkingOvertimeListItem extends VnrRenderListItem {
                                                 {dataItem?.OrgStructureName ?? ''}
                                             </Text>
 
-                                            {dataItem?.OrgStructureName && (
+                                            {dataItem?.Code && (
                                                 <View style={CustomStyleSheet.flex(1)}>
                                                     <View style={styles.styleFlex1_row_AlignCenter}>
                                                         <Text
                                                             style={[styleSheets.text, customStyle.textmaphieu]}
                                                             numberOfLines={1}
                                                         >
-                                                            {dataItem?.OrgStructureName}
+                                                            {dataItem?.Code}
                                                         </Text>
                                                     </View>
                                                 </View>
@@ -184,40 +182,42 @@ export default class AttWorkingOvertimeListItem extends VnrRenderListItem {
                                                         }
                                                     ]}
                                                 >
-                                                    {DataStatus && DataStatus.StatusView ? DataStatus.StatusView : ''}
+                                                    {dataItem?.StatusView ? dataItem.StatusView : ''}
                                                 </Text>
                                             </View>
                                         </View>
                                     </View>
 
-                                    <View style={styles.wrapContentCenter}>
-                                        <View style={styles.styIconMess}>
-                                            <IconGroupUser size={Size.text + 1} color={Colors.gray_8} />
-                                        </View>
-                                        <View style={styles.wrapReason}>
-                                            <Text
-                                                numberOfLines={2}
-                                                style={[styleSheets.text, customStyle.textQuantityEmp]}
-                                            >
-                                                {translate('HRM_PortalApp_TakeBusinessTrip_EmployeeCount')}:{' '}
+                                    {Array.isArray(dataItem?.DataDetail) && (
+                                        <View style={styles.wrapContentCenter}>
+                                            <View style={styles.styIconMess}>
+                                                <IconGroupUser size={Size.text + 1} color={Colors.gray_8} />
+                                            </View>
+                                            <View style={styles.wrapReason}>
                                                 <Text
-                                                    style={[
-                                                        CustomStyleSheet.color(Colors.black),
-                                                        CustomStyleSheet.fontWeight('500')
-                                                    ]}
+                                                    numberOfLines={2}
+                                                    style={[styleSheets.text, customStyle.textQuantityEmp]}
                                                 >
-                                                    {123}
+                                                    {translate('HRM_PortalApp_TakeBusinessTrip_EmployeeCount')}:{' '}
+                                                    <Text
+                                                        style={[
+                                                            CustomStyleSheet.color(Colors.black),
+                                                            CustomStyleSheet.fontWeight('500')
+                                                        ]}
+                                                    >
+                                                        {dataItem?.DataDetail?.length}
+                                                    </Text>
                                                 </Text>
-                                            </Text>
+                                            </View>
                                         </View>
-                                    </View>
+                                    )}
                                 </View>
                                 <View style={[styles.viewStatusBottom]}>
-                                    {dataItem?.DateCreate && (
+                                    {dataItem?.WorkDate && (
                                         <View style={styles.styViewDate}>
                                             <IconOclock size={Size.text - 1} color={Colors.gray_7} />
                                             <Text style={[styleSheets.text, styles.dateTimeSubmit_Text]}>
-                                                {moment(dataItem.DateCreate).format('DD/MM/YYYY')}
+                                                {moment(dataItem.WorkDate).format('DD/MM/YYYY')}
                                             </Text>
                                         </View>
                                     )}

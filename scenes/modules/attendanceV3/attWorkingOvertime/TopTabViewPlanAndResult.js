@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, DeviceEventEmitter } from 'react-native';
+import PlanResultState from './PlanResultState';
 import { Text, View } from 'react-native';
 import { IconSearch, IconSliders } from '../../../../constants/Icons';
 import { Colors, CustomStyleSheet, Size } from '../../../../constants/styleConfig';
@@ -10,7 +11,7 @@ export default class TopTabViewPlanAndResult extends React.Component {
         super(props);
 
         this.state = {
-            isPlan: true
+            isPlan: PlanResultState.isPlan === true
         };
     }
 
@@ -25,9 +26,17 @@ export default class TopTabViewPlanAndResult extends React.Component {
                             <TouchableOpacity
                                 onPress={() => {
                                     if (!isPlan)
-                                        this.setState({
-                                            isPlan: true
-                                        });
+                                        this.setState(
+                                            {
+                                                isPlan: true
+                                            },
+                                            () => {
+                                                PlanResultState.isPlan = true;
+                                                DeviceEventEmitter.emit('ATT_WO_PLAN_RESULT_CHANGED', {
+                                                    isPlan: true
+                                                });
+                                            }
+                                        );
                                 }}
                                 activeOpacity={0.7}
                                 style={[isPlan ? styles.switchActive : styles.switchInactive]}
@@ -39,9 +48,17 @@ export default class TopTabViewPlanAndResult extends React.Component {
                             <TouchableOpacity
                                 onPress={() => {
                                     if (isPlan)
-                                        this.setState({
-                                            isPlan: false
-                                        });
+                                        this.setState(
+                                            {
+                                                isPlan: false
+                                            },
+                                            () => {
+                                                PlanResultState.isPlan = false;
+                                                DeviceEventEmitter.emit('ATT_WO_PLAN_RESULT_CHANGED', {
+                                                    isPlan: false
+                                                });
+                                            }
+                                        );
                                 }}
                                 activeOpacity={0.7}
                                 style={[!isPlan ? styles.switchActive : styles.switchInactive]}

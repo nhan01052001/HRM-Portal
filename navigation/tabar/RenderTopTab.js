@@ -27,7 +27,7 @@ export default class RenderTopTab extends React.Component {
 
     componentDidMount() {
         if (this.props?.isShowCountData)
-            HttpService.Post('[URI_CENTER]/api/Att_OvertimePlan/GetCountDataGridOvertimePlan', {}).then((res) => {
+            HttpService.Post('[URI_CENTER]/api/Att_OvertimeForm/CountOvertimeFormRegister', {}).then((res) => {
                 if (res?.Status === EnumName.E_SUCCESS && res?.Data && Object.keys(res?.Data).length > 0) {
                     const total = Object.values(res?.Data).reduce((sum, val) => sum + val, 0);
                     this.setState({

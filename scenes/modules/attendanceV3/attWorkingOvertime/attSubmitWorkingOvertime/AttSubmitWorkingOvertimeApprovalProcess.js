@@ -6,9 +6,11 @@ import { translate } from '../../../../../i18n/translate';
 import { IconPlus, IconRemoveUser, IconUserSetting } from '../../../../../constants/Icons';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle';
-import VnrSuperFilterWithTextInput from '../../../../../componentsV3/VnrSuperFilterWithTextInput/VnrSuperFilterWithTextInput';
 import { AlertSevice } from '../../../../../components/Alert/Alert';
-import { EnumIcon } from '../../../../../assets/constant';
+import { EnumIcon, EnumName } from '../../../../../assets/constant';
+import HttpService from '../../../../../utils/HttpService';
+import VnrSuperFilterWithTextInputUserApprover from '../../../../../componentsV3/VnrSuperFilterWithTextInput/VnrSuperFilterWithTextInputUserApprover';
+import { VnrLoadingSevices } from '../../../../../components/VnrLoading/VnrLoadingPages';
 
 const initSateDefault = {
     setUpProcess: {
@@ -60,7 +62,10 @@ const initSateDefault = {
         visible: true,
         visibleConfig: true,
         isProposer: true
-    }
+    },
+    DataApprove: [],
+    dataUserApprover: [],
+    listTemplate: []
 };
 
 class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
@@ -74,8 +79,143 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
         this.refStep = {};
     }
 
+    GetDataPropose = () => {
+        try {
+            VnrLoadingSevices.show();
+            HttpService.MultiRequest([
+                HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataPropose', {
+                    Bussiness: 'E_OVERTIMEFORM'
+                }),
+                HttpService.Post('[URI_CENTER]/api/Sys_Common/GetMultiUserApproveByType', {
+                    page: 1,
+                    pageSize: 100,
+                    IsExclude: true,
+                    Type: 'E_OVERTIMEFORM'
+                })
+            ]).then((resAll) => {
+                VnrLoadingSevices.hide();
+                const [res1, res2] = resAll;
+                let nextState = {};
+                if (res1?.Status === EnumName.E_SUCCESS) {
+                    if (Array.isArray(res1?.Data?.DataApprove)) {
+                        nextState = {
+                            ...nextState,
+                            DataApprove: [...res1?.Data?.DataApprove]
+                        };
+                    }
+                } else {
+                    nextState = {
+                        ...nextState,
+                        DataApprove: []
+                    };
+                }
+
+                if (res2?.Status === EnumName.E_SUCCESS && res2?.Data?.Data?.length > 0) {
+                    nextState = {
+                        ...nextState,
+                        dataUserApprover: res2?.Data?.Data
+                    };
+                } else {
+                    nextState = {
+                        ...nextState,
+                        dataUserApprover: []
+                    };
+                }
+
+                this.setState({ ...nextState });
+            });
+        } catch (error) {
+            VnrLoadingSevices.hide();
+            this.setState({
+                DataApprove: [],
+                dataUserApprover: []
+            });
+        }
+    };
+
+    // Cập nhật danh sách người duyệt cho một cấp duyệt cụ thể theo index
+    // Bảo toàn cấu trúc DataApprove và chỉ thay trường EmployeeInfo
+    updateApproverAtIndex = (rowIndex, listItem) => {
+        try {
+            const { DataApprove } = this.state;
+            const next = Array.isArray(DataApprove) ? [...DataApprove] : [];
+            if (rowIndex != null && next[rowIndex]) {
+                next[rowIndex] = {
+                    ...next[rowIndex],
+                    EmployeeInfo: Array.isArray(listItem) ? [...listItem] : []
+                };
+                this.setState({ DataApprove: next });
+            }
+        } catch (e) {}
+    };
+
+    GetManagementConfigMulti = () => {
+        try {
+            VnrLoadingSevices.show();
+            HttpService.Post('[URI_CENTER]/api/Sys_Common/GetManagementConfigMulti', {
+                Bussiness: 'E_OVERTIMEFORM'
+            }).then((res) => {
+                VnrLoadingSevices.hide();
+                if (res?.Status === EnumName.E_SUCCESS && res?.Data?.[0]?.ListChild?.length > 0) {
+                    this.setState({
+                        Template: {
+                            ...this.state.Template,
+                            data: res?.Data?.[0]?.ListChild,
+                            refresh: !this.state.Template.refresh
+                        }
+                    });
+                }
+            });
+        } catch (error) {
+            VnrLoadingSevices.hide();
+            this.setState({
+                Template: {
+                    ...this.state.Template,
+                    data: [],
+                    refresh: !this.state.Template.refresh
+                }
+            });
+        }
+    };
+
+    GetDataApproveByConfigID = (ID = null) => {
+        if (!ID) return;
+        try {
+            VnrLoadingSevices.show();
+            HttpService.Get(`[URI_CENTER]/api/Sys_Common/GetDataApproveByConfigID?ID=${ID}`).then((res) => {
+                let nextState = {};
+                if (res?.Status === EnumName.E_SUCCESS) {
+                    if (Array.isArray(res?.Data)) {
+                        nextState = {
+                            ...nextState,
+                            DataApprove: [...res?.Data]
+                        };
+                    }
+                } else {
+                    nextState = {
+                        ...nextState,
+                        DataApprove: []
+                    };
+                }
+
+                this.setState({
+                    ...nextState
+                });
+            });
+        } catch (error) {
+            VnrLoadingSevices.hide();
+            this.setState({
+                DataApprove: [...this.state.DataApprove]
+            });
+        }
+    };
+
+    componentDidMount() {
+        this.GetDataPropose();
+    }
+
     render() {
-        const { setUpProcess, Template, listApprove } = this.state;
+        const { setUpProcess, Template, listApprove, DataApprove, dataUserApprover } = this.state;
 
         return (
             <View style={[CustomStyleSheet.flex(1), CustomStyleSheet.backgroundColor(Colors.white)]}>
@@ -95,14 +235,23 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                                     }
                                 };
                             }
-                            this.setState({
-                                ...nextState,
-                                setUpProcess: {
-                                    ...setUpProcess,
-                                    value,
-                                    refresh: !setUpProcess.refresh
+                            this.setState(
+                                {
+                                    ...nextState,
+                                    setUpProcess: {
+                                        ...setUpProcess,
+                                        value,
+                                        refresh: !setUpProcess.refresh
+                                    }
+                                },
+                                () => {
+                                    if (value) {
+                                        this.GetManagementConfigMulti();
+                                    } else {
+                                        this.GetDataPropose();
+                                    }
                                 }
-                            });
+                            );
                         }}
                     />
                 </View>
@@ -121,24 +270,26 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
                             refresh={Template.refresh}
                             dataLocal={Template.data}
                             value={Template.value}
-                            textField="Text"
-                            valueField="Value"
-                            filter={true}
-                            filterServer={true}
-                            filterParams="text"
-                            params="Template"
+                            textField="ManagementConfigCodeName"
+                            valueField="ID"
+                            filter={false}
                             disable={Template.disable}
                             lable={Template.label}
                             stylePicker={styles.resetBorder}
                             isChooseQuickly={true}
                             onFinish={(item) => {
-                                this.setState({
-                                    Template: {
-                                        ...Template,
-                                        value: item ? { ...item } : null,
-                                        refresh: !Template.refresh
+                                this.setState(
+                                    {
+                                        Template: {
+                                            ...Template,
+                                            value: item ? { ...item } : null,
+                                            refresh: !Template.refresh
+                                        }
+                                    },
+                                    () => {
+                                        this.GetDataApproveByConfigID(item?.ID);
                                     }
-                                });
+                                );
                             }}
                         />
                     </View>
@@ -146,205 +297,186 @@ class AttSubmitWorkingOvertimeApprovalProcess extends React.Component {
 
                 {/* --- Block người lập đề xuất --- */}
                 <View style={CustomStyleSheet.paddingHorizontal(12)}>
-                    {listApprove.map((item, index) => {
-                        return (
-                            <View key={index}>
-                                <View
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: -Size.deviceheight
-                                    }}
-                                >
-                                    <View
-                                        style={[
-                                            CustomStyleSheet.marginBottom(12),
-                                            CustomStyleSheet.paddingHorizontal(12)
-                                        ]}
-                                    >
-                                        <VnrSuperFilterWithTextInput
-                                            ref={(ref) => {
-                                                this.refEmp[`${item ?? index}`] = ref;
-                                            }}
-                                            lable={this.state[item]?.label}
-                                            value={this.state[item]?.value ?? []}
-                                            fieldValid={true}
-                                            onFinish={(listItem) => {
-                                                this.setState({
-                                                    [item]: {
-                                                        ...this.state[item],
-                                                        value: [
-                                                            {
-                                                                ...listItem[0],
-                                                                Name: listItem[0]?.JoinProfileNameCode ?? ''
-                                                            }
-                                                        ],
-                                                        refresh: !this.state[item]?.refresh
-                                                    }
-                                                });
-                                            }}
-                                            refresh={this.state[item]?.refresh}
-                                            api={{
-                                                urlApi: '[URI_CENTER]/api/Att_GetData/GetProfileDetailForAttendance_App',
-                                                type: 'E_POST',
-                                                dataBody: {
-                                                    page: 1,
-                                                    pageSize: 100
-                                                }
-                                            }}
-                                            filterParams={'ProfileName'}
-                                            textField={'JoinProfileNameCode'}
-                                            textFieldFilter={'FormatProfileCodeLogin'}
-                                            valueField={'ID'}
-                                            filter={true}
-                                            autoFilter={true}
-                                            filterServer={true}
-                                            response={'string'}
-                                            placeholder={'SELECT_ITEM'}
-                                            isChooseOne={true}
-                                            licensedDisplay={[
-                                                {
-                                                    Name: ['JoinProfileNameCode'],
-                                                    Avatar: ['ImagePath'],
-                                                    UnderName: [
-                                                        'PositionName',
-                                                        'HRM_PortalApp_ContractHistory_Position'
-                                                    ]
-                                                }
-                                            ]}
-                                        />
-                                    </View>
-                                    <View>
-                                        <VnrPickerLittle
-                                            ref={(ref) => {
-                                                this.refStep[`${item ?? index}`] = ref;
-                                            }}
-                                            isNewUIValue={true}
-                                            refresh={this.state[item]?.refresh}
-                                            dataLocal={[
-                                                {
-                                                    Text: 'Người xem xét/ Thẩm định',
-                                                    Value: 'E_REVIEWER'
-                                                },
-                                                {
-                                                    Text: 'Người phê duyệt',
-                                                    Value: 'E_APPROVER'
-                                                }
-                                            ]}
-                                            value={
-                                                this.state[item]?.enum
-                                                    ? {
-                                                        Text: this.state[item]?.label,
-                                                        Value: this.state[item]?.enum
-                                                    }
-                                                    : null
-                                            }
-                                            textField="Text"
-                                            valueField="Value"
-                                            lable={this.state[item]?.label}
-                                            stylePicker={styles.resetBorder}
-                                            isChooseQuickly={true}
-                                            onFinish={(value) => {
-                                                this.setState({
-                                                    [item]: {
-                                                        ...this.state[item],
-                                                        label: value?.Text ?? '',
-                                                        refresh: !this.state[item]?.refresh,
-                                                        enum: value?.Value
-                                                    }
-                                                });
-                                            }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.proposerContainer}>
-                                    <View style={styles.proposerHeader}>
-                                        <View style={styles.proposerTitleWrapper}>
-                                            <Text numberOfLines={1} style={styles.proposerTitle}>
-                                                {this.state[item]?.label}
-                                            </Text>
-                                        </View>
-
-                                        <View style={styles.actionButtons}>
-                                            <TouchableOpacity
-                                                onPress={() => {
-                                                    if (
-                                                        typeof this.refStep?.[`${item ?? index}`]?.opentModal ===
-                                                        'function'
-                                                    ) {
-                                                        this.refStep?.[`${item ?? index}`]?.opentModal();
-                                                    }
-                                                }}
-                                                disabled={this.state[item]?.isProposer}
-                                                activeOpacity={0.7}
-                                                style={styles.btnSetting}
-                                            >
-                                                <IconUserSetting size={14} color={Colors.black} />
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity
-                                                disabled={this.state[item]?.isProposer}
-                                                onPress={() => {
-                                                    AlertSevice.alert({
-                                                        iconType: EnumIcon.E_WARNING,
-                                                        title: 'Bạn có chắc muốn xoá dữ liệu?',
-                                                        textLeftButton: 'Huỷ',
-                                                        textRightButton: 'Đồng ý xoá',
-                                                        message: null,
-                                                        onCancel: () => {},
-                                                        onConfirm: () => {
-                                                            this.setState({
-                                                                listApprove:
-                                                                    listApprove?.length > 0
-                                                                        ? listApprove.filter((value) => value !== item)
-                                                                        : [],
-                                                                [item]: null
-                                                            });
-                                                        }
-                                                    });
-                                                }}
-                                                activeOpacity={0.7}
-                                                style={styles.btnRemove}
-                                            >
-                                                <IconRemoveUser size={14} color={Colors.white} />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            if (typeof this.refEmp?.[`${item ?? index}`]?.opentModal === 'function') {
-                                                this.refEmp?.[`${item ?? index}`]?.opentModal();
-                                            }
-                                        }}
-                                        activeOpacity={0.7}
-                                        style={styles.userInfoRow}
-                                    >
-                                        {Vnr_Function.renderAvatarCricleByName(null, 'A', 44)}
-                                        <View style={styles.userInfoWrapper}>
-                                            <View style={CustomStyleSheet.flex(1)}>
-                                                <Text numberOfLines={2} style={[styleSheets.subTitleApprover]}>
-                                                    <Text
-                                                        style={[
-                                                            styleSheets.detailNameApprover,
-                                                            !this.state[item]?.value[0]?.Name && styles.noValueText
-                                                        ]}
-                                                    >
-                                                        {this.state[item]?.value[0]?.Name ?? translate('SELECT_ITEM')}
-                                                    </Text>
+                    {Array.isArray(DataApprove) &&
+                        DataApprove.map((item, index) => {
+                            return (
+                                <View key={index}>
+                                    <View style={styles.proposerContainer}>
+                                        <View style={styles.proposerHeader}>
+                                            <View style={styles.proposerTitleWrapper}>
+                                                <Text numberOfLines={1} style={styles.proposerTitle}>
+                                                    {item?.ExecutionStepView ?? ''}
                                                 </Text>
                                             </View>
-                                            <Text numberOfLines={1} style={[styleSheets.detailPositionApprover]}>
-                                                {this.state[item]?.value[0]?.PositionName ?? ''}
-                                            </Text>
+
+                                            <View style={styles.actionButtons}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        // if (
+                                                        //     typeof this.refStep?.[`${item ?? index}`]?.opentModal ===
+                                                        //     'function'
+                                                        // ) {
+                                                        //     this.refStep?.[`${item ?? index}`]?.opentModal();
+                                                        // }
+                                                    }}
+                                                    disabled={!item?.IsEdit}
+                                                    activeOpacity={0.7}
+                                                    style={styles.btnSetting}
+                                                >
+                                                    <IconUserSetting size={14} color={Colors.black} />
+                                                </TouchableOpacity>
+
+                                                <TouchableOpacity
+                                                    disabled={!item?.IsDelete}
+                                                    onPress={() => {
+                                                        AlertSevice.alert({
+                                                            iconType: EnumIcon.E_WARNING,
+                                                            title: 'Bạn có chắc muốn xoá dữ liệu?',
+                                                            textLeftButton: 'Huỷ',
+                                                            textRightButton: 'Đồng ý xoá',
+                                                            message: null,
+                                                            onCancel: () => {},
+                                                            onConfirm: () => {
+                                                                this.setState({
+                                                                    listApprove:
+                                                                        listApprove?.length > 0
+                                                                            ? listApprove.filter(
+                                                                                  (value) => value !== item
+                                                                              )
+                                                                            : [],
+                                                                    [item]: null
+                                                                });
+                                                            }
+                                                        });
+                                                    }}
+                                                    activeOpacity={0.7}
+                                                    style={styles.btnRemove}
+                                                >
+                                                    <IconRemoveUser size={14} color={Colors.white} />
+                                                </TouchableOpacity>
+                                            </View>
                                         </View>
-                                    </TouchableOpacity>
+                                        {item?.EmployeeInfo?.length > 0 ? (
+                                            item?.EmployeeInfo?.map((emp) => {
+                                                return (
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            const ref = this.refEmp[index];
+                                                            if (ref && typeof ref.opentModal === 'function') {
+                                                                ref.opentModal();
+                                                            }
+                                                        }}
+                                                        activeOpacity={0.7}
+                                                        style={styles.userInfoRow}
+                                                    >
+                                                        {Vnr_Function.renderAvatarCricleByName(emp?.ImagePath, 'A', 44)}
+                                                        <View style={styles.userInfoWrapper}>
+                                                            <View style={CustomStyleSheet.flex(1)}>
+                                                                <Text
+                                                                    numberOfLines={2}
+                                                                    style={[styleSheets.subTitleApprover]}
+                                                                >
+                                                                    <Text
+                                                                        style={[
+                                                                            styleSheets.detailNameApprover,
+                                                                            !emp?.ProfileName && styles.noValueText
+                                                                        ]}
+                                                                    >
+                                                                        {emp?.ProfileName ?? translate('SELECT_ITEM')}
+                                                                    </Text>
+                                                                </Text>
+                                                            </View>
+                                                            <Text
+                                                                numberOfLines={1}
+                                                                style={[styleSheets.detailPositionApprover]}
+                                                            >
+                                                                {emp?.PositionName ?? ''}
+                                                            </Text>
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                );
+                                            })
+                                        ) : (
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    // if (typeof this.refEmp?.[`${item ?? index}`]?.opentModal === 'function') {
+                                                    //     this.refEmp?.[`${item ?? index}`]?.opentModal();
+                                                    // }
+                                                }}
+                                                activeOpacity={0.7}
+                                                style={styles.userInfoRow}
+                                            >
+                                                {Vnr_Function.renderAvatarCricleByName(null, 'A', 44)}
+                                                <View style={styles.userInfoWrapper}>
+                                                    <View style={CustomStyleSheet.flex(1)}>
+                                                        <Text numberOfLines={2} style={[styleSheets.subTitleApprover]}>
+                                                            <Text
+                                                                style={[
+                                                                    styleSheets.detailNameApprover,
+                                                                    !this.state[item]?.value[0]?.Name &&
+                                                                        styles.noValueText
+                                                                ]}
+                                                            >
+                                                                {this.state[item]?.value[0]?.Name ??
+                                                                    translate('SELECT_ITEM')}
+                                                            </Text>
+                                                        </Text>
+                                                    </View>
+                                                    <Text
+                                                        numberOfLines={1}
+                                                        style={[styleSheets.detailPositionApprover]}
+                                                    >
+                                                        {this.state[item]?.value[0]?.PositionName ?? ''}
+                                                    </Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        )}
+                                        <View
+                                            style={{
+                                                position: 'absolute',
+                                                bottom: -Size.deviceheight
+                                            }}
+                                        >
+                                            <VnrSuperFilterWithTextInputUserApprover
+                                                ref={(ref) => (this.refEmp[index] = ref)}
+                                                lable={item?.ExecutionStepView ?? ''}
+                                                value={item?.EmployeeInfo?.length > 0 ? item?.EmployeeInfo : []}
+                                                fieldValid={true}
+                                                onFinish={(listItem) => {
+                                                    this.updateApproverAtIndex(index, listItem);
+                                                }}
+                                                refresh={false}
+                                                dataLocal={dataUserApprover}
+                                                filterParams={'ProfileName'}
+                                                textField={'ProfileName'}
+                                                textFieldFilter={'FormatProfileCodeLogin'}
+                                                valueField={'ID'}
+                                                filter={true}
+                                                autoFilter={true}
+                                                filterServer={false}
+                                                response={'string'}
+                                                placeholder={'SELECT_ITEM'}
+                                                // isChooseOne={true}
+                                                licensedDisplay={[
+                                                    {
+                                                        Name: ['ProfileName'],
+                                                        Avatar: ['ImagePath'],
+                                                        UnderName: [
+                                                            'PositionName',
+                                                            'HRM_PortalApp_ContractHistory_Position'
+                                                        ]
+                                                    }
+                                                ]}
+                                            />
+                                        </View>
+                                    </View>
+                                    {/* --- Line dashed --- */}
+                                    <View style={styles.lineDashedWrapper}>
+                                        <View style={styles.lineDashed} />
+                                    </View>
                                 </View>
-                                {/* --- Line dashed --- */}
-                                <View style={styles.lineDashedWrapper}>
-                                    <View style={styles.lineDashed} />
-                                </View>
-                            </View>
-                        );
-                    })}
+                            );
+                        })}
                 </View>
 
                 {/* --- Add step button --- */}
