@@ -80,7 +80,7 @@ const configDefault = [
         Name: 'Comment',
         NameCancel: 'CommentCancel',
         NameReject: 'DeclineReason',
-        DisplayKey: 'HRM_Attendance_Overtime_ReasonOT',
+        DisplayKey: 'HRM_Attendance_Roster_Comment',
         DataType: 'string'
     },
     {

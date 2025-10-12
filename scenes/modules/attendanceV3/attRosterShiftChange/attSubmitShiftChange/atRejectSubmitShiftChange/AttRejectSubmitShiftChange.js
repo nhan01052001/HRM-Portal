@@ -10,7 +10,10 @@ import {
 import VnrFilterCommon from '../../../../../../componentsV3/VnrFilter/VnrFilterCommon';
 import { ConfigList } from '../../../../../../assets/configProject/ConfigList';
 import { ScreenName, EnumName, EnumTask } from '../../../../../../assets/constant';
-import { generateRowActionAndSelected, AttSubmitShiftChangeBusinessFunction } from '../AttSubmitShiftChangeBusiness';
+import {
+    generateRowActionAndSelected,
+    AttSubmitShiftChangeBusinessFunction
+} from '../AttSubmitShiftChangeBusiness';
 import { connect } from 'react-redux';
 import { startTask } from '../../../../../../factories/BackGroundTask';
 import AttSubmitShiftChangeAddOrEdit from '../AttSubmitShiftChangeAddOrEdit';
@@ -72,7 +75,7 @@ class AttRejectSubmitShiftChange extends Component {
         }
     };
 
-    onEdit = (item) => {
+    onEdit = item => {
         if (item) {
             if (this.AttSubmitShiftChangeAddOrEdit && this.AttSubmitShiftChangeAddOrEdit.onShow) {
                 this.AttSubmitShiftChangeAddOrEdit.onShow({
@@ -83,7 +86,7 @@ class AttRejectSubmitShiftChange extends Component {
         }
     };
 
-    reload = (paramsFilter) => {
+    reload = paramsFilter => {
         if (paramsFilter === 'E_KEEP_FILTER') {
             paramsFilter = { ...this.paramsFilter };
         } else {
@@ -138,42 +141,31 @@ class AttRejectSubmitShiftChange extends Component {
                     type: 'POST',
                     pageSize: 20
                 },
-                Row: [
-                    {
-                        TypeView: 'E_COMMON',
-                        Name: 'DateStart',
-                        NameSecond: 'DateEnd',
-                        DisplayKey: 'HRM_PortalApp_ShiftChangeDate',
-                        DataType: 'DateToFrom',
-                        DataFormat: 'DD/MM/YYYY'
-                    },
-                    {
-                        TypeView: 'E_COMMON',
-                        Name: 'ChangeShiftTypeView',
-                        DisplayKey: 'HRM_PortalApp_TypeChangeShift',
-                        DataType: 'string'
-                    }
-                ],
+                Row: [],
                 Order: [
                     {
-                        field: 'TimeLog',
+                        field: 'DateUpdate',
                         dir: 'desc'
                     }
                 ],
-                Filter: [
-                    {
-                        logic: 'and',
-                        filters: []
-                    }
-                ],
                 BusinessAction: [
+                    {
+                        Type: 'E_CANCEL',
+                        Resource: {
+                            Name: 'New_Att_Roster_New_Index_btnCancel',
+                            Rule: 'View'
+                        },
+                        Confirm: {
+                            isInputText: true,
+                            isValidInputText: false
+                        }
+                    }
                 ]
             };
         }
 
         const _configList = configList[attRejectSubmitShiftChange],
             filter = _configList[enumName.E_Filter],
-            renderRow = _configList[enumName.E_Row],
             dataFromParams = this.checkDataFormNotify();
 
         const dataRowActionAndSelected = generateRowActionAndSelected(attRejectSubmitShiftChange);
@@ -188,7 +180,6 @@ class AttRejectSubmitShiftChange extends Component {
         return {
             rowActions: dataRowActionAndSelected.rowActions,
             selected: dataRowActionAndSelected.selected,
-            renderRow: renderRow,
             dataBody: _params,
             keyQuery: EnumName.E_PRIMARY_DATA
         };
@@ -286,7 +277,15 @@ class AttRejectSubmitShiftChange extends Component {
     }
 
     render() {
-        const { dataBody, rowActions, selected, isLazyLoading, isRefreshList, keyQuery, dataChange, renderRow } = this.state;
+        const {
+            dataBody,
+            rowActions,
+            selected,
+            isLazyLoading,
+            isRefreshList,
+            keyQuery,
+            dataChange
+        } = this.state;
 
         return (
             <SafeAreaViewDetail style={styleSafeAreaView.style}>
@@ -331,12 +330,13 @@ class AttRejectSubmitShiftChange extends Component {
                                         pageSize: pageSizeList
                                     }}
                                     valueField="ID"
-                                    renderConfig={renderRow}
                                 />
                             )}
                         </View>
 
-                        <AttSubmitShiftChangeAddOrEdit ref={(refs) => (this.AttSubmitShiftChangeAddOrEdit = refs)} />
+                        <AttSubmitShiftChangeAddOrEdit
+                            ref={refs => (this.AttSubmitShiftChangeAddOrEdit = refs)}
+                        />
                     </View>
                 )}
             </SafeAreaViewDetail>
@@ -344,7 +344,7 @@ class AttRejectSubmitShiftChange extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
     return {
         reloadScreenName: state.lazyLoadingReducer.reloadScreenName,
         isChange: state.lazyLoadingReducer.isChange,
@@ -352,4 +352,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, null)(AttRejectSubmitShiftChange);
+export default connect(
+    mapStateToProps,
+    null
+)(AttRejectSubmitShiftChange);

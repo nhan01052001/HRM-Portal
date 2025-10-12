@@ -1,3 +1,4 @@
+import { Colors } from '../../../../../constants/styleConfig';
 import { ToasterSevice } from '../../../../../components/Toaster/Toaster';
 import { AlertSevice } from '../../../../../components/Alert/Alert';
 import { VnrLoadingSevices } from '../../../../../components/VnrLoading/VnrLoadingPages';
@@ -145,11 +146,10 @@ export const AttApproveTakeDailyTaskBusiness = {
         AttCanceledTakeDailyTask: false,
         AttAllTakeDailyTask: false
     },
-    setThisForBusiness: (dataThis, isNotification, rowActionsFromScreen = _rowActions) => {
+    setThisForBusiness: (dataThis, isNotification) => {
         if (isNotification) _isOnScreenNotification = true;
         else _isOnScreenNotification = false;
 
-        _rowActions = rowActionsFromScreen;
         _this = dataThis;
     },
     //#region [action approve]
@@ -193,13 +193,15 @@ export const AttApproveTakeDailyTaskBusiness = {
                 if (item.RecordID) listID.push(item.RecordID);
             });
             VnrLoadingSevices.show();
-            HttpService.Post('[URI_CENTER]/api/Att_Roster/ValidateApprovalOrRejectRegister', {
-                ListSelectedId: listID,
-                IsApproval: true,
-                IsWaiting: true,
+            HttpService.Post('[URI_CENTER]/api/Att_GetData/ValidateProcessData', {
                 Host: apiConfig.uriPor,
+                ProfileTimesheetRegisterModel: {
+                    ListRecordID: listID
+                },
                 UserLogin: headers.userlogin,
-                UserProcessID: headers.userid
+                UserProcessID: headers.userid,
+                TypeOfBusiness : 'E_PROFILETIMESHEET_REGISTER',
+                TypeProcess: 'E_APPROVE'
             })
                 .then(res => {
                     VnrLoadingSevices.hide();
@@ -209,14 +211,9 @@ export const AttApproveTakeDailyTaskBusiness = {
                             res.Status === 'SUCCESS' &&
                             res.Data
                         ) {
-                            let numberRow = listID.length == 1 ? '1/1' : `${res.Data.length}/${listID.length}`,
-                                keyTrans = listID.length > 1 ? translate('HRM_PortalApp_ConfirmAprrove_LeavedayReplace') : translate('HRM_PortalApp_DailyTask_ApproveConfirmOnly');
+                            let numberRow = listID.length == 1 ? '1' : `${listID.length}/${objValid?.allItems}`,
+                                keyTrans = res.Data.length > 1 ? translate('HRM_PortalApp_ConfirmAprrove_LeavedayReplace') : translate('HRM_PortalApp_DailyTask_ApproveConfirmOnly');
                             AttApproveTakeDailyTaskBusiness.confirmApprove({
-                                ListRecord: {
-                                    RecordID: res.Data,
-                                    Comment: '',
-                                    Type: 'E_APPROVED'
-                                },
                                 message: keyTrans.replace('[E_NUMBER]', numberRow)
                             });
                         } else if (res.Status === 'Locked') {
@@ -266,12 +263,14 @@ export const AttApproveTakeDailyTaskBusiness = {
                     } else {
                         VnrLoadingSevices.show();
 
-                        HttpService.Post('[URI_CENTER]/api/Att_Roster/SetApproveTimeSheetRegister', {
+                        HttpService.Post('[URI_CENTER]/api/Att_Getdata/ProcessChangeStatusData', {
                             Host: apiConfig.uriPor,
                             ListRecordID: objValid.ListRecord.RecordID,
                             UserLogin: headers.userlogin,
                             UserProcessID: headers.userid,
-                            Comment: reason
+                            Comment: reason,
+                            TypeOfBusiness : 'E_PROFILETIMESHEET_REGISTER',
+                            TypeProcess: 'E_APPROVE'
                         }).then(res => {
                             VnrLoadingSevices.hide();
                             try {
@@ -294,10 +293,10 @@ export const AttApproveTakeDailyTaskBusiness = {
                                         // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
                                         if (!_isOnScreenNotification)
                                             DrawerServices.navigate('AttApproveTakeDailyTask');
-                                    } else if (res.Status === 'FAIL') {
-                                        ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 5000);
+                                    } else if (res.Status === 'Locked') {
+                                        ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {
-                                        ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
+                                        ToasterSevice.showWarning(res.Message, 5000);
                                     }
                                 } else {
                                     ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
@@ -311,12 +310,14 @@ export const AttApproveTakeDailyTaskBusiness = {
             });
         } else {
             VnrLoadingSevices.show();
-            HttpService.Post('[URI_CENTER]/api/Att_Roster/SetApproveTimeSheetRegister', {
+            HttpService.Post('[URI_CENTER]/api/Att_Getdata/ProcessChangeStatusData', {
                 Host: apiConfig.uriPor,
                 ListRecordID: objValid.ListRecord.RecordID,
                 UserLogin: headers.userlogin,
                 UserProcessID: headers.userid,
-                Comment: ''
+                Comment: '',
+                TypeOfBusiness : 'E_PROFILETIMESHEET_REGISTER',
+                TypeProcess: 'E_APPROVE'
             }).then(res => {
                 VnrLoadingSevices.hide();
                 try {
@@ -338,10 +339,10 @@ export const AttApproveTakeDailyTaskBusiness = {
 
                             // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
                             if (!_isOnScreenNotification) DrawerServices.navigate('AttApproveTakeDailyTask');
-                        } else if (res.Status === 'FAIL') {
-                            ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 5000);
+                        } else if (res.Status === 'Locked') {
+                            ToasterSevice.showWarning('Hrm_Locked', 5000);
                         } else {
-                            ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
+                            ToasterSevice.showWarning(res.Message, 5000);
                         }
                     } else {
                         ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
@@ -391,12 +392,15 @@ export const AttApproveTakeDailyTaskBusiness = {
                 if (item.RecordID) listID.push(item.RecordID);
             });
             VnrLoadingSevices.show();
-            HttpService.Post('[URI_CENTER]/api/Att_Roster/ValidateApprovalOrRejectRegister', {
+            HttpService.Post('[URI_CENTER]/api/Att_GetData/ValidateProcessData', {
                 Host: apiConfig.uriPor,
-                ListSelectedId: listID,
+                ProfileTimesheetRegisterModel: {
+                    ListRecordID: listID
+                },
                 UserLogin: headers.userlogin,
                 UserProcessID: headers.userid,
-                IsWaiting: true
+                TypeOfBusiness : 'E_PROFILETIMESHEET_REGISTER',
+                TypeProcess: 'E_REJECT'
             })
                 .then(res => {
                     VnrLoadingSevices.hide();
@@ -406,14 +410,9 @@ export const AttApproveTakeDailyTaskBusiness = {
                             res.Status === 'SUCCESS' &&
                             res.Data
                         ) {
-                            let numberRow = listID.length == 1 ? '1/1' : `${res.Data.length}/${listID.length}`,
-                                keyTrans = listID.length > 1 ? translate('HRM_PortalApp_ConfirmReject_LeavedayReplace') : translate('HRM_PortalApp_DailyTask_RejectConfirmOnly');
+                            let numberRow = listID.length == 1 ? '1' : `${listID.length}/${objValid?.allItems}`,
+                                keyTrans = res.Data.length > 1 ? translate('HRM_PortalApp_ConfirmReject_LeavedayReplace') : translate('HRM_PortalApp_DailyTask_RejectConfirmOnly');
                             AttApproveTakeDailyTaskBusiness.confirmReject({
-                                ListRecord: {
-                                    RecordID: res.Data,
-                                    Comment: '',
-                                    Type: 'E_APPROVED'
-                                },
                                 message: keyTrans.replace('[E_NUMBER]', numberRow)
                             });
                         } else if (res.Status === 'Locked') {
@@ -463,12 +462,14 @@ export const AttApproveTakeDailyTaskBusiness = {
                     } else {
                         VnrLoadingSevices.show();
 
-                        HttpService.Post('[URI_CENTER]/api/Att_Roster/SetRejectTimeSheetRegister', {
+                        HttpService.Post('[URI_CENTER]/api/Att_Getdata/ProcessChangeStatusData', {
                             Host: apiConfig.uriPor,
                             ListRecordID: objValid.ListRecord.RecordID,
                             UserLogin: headers.userlogin,
                             UserProcessID: headers.userid,
-                            Comment: reason ? reason : null
+                            Comment: reason ? reason : null,
+                            TypeOfBusiness : 'E_PROFILETIMESHEET_REGISTER',
+                            TypeProcess: 'E_REJECT'
                         }).then(res => {
                             VnrLoadingSevices.hide();
                             try {
@@ -490,10 +491,10 @@ export const AttApproveTakeDailyTaskBusiness = {
                                         // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
                                         if (!_isOnScreenNotification)
                                             DrawerServices.navigate('AttApproveTakeDailyTask');
-                                    } else if (res.Status === 'FAIL') {
-                                        ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 5000);
+                                    } else if (res.Status === 'Locked') {
+                                        ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {
-                                        ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
+                                        ToasterSevice.showWarning(res.Message, 5000);
                                     }
                                 } else {
                                     ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
@@ -507,12 +508,14 @@ export const AttApproveTakeDailyTaskBusiness = {
             });
         } else {
             VnrLoadingSevices.show();
-            HttpService.Post('[URI_CENTER]/api/Att_Roster/SetRejectTimeSheetRegister', {
+            HttpService.Post('[URI_CENTER]/api/Att_Getdata/ProcessChangeStatusData', {
                 Host: apiConfig.uriPor,
                 ListRecordID: objValid.ListRecord.RecordID,
                 UserLogin: headers.userlogin,
                 UserProcessID: headers.userid,
-                Comment: ''
+                Comment: '',
+                TypeOfBusiness : 'E_PROFILETIMESHEET_REGISTER',
+                TypeProcess: 'E_REJECT'
             }).then(res => {
                 VnrLoadingSevices.hide();
                 try {
@@ -533,10 +536,10 @@ export const AttApproveTakeDailyTaskBusiness = {
                             store.dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
                             // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
                             if (!_isOnScreenNotification) DrawerServices.navigate('AttApproveTakeDailyTask');
-                        } else if (res.Status === 'FAIL') {
-                            ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 5000);
+                        } else if (res.Status === 'Locked') {
+                            ToasterSevice.showWarning('Hrm_Locked', 5000);
                         } else {
-                            ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
+                            ToasterSevice.showWarning(res.Message, 5000);
                         }
                     } else {
                         ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
@@ -563,10 +566,10 @@ export const AttApproveTakeDailyTaskBusiness = {
                 if (item.BusinessAllowAction && item.BusinessAllowAction.indexOf(EnumStatus.E_CANCEL) > -1) {
                     ListRecordID.push(item.ID);
                     arrValid.push(item.ID);
-                    totalList.push(item.ID);
+                    totalList.push(item.ID)
                 }
                 else {
-                    totalList.push(item.ID);
+                    totalList.push(item.ID)
                 }
             });
 
@@ -593,7 +596,7 @@ export const AttApproveTakeDailyTaskBusiness = {
                 .then(res => {
                     VnrLoadingSevices.hide();
                     if (res) {
-                        let numberRow = objValid?.totalList.length == 1 ? '1/1' : `${res.Data.length}/${objValid?.totalList.length}`,
+                        let numberRow = objValid?.totalList.length == 1 ? '1' : `${res.Data.length}/${objValid?.totalList.length}`,
                             keyTrans = objValid?.totalList.length > 1 ? translate('HRM_PortalApp_DailyTask_ConfirmCancel') : translate('HRM_PortalApp_DailyTask_CancelConfirmOnly');
                         if (res.Status === 'SUCCESS' && res.Data && Array.isArray(res.Data) && res.Data.length > 0) {
                             AttApproveTakeDailyTaskBusiness.confirmCancel({
@@ -605,7 +608,7 @@ export const AttApproveTakeDailyTaskBusiness = {
                                 message: keyTrans.replace('[E_NUMBER]', numberRow)
                             });
                         } else {
-                            ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 5000);
+                            ToasterSevice.showWarning(res.Message, 5000);
                         }
                     } else {
                         ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);
@@ -668,10 +671,10 @@ export const AttApproveTakeDailyTaskBusiness = {
                                         AttApproveTakeDailyTaskBusiness.checkForReLoadScreen[
                                             ScreenName.AttCanceledTakeDailyTask
                                         ] = true;
-                                    } else if (res.Status == 'FAIL') {
-                                        ToasterSevice.showError(res.Message ? res.Message : 'Hrm_Locked', 5000);
+                                    } else if (res.Status == 'Locked') {
+                                        ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {
-                                        ToasterSevice.showError(
+                                        ToasterSevice.showWarning(
                                             res.Message ? res.Message : 'HRM_Common_SendRequest_Error',
                                             5000
                                         );
@@ -708,10 +711,10 @@ export const AttApproveTakeDailyTaskBusiness = {
                             AttApproveTakeDailyTaskBusiness.checkForReLoadScreen[
                                 ScreenName.AttCanceledTakeDailyTask
                             ] = true;
-                        } else if (res.Status == 'FAIL') {
-                            ToasterSevice.showError(res.Message ? res.Message : 'Hrm_Locked', 5000);
+                        } else if (res.Status == 'Locked') {
+                            ToasterSevice.showWarning('Hrm_Locked', 5000);
                         } else {
-                            ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 5000);
+                            ToasterSevice.showWarning(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 5000);
                         }
                     } else {
                         ToasterSevice.showError('HRM_Common_SendRequest_Error', 5000);

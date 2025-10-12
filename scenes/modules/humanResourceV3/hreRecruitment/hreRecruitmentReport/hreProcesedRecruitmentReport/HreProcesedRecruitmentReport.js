@@ -45,8 +45,23 @@ class HreProcesedRecruitmentReport extends Component {
 
         //biến lưu lại object filter
         this.paramsFilter = null;
+
+        this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
+            // Trường hợp goBack từ detail thì phải gán lại this
+            // AttSubmitWorkingOvertimeBusinessFunction.setThisForBusiness(this);
+            // if (AttSubmitWorkingOvertimeBusinessFunction.checkForReLoadScreen[hreProcesedRecruitmentReport]) {
+            //     this.reload();
+            // } else {
+            //     
+            // }
+        });
     }
 
+    componentWillUnmount() {
+        if (this.willFocusScreen) {
+            this.willFocusScreen.remove();
+        }
+    }
 
     reload = paramsFilter => {
         if (paramsFilter === 'E_KEEP_FILTER') {

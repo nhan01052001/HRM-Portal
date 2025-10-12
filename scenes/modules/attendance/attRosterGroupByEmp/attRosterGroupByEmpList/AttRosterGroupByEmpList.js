@@ -498,7 +498,7 @@ export default class AttRosterGroupByEmpList extends React.Component {
                                     }}
                                     onPressIn={() => this.handerOpenSwipeOut(index)}
                                 >
-                                    <View style={CustomStyleSheet.flex(1)}>
+                                    <View style={CustomStyleSheet}>
                                         {detail.screenName == ScreenName.AttApproveRosterGroupByEmp ||
                                         detail.screenName == ScreenName.AttApprovedRosterGroupByEmp ? (
                                                 <AttRosterGroupByEmpListItemApprove

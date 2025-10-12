@@ -1067,7 +1067,7 @@ export default class AttSubmitLeaveDayCancelAddOrEdit extends Component {
         if (screenName == 'AttSubmitLeaveDay') {
             arrRequest = [
                 HttpService.Get(
-                    '[URI_HR]/Att_GetData/GetByIDLeaveDay?id=' + ID + '&profileID=' + ProfileID + '&_isPortalApp=' + true
+                    '[URI_POR]/Att_Leaveday/New_Edit?id=' + ID + '&profileID=' + ProfileID + '&_isPortalApp=' + true
                 )
             ];
         } else {
@@ -1088,7 +1088,7 @@ export default class AttSubmitLeaveDayCancelAddOrEdit extends Component {
             HttpService.Post('[URI_HR]/Sys_GetEnumData/GetEnum', { text: 'LeaveDayDurationType' }),
             HttpService.Post('[URI_HR]/Sys_GetEnumData/GetEnum', { text: 'LeaveDayType' }),
             HttpService.Post('[URI_SYS]/Sys_GetData/GetEnum', { text: 'LeaveDayDurationType' }),
-            HttpService.Post('[URI_HR]/Att_GetData/GetMultiTypeHalfShift'),
+            HttpService.Post('[URI_POR]/New_Att_Overtime/GetMultiTypeHalfShift'),
             HttpService.Post('[URI_HR]/Cat_GetData/GetMultiLeaveDayTypeInPortal'),
             HttpService.Post('[URI_HR]/Att_GetData/GetLevelApprovedLeavedayCancel', {
                 ProfileID: ProfileID,

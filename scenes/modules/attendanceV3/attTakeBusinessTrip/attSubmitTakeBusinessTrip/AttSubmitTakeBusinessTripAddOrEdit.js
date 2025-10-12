@@ -19,7 +19,6 @@ import { translate } from '../../../../../i18n/translate';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import AttSubmitTakeBusinessTripComponent from './AttSubmitTakeBusinessTripComponent';
 import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
-import VnrApprovalProcess from '../../../../../componentsV3/VnrApprovalProcess/VnrApprovalProcess';
 import HttpService from '../../../../../utils/HttpService';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
 import { EnumIcon, EnumName } from '../../../../../assets/constant';
@@ -32,7 +31,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ListButtonRegister from '../../../../../componentsV3/ListButtonRegister/ListButtonRegister';
 import { AttSubmitTakeBusinessTripBusinessFunction } from './AttSubmitTakeBusinessTripBusiness';
 import { ScreenName } from '../../../../../assets/constant';
-import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile';
 const initSateDefault = {
     ID: null,
     Profile: {
@@ -41,7 +39,7 @@ const initSateDefault = {
         disable: true
     },
     fieldConfig: {
-        RegisterDate: {
+        DateRage: {
             visibleConfig: true,
             isValid: false
         },
@@ -54,12 +52,12 @@ const initSateDefault = {
             isValid: false
         },
         DurationType: {
-            visibleConfig: false,
-            isValid: false
+            visibleConfig: true,
+            isValid: true
         },
         BusinessTripTypeID: {
-            visibleConfig: false,
-            isValid: false
+            visibleConfig: true,
+            isValid: true
         },
         LeaveDays: {
             visibleConfig: true,
@@ -102,30 +100,10 @@ const initSateDefault = {
             isValid: false
         },
         PlaceSendToID: {
-            visibleConfig: false,
-            isValid: false
-        },
-        Note: {
             visibleConfig: true,
             isValid: false
         },
-        Location: {
-            visibleConfig: true,
-            isValid: false
-        },
-        ContactInfo: {
-            visibleConfig: true,
-            isValid: false
-        },
-        Content: {
-            visibleConfig: true,
-            isValid: false
-        },
-        PreparationWork: {
-            visibleConfig: true,
-            isValid: false
-        },
-        Comment: {
+        BusinessTripReasonID: {
             visibleConfig: true,
             isValid: false
         }
@@ -180,7 +158,6 @@ const initSateDefault = {
     },
     isShowLoading: false,
     isShowModalApprove: false,
-    dataApprovalProcess: [],
 
     SimilarRegistration: {
         value: true,
@@ -219,7 +196,6 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         this.refVnrDateFromTo = null;
         this.listRefGetDataSave = {};
         this.refFlatList = null;
-        this.refApproval = null;
     }
 
     //#region [khởi tạo - lấy các dữ liệu cho control, lấy giá trị mặc đinh]
@@ -248,48 +224,16 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         this.AlertSevice = {
             alert: null
         };
-
-        this.ToasterSeviceCallBack = () => {
-            return this.ToasterSevice;
-        };
-    };
-
-    getApprovalProcess = () => {
-        const { Profile, DateFromTo } = this.state;
-        if (!Profile.ID || !DateFromTo.value) return;
-
-        this.showLoading(true);
-        const payload = {
-            'ProfileID': Profile.ID,
-            'WorkDate': Array.isArray(DateFromTo.value) ? moment(DateFromTo.value[0]).format('YYYY/MM/DD') : moment(DateFromTo.value.startDate).format('YYYY/MM/DD'),
-            'BusinessType': 'E_BUSINESSTRAVEL'
-        };
-
-        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload).then((res) => {
-            this.showLoading(false);
-            if (res?.Status === EnumName.E_SUCCESS) {
-                this.setState({
-                    dataApprovalProcess: res.Data
-                });
-            } else {
-                this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
-            }
-
-        }).catch(() => {
-            this.showLoading(false);
-            this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
-        });
     };
 
     getConfigValid = () => {
         let { fieldConfig } = this.state;
         const tblName = 'Attendance_FormRegisterBusiness';
-        HttpService.Get(`[URI_CENTER]/api/Sys_common/GetValidateJson?listFormId=${tblName}`).then((res) => {
+        HttpService.Get(`[URI_CENTER]/api/Sys_common/GetValidateJson?listFormId=${tblName}`).then(res => {
             const data = res.Status == EnumName.E_SUCCESS && res.Data && res.Data[tblName] ? res.Data[tblName] : null;
-
             if (data && Object.keys(data).length > 0) {
                 const listControl = Object.keys(fieldConfig);
-                listControl.forEach((key) => {
+                listControl.forEach(key => {
                     if (data[key]) {
                         const { validation } = data[key];
                         fieldConfig = {
@@ -341,10 +285,12 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         };
 
         this.setState(nextState, () => {
+            //[CREATE] Step 4: Lấy cấp duyệt .
+            this.getHighSupervisor();
             const { params, DateFromTo, SimilarRegistration } = this.state;
             if (params.listItem && params.listItem.length > 0) {
                 // Trường hợp tạo mới từ ngày công
-                let listday = params.listItem.map((item) => moment(item.WorkDate).format('YYYY-MM-DD'));
+                let listday = params.listItem.map(item => moment(item.WorkDate).format('YYYY-MM-DD'));
                 this.setState({
                     DateFromTo: {
                         ...DateFromTo,
@@ -356,8 +302,6 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         refresh: !SimilarRegistration.refresh
                     },
                     isShowModal: true
-                }, () => {
-                    this.getApprovalProcess();
                 });
             } else if (this.refVnrDateFromTo && this.refVnrDateFromTo.showModal) {
                 this.refVnrDateFromTo.showModal();
@@ -373,7 +317,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             ProfileID: Profile.ID,
             userSubmit: Profile.ID,
             type: 'E_BUSINESSTRAVEL'
-        }).then((resData) => {
+        }).then(resData => {
             this.showLoading(false);
             if (resData.Status == EnumName.E_SUCCESS) {
                 const result = resData.Data;
@@ -833,7 +777,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
 
     // Step 1: Gọi hàm onShow để tạo mới hoặc chỉnh sửa hoặc onShowFromWorkDay để tạo mới
-    onShow = (params) => {
+    onShow = params => {
         this.setState(
             {
                 ...{ ...initSateDefault },
@@ -846,18 +790,18 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         );
     };
 
-    showLoading = (isShow) => {
+    showLoading = isShow => {
         this.setState({
             isShowLoading: isShow
         });
     };
 
     _renderHeaderLoading = () => {
-        if (this.state.isShowLoading) {
+        if (this.state.isShowLoading || this.isProcessing) {
             return (
-                <View style={styles.styLoadingHeader}>
+                <View style={[styleComonAddOrEdit.styLoadingHeader, Platform.OS === 'ios' && CustomStyleSheet.zIndex(99)]}>
                     <View style={styles.styViewLoading} />
-                    <VnrIndeterminate isVisible={this.state.isShowLoading} />
+                    <VnrIndeterminate isVisible={this.state.isShowLoading || this.isProcessing} />
                 </View>
             );
         } else return <View />;
@@ -869,7 +813,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
 
     handleSetState = async (response) => {
-        const { DateFromTo, SimilarRegistration } = this.state;
+        const { DateFromTo, UserApprove, UserApprove3, UserApprove4, UserApprove2, SimilarRegistration } = this.state;
         this.levelApprove = response.ProcessApproval ? response.ProcessApproval.length - 1 : 4;
 
         let nextState = {
@@ -891,15 +835,123 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 ID: response.ProfileID,
                 ProfileName: response.ProfileName
             },
-            // dataApprovalProcess: response?.ProcessApproval ?? []
+
+            UserApprove: {
+                ...UserApprove,
+                value: response.UserApproveID
+                    ? {
+                        UserInfoName: response.UserApproveName,
+                        ID: response.UserApproveID,
+                        AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
+                    }
+                    : null,
+                disable: true,
+                refresh: !UserApprove.refresh
+            },
+            UserApprove3: {
+                ...UserApprove3,
+                value: response.UserApproveID2
+                    ? {
+                        UserInfoName: response.UserApproveName2,
+                        ID: response.UserApproveID2,
+                        AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
+                    }
+                    : null,
+                disable: true,
+                refresh: !UserApprove3.refresh
+            },
+            UserApprove4: {
+                ...UserApprove4,
+                value: response.UserApproveID3
+                    ? {
+                        UserInfoName: response.UserApproveName3,
+                        ID: response.UserApproveID3,
+                        AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
+                    }
+                    : null,
+                disable: true,
+                refresh: !UserApprove4.refresh
+            },
+            UserApprove2: {
+                ...UserApprove2,
+                value: response.UserApproveID4
+                    ? {
+                        UserInfoName: response.UserApproveName4,
+                        ID: response.UserApproveID4,
+                        AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
+                    }
+                    : null,
+                disable: true,
+                refresh: !UserApprove2.refresh
+            }
         };
 
-        this.setState(nextState, () => {
-            // if(Array.isArray(response?.ProcessApproval) && response?.ProcessApproval.length === 0 || !Array.isArray(response?.ProcessApproval)) {
-            //     this.getApprovalProcess();
-            // }
-            this.getApprovalProcess();
-        });
+        if (this.levelApprove == 4) {
+            nextState = {
+                ...nextState,
+                UserApprove: {
+                    ...nextState.UserApprove,
+                    levelApproval: 1
+                },
+                UserApprove3: {
+                    ...nextState.UserApprove3,
+                    visible: true,
+                    levelApproval: 2
+                },
+                UserApprove4: {
+                    ...nextState.UserApprove4,
+                    visible: true,
+                    levelApproval: 3
+                },
+                UserApprove2: {
+                    ...nextState.UserApprove2,
+                    levelApproval: 4
+                }
+            };
+        } else if (this.levelApprove == 3) {
+            nextState = {
+                ...nextState,
+                UserApprove: {
+                    ...nextState.UserApprove,
+                    levelApproval: 1
+                },
+                UserApprove3: {
+                    ...nextState.UserApprove3,
+                    visible: true,
+                    levelApproval: 2
+                },
+                UserApprove4: {
+                    ...nextState.UserApprove4,
+                    visible: false
+                },
+                UserApprove2: {
+                    ...nextState.UserApprove2,
+                    levelApproval: 3
+                }
+            };
+        } else {
+            nextState = {
+                ...nextState,
+                UserApprove: {
+                    ...nextState.UserApprove,
+                    levelApproval: 1
+                },
+                UserApprove3: {
+                    ...nextState.UserApprove3,
+                    visible: false
+                },
+                UserApprove4: {
+                    ...nextState.UserApprove4,
+                    visible: false
+                },
+                UserApprove2: {
+                    ...nextState.UserApprove2,
+                    levelApproval: 2
+                }
+            };
+        }
+
+        this.setState(nextState, () => this.getHighSupervisor());
     };
 
     refreshForm = () => {
@@ -917,7 +969,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
 
                     if (!record) {
                         // nếu bấm refresh lấy lại cấp duyệt
-                        this.getApprovalProcess();
+                        this.getHighSupervisor();
                     } else {
                         // Nếu bấm refresh khi Chỉnh sửa
                         this.isModify = true;
@@ -932,8 +984,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         } else {
                             // Đăng ký từng ngày, 1 ngày
                             DateFromTo.value.map((item, index) => {
-                                if (this.listRefGetDataSave[`${item}-${index}`])
-                                    this.listRefGetDataSave[`${item}-${index}`].unduData();
+                                if (this.listRefGetDataSave[`${item}-${index}`]) this.listRefGetDataSave[`${item}-${index}`].unduData();
                             });
                         }
                     } else if (DateFromTo.value.startDate && DateFromTo.value.endDate) {
@@ -946,9 +997,9 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
     //#endregion
 
-    delete = (item) => {
+    delete = item => {
         const { DateFromTo } = this.state;
-        let rs = DateFromTo.value.filter((e) => {
+        let rs = DateFromTo.value.filter(e => {
             return moment(e).isSame(moment(item)) === false;
         });
         this.setState({
@@ -973,7 +1024,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         });
     };
 
-    onDeleteItemDay = (index) => {
+    onDeleteItemDay = index => {
         this.AlertSevice.alert({
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnDeleteItemDay',
@@ -1033,7 +1084,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         }
     };
 
-    onChangeDateFromTo = (range) => {
+    onChangeDateFromTo = range => {
         const { DateFromTo } = this.state;
         this.listRefGetDataSave = {};
         this.setState({
@@ -1043,8 +1094,6 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 refresh: !DateFromTo.refresh
             },
             isShowModal: true
-        }, () => {
-            this.getApprovalProcess();
         });
     };
 
@@ -1082,10 +1131,14 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
 
     onSave = (isSend, isconfirm) => {
         let ListBussinessTravelItem = [];
-        let dataExtend = {};
+        let dataExtend = {}
         const {
                 DateFromTo,
                 Profile,
+                UserApprove,
+                UserApprove2,
+                UserApprove3,
+                UserApprove4,
                 modalErrorDetail,
                 params,
                 SimilarRegistration,
@@ -1094,32 +1147,26 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
             { record } = params;
-        let dataApprovalProcess = [];
-
-        if (typeof this.refApproval?.getData === 'function') {
-            dataApprovalProcess = this.refApproval?.getData();
-        }
-
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
+
             if (SimilarRegistration.value && DateFromTo.value.length > 1) {
                 // Đăng ký nhiều ngày cùng lúc
                 const key = JSON.stringify(DateFromTo.value);
                 if (this.listRefGetDataSave[key]) {
                     let data = this.listRefGetDataSave[key].getAllData();
-                    let dataVisible = this.listRefGetDataSave[key].getDataVisible();
+                    let dataVisible= this.listRefGetDataSave[key].getDataVisible();
                     if (dataVisible) {
-                        dataExtend = dataVisible;
+                        dataExtend = dataVisible
                     }
                     if (data) {
                         DateFromTo.value.map((item) => {
                             ListBussinessTravelItem.push({
                                 ...data,
-                                DataApprove: dataApprovalProcess,
                                 DateFrom: item ? moment(item).format('YYYY/MM/DD') : null,
                                 DateTo: item ? moment(item).format('YYYY/MM/DD') : null,
                                 RegisterDate: item ? moment(item).format('YYYY/MM/DD') : null
                             });
-                        });
+                        })
                     }
                 }
             } else {
@@ -1127,15 +1174,12 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 DateFromTo.value.map((item, index) => {
                     if (this.listRefGetDataSave[`${item}-${index}`]) {
                         let data = this.listRefGetDataSave[`${item}-${index}`].getAllData();
-                        let dataVisible = this.listRefGetDataSave[`${item}-${index}`].getDataVisible();
+                        let dataVisible= this.listRefGetDataSave[`${item}-${index}`].getDataVisible();
                         if (dataVisible) {
-                            dataExtend = dataVisible;
+                            dataExtend = dataVisible
                         }
                         if (data) {
-                            ListBussinessTravelItem.push({
-                                ...data,
-                                DataApprove: dataApprovalProcess
-                            });
+                            ListBussinessTravelItem.push(data);
                         }
                     }
                 });
@@ -1145,21 +1189,17 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
 
             if (this.listRefGetDataSave[key]) {
                 let data = this.listRefGetDataSave[key].getAllData(),
-                    dataVisible = this.listRefGetDataSave[key].getDataVisible(),
+                    dataVisible= this.listRefGetDataSave[key].getDataVisible(),
                     DateRange = null;
                 if (DateFromTo.value) {
-                    DateRange = [
-                        `${moment(DateFromTo.value?.startDate).format('YYYY/MM/DD')} 00:00:00`,
-                        `${moment(DateFromTo.value?.endDate).format('YYYY/MM/DD')} 23:59:59`
-                    ];
+                    DateRange = [`${moment(DateFromTo.value?.startDate).format('YYYY/MM/DD')} 00:00:00`, `${moment(DateFromTo.value?.endDate).format('YYYY/MM/DD')} 23:59:59`];
                 }
                 if (dataVisible) {
-                    dataExtend = dataVisible;
+                    dataExtend = dataVisible
                 }
                 if (data) {
                     ListBussinessTravelItem.push({
                         ...data,
-                        DataApprove: dataApprovalProcess,
                         DateRange
                     });
                 }
@@ -1175,12 +1215,8 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                     (fieldConfig.DurationType.isValid && item.DurationType == null) ||
                     (fieldConfig.PlaceFrom.isValid && item.PlaceFrom == null && dataExtend.PlaceFrom.visible) ||
                     (fieldConfig.PlaceTo.isValid && item.PlaceTo == null && dataExtend.PlaceTo.visible) ||
-                    (fieldConfig.PlaceFromCombobox.isValid &&
-                        item.PlaceFromCombobox == null &&
-                        dataExtend.PlaceInFromID.visible) ||
-                    (fieldConfig.PlaceToCombobox.isValid &&
-                        item.PlaceToCombobox == null &&
-                        dataExtend.PlaceInToID.visible) ||
+                    (fieldConfig.PlaceFromCombobox.isValid && item.PlaceFromCombobox == null && dataExtend.PlaceInFromID.visible) ||
+                    (fieldConfig.PlaceToCombobox.isValid && item.PlaceToCombobox == null && dataExtend.PlaceInToID.visible) ||
                     (fieldConfig.PlaceSendToID.isValid && item.PlaceSendToID == null)
                 ) {
                     checkValid = false;
@@ -1206,23 +1242,23 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             for (let index = 0; index < ListBussinessTravelItem.length; index++) {
                 const item = ListBussinessTravelItem[index];
                 if (item.Note && item.Note.length > 500) {
-                    checkValid = false;
-                    let mess = translate('HRM_Sytem_MaxLength500').replace(
-                        '[E_NAME]',
-                        `[${translate('HRM_PortalApp_TSLRegister_Comment')}]`
-                    );
+                    checkValid =false
+                    let mess = translate('HRM_Sytem_MaxLength500')
+                        .replace('[E_NAME]', `[${translate('HRM_PortalApp_TSLRegister_Comment')}]`)
                     this.ToasterSevice.showWarning(mess);
                     break;
                 }
                 if (item.PlaceFrom && item.PlaceFrom.length > 500) {
-                    checkValid = false;
-                    let mess = translate('HRM_Sytem_MaxLength500').replace('[E_NAME]', `[${translate('PlaceFrom')}]`);
+                    checkValid =false
+                    let mess = translate('HRM_Sytem_MaxLength500')
+                        .replace('[E_NAME]', `[${translate('PlaceFrom')}]`)
                     this.ToasterSevice.showWarning(mess);
                     break;
                 }
                 if (item.PlaceTo && item.PlaceTo.length > 500) {
-                    checkValid = false;
-                    let mess = translate('HRM_Sytem_MaxLength500').replace('[E_NAME]', `[${translate('PlaceTo')}]`);
+                    checkValid =false
+                    let mess = translate('HRM_Sytem_MaxLength500')
+                        .replace('[E_NAME]', `[${translate('PlaceTo')}]`)
                     this.ToasterSevice.showWarning(mess);
                     break;
                 }
@@ -1242,10 +1278,16 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 IsConfirmSaveContinue: this.IsRemoveAndContinue
             };
             if (ListBussinessTravelItem.length > 0) {
+
                 payload = {
                     ...payload,
                     ID: record && record.ID ? record.ID : null,
                     ProfileIDs: Profile.ID,
+                    // Lý do gán lại cấp duyệt thứ tự 1.2.3.4 là do server tự gán lại theo thứ tự 1.3.4.2
+                    UserApproveID: UserApprove && UserApprove.value ? UserApprove.value.ID : null,
+                    UserApproveID2: UserApprove3 && UserApprove3.value ? UserApprove3.value.ID : null,
+                    UserApproveID3: UserApprove4 && UserApprove4.value ? UserApprove4.value.ID : null,
+                    UserApproveID4: UserApprove2 && UserApprove2.value ? UserApprove2.value.ID : null,
                     Host: uriPor,
                     ListBussinessTravelItem: ListBussinessTravelItem
                 };
@@ -1267,99 +1309,34 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 }
                 this.isProcessing = true;
                 this.showLoading(true);
+                HttpService.Post('[URI_CENTER]/api/Att_BussinessTravel/CreateOrUpdateBusinessTrip', payload).then(
+                    res => {
+                        this.isProcessing = false;
+                        this.showLoading(false);
+                        if (res && typeof res === EnumName.E_object) {
+                            if (res.Status == EnumName.E_SUCCESS) {
+                                this.onClose();
 
-                HttpService.Post('[URI_CENTER]/api/Att_BussinessTravel/CreateOrUpdateBusinessTrip', payload)
-                    .then(
-                        (res) => {
-                            this.isProcessing = false;
-                            this.showLoading(false);
-                            if (res && typeof res === EnumName.E_object) {
-                                if (res.Status == EnumName.E_SUCCESS) {
-                                    this.onClose();
+                                ToasterSevice.showSuccess('Hrm_Succeed', 5500);
 
-                                    ToasterSevice.showSuccess('Hrm_Succeed', 5500);
-
-                                    const { reload } = params;
-                                    if (reload && typeof reload === 'function') {
-                                        reload();
-                                    }
-                                } else if (res.Status == EnumName.E_FAIL) {
-                                    if (res.Data) {
-                                        if (res.Data.IsBlock == true) {
-                                            if (res.Data.IsRemoveAndContinue) {
-                                                this.AlertSevice.alert({
-                                                    title: translate('Hrm_Notification'),
-                                                    iconType: EnumIcon.E_WARNING,
-                                                    message: translate(
-                                                        'HRM_Attendance_Message_InvalidRequestDataPleaseCheckAgain'
-                                                    ),
-                                                    //lưu và tiếp tục
-                                                    colorSecondConfirm: Colors.primary,
-                                                    textSecondConfirm: translate('Button_OK'),
-                                                    onSecondConfirm: () => {
-                                                        this.ProfileRemoveIDs = res.Data.ProfileRemoveIDs;
-                                                        this.IsRemoveAndContinue = true;
-                                                        this.CacheID = res.Data.CacheID;
-                                                        this.onSave(isSend);
-                                                    },
-                                                    //đóng
-                                                    onCancel: () => { },
-                                                    //chi tiết lỗi
-                                                    textRightButton: translate('Button_Detail'),
-                                                    onConfirm: () => {
-                                                        this.setState(
-                                                            {
-                                                                modalErrorDetail: {
-                                                                    ...modalErrorDetail,
-                                                                    cacheID: res.Data.CacheID,
-                                                                    isModalVisible: true
-                                                                }
-                                                            },
-                                                            () => {
-                                                                this.getErrorMessageRespone();
-                                                            }
-                                                        );
-                                                    }
-                                                });
-                                            } else {
-                                                this.AlertSevice.alert({
-                                                    title: translate('Hrm_Notification'),
-                                                    iconType: EnumIcon.E_WARNING,
-                                                    message: translate(
-                                                        'HRM_Attendance_Message_InvalidRequestDataPleaseCheckAgain'
-                                                    ),
-                                                    textRightButton: translate('Button_Detail'),
-                                                    //đóng popup
-                                                    onCancel: () => { },
-                                                    //chi tiết lỗi
-                                                    onConfirm: () => {
-                                                        this.setState(
-                                                            {
-                                                                modalErrorDetail: {
-                                                                    ...modalErrorDetail,
-                                                                    cacheID: res.Data.CacheID,
-                                                                    isModalVisible: true
-                                                                }
-                                                            },
-                                                            () => {
-                                                                this.getErrorMessageRespone();
-                                                            }
-                                                        );
-                                                    }
-                                                });
-                                            }
-                                        } else {
+                                const { reload } = params;
+                                if (reload && typeof reload === 'function') {
+                                    reload();
+                                }
+                            } else if (res.Status == EnumName.E_FAIL) {
+                                if (res.Data) {
+                                    if (res.Data.IsBlock == true) {
+                                        if (res.Data.IsRemoveAndContinue) {
                                             this.AlertSevice.alert({
                                                 title: translate('Hrm_Notification'),
                                                 iconType: EnumIcon.E_WARNING,
                                                 message: translate(
-                                                    'HRM_Attendance_Message_InvalidRequestDataDoYouWantToSave'
+                                                    'HRM_Attendance_Message_InvalidRequestDataPleaseCheckAgain'
                                                 ),
                                                 //lưu và tiếp tục
                                                 colorSecondConfirm: Colors.primary,
                                                 textSecondConfirm: translate('Button_OK'),
                                                 onSecondConfirm: () => {
-                                                    this.IsContinueSave = true;
                                                     this.ProfileRemoveIDs = res.Data.ProfileRemoveIDs;
                                                     this.IsRemoveAndContinue = true;
                                                     this.CacheID = res.Data.CacheID;
@@ -1384,20 +1361,82 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                                                     );
                                                 }
                                             });
+                                        } else {
+                                            this.AlertSevice.alert({
+                                                title: translate('Hrm_Notification'),
+                                                iconType: EnumIcon.E_WARNING,
+                                                message: translate(
+                                                    'HRM_Attendance_Message_InvalidRequestDataPleaseCheckAgain'
+                                                ),
+                                                textRightButton: translate('Button_Detail'),
+                                                //đóng popup
+                                                onCancel: () => { },
+                                                //chi tiết lỗi
+                                                onConfirm: () => {
+                                                    this.setState(
+                                                        {
+                                                            modalErrorDetail: {
+                                                                ...modalErrorDetail,
+                                                                cacheID: res.Data.CacheID,
+                                                                isModalVisible: true
+                                                            }
+                                                        },
+                                                        () => {
+                                                            this.getErrorMessageRespone();
+                                                        }
+                                                    );
+                                                }
+                                            });
                                         }
-                                    } else if (res.Message) {
-                                        this.ToasterSevice.showWarning(res.Message, 4000);
+                                    } else {
+                                        this.AlertSevice.alert({
+                                            title: translate('Hrm_Notification'),
+                                            iconType: EnumIcon.E_WARNING,
+                                            message: translate(
+                                                'HRM_Attendance_Message_InvalidRequestDataDoYouWantToSave'
+                                            ),
+                                            //lưu và tiếp tục
+                                            colorSecondConfirm: Colors.primary,
+                                            textSecondConfirm: translate('Button_OK'),
+                                            onSecondConfirm: () => {
+                                                this.IsContinueSave = true;
+                                                this.ProfileRemoveIDs = res.Data.ProfileRemoveIDs;
+                                                this.IsRemoveAndContinue = true;
+                                                this.CacheID = res.Data.CacheID;
+                                                this.onSave(isSend);
+                                            },
+                                            //đóng
+                                            onCancel: () => { },
+                                            //chi tiết lỗi
+                                            textRightButton: translate('Button_Detail'),
+                                            onConfirm: () => {
+                                                this.setState(
+                                                    {
+                                                        modalErrorDetail: {
+                                                            ...modalErrorDetail,
+                                                            cacheID: res.Data.CacheID,
+                                                            isModalVisible: true
+                                                        }
+                                                    },
+                                                    () => {
+                                                        this.getErrorMessageRespone();
+                                                    }
+                                                );
+                                            }
+                                        });
                                     }
-                                } else if (res.Status == 'Hrm_Locked') {
-                                    this.ToasterSevice.showWarning('Hrm_Locked', 4000);
                                 } else if (res.Message) {
                                     this.ToasterSevice.showWarning(res.Message, 4000);
                                 }
+                            } else if (res.Status == 'Hrm_Locked') {
+                                this.ToasterSevice.showWarning('Hrm_Locked', 4000);
+                            } else if (res.Message) {
+                                this.ToasterSevice.showWarning(res.Message, 4000);
                             }
                         }
-                        // eslint-disable-next-line no-console
-                    )
-                    .catch(() => { });
+                    }
+                    // eslint-disable-next-line no-console
+                ).catch(err => console.log(err))
             }
         };
 
@@ -1427,7 +1466,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         }, {}); // empty object is the initial value for result object
     };
 
-    mappingDataGroup = (dataGroup) => {
+    mappingDataGroup = dataGroup => {
         let dataSource = [];
         // eslint-disable-next-line no-unused-vars
         for (let key in dataGroup) {
@@ -1540,7 +1579,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             cacheID: cacheID,
             IsPortal: true,
             ProfileID: Profile.ID
-        }).then((res) => {
+        }).then(res => {
             this.showLoading(false);
             if (res && res.Data && res.Status == EnumName.E_SUCCESS) {
                 const data = res.Data.Data;
@@ -1567,7 +1606,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     //#endregion
 
     // Thay đổi đăng ký tương tự
-    onChangeSimilarRegistration = (value) => {
+    onChangeSimilarRegistration = value => {
         const { SimilarRegistration } = this.state;
 
         this.setState({
@@ -1580,12 +1619,16 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
 
     componentDidMount() {
-        PermissionForAppMobile.value = {
-            ...PermissionForAppMobile.value,
-            Sys_ProcessApprove_ChangeProcess: {
-                View: true
-            }
-        };
+        // this.onShow({
+        //     reload: () => { },
+        //     record: null,
+        //     // {endDate: '2023-06-22', startDate: '2023-06-12'}
+        //     listItem: [
+        //         {
+        //             "WorkDate": new Date()
+        //         }
+        //     ]
+        // });
     }
 
     onScrollToInputIOS = (index, height) => {
@@ -1609,16 +1652,16 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 const key = JSON.stringify(DateFromTo.value);
                 return (
                     <FlatList
-                        ref={(refs) => (this.refFlatList = refs)}
+                        ref={refs => (this.refFlatList = refs)}
                         onScrollToInputIOS={(index, height) => {
-                            this.onScrollToInputIOS(index, height);
+                            this.onScrollToInputIOS(index, height)
                         }}
                         style={styles.styFlatListContainer}
                         data={[key]}
                         renderItem={({ item, index }) => (
                             <AttSubmitTakeBusinessTripComponent
                                 key={index}
-                                ref={(refCom) => {
+                                ref={refCom => {
                                     this.listRefGetDataSave[`${item}`] = refCom;
                                 }}
                                 levelApprove={this.levelApprove}
@@ -1639,19 +1682,16 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         )}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={() => {
-                            const { dataApprovalProcess } = this.state;
-                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
-                        }}
+                        ListFooterComponent={this.renderApprove}
                     />
                 );
             } else {
                 // Đăng ký từng ngày, 1 ngày
                 return (
                     <FlatList
-                        ref={(refs) => (this.refFlatList = refs)}
+                        ref={refs => (this.refFlatList = refs)}
                         onScrollToInputIOS={(index, height) => {
-                            this.onScrollToInputIOS(index, height);
+                            this.onScrollToInputIOS(index, height)
                         }}
                         style={styles.styFlatListContainer}
                         // scrollEnabled={false}
@@ -1660,7 +1700,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                             return (
                                 <View key={index}>
                                     <AttSubmitTakeBusinessTripComponent
-                                        ref={(refCom) => {
+                                        ref={refCom => {
                                             this.listRefGetDataSave[`${item}-${index}`] = refCom;
                                         }}
                                         levelApprove={this.levelApprove}
@@ -1676,20 +1716,15 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                                         ToasterSevice={this.ToasterSevice}
                                         updateShowRemain={this.updateShowRemain}
                                         isShowDelete={
-                                            Array.isArray(DateFromTo.value) && DateFromTo.value.length == 1
-                                                ? false
-                                                : true
+                                            Array.isArray(DateFromTo.value) && DateFromTo.value.length == 1 ? false : true
                                         }
                                     />
                                 </View>
-                            );
+                            )
                         }}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={() => {
-                            const { dataApprovalProcess } = this.state;
-                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
-                        }}
+                        ListFooterComponent={this.renderApprove}
                     />
                 );
             }
@@ -1698,16 +1733,16 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             const key = `${DateFromTo.value.startDate}-${DateFromTo.value.endDate}`;
             return (
                 <FlatList
-                    ref={(refs) => (this.refFlatList = refs)}
+                    ref={refs => (this.refFlatList = refs)}
                     // key={item}
                     onScrollToInputIOS={(index, height) => {
-                        this.onScrollToInputIOS(index, height);
+                        this.onScrollToInputIOS(index, height)
                     }}
                     style={styles.styFlatListContainer}
                     data={[key]}
                     renderItem={({ item }) => (
                         <AttSubmitTakeBusinessTripComponent
-                            ref={(refCom) => {
+                            ref={refCom => {
                                 this.listRefGetDataSave[`${item}`] = refCom;
                             }}
                             levelApprove={this.levelApprove}
@@ -1728,16 +1763,13 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                     )}
                     keyExtractor={(item, index) => index}
                     ItemSeparatorComponent={() => <View style={styles.separate} />}
-                    ListFooterComponent={() => {
-                        const { dataApprovalProcess } = this.state;
-                        return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
-                    }}
+                    ListFooterComponent={this.renderApprove}
                 />
             );
         }
     };
 
-    updateShowRemain = (value) => {
+    updateShowRemain = value => {
         this.setState({
             isShowRemain: {
                 visible: value != null && value !== '' && value !== 0 ? true : false,
@@ -1747,7 +1779,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
 
     //change duyệt đầu
-    onChangeUserApprove = (item) => {
+    onChangeUserApprove = item => {
         const { UserApprove, UserApprove2, UserApprove3, UserApprove4 } = this.state;
 
         let nextState = {
@@ -1821,7 +1853,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
 
     //change duyệt cuối
-    onChangeUserApprove2 = (item) => {
+    onChangeUserApprove2 = item => {
         const { UserApprove, UserApprove2, UserApprove3, UserApprove4 } = this.state;
 
         let nextState = {
@@ -1944,6 +1976,11 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         const {
             DateFromTo,
             isShowModal,
+            isShowModalApprove,
+            UserApprove,
+            UserApprove3,
+            UserApprove4,
+            UserApprove2,
             SimilarRegistration,
             /// lỗi chi tiết
             modalErrorDetail
@@ -1954,9 +1991,9 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
 
         const listActions = [];
         listActions.push({
-            type: EnumName.E_REGISTER,
-            title: 'HRM_PortalApp_Register',
-            onPress: () => this.onSaveAndSend()
+            type: EnumName.E_REFRESH,
+            title: '',
+            onPress: () => this.refreshForm()
         });
         listActions.push({
             type: EnumName.E_SAVE_TEMP,
@@ -1964,22 +2001,22 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
             onPress: () => this.onSaveTemp()
         });
         listActions.push({
-            type: EnumName.E_REFRESH,
-            title: '',
-            onPress: () => this.refreshForm()
+            type: EnumName.E_REGISTER,
+            title: 'HRM_PortalApp_Register',
+            onPress: () => this.onSaveAndSend()
         });
 
         return (
             <View style={styles.container}>
                 <VnrDateFromTo
-                    ref={(ref) => (this.refVnrDateFromTo = ref)}
+                    ref={ref => (this.refVnrDateFromTo = ref)}
                     //key={DateFromTo.id}
                     refresh={DateFromTo.refresh}
                     value={DateFromTo.value === null ? {} : DateFromTo.value}
                     displayOptions={true}
                     onlyChooseEveryDay={false}
                     disable={DateFromTo.disable}
-                    onFinish={(range) => this.onChangeDateFromTo(range)}
+                    onFinish={range => this.onChangeDateFromTo(range)}
                 />
 
                 {DateFromTo.value !== null ? (
@@ -1989,8 +2026,8 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                         visible={isShowModal} //isShowModal
                     >
                         <SafeAreaView style={styles.wrapInsideModal}>
-                            <ToasterInModal ref={(refs) => (this.ToasterSevice = refs)} />
-                            <AlertInModal ref={(refs) => (this.AlertSevice = refs)} />
+                            <ToasterInModal ref={refs => (this.ToasterSevice = refs)} />
+                            <AlertInModal ref={refs => (this.AlertSevice = refs)} />
 
                             <View style={styles.flRowSpaceBetween}>
                                 <VnrText
@@ -2006,11 +2043,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                                 </TouchableOpacity>
                             </View>
 
-                            <View style={[
-                                styles.styViewLogo,
-                                CustomStyleSheet.borderBottomColor(Colors.blue),
-                                CustomStyleSheet.borderBottomWidth(2)
-                            ]}>
+                            <View style={styles.styViewLogo}>
                                 <Image source={require('../../../../../assets/images/vnrDateFromTo/Group.png')} />
                             </View>
 
@@ -2022,17 +2055,12 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                                 DateFromTo.value &&
                                 Array.isArray(DateFromTo.value) &&
                                 DateFromTo.value.length > 1 && (
-                                <View
-                                    style={[
-                                        CustomStyleSheet.backgroundColor(Colors.white),
-                                        CustomStyleSheet.paddingVertical(8)
-                                    ]}
-                                >
+                                <View style={CustomStyleSheet.backgroundColor(Colors.white)}>
                                     <VnrSwitch
                                         lable={'HRM_PortalApp_TakeLeave_Similar'}
                                         subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
                                         value={SimilarRegistration.value}
-                                        onFinish={(value) => {
+                                        onFinish={value => {
                                             this.onChangeSimilarRegistration(value);
                                         }}
                                     />
@@ -2049,6 +2077,133 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
 
                             {/* button */}
                             <ListButtonRegister listActions={listActions} />
+
+                            {/* modal cấp duyệt */}
+                            {isShowModalApprove ? (
+                                <View style={styles.wrapModalApproval}>
+                                    <TouchableOpacity
+                                        style={[styles.bgOpacity]}
+                                        onPress={() => {
+                                            this.setState({
+                                                isShowModalApprove: false
+                                            });
+                                        }}
+                                    />
+                                    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+                                        <SafeAreaView style={styles.wrapContentModalApproval}>
+                                            <View style={styles.wrapTitileHeaderModalApprovaLevel}>
+                                                <VnrText
+                                                    style={[styleSheets.text, styles.styRegister, styles.fS16fW600]}
+                                                    i18nKey={'HRM_PortalApp_Approval_Process'}
+                                                />
+                                                <VnrText
+                                                    style={[styleSheets.text, styles.styApproveProcessTitle]}
+                                                    i18nKey={`${this.levelApprove} ${translate(
+                                                        'HRM_PortalApp_Approval_Level'
+                                                    )}`}
+                                                />
+                                            </View>
+                                            <View style={styles.wrapLevelApproval}>
+                                                <View style={styles.h90}>
+                                                    <VnrLoadApproval
+                                                        api={API_APPROVE}
+                                                        refresh={UserApprove.refresh}
+                                                        textField="UserInfoName"
+                                                        valueField="ID"
+                                                        nameApprovalLevel={UserApprove.label}
+                                                        levelApproval={UserApprove.levelApproval}
+                                                        filter={true}
+                                                        filterServer={true}
+                                                        filterParams={'Text'}
+                                                        autoFilter={true}
+                                                        status={UserApprove.status}
+                                                        value={UserApprove.value}
+                                                        disable={UserApprove.disable}
+                                                        onFinish={item => this.onChangeUserApprove(item)}
+                                                    />
+                                                </View>
+
+                                                {UserApprove3.visible && UserApprove3.visibleConfig && (
+                                                    <View style={styles.h90}>
+                                                        <VnrLoadApproval
+                                                            api={API_APPROVE}
+                                                            refresh={UserApprove3.refresh}
+                                                            textField="UserInfoName"
+                                                            nameApprovalLevel={UserApprove3.label}
+                                                            levelApproval={UserApprove3.levelApproval}
+                                                            valueField="ID"
+                                                            filter={true}
+                                                            filterServer={true}
+                                                            filterParams={'Text'}
+                                                            autoFilter={true}
+                                                            status={UserApprove3.status}
+                                                            value={UserApprove3.value}
+                                                            disable={UserApprove3.disable}
+                                                            onFinish={item => {
+                                                                this.setState({
+                                                                    UserApprove3: {
+                                                                        ...UserApprove3,
+                                                                        value: item,
+                                                                        refresh: !UserApprove3.refresh
+                                                                    }
+                                                                });
+                                                            }}
+                                                        />
+                                                    </View>
+                                                )}
+
+                                                {UserApprove4.visible && UserApprove4.visibleConfig && (
+                                                    <View style={styles.h90}>
+                                                        <VnrLoadApproval
+                                                            api={API_APPROVE}
+                                                            refresh={UserApprove4.refresh}
+                                                            textField="UserInfoName"
+                                                            nameApprovalLevel={UserApprove4.label}
+                                                            levelApproval={UserApprove4.levelApproval}
+                                                            valueField="ID"
+                                                            filter={true}
+                                                            filterServer={true}
+                                                            filterParams={'Text'}
+                                                            autoFilter={true}
+                                                            status={UserApprove4.status}
+                                                            value={UserApprove4.value}
+                                                            disable={UserApprove4.disable}
+                                                            onFinish={item => {
+                                                                this.setState({
+                                                                    UserApprove4: {
+                                                                        ...UserApprove4,
+                                                                        value: item,
+                                                                        refresh: !UserApprove4.refresh
+                                                                    }
+                                                                });
+                                                            }}
+                                                        />
+                                                    </View>
+                                                )}
+
+                                                <View style={styles.h90}>
+                                                    <VnrLoadApproval
+                                                        api={API_APPROVE}
+                                                        refresh={UserApprove2.refresh}
+                                                        textField="UserInfoName"
+                                                        nameApprovalLevel={UserApprove2.label}
+                                                        levelApproval={UserApprove2.levelApproval}
+                                                        valueField="ID"
+                                                        filter={true}
+                                                        filterServer={true}
+                                                        filterParams={'Text'}
+                                                        autoFilter={true}
+                                                        status={UserApprove2.status}
+                                                        value={UserApprove2.value}
+                                                        disable={UserApprove2.disable}
+                                                        onFinish={item => this.onChangeUserApprove2(item)}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </SafeAreaView>
+                                    </View>
+                                </View>
+                            ) : null}
                         </SafeAreaView>
                         {modalErrorDetail.isModalVisible && (
                             <Modal animationType="slide" transparent={true} isVisible={true}>

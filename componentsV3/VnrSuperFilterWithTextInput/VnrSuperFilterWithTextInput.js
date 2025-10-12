@@ -20,8 +20,7 @@ import {
     styleSheets,
     stylesVnrFilter,
     styleValid,
-    stylesVnrPickerV3,
-    CustomStyleSheet
+    stylesVnrPickerV3
 } from '../../constants/styleConfig';
 import VnrLoading from '../../components/VnrLoading/VnrLoading';
 import HttpFactory from '../../factories/HttpFactory';
@@ -31,7 +30,7 @@ import ListItem from './ListItem';
 import ListMultiItem from './MultiItem';
 import EmptyData from '../../components/EmptyData/EmptyData';
 import { translate } from '../../i18n/translate';
-import { IconDown, IconSearch, IconCancel, IconPlus, IconWarn, IconColse } from '../../constants/Icons';
+import { IconDown, IconSearch, IconCancel, IconPlus } from '../../constants/Icons';
 import HttpService from '../../utils/HttpService';
 import { EnumName } from '../../assets/constant';
 
@@ -61,7 +60,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         this.refSearch = null;
     }
 
-    setDataConfirm = (data) => {
+    setDataConfirm = data => {
         this.dataConfirm = data;
     };
 
@@ -71,10 +70,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
 
     opentModal = () => {
         let isVisibleLoading = this.isModalOpened ? false : true;
-        if (
-            HttpService.checkConnectInternet() == false &&
-            !Object.prototype.hasOwnProperty.call(this.props, 'dataLocal')
-        ) {
+        if (HttpService.checkConnectInternet() == false && !Object.prototype.hasOwnProperty.call(this.props, 'dataLocal')) {
             HttpService.showAlertNoNetwork(this.opentModal);
             return;
         }
@@ -86,7 +82,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
 
     checkItemInArray(arr, item, valueField) {
         if (
-            arr.findIndex((value) => {
+            arr.findIndex(value => {
                 return value[valueField] == item[valueField];
             }) != -1
         ) {
@@ -96,7 +92,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         }
     }
 
-    handelDataSelect = (data) => {
+    handelDataSelect = data => {
         let { itemSelected } = this.state;
         const { value, isOptionFilterQuicly } = this.props;
 
@@ -155,7 +151,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         if (itemSelected.length > 0 && Array.isArray(data) && data.length > 0) {
             data = data.map((item) => {
                 if (
-                    itemSelected.findIndex((_value) => {
+                    itemSelected.findIndex(_value => {
                         return _value.ID == item.ID;
                     }) != -1
                 ) {
@@ -222,9 +218,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         }
 
         HttpFactory.getDataPicker(url)
-            .then((res) => {
-                console.log(res, 'res');
-                
+            .then(res => {
                 let data = [];
                 if (res.Status == EnumName.E_SUCCESS) {
                     data = res.Data;
@@ -235,7 +229,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
                 this.isModalOpened = true;
                 this.handelDataSelect(data);
             })
-            .catch((error) => console.log(error));
+            .catch(error => console.log(error));
     };
 
     closeModal = () => {
@@ -245,7 +239,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         if (dataPicker && Array.isArray(dataPicker) && dataPicker.length > 0) {
             dataPicker = dataPicker.map((item) => {
                 if (
-                    itemSelected.findIndex((value) => {
+                    itemSelected.findIndex(value => {
                         return value[stateProps.valueField] == item[stateProps.valueField];
                     }) != -1
                 ) {
@@ -275,7 +269,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         }
     };
 
-    addItemChecked = (indexItem) => {
+    addItemChecked = indexItem => {
         const { valueField, isChooseOne } = this.state.stateProps;
         let { itemSelected, dataPicker } = this.state;
 
@@ -283,12 +277,12 @@ export default class VnrSuperFilterWithTextInput extends Component {
         if (isChooseOne) {
             itemSelected.length = 0;
             itemSelected.push(itemChecked);
-            const index = dataPicker.findIndex((item) => item?.isSelect === true);
+            const index = dataPicker.findIndex(item => item?.isSelect === true);
             if (index > -1) {
                 dataPicker[index].isSelect = false;
             }
         } else if (!itemChecked.isSelect)
-            // kiem tra isSelect == true thi add vao mang itemSelected
+        // kiem tra isSelect == true thi add vao mang itemSelected
             itemSelected = itemSelected.concat(itemChecked);
         else {
             itemSelected = Vnr_Function.removeObjectInArray(itemSelected, itemChecked, valueField);
@@ -297,11 +291,11 @@ export default class VnrSuperFilterWithTextInput extends Component {
         this.setState({ dataPicker: dataPicker, itemSelected: itemSelected, searchText: '' });
     };
 
-    revomeItemSelected = (objectItem) => {
+    revomeItemSelected = objectItem => {
         let { itemSelected, stateProps, dataPicker } = this.state;
         const List = Vnr_Function.removeObjectInArray(itemSelected, objectItem, stateProps.valueField);
         if (dataPicker != null && dataPicker.length > 0) {
-            let indexItemRemove = dataPicker.findIndex((item) => {
+            let indexItemRemove = dataPicker.findIndex(item => {
                 return item[stateProps.valueField] == objectItem[stateProps.valueField];
             });
             if (indexItemRemove != -1) {
@@ -322,7 +316,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         let { stateProps, dataPicker } = this.state;
         this.setDataConfirm([]);
         if (dataPicker != null && dataPicker.length > 0) {
-            dataPicker.map((item) => {
+            dataPicker.map(item => {
                 item.isSelect = false;
                 return item;
             });
@@ -343,11 +337,11 @@ export default class VnrSuperFilterWithTextInput extends Component {
         this.setState({ isModalVisible: false });
     };
 
-    changeSearchBar = (textValue) => {
+    changeSearchBar = textValue => {
         this.setState({ searchText: textValue });
     };
 
-    changeDisable = (bool) => {
+    changeDisable = bool => {
         const stateProps = { ...this.state.stateProps };
         if (!Vnr_Function.CheckIsNullOrEmpty(stateProps.disable) && typeof stateProps.disable === 'boolean') {
             stateProps.disable = bool;
@@ -370,9 +364,9 @@ export default class VnrSuperFilterWithTextInput extends Component {
             const data = fullData.filter((item) => {
                 return Vnr_Function.CheckContains(item, fieldFilterLocal, searchText);
             });
-            data.map((item) => {
+            data.map(item => {
                 if (
-                    itemSelected.findIndex((value) => {
+                    itemSelected.findIndex(value => {
                         return item[valueField] == value[valueField];
                     }) != -1
                 ) {
@@ -387,7 +381,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         }
     };
 
-    onRefreshControl = (nextProps) => {
+    onRefreshControl = nextProps => {
         const { value } = nextProps;
         let _state = this.state;
         _state = defaultState;
@@ -482,14 +476,14 @@ export default class VnrSuperFilterWithTextInput extends Component {
         );
     };
 
-    removeItemOnSearch = (index) => {
+    removeItemOnSearch = index => {
         let { itemSelected, dataPicker } = this.state;
         if (itemSelected[index].isSelect === true) {
             itemSelected[index].isSelect = false;
-            let arr = itemSelected.filter((item) => item.ID !== itemSelected[index].ID);
+            let arr = itemSelected.filter(item => item.ID !== itemSelected[index].ID);
             let data = dataPicker.map((item) => {
                 if (
-                    arr.findIndex((_value) => {
+                    arr.findIndex(_value => {
                         return _value[this.props.valueField] == item[this.props.valueField];
                     }) != -1
                 ) {
@@ -511,7 +505,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
         return false;
     }
 
-    renderLableLayout = (value) => {
+    renderLableLayout = value => {
         const { lable } = this.props;
         let countSelect = value !== undefined ? value.length : null;
         return (
@@ -545,10 +539,22 @@ export default class VnrSuperFilterWithTextInput extends Component {
     };
 
     render() {
-        const { searchText, isModalVisible, isVisibleLoading, dataPicker, itemSelected, stateProps, isExceedSize } =
-            this.state;
+        const {
+            searchText,
+            isModalVisible,
+            isVisibleLoading,
+            dataPicker,
+            itemSelected,
+            stateProps,
+            isExceedSize
+        } = this.state;
 
-        const { ScroollviewModal, bottomModal, bntPickerDisable, stylePlaceholder } = stylesVnrPickerV3;
+        const {
+            ScroollviewModal,
+            bottomModal,
+            bntPickerDisable,
+            stylePlaceholder
+        } = stylesVnrPickerV3;
 
         const {
             value,
@@ -560,12 +566,9 @@ export default class VnrSuperFilterWithTextInput extends Component {
             valueDisplay,
             layoutFilter,
             children,
-            isChooseOne,
-            isCheckEmpty,
-            fieldValid
+            isChooseOne
         } = this.props;
 
-        let isShowErr = false;
         let disable = false;
         let isHaveValue = true;
         let viewListItem = <View />;
@@ -594,19 +597,6 @@ export default class VnrSuperFilterWithTextInput extends Component {
         if (!value || value.length == 0) {
             isHaveValue = false;
         }
-
-        if (
-            fieldValid &&
-            fieldValid === true &&
-            isCheckEmpty &&
-            isCheckEmpty === true &&
-            (value === null || value === undefined || Object.keys(value).length === 0)
-        ) {
-            isShowErr = true;
-        } else {
-            isShowErr = false;
-        }
-
         return (
             <View
                 style={[
@@ -614,16 +604,15 @@ export default class VnrSuperFilterWithTextInput extends Component {
                     layoutFilter && { height: 50 },
                     isOptionFilterQuicly === true
                         ? {
-                              height: '100%',
-                              width: '100%'
-                          }
+                            height: '100%',
+                            width: '100%'
+                        }
                         : ((value !== undefined && value.length > 2) || (isExceedSize === true && value.length > 1)) &&
-                            !isChooseOne
-                          ? { height: 'auto' }
-                          : value !== undefined && value.length <= 2 && value.length > 0 && !isChooseOne
+                          !isChooseOne
                             ? { height: 'auto' }
-                            : { height: 50 },
-                    isShowErr && styles.borderBottom
+                            : value !== undefined && value.length <= 2 && value.length > 0 && !isChooseOne
+                                ? { height: 'auto' }
+                                : { height: 50 }
                 ]}
             >
                 {layoutFilter && this.renderLableLayout(value)}
@@ -636,11 +625,11 @@ export default class VnrSuperFilterWithTextInput extends Component {
                         disable && bntPickerDisable,
                         isOptionFilterQuicly === true
                             ? {
-                                  height: '100%',
-                                  width: '100%'
-                              }
+                                height: '100%',
+                                width: '100%'
+                            }
                             : styles.styBntPicker,
-                        (layoutFilter || isShowErr) && { borderBottomWidth: 0 }
+                        layoutFilter && { borderBottomWidth: 0 }
                     ]}
                     activeOpacity={!disable ? 0.2 : 1}
                 >
@@ -655,10 +644,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
                             >
                                 {valueDisplay.map((item, index) => {
                                     return (
-                                        <TouchableOpacity
-                                            key={index}
-                                            onPress={() => (!disable ? this.opentModal() : null)}
-                                        >
+                                        <TouchableOpacity key={index} onPress={() => (!disable ? this.opentModal() : null)}>
                                             <Text style={styleSheets.text}>{item},</Text>
                                         </TouchableOpacity>
                                     );
@@ -675,33 +661,29 @@ export default class VnrSuperFilterWithTextInput extends Component {
                             <View
                                 style={[
                                     stylesVnrPickerV3.styLeftPicker,
-                                    stateProps.lable && isHaveValue
-                                        ? CustomStyleSheet.paddingVertical(6)
-                                        : stylesVnrPickerV3.onlyFlRowSpaceBetween,
-                                    !isHaveValue && CustomStyleSheet.alignItems('center')
+                                    stateProps.lable && isHaveValue ? {} : stylesVnrPickerV3.onlyFlRowSpaceBetween
                                 ]}
                             >
                                 {stateProps.lable && !layoutFilter && (
-                                    <View
-                                        style={[
-                                            stylesVnrPickerV3.styLbPicker,
-                                            !isHaveValue && CustomStyleSheet.maxWidth('45%')
-                                        ]}
-                                    >
-                                        <Text style={[styleSheets.text, stylesVnrPickerV3.styLbNoValuePicker]}>
-                                            {translate(stateProps.lable)}
-                                            {stateProps.fieldValid && (
-                                                <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
-                                            )}
-                                        </Text>
+                                    <View style={stylesVnrPickerV3.styLbPicker}>
+                                        <VnrText
+                                            style={[
+                                                styleSheets.text,
+                                                stylesVnrPickerV3.styLbNoValuePicker
+                                                //isHaveValue ? { fontSize: 14, } : { fontSize: Size.text, }
+                                            ]}
+                                            i18nKey={stateProps.lable}
+                                        />
+                                        {stateProps.fieldValid && (
+                                            <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
+                                        )}
                                     </View>
                                 )}
 
                                 <View
                                     style={[
                                         stylesVnrPickerV3.styVlPicker,
-                                        isHaveValue ? styles.haveValue : styles.yetValue,
-                                        { alignItems: 'center' }
+                                        isHaveValue ? styles.haveValue : styles.yetValue
                                     ]}
                                 >
                                     {isHaveValue ? (
@@ -717,13 +699,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
                                         />
                                     ) : (
                                         !layoutFilter && (
-                                            <View
-                                                style={[
-                                                    isOptionFilterQuicly === true
-                                                        ? styles.fl1Center
-                                                        : { marginRight: 2 }
-                                                ]}
-                                            >
+                                            <View style={[isOptionFilterQuicly === true ? styles.fl1Center : {}]}>
                                                 <VnrText
                                                     style={[
                                                         styleSheets.text,
@@ -739,32 +715,24 @@ export default class VnrSuperFilterWithTextInput extends Component {
                                             </View>
                                         )
                                     )}
-                                    {/* {this.renderIconRight(isHaveValue, isShowErr)} */}
-                                    {isHaveValue || isOptionFilterQuicly === true || layoutFilter ? null : (
-                                        <View
-                                            style={[stylesVnrPickerV3.styRightPicker, CustomStyleSheet.marginRight(16)]}
-                                        >
-                                            {stateProps.clearText == true ? (
-                                                <TouchableOpacity
-                                                    onPress={this.clearDate}
-                                                    style={stylesVnrPickerV3.styBtnClear}
-                                                >
-                                                    <IconCancel size={Size.iconSize - 2} color={Colors.grey} />
-                                                </TouchableOpacity>
-                                            ) : isShowErr ? (
-                                                <View style={stylesVnrPickerV3.styBtnClear}>
-                                                    <IconWarn color={Colors.red} size={Size.iconSize - 2} />
-                                                </View>
-                                            ) : (
-                                                <IconDown
-                                                    size={Size.iconSize}
-                                                    color={disable ? Colors.gray_7 : Colors.gray_8}
-                                                />
-                                            )}
-                                        </View>
-                                    )}
                                 </View>
                             </View>
+
+                            {/* {this.renderIconRight(isHaveValue, isShowErr)} */}
+                            {isHaveValue || isOptionFilterQuicly === true || layoutFilter ? null : (
+                                <View style={stylesVnrPickerV3.styRightPicker}>
+                                    {stateProps.clearText == true && (
+                                        <TouchableOpacity
+                                            onPress={this.clearDate}
+                                            style={stylesVnrPickerV3.styBtnClear}
+                                        >
+                                            <IconCancel size={Size.iconSize - 2} color={Colors.grey} />
+                                        </TouchableOpacity>
+                                    )}
+
+                                    <IconDown size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_8} />
+                                </View>
+                            )}
                         </View>
                     )}
                 </TouchableOpacity>
@@ -778,40 +746,6 @@ export default class VnrSuperFilterWithTextInput extends Component {
                 >
                     <SafeAreaView style={ScroollviewModal} forceInset={{ top: 'always', bottom: 'always' }}>
                         {/* search */}
-
-                        {stateProps?.lable && (
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: 12,
-                                    marginTop: 12
-                                }}
-                            >
-                                <Text
-                                    style={[styleSheets.lable, {
-                                        fontSize: 16,
-                                        fontWeight: '600'
-                                    }]}
-                                >
-                                    {stateProps?.lable}
-                                </Text>
-
-                                <TouchableOpacity
-                                    activeOpacity={0.7}
-                                    onPress={this.closeModal}
-                                    style={{
-                                        padding: 6,
-                                        borderRadius: 100,
-                                        backgroundColor: Colors.gray_4
-                                    }}
-                                >
-                                    <IconCancel size={Size.iconSize - 4} color={Colors.black} />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-
                         {stateProps.filter === true && (
                             <View style={stylesSearch.viewFilter}>
                                 <View
@@ -859,10 +793,10 @@ export default class VnrSuperFilterWithTextInput extends Component {
                                         </ScrollView>
 
                                         <TextInput
-                                            ref={(refSearch) => (this.refSearch = refSearch)}
+                                            ref={refSearch => (this.refSearch = refSearch)}
                                             // onClearText={() => this.changeSearchBar('')}
                                             placeholder={translate('HRM_Common_Search')}
-                                            onChangeText={(text) => {
+                                            onChangeText={text => {
                                                 this.setState({ searchText: text }, () => {
                                                     if (filter === true && filterServer === true) {
                                                         this.filterServer();
@@ -900,7 +834,7 @@ export default class VnrSuperFilterWithTextInput extends Component {
                                         i18nKey={
                                             stateProps.textLeftButton != null
                                                 ? stateProps.textLeftButton
-                                                : 'HRM_PortalApp_RemoveSelect'
+                                                : 'HRM_Common_Close'
                                         }
                                     />
                                 </TouchableOpacity>
@@ -952,10 +886,6 @@ const styles = StyleSheet.create({
     styScrollView: {
         flexGrow: 1,
         alignItems: 'center'
-    },
-    borderBottom: {
-        borderBottomColor: Colors.red,
-        borderBottomWidth: 0.8
     }
 });
 
@@ -976,7 +906,7 @@ const stylesSearch = StyleSheet.create({
         flexDirection: 'row',
         borderWidth: 0.5,
         borderColor: Colors.gray_5,
-        borderRadius: 8,
+        borderRadius: 20,
         alignItems: 'flex-start',
         paddingRight: 10,
         marginVertical: 12,

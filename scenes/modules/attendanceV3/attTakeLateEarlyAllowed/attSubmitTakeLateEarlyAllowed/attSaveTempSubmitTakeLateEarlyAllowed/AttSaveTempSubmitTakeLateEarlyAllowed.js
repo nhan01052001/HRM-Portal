@@ -336,7 +336,6 @@ class AttSaveTempSubmitTakeLateEarlyAllowed extends Component {
                             }}
                             screenName={attSubmitTakeLateEarlyAllowed}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Attendance_Late_Early_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

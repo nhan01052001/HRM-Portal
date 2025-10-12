@@ -513,26 +513,6 @@ export const ScreenName = {
     AttCanceledTakeBusinessTrip: 'AttCanceledTakeBusinessTrip',
     AttAllTakeBusinessTrip: 'AttAllTakeBusinessTrip',
 
-    // Region: AttBackWorkBeforeMaternity V3
-    AttSubmitBackWorkBeforeMaternity: 'AttSubmitBackWorkBeforeMaternity',
-    AttSubmitBackWorkBeforeMaternityViewDetail: 'AttSubmitBackWorkBeforeMaternityViewDetail',
-    AttSubmitBackWorkBeforeMaternityAddOrEdit: 'AttSubmitBackWorkBeforeMaternityAddOrEdit',
-    AttApproveSubmitBackWorkBeforeMaternity: 'AttApproveSubmitBackWorkBeforeMaternity',
-    AttApprovedSubmitBackWorkBeforeMaternity: 'AttApprovedSubmitBackWorkBeforeMaternity',
-    AttSaveTempSubmitBackWorkBeforeMaternity: 'AttSaveTempSubmitBackWorkBeforeMaternity',
-    AttRejectSubmitBackWorkBeforeMaternity: 'AttRejectSubmitBackWorkBeforeMaternity',
-    AttCanceledSubmitBackWorkBeforeMaternity: 'AttCanceledSubmitBackWorkBeforeMaternity',
-
-    AttApproveBackWorkBeforeMaternity: 'AttApproveBackWorkBeforeMaternity',
-    AttApproveBackWorkBeforeMaternityViewDetail: 'AttApproveBackWorkBeforeMaternityViewDetail',
-
-    AttApprovedBackWorkBeforeMaternity: 'AttApprovedBackWorkBeforeMaternity',
-    AttApprovedBackWorkBeforeMaternityViewDetail: 'AttApprovedBackWorkBeforeMaternityViewDetail',
-
-    AttRejectBackWorkBeforeMaternity: 'AttRejectBackWorkBeforeMaternity',
-    AttCanceledBackWorkBeforeMaternity: 'AttCanceledBackWorkBeforeMaternity',
-    AttAllBackWorkBeforeMaternity: 'AttAllBackWorkBeforeMaternity',
-
     //Region: WorkingOvertime V3
     AttSubmitWorkingOvertime: 'AttSubmitWorkingOvertime',
     AttSubmitWorkingOvertimeAddOrEdit: 'AttSubmitWorkingOvertimeAddOrEdit',
@@ -602,8 +582,6 @@ export const ScreenName = {
     UnEmploymentInsurance: 'UnEmploymentInsurance',
 
     AttLeaveFundManagement: 'AttLeaveFundManagement',
-    AttLeaveFundSeniorBonusViewDetail: 'AttLeaveFundSeniorBonusViewDetail',
-    AttLeaveFundCompensatoryViewDetail: 'AttLeaveFundCompensatoryViewDetail',
 
     // Hre WorkHistory
     HreWorkHistorySubmit: 'HreWorkHistorySubmit',
@@ -793,19 +771,20 @@ export const ScreenName = {
     AttSubmitShiftChange: 'AttSubmitShiftChange',
     AttSubmitShiftChangeAddOrEdit: 'AttSubmitShiftChangeAddOrEdit',
     AttSubmitShiftChangeViewDetail: 'AttSubmitShiftChangeViewDetail',
+    AttApproveShiftChange: 'AttApproveShiftChange',
+    AttApproveShiftChangeViewDetail: 'AttApproveShiftChangeViewDetail',
+    AttApprovedShiftChange: 'AttApprovedShiftChange',
+    AttApprovedShiftChangeViewDetail: 'AttApprovedShiftChangeViewDetail',
     AttSaveTempSubmitShiftChange: 'AttSaveTempSubmitShiftChange',
     AttCanceledSubmitShiftChange: 'AttCanceledSubmitShiftChange',
     AttApproveSubmitShiftChange: 'AttApproveSubmitShiftChange',
     AttApprovedSubmitShiftChange: 'AttApprovedSubmitShiftChange',
     AttRejectSubmitShiftChange: 'AttRejectSubmitShiftChange',
     AttAllSubmitShiftChange: 'AttAllSubmitShiftChange',
-
-    AttAllTakeShiftChange: 'AttAllTakeShiftChange',
-    AttApproveShiftChange: 'AttApproveShiftChange',
-    AttApprovedShiftChange: 'AttApprovedShiftChange',
+    AttSaveTempShiftChange: 'AttSaveTempShiftChange',
     AttCanceledShiftChange: 'AttCanceledShiftChange',
     AttRejectShiftChange: 'AttRejectShiftChange',
-    AttApproveShiftChangeViewDetail: 'AttApproveShiftChangeViewDetail',
+    AttAllShiftChange: 'AttAllShiftChange',
 
     //Region: attTakeDailyTask v3
     AttSubmitTakeDailyTask: 'AttSubmitTakeDailyTask',
@@ -867,8 +846,7 @@ export const ScreenName = {
     HreWaitProcessingJobPosting: 'HreWaitProcessingJobPosting',
     HreDoneProcessingJobPosting: 'HreDoneProcessingJobPosting',
     HreProcessingJobPostingViewDetail: 'HreProcessingJobPostingViewDetail',
-    HrePostChanelViewDetail: 'HrePostChanelViewDetail',
-    HrePostPreviewViewDetail: 'HrePostPreviewViewDetail',
+    HrePostChanelViewDetail :'HrePostChanelViewDetail',
 
     // module HRE V3: hreRecruitment/hreApproveRecruitmentProposal
     HrePendingApproveRecruitmentProposal: 'HrePendingApproveRecruitmentProposal',
@@ -881,58 +859,22 @@ export const ScreenName = {
     AttWaitConfirmLeaveDayReplacement: 'AttWaitConfirmLeaveDayReplacement',
     AttLeaveDayReplacementViewDetail: 'AttLeaveDayReplacementViewDetail',
 
-    //module ATT V3: attConfirmeShiftChange
-    AttConfirmedShiftChange: 'AttConfirmedShiftChange',
-    AttConfirmShiftChange: 'AttConfirmShiftChange',
-    AttWaitConfirmShiftChange: 'AttWaitConfirmShiftChange',
-    AttRejectedShiftChange: 'AttRejectedShiftChange',
-    AttConfirmShiftChangeViewDetail: 'AttConfirmShiftChangeViewDetail',
-
     // module HRE V3: hreRecruitment/hreReceiveJob
     HreWaitingReceiveJob: 'HreWaitingReceiveJob',
     HreRefuseReceiveJob: 'HreRefuseReceiveJob',
     HreReceiveJobViewDetail: 'HreReceiveJobViewDetail',
 
-    // module HRE V3: hreJobPosting
-    HreInProcessJobPosting: 'HreInProcessJobPosting',
-    HreOutDateJobPosting: 'HreOutDateJobPosting',
-    HreStopJobPosting: 'HreStopJobPosting',
-    HreJobPostingViewDetail: 'HreJobPostingViewDetail',
-
-    // uỷ quyền duyệt
-    AttSubmitDelegationApproval: 'AttSubmitDelegationApproval',
-    AttWaitConfirmSubmitDelegationApproval: 'AttWaitConfirmSubmitDelegationApproval',
-    AttConfirmedSubmitDelegationApproval: 'AttConfirmedSubmitDelegationApproval',
-    AttCanceledSubmitDelegationApproval: 'AttCanceledSubmitDelegationApproval',
-    AttRejectSubmitDelegationApproval: 'AttRejectSubmitDelegationApproval',
-    AttRejectDelegationApproval: 'AttRejectDelegationApproval',
-    AttWaitConfirmDelegationApproval: 'AttWaitConfirmDelegationApproval',
-    AttConfirmedDelegationApproval: 'AttConfirmedDelegationApproval',
-    AttCanceledDelegationApproval: 'AttCanceledDelegationApproval',
-    AttSubmitDelegationApprovalAddOrEdit: 'AttSubmitDelegationApprovalAddOrEdit',
-    AttSubmitDelegationApprovalViewDetail: 'AttSubmitDelegationApprovalViewDetail',
-    AttConfirmDelegationApprovalViewDetail: 'AttConfirmDelegationApprovalViewDetail',
-    AttConfirmDelegationApproval: 'AttConfirmDelegationApproval',
-
-    SalFeeCheck: 'SalFeeCheck',
-    SalFeeCheckAddOrEdit: 'SalFeeCheckAddOrEdit',
-    SalFeeCheckViewDetail: 'SalFeeCheckViewDetail',
-
-    SalWaitApprovePaymentCostRegister: 'SalWaitApprovePaymentCostRegister',
-    SalApprovedPaymentCostRegister: 'SalApprovedPaymentCostRegister',
-    SalApprovePaymentCostRegister: 'SalApprovePaymentCostRegister',
-    SalApprovePaymentCostRegisterViewDetail: 'SalApprovePaymentCostRegisterViewDetail',
-
-    RecruitmentReport: 'RecruitmentReport'
+    AttNumberOfMeals: 'AttNumberOfMeals',
+    AttNumberOfMealsHistory: 'AttNumberOfMealsHistory'
 };
 
 export const EnumName = {
+    E_REQUEST_NO_RESPONSE: 'E_REQUEST_NO_RESPONSE',
     E_ENTER_INTERVIEW: 'E_ENTER_INTERVIEW',
     E_GRANT_PERMISSION: 'E_GRANT_PERMISSION',
     E_SYSTEM: 'system',
     E_ANALYSICS: 'E_ANALYSICS',
     E_EMPTYDATA: 'EmptyData',
-    E_REQUEST_NO_RESPONSE: 'E_REQUEST_NO_RESPONSE',
     E_NOINTERNET: 'E_NOINTERNET',
     E_New_Att_LeaveDay_Register_Help: 'New_Att_LeaveDay_Register_Help',
     E_Att_Overtime_Register_Help: 'Att_Overtime_Register_Help',
@@ -1031,8 +973,6 @@ export const EnumName = {
     E_COMPENSATORY_LEAVE: 'E_COMPENSATORY_LEAVE',
     E_SICK_LEAVE: 'E_SICK_LEAVE',
     E_ADDITIONAL_LEAVE: 'E_ADDITIONAL_LEAVE',
-    E_COMPENSATORY_LEAVE_DETAIL: 'E_COMPENSATORY_LEAVE_DETAIL',
-    E_SENIORBONUS_LEAVE_DETAIL: 'E_SENIORBONUS_LEAVE_DETAIL',
     E_FAIL: 'FAIL',
     E_MIDDLEOFSHIFT: 'E_MIDDLEOFSHIFT',
     E_ATTACH_FILE: 'E_ATTACH_FILE',
@@ -1050,14 +990,7 @@ export const EnumName = {
     E_CHANGE_SHIFT_COMPANSATION: 'E_CHANGE_SHIFT_COMPANSATION',
     E_DIFFERENTDAY: 'E_DIFFERENTDAY',
     E_SAMEDAY: 'E_SAMEDAY',
-    E_CLUSTER: 'E_CLUSTER',
-    E_EXPIRE: 'E_EXPIRE',
-    E_REPOST: 'E_REPOST',
-    E_POSTPONE: 'E_POSTPONE',
-    E_STOP_POSTING: 'E_STOP_POSTING',
-    E_warning: 'warning',
-    E_wait: 'wait',
-    E_submitChange: 'submitChange'
+    E_CLUSTER: 'E_CLUSTER'
 };
 
 export const EnumStatus = {
@@ -1080,11 +1013,7 @@ export const EnumStatus = {
     E_SUBMIT_TEMP: 'E_SUBMIT_TEMP',
     E_SUBMIT: 'E_SUBMIT',
     E_REQUEST_CANCEL: 'E_REQUEST_CANCEL',
-    E_REQUEST_CHANGE: 'E_REQUEST_CHANGE',
-    E_EXPIRE: 'E_EXPIRE',
-    E_REPOST: 'E_REPOST',
-    E_STOP_POSTING: 'E_STOP_POSTING',
-    E_POSTPONE: 'E_POSTPONE'
+    E_REQUEST_CHANGE: 'E_REQUEST_CHANGE'
 };
 
 export const ControlName = {
@@ -1327,19 +1256,6 @@ export const EnumTask = {
     KT_AttCanceledTakeBusinessTrip: 'KT_AttCanceledTakeBusinessTrip',
     KT_AttAllTakeBusinessTrip: 'KT_AttAllTakeBusinessTrip',
 
-    // V3 BackWorkBeforeMaternity
-    KT_AttSubmitBackWorkBeforeMaternity: 'KT_AttSubmitBackWorkBeforeMaternity',
-    KT_AttRejectSubmitBackWorkBeforeMaternity: 'KT_AttRejectSubmitBackWorkBeforeMaternity',
-    KT_AttCanceledSubmitBackWorkBeforeMaternity: 'KT_AttCanceledSubmitBackWorkBeforeMaternity',
-    KT_AttSaveTempSubmitBackWorkBeforeMaternity: 'KT_AttSaveTempSubmitBackWorkBeforeMaternity',
-    KT_AttApproveSubmitBackWorkBeforeMaternity: 'KT_AttApproveSubmitBackWorkBeforeMaternity',
-    KT_AttApprovedSubmitBackWorkBeforeMaternity: 'KT_AttApprovedSubmitBackWorkBeforeMaternity',
-    KT_AttApproveBackWorkBeforeMaternity: 'KT_AttApproveBackWorkBeforeMaternity',
-    KT_AttApprovedBackWorkBeforeMaternity: 'KT_AttApprovedBackWorkBeforeMaternity',
-    KT_AttRejectBackWorkBeforeMaternity: 'KT_AttRejectBackWorkBeforeMaternity',
-    KT_AttCanceledBackWorkBeforeMaternity: 'KT_AttCanceledBackWorkBeforeMaternity',
-    KT_AttAllBackWorkBeforeMaternity: 'KT_AttAllBackWorkBeforeMaternity',
-
     // V3 WorkingOvertime
     KT_AttSubmitWorkingOvertime: 'KT_AttSubmitWorkingOvertime',
     KT_AttApproveWorkingOvertime: 'KT_AttApproveWorkingOvertime',
@@ -1553,17 +1469,18 @@ export const EnumTask = {
 
     // V3 ShiftChange
     KT_AttSubmitShiftChange: 'KT_AttSubmitShiftChange',
+    KT_AttApproveShiftChange: 'KT_AttApproveShiftChange',
+    KT_AttApprovedShiftChange: 'KT_AttApprovedShiftChange',
     KT_AttSaveTempSubmitShiftChange: 'KT_AttSaveTempSubmitShiftChange',
     KT_AttCanceledSubmitShiftChange: 'KT_AttCanceledSubmitShiftChange',
     KT_AttApproveSubmitShiftChange: 'KT_AttApproveSubmitShiftChange',
     KT_AttApprovedSubmitShiftChange: 'KT_AttApprovedSubmitShiftChange',
     KT_AttRejectSubmitShiftChange: 'KT_AttRejectSubmitShiftChange',
-
-    KT_AttAllTakeShiftChange: 'KT_AttAllTakeShiftChange',
-    KT_AttApproveShiftChange: 'KT_AttApproveShiftChange',
-    KT_AttApprovedShiftChange: 'KT_AttApprovedShiftChange',
+    KT_AttAllSubmitShiftChange: 'KT_AttAllSubmitShiftChange',
+    KT_AttSaveTempShiftChange: 'KT_AttSaveTempShiftChange',
     KT_AttCanceledShiftChange: 'KT_AttCanceledShiftChange',
     KT_AttRejectShiftChange: 'KT_AttRejectShiftChange',
+    KT_AttAllShiftChange: 'KT_AttAllShiftChange',
 
     // V3 TakeDailyTask
     KT_AttSubmitTakeDailyTask: 'KT_AttSubmitTakeDailyTask',
@@ -1589,12 +1506,6 @@ export const EnumTask = {
     KT_HreWaitRecruitmentProposalProcessing: 'KT_HreWaitRecruitmentProposalProcessing',
     KT_HreDoneRecruitmentProposalProcessing: 'KT_HreDoneRecruitmentProposalProcessing',
 
-    KT_HreWaitProcessingPostingPlan: 'KT_HreWaitProcessingPostingPlan',
-    KT_HreDoneProcessingPostingPlan: 'KT_HreDoneProcessingPostingPlan',
-
-    KT_HreWaitProcessingJobPosting: 'KT_HreWaitProcessingJobPosting',
-    KT_HreDoneProcessingJobPosting: 'KT_HreDoneProcessingJobPosting',
-
     KT_HreInterviewCalendar: 'KT_HreInterviewCalendar',
     KT_HreWaitingInterview: 'KT_HreWaitingInterview',
     KT_HreCompletedInterview: 'KT_HreCompletedInterview',
@@ -1607,36 +1518,10 @@ export const EnumTask = {
     KT_AttWaitConfirmLeaveDayReplacement: 'KT_AttWaitConfirmLeaveDayReplacement',
     KT_AttConfirmedLeaveDayReplacement: 'KT_AttConfirmedLeaveDayReplacement',
 
-    KT_AttLeaveFundSeniorBonusViewDetail: 'KT_AttLeaveFundSeniorBonusViewDetail',
-    KT_AttLeaveFundCompensatoryViewDetail: 'KT_AttLeaveFundCompensatoryViewDetail',
-    // module ATT V3: AttConfirmShiftChange
-    KT_AttWaitConfirmShiftChange: 'KT_AttWaitConfirmShiftChange',
-    KT_AttConfirmedShiftChange: 'KT_AttConfirmedShiftChange',
-    KT_AttRejectedShiftChange: 'KT_AttRejectedShiftChange',
-
     KT_HreWaitingReceiveJob: 'KT_HreWaitingReceiveJob',
     KT_HreRefuseReceiveJob: 'KT_HreRefuseReceiveJob',
-
-    // module HRE V3: hreJobPosting
-    KT_HreInProcessJobPosting: 'KT_HreInProcessJobPosting',
-    KT_HreOutDateJobPosting: 'KT_HreOutDateJobPosting',
-    KT_HreStopJobPosting: 'KT_HreStopJobPosting',
-
-    // uỷ quyền duyệt
-    KT_AttSubmitDelegationApproval: 'KT_AttSubmitDelegationApproval',
-    KT_AttRejectSubmitDelegationApproval: 'KT_AttRejectSubmitDelegationApproval',
-    KT_AttWaitConfirmSubmitDelegationApproval: 'KT_AttWaitConfirmSubmitDelegationApproval',
-    KT_AttConfirmedSubmitDelegationApproval: 'KT_AttConfirmedSubmitDelegationApproval',
-    KT_AttCanceledSubmitDelegationApproval: 'KT_AttCanceledSubmitDelegationApproval',
-    KT_AttRejectDelegationApproval: 'KT_AttRejectDelegationApproval',
-    KT_AttWaitConfirmDelegationApproval: 'KT_AttWaitConfirmDelegationApproval',
-    KT_AttConfirmedDelegationApproval: 'KT_AttConfirmedDelegationApproval',
-    KT_AttCanceledDelegationApproval: 'KT_AttCanceledDelegationApproval',
-    KT_AttConfirmDelegationApproval: 'KT_AttConfirmDelegationApproval',
-
-    KT_SalFeeCheck: 'KT_SalFeeCheck',
-    KT_SalWaitApprovePaymentCostRegister: 'KT_SalWaitApprovePaymentCostRegister',
-    KT_SalApprovedPaymentCostRegister: 'KT_SalApprovedPaymentCostRegister'
+    KT_AttNumberOfMeals: 'KT_AttNumberOfMeals',
+    KT_AttNumberOfMealsHistory: 'KT_AttNumberOfMealsHistory'
 };
 
 export const EnumUser = {
@@ -1646,11 +1531,7 @@ export const EnumUser = {
     PASSWORD: 'password',
     TOUCHID: 'touchID',
     SHARED_PREFERENCES: 'myLocalAndroid',
-    KEYCHANGE_SERVICE: 'myLocalIOS',
-
-    // Key quan trong thay đổi khi tách nhánh
-    // Cần đổi tên theo dự án
-    DATA_VNR_SECUR_LTM: '@DATA_VNR_SECUR_'
+    KEYCHANGE_SERVICE: 'myLocalIOS'
 };
 
 export const PlatformURL = Platform.select({

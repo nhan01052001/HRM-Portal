@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Platform, Animated, TouchableOpacity, StyleSheet } from 'react-native';
-import { EnumStatus, EnumName, EnumTask, ScreenName } from '../../../../../../../assets/constant';
+import { EnumStatus, EnumName, EnumTask } from '../../../../../../../assets/constant';
 import Vnr_Function from '../../../../../../../utils/Vnr_Function';
 import EmptyData from '../../../../../../../components/EmptyData/EmptyData';
 import {
@@ -114,7 +114,6 @@ class HreInterviewCalendar extends Component {
             isLoading: false, //biến loading
             // // minDate: moment(new Date()).startOf('month').format('YYYY-MM-DD'),
             // maxDate: moment(new Date()).endOf('month').format('YYYY-MM-DD'),
-            initDateNotify : null, // Vào từ thống báo
             daySelected: moment().format('YYYY-MM-DD'),
             listMarked: {},
             monthSelected: moment().format('YYYY-MM-DD'), //thang select, mac dinh thang hien tai
@@ -124,7 +123,8 @@ class HreInterviewCalendar extends Component {
             dataChange: false, //biến check dữ liệu có thay đổi hay không
             refreshing: false,
             isExpandCalendar: false,
-            isRefreshList: false
+            isRefreshList: false,
+            disableBtnViewDetail: true
         };
         this.scrollViewRef = React.createRef(); //ref đến scroll lịch
         this.hreEventCalendarListRef = React.createRef(); //ref đến list scroll
@@ -169,17 +169,12 @@ class HreInterviewCalendar extends Component {
     }
 
     paramsDefault = () => {
-        const { params = {} } = this.props.navigation.state,
-            { CutOffDuration } = typeof params == 'object' ? params : JSON.parse(params);
-
-        const date = CutOffDuration ? moment(CutOffDuration, 'DD/MM/YYYY') : new Date();
-        const dataRowActionAndSelected = generateRowActionAndSelected(ScreenName.HreWaitingInterview);
+        const date = new Date();
+        const dataRowActionAndSelected = generateRowActionAndSelected();
         const startWeek = moment(date).startOf('W'),
             endWeek = moment(date).endOf('W');
 
         return {
-            isFilter: CutOffDuration ? true : false,
-            initDateNotify: CutOffDuration ? moment(date).format('YYYY-MM-DD') : null,
             rowActions: dataRowActionAndSelected.rowActions,
             DateStart: Vnr_Function.formatDateAPI(startWeek),
             DateEnd: Vnr_Function.formatDateAPI(endWeek, true)
@@ -188,9 +183,11 @@ class HreInterviewCalendar extends Component {
 
     generaRender = () => {
         const param = this.paramsDefault();
+
         this.setState(
             {
                 ...param,
+                daySelected: moment().format('YYYY-MM-DD'),
                 minDate: moment(param.DateStart).format('YYYY-MM-DD'),
                 maxDate: moment(param.DateEnd).format('YYYY-MM-DD'),
                 isRefreshList: !this.state.isRefreshList,
@@ -214,50 +211,43 @@ class HreInterviewCalendar extends Component {
 
     loadItems = (isLazyLoading) => {
         // eslint-disable-next-line no-unused-vars
-        const { keyQuery, initDateNotify } = this.state;
-        this.setState({ isLoading: true });
+        const { keyQuery } = this.state;
 
+        this.setState({ isLoading: true });
         getDataLocal(EnumTask.KT_HreInterviewCalendar).then((resData) => {
             const res = resData && resData[keyQuery] ? resData[keyQuery] : null;
             if (res && res.Status == EnumName.E_SUCCESS && res.Data && res.Data.length > 0) {
                 let _listMarked = {},
                     _dataSource = [];
+                //_daySelected = null;
 
                 _dataSource = res.Data.map((item) => {
                     const dateTime = moment(item.Date).format('YYYY-MM-DD');
                     _listMarked[dateTime] = { marked: true, dotColor: Colors.primary, activeOpacity: 0 };
 
+                    // if (_daySelected == null) {
+                    //     _daySelected = dateTime;
+                    // }
                     item.title = dateTime;
                     item.source = item.data;
-                    item.data = item.data && item.data.length > 0 ? [item.data[0]] : [{}];
+                    item.data = (item.data && item.data.length > 0) ? [item.data[0]] : [{}];
                     return item;
                 });
 
-                this.setState(
-                    {
-                        //daySelected : fist,
-                        data: _dataSource,
-                        listMarked: _listMarked,
-                        isLoading: false,
-                        isLoadingHeader: isLazyLoading ? false : true
-                    },
-                    () => {
-                        if (initDateNotify) {
-                            setTimeout(() => {
-                                this.setState({
-                                    daySelected: initDateNotify,
-                                    initDateNotify: null
-                                });
-                            }, 1000);
-                        }
-                    }
-                );
+                this.setState({
+                    //daySelected : _daySelected,
+                    data: _dataSource,
+                    listMarked: _listMarked,
+                    isLoading: false,
+                    isLoadingHeader: isLazyLoading ? false : true
+                });
             } else {
                 this.setState({
                     data: EnumName.E_EMPTYDATA,
                     listMarked: {},
                     isLoading: false,
-                    isLoadingHeader: isLazyLoading ? false : true
+                    isLoadingHeader: isLazyLoading ? false : true,
+                    disableBtnViewDetail : false
                 });
             }
         });
@@ -296,7 +286,7 @@ class HreInterviewCalendar extends Component {
     };
 
     onChangeDay = (value) => {
-        if (!value) {
+        if (!value ) {
             return;
         }
         const { minDate, maxDate } = this.state;
@@ -307,6 +297,7 @@ class HreInterviewCalendar extends Component {
                     DateStart: Vnr_Function.formatDateAPI(startWeek),
                     DateEnd: Vnr_Function.formatDateAPI(endWeek, true)
                 };
+
 
             this.setState(
                 {
@@ -353,8 +344,15 @@ class HreInterviewCalendar extends Component {
         }
     }
 
+    onScrollEnd() {
+        if (this.state.disableBtnViewDetail && Platform.OS === 'android')
+            this.setState({
+                disableBtnViewDetail: false
+            });
+    }
+
     render() {
-        const { isLoading, data, daySelected, listMarked } = this.state;
+        const { isLoading, data, daySelected, listMarked, disableBtnViewDetail } = this.state;
 
         let contentList = <View />;
         if (isLoading) {
@@ -364,13 +362,29 @@ class HreInterviewCalendar extends Component {
         } else if (!Vnr_Function.CheckIsNullOrEmpty(data) && Object.keys(data).length > 0) {
             contentList = (
                 <AgendaList
-                    selected={'2024-09-15'}
+                    ref={(refAgenda) => (this.refAgenda = refAgenda)}
                     testID={testIDs.agenda.CONTAINER}
                     sections={data}
                     renderItem={this.renderItem.bind(this)}
                     sectionStyle={styles.componentAgendaList}
                     theme={testIDs.theme.CONTAINER}
                     style={styles.styAgenda}
+                    onScroll={() => {
+                        // handle just only androids
+                        if (disableBtnViewDetail && Platform.OS === 'android') this.onScrollEnd();
+                    }}
+                    onScrollToIndexFailed={() => {
+                        this.setState({
+                            disableBtnViewDetail: false
+                        });
+                    }}
+                    onMomentumScrollEnd={() => {
+                        // handle just only IOS
+                        if (disableBtnViewDetail && Platform.OS === 'ios')
+                            this.setState({
+                                disableBtnViewDetail: false
+                            });
+                    }}
                 />
             );
         }
@@ -385,6 +399,7 @@ class HreInterviewCalendar extends Component {
                     <CalendarProvider
                         date={daySelected}
                         onDateChanged={(item) => this.onDayPress(item)}
+                        // onMonthChange={(month) => this.onChangeMonth(month)}
                     >
                         <ExpandableCalendar
                             testID={testIDs.expandableCalendar.CONTAINER}
@@ -398,6 +413,7 @@ class HreInterviewCalendar extends Component {
                             // renderHeader={() => <VnrText i18nKey={'Lịch phỏng vấn'} style={styleSheets.headerTitleStyle}/>}
                         />
                         {this._renderHeaderLoading()}
+                        {disableBtnViewDetail && <View style={styles.opacityTransparent} />}
                         {contentList}
                     </CalendarProvider>
                 </View>
@@ -433,6 +449,13 @@ const styles = StyleSheet.create({
         left: -100,
         width: 0,
         height: 0
+    },
+    opacityTransparent: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        zIndex: 1,
+        elevation: 1
     }
 });
 

@@ -269,7 +269,6 @@ class AttRejectWorkingOvertime extends Component {
                             }}
                             screenName={attApproveWorkingOvertime}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Overtime_list'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

@@ -1,36 +1,32 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator, Text } from 'react-native';
 import VnrText from '../../../../../components/VnrText/VnrText';
 import { styleSheets, Colors } from '../../../../../constants/styleConfig';
+import { dataVnrStorage } from '../../../../../assets/auth/authentication';
 import HttpService from '../../../../../utils/HttpService';
 import DrawerServices from '../../../../../utils/DrawerServices';
-import { dataVnrStorage } from '../../../../../assets/auth/authentication';
+import { translate } from '../../../../../i18n/translate';
+
 export default class PassportComponent extends Component {
     constructor(porps) {
         super(porps);
         this.state = {
             isLoading: true,
-            dataSource: null
+            dataSource: null,
+            length: 0
         };
     }
 
     getData = () => {
-        this.setState({
-            dataSource: null,
-            isLoading: false
-        });
+        const dataBody = {
+            profileID: dataVnrStorage.currentUser.info ? dataVnrStorage.currentUser.info.ProfileID : null
+        };
 
-        HttpService.Post(
-            `[URI_HR]/Hre_GetDataV2/GetListPassportByProfileID?profileID=${dataVnrStorage.currentUser.info ? dataVnrStorage.currentUser.info.ProfileID : null}`,
-            null,
-            this.getData
-        ).then((res) => {
+        HttpService.Post('[URI_HR]/Hre_GetData/GetListRelativeByProfileID', dataBody, null, this.getData).then(res => {
             if (res && res.Data && Array.isArray(res.Data) && res.Data.length > 0) {
-                let newItem = res.Data[0];
-
-
                 this.setState({
-                    dataSource: newItem,
+                    dataSource: res.Data,
+                    length: res.Data.length,
                     isLoading: false
                 });
             } else {
@@ -46,61 +42,61 @@ export default class PassportComponent extends Component {
     }
 
     render() {
-        const { isLoading, dataSource } = this.state,
-            { styles, initLableValue } = this.props;
-
+        const { isLoading, length } = this.state,
+            { styles } = this.props;
         return (
             <View style={styles.styBlock}>
                 <View style={styles.styTopTitle}>
                     <View style={styles.styWrap}>
                         <VnrText
                             style={[styleSheets.lable, styles.styTitle]}
-                            i18nKey={'ProfilePersonalInfoToInput__E_Passport'}
+                            i18nKey={'HR_Relatives'}
+                            numberOfLines={1}
                         />
+                        {length > 0 && (
+                            <View style={styles.styViewCount}>
+                                <Text style={[styleSheets.text, styles.styCountText]}>
+                                    {`+${length} ${translate('Hrm_Sal_EvaluationOfSalaryApprove_FluctuationsPerson')}`}
+                                </Text>
+                            </View>
+                        )}
                     </View>
+
                     {isLoading ? (
                         <ActivityIndicator size={'small'} color={Colors.primary} />
                     ) : (
-                        <TouchableOpacity
-                            onPress={() =>
-                                DrawerServices.navigate('TopTabPassportInfo')
-                            }
-                            style={styles.styWrapRight}
-                        >
+                        <TouchableOpacity onPress={() => DrawerServices.navigate('RelativeInfo')}>
                             <VnrText style={[styleSheets.text, styles.styTextDetail]} i18nKey={'HRM_Common_ViewMore'} />
                         </TouchableOpacity>
                     )}
                 </View>
+                {/* <View style={styles.styViewData}>
+                    {
+                        (dataSource && dataSource.length > 0) && (
+                            dataSource.map((item, index) => {
+                                return (
+                                    <View style={[styles.styViewData, { marginTop: 0 }]}>
+                                        {initLableValue(
+                                            item, {
+                                            Name: "RelativeName",
+                                            DisplayKey: "HRM_HR_Profile_LastName",
+                                            DataType: "string",
+                                        })}
 
-                {dataSource !== null && (
-                    <View style={styles.styViewData}>
-                        {initLableValue(dataSource, {
-                            Name: 'PassportNo',
-                            DisplayKey: 'HRM_HR_Profile_PassportNo',
-                            DataType: 'string'
-                        })}
+                                        {initLableValue(
+                                            item, {
+                                            Name: "RelativeTypeName",
+                                            DisplayKey: "RelativeTypeName",
+                                            DataType: "string",
+                                        })}
 
-                        {initLableValue(dataSource, {
-                            Name: 'PassportPlaceNewName',
-                            DisplayKey: 'HRM_HR_Profile_PassportPlaceOfIssue',
-                            DataType: 'string'
-                        })}
+                                    </View>
+                                )
+                            })
 
-                        {initLableValue(dataSource, {
-                            Name: 'PassportDateOfIssue',
-                            DisplayKey: 'HRM_HR_Profile_PassportDateOfIssue',
-                            DataType: 'DateTime',
-                            DataFormat: 'DD/MM/YYYY'
-                        })}
-
-                        {initLableValue(dataSource, {
-                            Name: 'PassportDateOfExpiry',
-                            DisplayKey: 'HRM_HR_Profile_PassportDateOfExpiry',
-                            DataType: 'DateTime',
-                            DataFormat: 'DD/MM/YYYY'
-                        })}
-                    </View>
-                )}
+                        )
+                    }
+                </View> */}
             </View>
         );
     }

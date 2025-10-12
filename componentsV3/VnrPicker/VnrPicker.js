@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-console */
 import React from 'react';
 import { View, Text, TouchableOpacity, Modal, Platform } from 'react-native';
@@ -366,7 +365,7 @@ export default class VnrPicker extends React.Component {
 
         const { searchText, isModalVisible, isVisibleLoading, dataPicker, itemSelected, stateProps } = this.state;
 
-        const { isOptionFilterQuicly, layoutFilter } = this.props;
+        const { isOptionFilterQuicly } = this.props;
 
         let textValue = null;
         let disable = false;
@@ -443,8 +442,7 @@ export default class VnrPicker extends React.Component {
             <View
                 style={[
                     CustomStyleSheet.width('100%'),
-                    isOptionFilterQuicly === true ? CustomStyleSheet.height('100%') : stylesVnrPickerV3.styContentPicker,
-                    layoutFilter && { height : 65 }
+                    isOptionFilterQuicly === true ? CustomStyleSheet.height('100%') : stylesVnrPickerV3.styContentPicker
                 ]}
             >
                 <TouchableOpacity
@@ -455,7 +453,7 @@ export default class VnrPicker extends React.Component {
                         isShowErr && stylesVnrPickerV3.styBntPickerError,
                         stateProps.stylePicker,
                         disable && bntPickerDisable,
-                        (isOptionFilterQuicly === true || layoutFilter)&& { borderBottomWidth: 0 }
+                        isOptionFilterQuicly === true && CustomStyleSheet.borderBottomWidth(0)
                     ]}
                     activeOpacity={!disable ? 0.2 : 1}
                 >
@@ -465,36 +463,23 @@ export default class VnrPicker extends React.Component {
                             stateProps.lable && stylesVnrPickerV3.onlyFlRowSpaceBetween
                         ]}
                     >
-
-                        {
-                            layoutFilter ? (
-                                <View
-                                    style={stylesVnrPickerV3.styLbPicker}
-                                >
-                                    <VnrText
-                                        style={[styleSheets.lable, stylesVnrPickerV3.styLableLayoutFilter]}
-                                        numberOfLines={1}
-                                        i18nKey={stateProps.lable}
-                                    />
-                                </View>
-                            ) : (
-                                <View style={stylesVnrPickerV3.styLbPicker}>
-                                    <VnrText
-                                        style={[
-                                            styleSheets.text,
-                                            stylesVnrPickerV3.styLbNoValuePicker
+                        {stateProps.lable && (
+                            <View style={stylesVnrPickerV3.styLbPicker}>
+                                <VnrText
+                                    style={[
+                                        styleSheets.text,
+                                        stylesVnrPickerV3.styLbNoValuePicker
                                         // textValue != null
                                         //     ? stylesVnrPickerV3.styLbHaveValuePicker
                                         //     : stylesVnrPickerV3.styLbNotHaveValuePicker,
-                                        ]}
-                                        i18nKey={layoutFilter ? stateProps.placeHolder : stateProps.lable}
-                                    />
-                                    {stateProps.fieldValid && (
-                                        <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
-                                    )}
-                                </View>
-                            )
-                        }
+                                    ]}
+                                    i18nKey={stateProps.lable}
+                                />
+                                {stateProps.fieldValid && (
+                                    <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
+                                )}
+                            </View>
+                        )}
 
                         <View
                             style={[

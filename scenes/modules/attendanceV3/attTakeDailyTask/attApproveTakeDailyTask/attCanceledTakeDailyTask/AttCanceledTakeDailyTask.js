@@ -19,7 +19,7 @@ let configList = null,
     enumName = null,
     attCanceledTakeDailyTask = null,
     attApproveTakeDailyTaskViewDetail = null,
-    attApproveTakeDailyTask = null,
+    attApprovedTakeDailyTask = null,
     keyListTask = null,
     pageSizeList = 20;
 
@@ -217,7 +217,7 @@ class AttCanceledTakeDailyTask extends Component {
 
     componentDidMount() {
         attCanceledTakeDailyTask = ScreenName.AttCanceledTakeDailyTask;
-        attApproveTakeDailyTask = ScreenName.AttApproveTakeDailyTask;
+        attApprovedTakeDailyTask = ScreenName.AttApprovedTakeDailyTask;
         attApproveTakeDailyTaskViewDetail = ScreenName.AttApproveTakeDailyTaskViewDetail;
         keyListTask = EnumTask.KT_AttCanceledTakeDailyTask;
         AttApproveTakeDailyTaskBusiness.checkForReLoadScreen[attCanceledTakeDailyTask] = false;
@@ -265,9 +265,8 @@ class AttCanceledTakeDailyTask extends Component {
                                 ...styleContentFilterDesign,
                                 ...styleContentFilterDesignV3
                             }}
-                            screenName={attApproveTakeDailyTask}
+                            screenName={attApprovedTakeDailyTask}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Daily_Work'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 
@@ -277,7 +276,7 @@ class AttCanceledTakeDailyTask extends Component {
                                     detail={{
                                         dataLocal: false,
                                         screenDetail: attApproveTakeDailyTaskViewDetail,
-                                        screenName: attApproveTakeDailyTask
+                                        screenName: attApprovedTakeDailyTask
                                     }}
                                     scrollYAnimatedValue={this.scrollYAnimatedValue}
                                     rowActions={rowActions}

@@ -169,8 +169,7 @@ export const AttSubmitTakeLateEarlyAllowedBusinessFunction = {
         AttApprovedSubmitTakeLateEarlyAllowed: false,
         AttRejectSubmitTakeLateEarlyAllowed: false
     },
-    setThisForBusiness: (dataThis, rowActionsFromScreen = _rowActions) => {
-        _rowActions = rowActionsFromScreen ?? [];
+    setThisForBusiness: dataThis => {
         _this = dataThis;
     },
     //#region [action delete]

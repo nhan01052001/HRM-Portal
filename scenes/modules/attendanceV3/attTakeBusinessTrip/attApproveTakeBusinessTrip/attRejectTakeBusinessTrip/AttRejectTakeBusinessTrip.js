@@ -271,7 +271,6 @@ class AttRejectTakeBusinessTrip extends Component {
                             }}
                             screenName={attApproveTakeBusinessTrip}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Business'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

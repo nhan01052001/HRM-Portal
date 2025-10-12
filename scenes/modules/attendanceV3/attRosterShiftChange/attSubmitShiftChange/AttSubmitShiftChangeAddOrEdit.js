@@ -8,8 +8,7 @@ import {
     FlatList,
     Modal,
     KeyboardAvoidingView,
-    Platform,
-    StyleSheet
+    Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -17,7 +16,7 @@ import {
     Size,
     Colors,
     CustomStyleSheet,
-    styleValid
+    stylesVnrPickerV3
 } from '../../../../../constants/styleConfig.js';
 import { IconCloseCircle, IconCancel } from '../../../../../constants/Icons.js';
 import VnrText from '../../../../../components/VnrText/VnrText.js';
@@ -38,8 +37,11 @@ import { PermissionForAppMobile } from '../../../../../assets/configProject/Perm
 import ListButtonRegister from '../../../../../componentsV3/ListButtonRegister/ListButtonRegister.js';
 import { AttSubmitShiftChangeBusinessFunction } from './AttSubmitShiftChangeBusiness.js';
 import DrawerServices from '../../../../../utils/DrawerServices.js';
+import VnrTextInput from '../../../../../componentsV3/VnrTextInput/VnrTextInput.js';
+import VnrAttachFile from '../../../../../componentsV3/VnrAttachFile/VnrAttachFile.js';
 import VnrPickerWeekDays from '../../../../../componentsV3/VnrPickerWeekDays/VnrPickerWeekDays.js';
 import { DATA_WEEKS } from '../../../../../componentsV3/VnrPickerWeekDays/VnrPickerWeekDays.js';
+import ManageFileSevice from '../../../../../utils/ManageFileSevice.js';
 
 const API_APPROVE = {
     urlApi: '[URI_CENTER]/api/Att_GetData/GetMultiUserApproved',
@@ -135,11 +137,25 @@ const initSateDefault = {
         visible: false,
         visibleConfig: true
     },
+    Comment: {
+        lable: 'HRM_PortalApp_ReasonChangeShift',
+        visible: true,
+        visibleConfig: true,
+        disable: false,
+        value: '',
+        refresh: false,
+        isValid: true
+    },
+    FileAttach: {
+        lable: 'HRM_PortalApp_TakeLeave_FileAttachment',
+        visible: true,
+        visibleConfig: true,
+        disable: false,
+        refresh: false,
+        value: null
+    },
     DataChangeShiftDate: [],
-    isDisableBtnSave: false,
-    isHiddenButtonChangeData: PermissionForAppMobile &&
-        PermissionForAppMobile.value['HRM_PortalV3_Att_RegisterChangeShift_ChkChangeSchedule'] &&
-        PermissionForAppMobile.value['HRM_PortalV3_Att_RegisterChangeShift_ChkChangeSchedule']['View']
+    isDisableBtnSave: false
 };
 
 export const dataConvertDate = {
@@ -157,7 +173,6 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
         super(props);
         this.state = { ...initSateDefault };
         this.refVnrDateFromTo = null;
-        this.refVnrDateFromTo2 = null;
         this.listRefGetDataSave = {};
         this.layoutHeightItem = null;
         // khai báo các biến this trong hàm setVariable
@@ -197,6 +212,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
         this.isProcessingAnalysic = false;
 
         //check processing cho nhấn lưu nhiều lần
+        this.isProcessing = false
         this.isProcessingSave = false;
 
         this.paramsExtend = {
@@ -227,13 +243,13 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
     refreshView = () => {
         // this.props.navigation.setParams({ title: 'HRM_Category_ShiftItem_Overtime_Create_Title' });
         this.setVariable();
-        this.setState(initSateDefault, () => this.getConfigValid('Filter_Attendance_ChangeShift_List', true));
+        this.setState(initSateDefault, () => this.getConfigValid('Attendance_RegisterChangeShift', true));
     };
     //promise get config valid
 
     getConfigValid = () => {
         let { fieldConfig } = this.state;
-        const tblName = 'Filter_Attendance_ChangeShift_List';
+        const tblName = 'Attendance_RegisterChangeShift';
         HttpService.Get(`[URI_CENTER]/api/Sys_common/GetValidateJson?listFormId=${tblName}`).then((res) => {
             const data = res.Status == EnumName.E_SUCCESS && res.Data && res.Data[tblName] ? res.Data[tblName] : null;
             if (data && Object.keys(data).length > 0) {
@@ -251,12 +267,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                 });
             }
 
-            this.setState({
-                fieldConfig,
-                isHiddenButtonChangeData: PermissionForAppMobile &&
-                    PermissionForAppMobile.value['HRM_PortalV3_Att_RegisterChangeShift_ChkChangeSchedule'] &&
-                    PermissionForAppMobile.value['HRM_PortalV3_Att_RegisterChangeShift_ChkChangeSchedule']['View']
-            }, () => {
+            this.setState({ fieldConfig }, () => {
                 const { params } = this.state;
 
                 let { record } = params;
@@ -281,7 +292,9 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
             UserApprove3,
             UserApprove4,
             UserApprove2,
-            isRefresh
+            isRefresh,
+            Comment,
+            FileAttach
         } = this.state;
 
         this.levelApprove = response.LevelApproved ? response.LevelApproved : 4;
@@ -294,6 +307,11 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
             Profile: {
                 ID: response.ProfileID,
                 ProfileName: response.ProfileName
+            },
+            Comment: {
+                ...Comment,
+                value: response?.Comment ? response.Comment : null,
+                refresh: !Comment.refresh
             },
             UserApprove: {
                 ...UserApprove,
@@ -356,7 +374,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                     },
                     refresh: !ChangeShiftDate.refresh
                 }
-            };
+            }
         }
 
         if (this.levelApprove == 4) {
@@ -424,6 +442,32 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
             };
         }
 
+
+        // Value Acttachment
+        if (response.FileAttach) {
+            let valFile = ManageFileSevice.setFileAttachApp(response.FileAttach);
+
+            nextState = {
+                ...nextState,
+                FileAttach: {
+                    ...FileAttach,
+                    disable: false,
+                    value: valFile && valFile.length > 0 ? valFile : null,
+                    refresh: !FileAttach.refresh
+                }
+            };
+        } else {
+            nextState = {
+                ...nextState,
+                FileAttach: {
+                    ...FileAttach,
+                    disable: false,
+                    value: null,
+                    refresh: !FileAttach.refresh
+                }
+            };
+        }
+
         this.setState(nextState, () => {
             (response?.Type === EnumName.E_CHANGE_SHIFT) ? this.onGetShiftByDate(response) : this.listRefGetDataSave['1']?.initState();
         });
@@ -466,7 +510,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                     this.onChangeDateFromTo({
                         startDate: listday[0],
                         endDate: listday[listday.length - 1]
-                    });
+                    })
                 }
             } else if (this.refVnrDateFromTo && this.refVnrDateFromTo.showModal) {
                 // Show modal chọn ngày đăng ký
@@ -969,7 +1013,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                     if (type === EnumName.E_CHANGE_SHIFT) {
                         DataChangeShiftDate.map((item) => {
                             this.listRefGetDataSave[item.ID].unduData();
-                        });
+                        })
                     } else {
                         this.listRefGetDataSave['1'].unduData();
                     }
@@ -1000,7 +1044,8 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
     onSave = (isSend) => {
         let lstRosterItem = [],
             isDataComplete = true,
-            objWeekDay = {};
+            objWeekDay = {},
+            FinallyFileName = [];
         const {
                 Profile,
                 UserApprove,
@@ -1010,14 +1055,22 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                 modalErrorDetail,
                 ChangeShiftDate,
                 DataChangeShiftDate,
+                Comment,
                 type,
                 RepeatWeek,
+                FileAttach,
                 params } = this.state,
             { record } = params;
         let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+
+        if (FileAttach.value && Array.isArray(FileAttach.value) && FileAttach.value.length > 0) {
+            FileAttach.value.map(item => {
+                FinallyFileName.push(item.fileName);
+            });
+        }
 
         if (type === EnumName.E_CHANGE_SHIFT) {
             DataChangeShiftDate.map((item) => {
@@ -1026,18 +1079,16 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                     if (data) {
                         objWeekDay = {
                             ...objWeekDay,
-                            [`${item.key}ID`]: data.ShiftID,
-                            Comment: data?.Comment,
-                            FileAttach: data?.FileAttach
-                        };
+                            [`${item.key}ID`]: data.ShiftID
+                        }
                         lstRosterItem.push({
                             ...data
-                        });
+                        })
                     } else {
                         isDataComplete = false;
                     }
                 }
-            });
+            })
         } else {
             const data = this.listRefGetDataSave['1'].getAllData();
             if (data) {
@@ -1045,7 +1096,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                     ...data,
                     DateEnd: ChangeShiftDate.value?.endDate ? `${moment(ChangeShiftDate.value?.endDate).format('YYYY/MM/DD')}` : null,
                     DateStart: ChangeShiftDate.value?.startDate ? `${moment(ChangeShiftDate.value?.startDate).format('YYYY/MM/DD')}` : null
-                };
+                }
                 lstRosterItem = [];
             } else {
                 isDataComplete = false;
@@ -1058,6 +1109,8 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                 ProfileID: Profile.ID,
                 DateEnd: ChangeShiftDate.value?.endDate ? `${moment(ChangeShiftDate.value?.endDate).format('YYYY/MM/DD')} 23:59:59` : null,
                 DateStart: ChangeShiftDate.value?.startDate ? `${moment(ChangeShiftDate.value?.startDate).format('YYYY/MM/DD')} 00:00:00` : null,
+                Comment: Comment.value?.length > 0 ? Comment.value : null,
+                FileAttach: FinallyFileName?.length > 0 ? FinallyFileName.join(',') : null,
                 Type: type,
                 LevelApproved: this.levelApprove,
                 IsRepeatWeek: RepeatWeek.value?.length > 0,
@@ -1250,7 +1303,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
             range = {
                 startDate: range[0],
                 endDate: range[range.length - 1]
-            };
+            }
         }
 
         let nextState = {
@@ -1361,7 +1414,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                                 isRefresh: !RepeatWeek.refresh,
                                 visible: true
                             }
-                        };
+                        }
                     }
                 }
 
@@ -1371,7 +1424,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                         ...payload,
                         DateEnd: ChangeShiftDate.value?.endDate,
                         DateStart: ChangeShiftDate.value?.startDate
-                    };
+                    }
                 }
 
                 // VnrLoadingSevices.show();
@@ -1406,7 +1459,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                             nextState = {
                                 ...nextState,
                                 isDisableBtnSave: true
-                            };
+                            }
                         }
 
                         if (finalData.length > 0 && this.isModify && response) {
@@ -1421,9 +1474,9 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                                             'DateShift': item.rootdate,
                                             'DayOfWeek': item.numberWeekday
                                         }
-                                    };
-                                return { ...item };
-                            });
+                                    }
+                                return { ...item }
+                            })
                         }
 
                         this.setState({
@@ -1501,11 +1554,11 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
     };
 
     _renderHeaderLoading = () => {
-        if (this.state.isShowLoading) {
+        if (this.state.isShowLoading || this.isProcessing) {
             return (
-                <View style={styleComonAddOrEdit.styLoadingHeader}>
-                    <View style={styleComonAddOrEdit.styViewLoading} />
-                    <VnrIndeterminate isVisible={this.state.isShowLoading} />
+                <View style={[styleComonAddOrEdit.styLoadingHeader, Platform.OS === 'ios' && CustomStyleSheet.zIndex(99)]}>
+                    <View style={styles.styViewLoading} />
+                    <VnrIndeterminate isVisible={this.state.isShowLoading || this.isProcessing} />
                 </View>
             );
         } else return <View />;
@@ -1733,8 +1786,9 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
             params,
             type,
             RepeatWeek,
-            DataChangeShiftDate,
-            isHiddenButtonChangeData
+            Comment,
+            FileAttach,
+            DataChangeShiftDate
         } = this.state;
         if (ChangeShiftDate.value) {
             const days = this.handleSplitDay(ChangeShiftDate.value);
@@ -1745,7 +1799,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                     data={
                         type === EnumName.E_CHANGE_SHIFT && DataChangeShiftDate.length > 0 ? DataChangeShiftDate : [1]
                     }
-                    renderItem={({ item, index }) => (
+                    renderItem={({ item }) => (
                         <View
                             key={item === 1 ? item : item?.ID}
                         >
@@ -1763,18 +1817,90 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                                 showLoading={this.showLoading}
                                 onDisableButtonSave={this.setDisableBtnSave}
                                 ToasterSevice={this.ToasterSeviceCallBack}
-                                index={index}
-                                length={type === EnumName.E_CHANGE_SHIFT && DataChangeShiftDate.length > 0 ? DataChangeShiftDate : [1]}
                             />
                         </View>
                     )}
                     keyExtractor={(item, index) => index}
-                    ListFooterComponent={this.renderApprove}
+                    ListFooterComponent={() => {
+                        return (
+                            <View>
+                                <View style={CustomStyleSheet.backgroundColor(Colors.white)}>
+                                    <View style={styles.flRowSpaceBetween}>
+                                        <VnrText
+                                            style={[styleSheets.lable, styles.styLableGp]}
+                                            i18nKey={'HRM_PortalApp_Explanation'}
+                                        />
+                                    </View>
+
+                                    {/* Lý do tăng ca */}
+                                    {Comment.visible && fieldConfig?.Comment?.visibleConfig && (
+                                        <VnrTextInput
+                                            fieldValid={fieldConfig?.Comment?.isValid}
+                                            // isCheckEmpty={
+                                            //     fieldConfig?.Comment?.isValid && isError && Comment.value.length === 0 ? true : false
+                                            // }
+                                            placeHolder={'HRM_PortalApp_PleaseInput'}
+                                            disable={Comment.disable}
+                                            lable={Comment.lable}
+                                            style={[
+                                                styleSheets.text,
+                                                stylesVnrPickerV3.viewInputMultiline,
+                                                CustomStyleSheet.paddingHorizontal(0)
+                                            ]}
+                                            multiline={true}
+                                            value={Comment.value}
+                                            onChangeText={(text) => {
+                                                this.setState({
+                                                    Comment: {
+                                                        ...Comment,
+                                                        value: text,
+                                                        refresh: !Comment.refresh
+                                                    }
+                                                });
+                                            }}
+                                            onFocus={() => {
+                                                Platform.OS == 'ios' &&
+                                                    this.onScrollToInputIOS(1, this.layoutHeightItem);
+                                            }}
+                                            refresh={Comment.refresh}
+                                        />
+                                    )}
+
+                                    {/* Tập tin đính kèm */}
+                                    {FileAttach.visible && fieldConfig?.FileAttach?.visibleConfig && (
+                                        <View style={{}}>
+                                            <VnrAttachFile
+                                                fieldValid={fieldConfig?.FileAttach?.isValid}
+                                                // isCheckEmpty={
+                                                //     fieldConfig?.FileAttach?.isValid && isError && !FileAttach.value ? true : false
+                                                // }
+                                                lable={FileAttach.lable}
+                                                disable={FileAttach.disable}
+                                                refresh={FileAttach.refresh}
+                                                value={FileAttach.value}
+                                                multiFile={true}
+                                                uri={'[URI_CENTER]/api/Sys_Common/saveFileFromApp'}
+                                                onFinish={(file) => {
+                                                    this.setState({
+                                                        FileAttach: {
+                                                            ...FileAttach,
+                                                            value: file,
+                                                            refresh: !FileAttach.refresh
+                                                        }
+                                                    });
+                                                }}
+                                            />
+                                        </View>
+                                    )}
+                                </View>
+                                {this.renderApprove()}
+                            </View>
+                        );
+                    }}
                     ListHeaderComponent={() => {
                         let valueChangeShiftDate = ChangeShiftDate.value;
                         if (type !== EnumName.E_CHANGE_SHIFT)
                             valueChangeShiftDate = [ChangeShiftDate.value?.startDate, ChangeShiftDate.value?.endDate];
-
                         return (
                             <View style={CustomStyleSheet.backgroundColor(Colors.white)}>
                                 <View>
@@ -1790,90 +1916,20 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                                         />
                                     </View>
 
-                                    <View style={styles.container}>
-                                        <VnrDateFromTo
-                                            ref={(ref) => (this.refVnrDateFromTo2 = ref)}
-                                            isHiddenIcon={true}
-                                            fieldValid={fieldConfig?.ChangeShiftDate?.isValid}
-                                            lable={ChangeShiftDate.label}
-                                            refresh={ChangeShiftDate.refresh}
-                                            value={valueChangeShiftDate}
-                                            displayOptions={true}
-                                            onlyChooseEveryDay={false}
-                                            isChangeShiftorChangeSchedule={true}
-                                            isControll={true}
-                                            isHiddenChooseEveryDay={!isHiddenButtonChangeData}
-                                            isHiddenChooseAboutDays={false}
-                                            onFinish={(value) => {
-                                                this.onChangeDateFromTo(value);
-                                            }}
-                                        />
-                                    </View>
-
-                                    {
-                                        type !== EnumName.E_CHANGE_SHIFT ? (
-                                            <View>
-                                                <TouchableOpacity
-                                                    style={stylesCustom.viewDate}
-                                                    onPress={() => {
-                                                        this.refVnrDateFromTo2.showModal();
-                                                    }}
-                                                >
-                                                    <View>
-                                                        <Text style={[styleSheets.text, stylesCustom.textLabelDate]}>{translate(ChangeShiftDate.label)}
-                                                            {
-                                                                fieldConfig?.ChangeShiftDate?.isValid && (
-                                                                    <Text style={[styleSheets.text, styleValid]}>*</Text>
-                                                                )
-                                                            }
-                                                        </Text>
-                                                    </View>
-                                                    <View>
-                                                        <Text style={[styleSheets.text, stylesCustom.textDate]}>{ChangeShiftDate.value?.startDate ? moment(ChangeShiftDate.value?.startDate).format('DD/MM/YYYY') : translate('SELECT_ITEM')}</Text>
-                                                    </View>
-                                                </TouchableOpacity>
-
-                                                <TouchableOpacity
-                                                    style={stylesCustom.viewDate}
-                                                    onPress={() => {
-                                                        this.refVnrDateFromTo2.showModal(true);
-                                                    }}
-                                                >
-                                                    <View>
-                                                        <Text
-                                                            style={[styleSheets.text, stylesCustom.textLabelDate]}
-                                                        >{translate('HRM_PortalApp_TheReplacementDay')}
-                                                            {
-                                                                fieldConfig?.ChangeShiftDate?.isValid && (
-                                                                    <Text style={[styleSheets.text, styleValid]}>*</Text>
-                                                                )
-                                                            }
-                                                        </Text>
-                                                    </View>
-                                                    <View>
-                                                        <Text style={[styleSheets.text, stylesCustom.textDate]}>{ChangeShiftDate.value?.endDate ? moment(ChangeShiftDate.value?.endDate).format('DD/MM/YYYY') : translate('SELECT_ITEM')}</Text>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            </View>
-                                        ) : (
-                                            <VnrDateFromTo
-                                                isHiddenIcon={true}
-                                                fieldValid={fieldConfig?.ChangeShiftDate?.isValid}
-                                                lable={ChangeShiftDate.label}
-                                                refresh={ChangeShiftDate.refresh}
-                                                value={valueChangeShiftDate}
-                                                displayOptions={true}
-                                                onlyChooseEveryDay={false}
-                                                isChangeShiftorChangeSchedule={true}
-                                                isControll={true}
-                                                isHiddenChooseEveryDay={!isHiddenButtonChangeData}
-                                                isHiddenChooseAboutDays={false}
-                                                onFinish={(value) => {
-                                                    this.onChangeDateFromTo(value);
-                                                }}
-                                            />
-                                        )
-                                    }
+                                    <VnrDateFromTo
+                                        isHiddenIcon={true}
+                                        fieldValid={fieldConfig?.ChangeShiftDate?.isValid}
+                                        lable={ChangeShiftDate.label}
+                                        refresh={ChangeShiftDate.refresh}
+                                        value={valueChangeShiftDate}
+                                        displayOptions={true}
+                                        onlyChooseEveryDay={false}
+                                        isChangeShiftorChangeSchedule={true}
+                                        isControll={true}
+                                        onFinish={(value) => {
+                                            this.onChangeDateFromTo(value);
+                                        }}
+                                    />
                                 </View>
 
                                 {(type === EnumName.E_CHANGE_SHIFT) && (
@@ -2159,8 +2215,8 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
     handleSplitDay = (range) => {
         if (range && range.startDate && range.endDate) {
             let days = [];
-            let start = new Date(moment(range.startDate).format('YYYY-MM-DD')).getTime();
-            let end = new Date(moment(range.endDate || range.startDate).format('YYYY-MM-DD')).getTime();
+            let start = new Date(range.startDate).getTime();
+            let end = new Date(range.endDate || range.startDate).getTime();
             for (let cur = start; cur <= end; cur += 60 * 60 * 24000) {
                 let curStr = new Date(cur).toISOString().substring(0, 10);
                 days.push(curStr);
@@ -2199,7 +2255,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
     setDisableBtnSave = (value) => {
         this.setState({
             isDisableBtnSave: value
-        });
+        })
     }
 
     render() {
@@ -2213,8 +2269,7 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
             isShowModalApprove,
             modalErrorDetail,
             isDisableBtnSave,
-            type,
-            isHiddenButtonChangeData
+            type
         } = this.state;
 
         const listActions = [];
@@ -2261,8 +2316,6 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
                     displayOptions={true}
                     disable={ChangeShiftDate.disable}
                     isChangeShiftorChangeSchedule={true}
-                    isHiddenChooseEveryDay={!isHiddenButtonChangeData}
-                    isHiddenChooseAboutDays={false}
                     onFinish={(range) => {
                         this.onChangeDateFromTo(range);
                     }}
@@ -2495,27 +2548,5 @@ export default class AttSubmitShiftChangeAddOrEdit extends Component {
         );
     }
 }
-
-const stylesCustom = StyleSheet.create({
-    viewDate: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: Size.defineHalfSpace + 6,
-        paddingHorizontal: Size.defineSpace,
-        borderBottomColor: Colors.gray_5,
-        borderBottomWidth: 0.5
-    },
-
-    textDate: {
-        fontSize: Size.text + 1,
-        fontWeight: '500'
-    },
-
-    textLabelDate: {
-        fontSize: Size.text + 1,
-        color: Colors.gray_8
-    }
-});
 
 const styles = styleComonAddOrEdit;

@@ -179,10 +179,8 @@ export const actions = {
                     }
 
                     if (
-                        (PermissionForAppMobile.value['New_Att_LateEarlyAllowed_Approve_New_Index'] &&
-                        PermissionForAppMobile.value['New_Att_LateEarlyAllowed_Approve_New_Index']['View']) ||
-                        (PermissionForAppMobile.value['New_Att_LateEarlyAllowedApprove_New_Index_V2'] &&
-                        PermissionForAppMobile.value['New_Att_LateEarlyAllowedApprove_New_Index_V2']['View'])
+                        PermissionForAppMobile.value['New_Att_LateEarlyAllowed_Approve_New_Index'] &&
+                        PermissionForAppMobile.value['New_Att_LateEarlyAllowed_Approve_New_Index']['View']
                     ) {
                         strBusiness.push('APPROVE_LATEEARLYALLOWED');
                     }
@@ -254,42 +252,6 @@ export const actions = {
                         ]
                     ) {
                         strBusiness.push('APPROVE_PROFILETIMESHEET');
-                    }
-
-                    if (
-                        PermissionForAppMobile.value['New_PortalV3_Rec_ComposePostingApprove'] &&
-                        PermissionForAppMobile.value['New_PortalV3_Rec_ComposePostingApprove'][
-                            'View'
-                        ]
-                    ) {
-                        strBusiness.push('TOTAL_REC_COMPOSEPOSTINGAPPROVE');
-                    }
-
-                    if (
-                        PermissionForAppMobile.value['Rec_ProposalHiringProcess'] &&
-                        PermissionForAppMobile.value['Rec_ProposalHiringProcess'][
-                            'View'
-                        ]
-                    ) {
-                        strBusiness.push('TOTAL_REC_RECRUITMENTFLYER_APPROVE');
-                    }
-
-                    if (
-                        PermissionForAppMobile.value['New_Sys_DelegateApprove_Confirmation_New_Index'] &&
-                        PermissionForAppMobile.value['New_Sys_DelegateApprove_Confirmation_New_Index'][
-                            'View'
-                        ]
-                    ) {
-                        strBusiness.push('TOTAL_DELEGATEAPPROVE_CONFIRM');
-                    }
-
-                    if (
-                        PermissionForAppMobile.value['Att_ApproveRosterApproveChangeShift_New_Index'] &&
-                        PermissionForAppMobile.value['Att_ApproveRosterApproveChangeShift_New_Index'][
-                            'View'
-                        ]
-                    ) {
-                        strBusiness.push('APPROVE_RTCHANGSHIFT');
                     }
                 }
 

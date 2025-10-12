@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Colors, Size, styleSheets, stylesVnrFilter, styleValid, stylesVnrPickerV3, CustomStyleSheet } from '../../constants/styleConfig';
+import { Colors, Size, styleSheets, stylesVnrFilter, styleValid, stylesVnrPickerV3 } from '../../constants/styleConfig';
 import VnrLoading from '../../components/VnrLoading/VnrLoading';
 import HttpFactory from '../../factories/HttpFactory';
 import Vnr_Function from '../../utils/Vnr_Function';
@@ -380,23 +380,18 @@ export default class VnrPickerMulti extends Component {
         _state = defaultState;
         _state.stateProps = nextProps;
         this.isModalOpened = false;
+        if (this.props.autoBind) {
+            this.getData();
+        }
 
         if (!Vnr_Function.CheckIsNullOrEmpty(value) && value.length > 0) {
             this.setDataConfirm([...value]);
             _state.itemSelected = [...value];
-            this.setState(_state, () => {
-                if (this.props.autoBind) {
-                    this.getData();
-                }
-            });
+            this.setState(_state);
         } else {
             this.setDataConfirm([]);
             _state.itemSelected = [];
-            this.setState(_state, () => {
-                if (this.props.autoBind) {
-                    this.getData();
-                }
-            });
+            this.setState(_state);
         }
     };
 
@@ -541,7 +536,7 @@ export default class VnrPickerMulti extends Component {
         const { textInput, headerSearch, topModal, ScroollviewModal, bottomModal, bntPickerDisable, stylePlaceholder } =
             stylesVnrPickerV3;
 
-        const { value, isOptionFilterQuicly, layoutFilter, autoBind } = this.props;
+        const { value, isOptionFilterQuicly, layoutFilter, autoBind, key } = this.props;
         let disable = false;
         let isHaveValue = true;
         let isShowQuickSelect = false;
@@ -552,7 +547,7 @@ export default class VnrPickerMulti extends Component {
             this.props.fieldValid === true &&
             this.props.isCheckEmpty &&
             this.props.isCheckEmpty === true &&
-            (stateProps.value === null || stateProps.value === undefined || Object.keys(stateProps.value).length === 0)
+            (stateProps.value === null || stateProps.value === undefined)
         ) {
             isShowErr = true;
         } else {
@@ -565,7 +560,7 @@ export default class VnrPickerMulti extends Component {
 
         if (isVisibleLoading) {
             viewListItem = <VnrLoading size="small" isVisible={isVisibleLoading} />;
-        } else if (dataPicker && dataPicker.length > 0) {
+        } else if (dataPicker.length > 0) {
             viewListItem = (
                 <ListItem
                     isLoading={isVisibleLoading}
@@ -603,91 +598,88 @@ export default class VnrPickerMulti extends Component {
                             ? { height: 'auto' }
                             : value !== undefined && value.length <= 2 && value.length > 0
                                 ? { height: 'auto' }
-                                : { height: 50 },
-                    isShowErr && { borderBottomWidth: 0.8, borderBottomColor: Colors.red }
-
+                                : { height: 50 }
                 ]}
             >
-                {layoutFilter ? this.renderLableLayout(value) : (
-                    <TouchableOpacity
-                        accessibilityLabel={`VnrPicker-${stateProps.fieldName ? stateProps.fieldName : stateProps.lable}`}
-                        onPress={() => (!disable ? this.opentModal() : null)}
+                {layoutFilter && this.renderLableLayout(value)}
+                <TouchableOpacity
+                    accessibilityLabel={`VnrPicker-${stateProps.fieldName ? stateProps.fieldName : stateProps.lable}`}
+                    onPress={() => (!disable ? this.opentModal() : null)}
+                    style={[
+                        stateProps.stylePicker,
+                        isShowErr && { borderBottomColor: Colors.red, borderBottomWidth: 1.5 },
+                        disable && bntPickerDisable,
+                        isOptionFilterQuicly === true
+                            ? {
+                                height: '100%',
+                                width: '100%'
+                            }
+                            : styles.styBntPicker,
+                        layoutFilter && { borderBottomWidth: 0 }
+                    ]}
+                    activeOpacity={!disable ? 0.2 : 1}
+                >
+                    <View
                         style={[
-                            stateProps.stylePicker,
-                            disable && bntPickerDisable,
-                            isOptionFilterQuicly === true
-                                ? {
-                                    height: '100%',
-                                    width: '100%'
-                                }
-                                : styles.styBntPicker,
-                            isShowErr && { borderBottomWidth: 0 },
-                            layoutFilter && { borderBottomWidth: 0 }
+                            stylesVnrPickerV3.styLeftPicker,
+                            stateProps.lable && isHaveValue ? {} : stylesVnrPickerV3.onlyFlRowSpaceBetween
                         ]}
-                        activeOpacity={!disable ? 0.2 : 1}
                     >
-                        <View
-                            style={[
-                                stylesVnrPickerV3.styLeftPicker,
-                                stateProps.lable && isHaveValue ? CustomStyleSheet.paddingVertical(6) : stylesVnrPickerV3.onlyFlRowSpaceBetween
-                            ]}
-                        >
-                            {stateProps.lable && !layoutFilter && !isOptionFilterQuicly && (
-                                <View style={[stylesVnrPickerV3.styLbPicker, {}]}>
-                                    <VnrText
-                                        style={[
-                                            styleSheets.text,
-                                            stylesVnrPickerV3.styLbNoValuePicker
-                                            // isHaveValue ? { fontSize: 14,color : 'red' } : { fontSize: Size.text, }
-                                        ]}
-                                        i18nKey={stateProps.lable}
-                                    />
-                                    {stateProps.fieldValid && (
-                                        <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
-                                    )}
-                                </View>
-                            )}
-
-                            <View
-                                style={[
-                                    stylesVnrPickerV3.styVlPicker,
-                                    isHaveValue ? styles.haveValue : styles.yetValue,
-                                    { flex: 1 }
-                                ]}
-                            >
-                                {isHaveValue && !isShowQuickSelect ? (
-                                    <ListMultiItem
-                                        disable={disable}
-                                        textField={stateProps.textField}
-                                        valueField={stateProps.valueField}
-                                        dataSource={value}
-                                        onOpentModal={this.opentModal}
-                                        revomeItemSelect={this.revomeItemSelected}
-                                        onExceedSizeWith={this.eventExceedSizeWith}
-                                    />
-                                ) : (
-                                    !layoutFilter && (
-                                        <View style={[isOptionFilterQuicly === true ? styles.fl1Center : {}]}>
-                                            <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    stylePlaceholder,
-                                                    stateProps.stylePlaceholder
-                                                ]}
-                                                i18nKey={
-                                                    !Vnr_Function.CheckIsNullOrEmpty(stateProps.placeholder)
-                                                        ? stateProps.placeholder
-                                                        : 'SELECT_ITEM'
-                                                }
-                                            />
-                                        </View>
-                                    )
+                        {stateProps.lable && !layoutFilter && !isOptionFilterQuicly && (
+                            <View style={[stylesVnrPickerV3.styLbPicker, {}]}>
+                                <VnrText
+                                    style={[
+                                        styleSheets.text,
+                                        stylesVnrPickerV3.styLbNoValuePicker
+                                        // isHaveValue ? { fontSize: 14,color : 'red' } : { fontSize: Size.text, }
+                                    ]}
+                                    i18nKey={stateProps.lable}
+                                />
+                                {stateProps.fieldValid && (
+                                    <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
                                 )}
                             </View>
+                        )}
+
+                        <View
+                            style={[
+                                stylesVnrPickerV3.styVlPicker,
+                                isHaveValue ? styles.haveValue : styles.yetValue,
+                                { flex: 1 }
+                            ]}
+                        >
+                            {isHaveValue && !isShowQuickSelect ? (
+                                <ListMultiItem
+                                    disable={disable}
+                                    textField={stateProps.textField}
+                                    valueField={stateProps.valueField}
+                                    dataSource={value}
+                                    onOpentModal={this.opentModal}
+                                    revomeItemSelect={this.revomeItemSelected}
+                                    onExceedSizeWith={this.eventExceedSizeWith}
+                                />
+                            ) : (
+                                !layoutFilter && (
+                                    <View style={[isOptionFilterQuicly === true ? styles.fl1Center : {}]}>
+                                        <VnrText
+                                            style={[
+                                                styleSheets.text,
+                                                stylePlaceholder,
+                                                stateProps.stylePlaceholder
+                                            ]}
+                                            i18nKey={
+                                                !Vnr_Function.CheckIsNullOrEmpty(stateProps.placeholder)
+                                                    ? stateProps.placeholder
+                                                    : 'SELECT_ITEM'
+                                            }
+                                        />
+                                    </View>
+                                )
+                            )}
                         </View>
-                        {this.renderIconRight(isHaveValue, isShowErr)}
-                    </TouchableOpacity>
-                )}
+                    </View>
+                    {this.renderIconRight(isHaveValue, isShowErr)}
+                </TouchableOpacity>
 
                 <Modal
                     visible={isModalVisible}
@@ -755,7 +747,7 @@ export default class VnrPickerMulti extends Component {
                                         i18nKey={
                                             stateProps.textLeftButton != null
                                                 ? stateProps.textLeftButton
-                                                : 'HRM_PortalApp_RemoveSelect'
+                                                : 'HRM_RemoveFilter'
                                         }
                                     />
                                 </TouchableOpacity>
@@ -778,7 +770,8 @@ export default class VnrPickerMulti extends Component {
                                         value={
                                             stateProps.textRightButton != null
                                                 ? translate(stateProps.textRightButton)
-                                                : `${translate('HRM_Select_Apply_Filter')} ${countSelect ? `(${countSelect})` : ''
+                                                : `${translate('HRM_Select_Apply_Filter')} ${
+                                                    countSelect ? `(${countSelect})` : ''
                                                 }`
                                         }
                                     />

@@ -220,15 +220,15 @@ export default class HreReceiveJobList extends VnrRenderList {
             let params = {};
             if (detail.screenDetail === 'HreCandidateInformation') {
                 params = {
-                    hiddenConfigDetail: [
-                        'E_POSITIONAPPLIED',
-                        'E_CONTACT',
-                        'E_QUALIFICATION',
-                        'E_TRAININGCOURSES',
-                        'E_FOREIGNLANGUAGE',
-                        'E_COMPUTERSKILL',
-                        'E_WORKINGEXPERIENCE'
-                    ]
+                    // hiddenConfigDetail: [
+                    //     'E_POSITIONAPPLIED',
+                    //     'E_CONTACT',
+                    //     'E_QUALIFICATION',
+                    //     'E_TRAININGCOURSES',
+                    //     'E_FOREIGNLANGUAGE',
+                    //     'E_COMPUTERSKILL',
+                    //     'E_WORKINGEXPERIENCE'
+                    // ]
                 }
             }
 
@@ -240,7 +240,6 @@ export default class HreReceiveJobList extends VnrRenderList {
                     screenName: detail.screenName,
                     listActions: _listActions,
                     reloadScreenList: reloadScreenList,
-                    beforeScreen : detail.screenName,
                     ...params
                 }
             );

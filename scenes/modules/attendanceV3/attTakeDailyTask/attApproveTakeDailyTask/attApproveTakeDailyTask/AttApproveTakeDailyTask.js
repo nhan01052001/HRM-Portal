@@ -21,7 +21,6 @@ let configList = null,
     attApproveTakeDailyTask = null,
     attApproveTakeDailyTaskViewDetail = null,
     attApproveTakeDailyTaskKeyTask = null,
-    dataRowActionAndSelected= null,
     pageSizeList = 20;
 
 class AttApproveTakeDailyTask extends Component {
@@ -52,7 +51,7 @@ class AttApproveTakeDailyTask extends Component {
         this.paramsFilter = null;
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // reload danh sách khi có approve hoặc reject dữ liệu
-            AttApproveTakeDailyTaskBusiness.setThisForBusiness(this, false, dataRowActionAndSelected.rowActions);
+            AttApproveTakeDailyTaskBusiness.setThisForBusiness(this);
             if (AttApproveTakeDailyTaskBusiness.checkForReLoadScreen[attApproveTakeDailyTask]) {
                 this.reload();
             }
@@ -159,7 +158,7 @@ class AttApproveTakeDailyTask extends Component {
             dataFromParams = this.checkDataFormNotify(),
             groupField = _configList[enumName.E_Field_Group] ? _configList[enumName.E_Field_Group] : null;
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attApproveTakeDailyTask);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attApproveTakeDailyTask);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -304,7 +303,6 @@ class AttApproveTakeDailyTask extends Component {
                             }}
                             screenName={attApproveTakeDailyTask}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Daily_Work'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
                         {/* </Animated.View> */}

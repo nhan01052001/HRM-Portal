@@ -200,7 +200,7 @@ export default class AttSubmitTamScanLogRegisterViewDetail extends Component {
                 const getDetailConfig = await Vnr_Function.HandleConfigListDetailATT(_configListDetail, 'Detail_List_Tamscanlog');
                 if (response && response.Status == EnumName.E_SUCCESS) {
                     let data = response.Data;
-                    data.BusinessAllowAction = Vnr_Services.handleStatus(data.Status, data?.SendEmailStatus, dataItem.TypeApprove);
+                    data.BusinessAllowAction = Vnr_Services.handleStatus(data.Status, data?.SendEmailStatus);
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachment);
                     if (data.SingleWordDetail[0]?.FileAttachment) {
@@ -226,24 +226,6 @@ export default class AttSubmitTamScanLogRegisterViewDetail extends Component {
                     if (!data?.UserProcessApproveID4 && data?.UserProcessID4) {
                         data.UserProcessApproveID4 = data?.UserProcessID4;
                     }
-
-                    // 0186607: Điều chỉnh view vùng lịch sử phê duyệt trên app (KHOT, Quên chấm công)
-                    if (Array.isArray(data.FileAttachment)) {
-                        let FileAttachmentRequestCancel = ManageFileSevice.setFileAttachApp(data.FileAttachmentRequestCancel);
-                        if (Array.isArray(FileAttachmentRequestCancel) && FileAttachmentRequestCancel.length > 0)
-                            data.FileAttachment.push(...FileAttachmentRequestCancel);
-                    } else {
-                        data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachmentRequestCancel);
-                    }
-
-                    // if (Array.isArray(data?.ProcessApproval) && data?.ProcessApproval.length > 0) {
-                    //     data.ProcessApproval = data?.ProcessApproval.map((item) => {
-                    //         delete item?.PositionName;
-                    //         return {
-                    //             ...item
-                    //         };
-                    //     });
-                    // }
 
                     const _listActions = await this.rowActionsHeaderRight(data);
 

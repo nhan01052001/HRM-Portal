@@ -24,10 +24,7 @@ class ListButtonRegister extends Component {
 
             switch (action.type) {
                 case EnumName.E_REFRESH:
-                    styleView =
-                        listActions?.length === 2
-                            ? { ...styles.btnRefresh, ...CustomStyleSheet.flex(1) }
-                            : styles.btnRefresh;
+                    styleView = listActions?.length === 2 ? { ...styles.btnRefresh, ...CustomStyleSheet.flex(1) } : styles.btnRefresh;
                     contentView = (
                         <Image
                             style={{ width: Size.iconSize, height: Size.iconSize }}
@@ -37,24 +34,12 @@ class ListButtonRegister extends Component {
                     );
                     break;
                 case EnumName.E_SAVE_TEMP:
-                    styleView =
-                        listActions?.length === 2
-                            ? {
-                                ...styles.btnSaveTemp,
-                                ...CustomStyleSheet.flex(9),
-                                ...CustomStyleSheet.paddingVertical(10)
-                            }
-                            : {
-                                ...styles.btnSaveTemp,
-                                ...CustomStyleSheet.borderRadius(2),
-                                ...CustomStyleSheet.marginRight(0),
-                                ...CustomStyleSheet.marginLeft(8)
-                            };
+                    styleView = listActions?.length === 2 ? { ...styles.btnSaveTemp, ...CustomStyleSheet.flex(9), ...CustomStyleSheet.paddingVertical(10) } : styles.btnSaveTemp;
                     buttonColor = isDisable ? Colors.gray_3 : styles.btnSaveTemp.backgroundColor;
                     contentView = <IconSave size={Size.iconSize} color={isDisable ? Colors.gray_7 : Colors.black} />;
                     break;
                 case EnumName.E_REGISTER:
-                    styleView = { ...styles.wrapBtnRegister, ...CustomStyleSheet.borderRadius(2), ...CustomStyleSheet.flex(5) };
+                    styleView = styles.wrapBtnRegister;
                     buttonColor = isDisable ? Colors.gray_3 : styles.wrapBtnRegister.backgroundColor;
                     contentView = (
                         <VnrText

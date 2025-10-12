@@ -458,7 +458,7 @@ export const SalApprovedPITFinalizationBusinessFunction = {
         let selectedIds = objValid.Ids,
             reason = objValid.reason;
 
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedRegisterVehicle', {
+        HttpService.Post('[URI_POR]/New_Att_RegisterVehicle/RemoveSelected', {
             selectedIds: selectedIds.split(','),
             reason
         }).then((res) => {

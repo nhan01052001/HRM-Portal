@@ -65,7 +65,8 @@ export default class HreProcessingCandidateApplicationsListItem extends VnrRende
         // render sub profile
         if (itemConfig?.TypeView === 'E_PROFILE' && typeof itemConfig?.Name === 'string' && itemConfig?.Name.split(',').length > 0) {
             itemConfig?.Name.split(',').map((item) => {
-                if (dataItem[item.trim()])
+                // eslint-disable-next-line no-extra-boolean-cast
+                if (!!dataItem[item.trim()])
                     subProfile.push(dataItem[item.trim()]);
             })
         }
@@ -270,7 +271,6 @@ export default class HreProcessingCandidateApplicationsListItem extends VnrRende
     }
 }
 
-
 const styles = StyleSheet.create({
     swipeable: {
         flex: 1
@@ -310,7 +310,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: Size.defineHalfSpace
     },
-
     left_isCheckbox: {
         alignItems: 'center',
         justifyContent: 'center',

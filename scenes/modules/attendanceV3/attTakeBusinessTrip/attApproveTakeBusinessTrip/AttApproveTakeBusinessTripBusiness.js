@@ -145,10 +145,9 @@ export const AttApproveTakeBusinessTripBusinessFunction = {
         AttCanceledTakeBusinessTrip: false,
         AttAllTakeBusinessTrip: false
     },
-    setThisForBusiness: (dataThis, isNotification, rowActionsFromScreen = _rowActions) => {
+    setThisForBusiness: (dataThis, isNotification) => {
         if (isNotification) _isOnScreenNotification = true;
         else _isOnScreenNotification = false;
-        _rowActions = rowActionsFromScreen ?? [];
         _this = dataThis;
     },
     checkRequireNote: async (field) => {
@@ -245,7 +244,7 @@ export const AttApproveTakeBusinessTripBusinessFunction = {
     confirmApprove: async (objValid) => {
         let actionCancel = _rowActions.find(item => item.Type === 'E_APPROVE'),
             isConfirm = actionCancel['Confirm'];
-        const isNote = await AttApproveTakeBusinessTripBusinessFunction.checkRequireNote('IsRequiredApproveNote');
+        const isNote = await AttApproveTakeBusinessTripBusinessFunction.checkRequireNote('IsRequiredApproveNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -443,7 +442,7 @@ export const AttApproveTakeBusinessTripBusinessFunction = {
     confirmReject: async (objValid) => {
         let actionCancel = _rowActions.find(item => item.Type === 'E_REJECT'),
             isConfirm = actionCancel['Confirm'];
-        const isNote = await AttApproveTakeBusinessTripBusinessFunction.checkRequireNote('IsRequiredRejectNote');
+        const isNote = await AttApproveTakeBusinessTripBusinessFunction.checkRequireNote('IsRequiredRejectNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -576,10 +575,10 @@ export const AttApproveTakeBusinessTripBusinessFunction = {
                 if (item.BusinessAllowAction && item.BusinessAllowAction.indexOf(EnumStatus.E_CANCEL) > -1) {
                     ListRecordID.push(item.ID);
                     arrValid.push(item.ID);
-                    totalList.push(item.ID);
+                    totalList.push(item.ID)
                 }
                 if (item.BusinessAllowAction == '') {
-                    totalList.push(item.ID);
+                    totalList.push(item.ID)
                 }
             });
 
@@ -636,7 +635,7 @@ export const AttApproveTakeBusinessTripBusinessFunction = {
     confirmCancel: async (objValid) => {
         let actionCancel = _rowActions.find(item => item.Type === 'E_CANCEL'),
             isConfirm = actionCancel['Confirm'];
-        const isNote = await AttApproveTakeBusinessTripBusinessFunction.checkRequireNote('IsRequiredCancelNote');
+        const isNote = await AttApproveTakeBusinessTripBusinessFunction.checkRequireNote('IsRequiredCancelNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],

@@ -17,7 +17,7 @@ export default class LoanComponent extends Component {
         this.state = {
             isLoading: true,
             dataSource: null
-        };
+        }
     }
 
     getData = () => {
@@ -33,21 +33,21 @@ export default class LoanComponent extends Component {
             return;
         }
 
-        HttpService.Get(`[URI_CENTER]/api/Hre_Personal/GetCreditByUserlogin?profileID=${dataBody.profileID}`, null, this.getData).
+        HttpService.Get(`[URI_CENTER]/api/Hre_Personal/GetLoanLimitByProfileID?profileID=${dataBody.profileID}`, null, this.getData).
             then(res => {
                 if (res && res?.Status === EnumName.E_SUCCESS && res.Data) {
 
                     this.setState({
                         dataSource: res.Data,
                         isLoading: false
-                    });
+                    })
                 }
                 else {
                     this.setState({
                         isLoading: false
-                    });
+                    })
                 }
-            });
+            })
     }
 
     componentDidMount() {
@@ -86,7 +86,7 @@ export default class LoanComponent extends Component {
                         <View style={styles.styViewData}>
                             {initLableValue(
                                 dataSource, {
-                                    Name: 'AnnualLimit',
+                                    Name: 'CurrentLimit',
                                     DisplayKey: 'HRM_PortalApp_AnnualLimit',
                                     'DataType': 'Double',
                                     'DataFormat': '#,###.##'
@@ -94,7 +94,7 @@ export default class LoanComponent extends Component {
 
                             {initLableValue(
                                 dataSource, {
-                                    Name: 'UsedLimit',
+                                    Name: 'CreditLimit',
                                     DisplayKey: 'HRM_PortalApp_UsedLimit',
                                     'DataType': 'Double',
                                     'DataFormat': '#,###.##'

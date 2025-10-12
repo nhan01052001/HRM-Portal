@@ -114,20 +114,6 @@ export default class VnrTextInput extends Component {
         }
     };
 
-    onBlur = () => {
-        const { onChangeText, value } = this.state.stateProps,
-            numRegexTextEmpty = /^\s+$/;
-
-        if (value) {
-            // Block input empty, space or \n
-            if (numRegexTextEmpty.test(value) == true) {
-                onChangeText('');
-            }
-        }
-
-        this.props.onBlur && this.props.onBlur();
-    };
-
     render() {
         const stateProps = this.state.stateProps;
         let disable = false;
@@ -162,7 +148,6 @@ export default class VnrTextInput extends Component {
                                     }
                                 ]
                         }
-                        onBlur={this.onBlur}
                         onChangeText={(text) => this.onChangeText(text)}
                     />
                 </View>

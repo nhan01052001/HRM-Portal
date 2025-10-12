@@ -98,43 +98,44 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'TimeHours',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Time',
+        Name: 'BusinessTravelName',
+        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_LeaveDayTypeID',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'WorkPlaceBussinessName',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Location',
+        Name: 'DurationTypeView',
+        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_DurationType',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'ContactInfo',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_ContactInfo',
+        Name: 'PlaceSendToName',
+        DisplayKey: 'HRM_PortalApp_TakeLeave_PlaceSendToID',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'Content',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Content',
+        Name: 'BusinessTripReasonName',
+        DisplayKey: 'HRM_Attendance_BusinessTravel_BusinessTripReasonID',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'PreparationWork',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_PreparationWork',
+        Name: 'PlaceFrom',
+        DisplayKey: 'PlaceFrom',
         DataType: 'string'
     },
     {
-        TypeView: 'E_GROUP',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Attachments',
+        TypeView: 'E_COMMON',
+        Name: 'PlaceTo',
+        DisplayKey: 'PlaceTo',
         DataType: 'string'
     },
     {
         TypeView: 'E_FILEATTACH',
         Name: 'FileAttachment',
-        DisplayKey: '',
+        DisplayKey: 'HRM_Payroll_Sal_TaxInformationRegister_FileAttach',
         DataType: 'FileAttach'
     },
     {
@@ -194,7 +195,7 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
         try {
             const _params = this.props.navigation.state.params,
                 { screenName, dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params),
-                _configListDetail = configDefault;//ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
+                _configListDetail = ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
 
             let id = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
             if (id) {
@@ -252,7 +253,6 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
     render() {
         const { dataItem, configListDetail, listActions } = this.state,
             { containerItemDetail, bottomActions } = styleScreenDetail;
-
         let contentViewDetail = <VnrLoading size={'large'} />;
         if (dataItem && configListDetail) {
             contentViewDetail = (

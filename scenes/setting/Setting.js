@@ -78,7 +78,7 @@ class Setting extends Component {
     setupData = async () => {
         const { userid } = dataVnrStorage.currentUser.headers;
 
-        const data = (await SInfoService.getItem(EnumUser.DATASAVEID)) || [];
+        const data = await SInfoService.getItem(EnumUser.DATASAVEID);
         const user = data.find((f) => {
             return f.userid === userid;
         });
@@ -388,7 +388,7 @@ class Setting extends Component {
                 UserID: dataVnrStorage.currentUser.headers.userid
             };
             VnrLoadingSevices.show();
-            const res = await HttpService.Post('[URI_HR]/Por_GetData/LoginAppMobile', dataBody);
+            const res = await HttpService.Post('[URI_POR]//Portal/LoginAppMobile', dataBody);
             VnrLoadingSevices.hide();
 
             if (res != undefined && res != null) {
@@ -471,7 +471,7 @@ class Setting extends Component {
         setdataVnrStorage(dataVnrStorage);
 
         //update
-        HttpService.Post('[URI_HR]/Por_GetData/ChangeLanguage', {
+        HttpService.Post('[URI_POR]/New_Home/ChangeLanguage', {
             LanguageValue: language,
             UserCreateID: dataVnrStorage.currentUser ? dataVnrStorage.currentUser.info.userid : null,
             UserLogin: dataVnrStorage.currentUser.headers.userlogin
@@ -501,9 +501,9 @@ class Setting extends Component {
         this.router('Permission');
     };
 
-    router = (roouterName, params) => {
+    router = (roouterName) => {
         const { navigation } = this.props;
-        navigation.navigate(roouterName, params);
+        navigation.navigate(roouterName);
     };
 
     handelOnpress = (item) => {
@@ -614,9 +614,9 @@ class Setting extends Component {
                     style={styles.bnt_action}
                     onPress={() => {
                         if (dataVnrStorage.isNewLayoutV3) {
-                            this.router('ChangePasswordV3', { setupData : this.setupData });
+                            this.router('ChangePasswordV3');
                         } else {
-                            this.router('ChangePassword', { setupData : this.setupData });
+                            this.router('ChangePassword');
                         }
                     }}
                 >

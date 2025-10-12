@@ -1116,12 +1116,12 @@ export default class AttSubmitLeaveDayAddOrEdit extends Component {
 
         let arrRequest = [
             HttpService.Get(
-                '[URI_HR]/Att_GetData/GetByIDLeaveDay?id=' + ID + '&profileID=' + ProfileID + '&_isPortalApp=' + true
+                '[URI_POR]/Att_Leaveday/New_Edit?id=' + ID + '&profileID=' + ProfileID + '&_isPortalApp=' + true
             ),
             HttpService.Post('[URI_HR]/Sys_GetEnumData/GetEnum', { text: 'LeaveDayDurationType' }),
             HttpService.Post('[URI_HR]/Sys_GetEnumData/GetEnum', { text: 'LeaveDayType' }),
             HttpService.Post('[URI_SYS]/Sys_GetData/GetEnum', { text: 'LeaveDayDurationType' }),
-            HttpService.Post('[URI_HR]/Att_GetData/GetMultiTypeHalfShift'),
+            HttpService.Post('[URI_POR]/New_Att_Overtime/GetMultiTypeHalfShift'),
             HttpService.Post('[URI_HR]/Cat_GetData/GetMultiLeaveDayTypeInPortal'),
             HttpService.Post('[URI_HR]/Att_GetData/GetLevelApproved', {
                 ProfileID: ProfileID,
@@ -1288,8 +1288,8 @@ export default class AttSubmitLeaveDayAddOrEdit extends Component {
         HttpService.MultiRequest([
             HttpService.Post('[URI_HR]/Sys_GetEnumData/GetEnum', { text: 'LeaveDayDurationType' }),
             HttpService.Post('[URI_HR]/Sys_GetEnumData/GetEnum', { text: 'LeaveDayType' }),
-            HttpService.Post('[URI_HR]/Att_GetData/GetMultiLeaveDayDurationType'),
-            HttpService.Post('[URI_HR]/Att_GetData/GetMultiTypeHalfShift'),
+            HttpService.Post('[URI_POR]/New_Att_Leaveday/GetMultiDurationType'),
+            HttpService.Post('[URI_POR]/New_Att_Overtime/GetMultiTypeHalfShift'),
             HttpService.Post('[URI_HR]/Cat_GetData/GetMultiLeaveDayTypeInPortal'),
             HttpService.Get('[URI_HR]/Cat_GetData/GetMultiShift')
         ]).then(resAll => {
@@ -2847,7 +2847,7 @@ export default class AttSubmitLeaveDayAddOrEdit extends Component {
                     params = {
                         ...params,
                         isChangeDate: true
-                    };
+                    }
                 }
 
                 VnrLoadingSevices.show();
@@ -6852,7 +6852,7 @@ export default class AttSubmitLeaveDayAddOrEdit extends Component {
             { DurationTypeDetail, DurationType } = Div_DurationType1,
             { OtherDurationType, DurationTypeFullShift } = DurationTypeDetail,
             { LeaveDays } = DurationTypeFullShift,
-            { divLeaveHours, divHoursMiddleOfShift } = OtherDurationType,
+            { divLeaveHours } = OtherDurationType,
             { LeaveHours } = divLeaveHours,
             { HoursTo, HoursFrom } = OtherDurationType;
 
@@ -6923,11 +6923,6 @@ export default class AttSubmitLeaveDayAddOrEdit extends Component {
             };
 
             this.setState(nextState, () => {
-                // nhan.nguyen: 0185491: [Hotfix TAISUN_v8.12.01.01.09.34] Submit ngày nghỉ loại "Giữa ca" bỏ trống field "Số giờ" vẫn cho phép lưu thành công.
-                if (divHoursMiddleOfShift.visible) {
-                    return;
-                }
-
                 VnrLoadingSevices.show();
                 HttpService.Post('[URI_HR]/Att_GetData/GetLeaveHourMidleShift', dataBody).then(data => {
                     VnrLoadingSevices.hide();

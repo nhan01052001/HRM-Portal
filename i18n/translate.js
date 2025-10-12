@@ -6,20 +6,14 @@ export const translate = (i18nKey) => {
     const language = store.getState()['languageReducer']['language'];
     if (!Vnr_Function.CheckIsNullOrEmpty(i18nKey)) {
         if (i18n.t(i18nKey).indexOf('[missing') == 0) {
-            if (
-                i18n.translations &&
-                language &&
-                i18n.translations[language] &&
-                i18n.translations[language][i18nKey]
-            ) {
+            if (i18n.translations && language && i18n.translations[language] && i18n.translations[language][i18nKey]) {
                 return i18n.translations[language][i18nKey];
             } else {
                 return i18nKey;
             }
         }
         return i18n.t(i18nKey);
-    }
-    else {
+    } else {
         return i18nKey;
     }
 };

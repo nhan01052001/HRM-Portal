@@ -161,7 +161,7 @@ class TakePictureFace extends Component {
                 .post(BASEURL, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                        token: '65a8971fd7f44e98ab509c65d48423f5'
+                        token: 'e0c414c6d6874a199970bd55d4278759'
                     }
                 })
                 .then((response) => {

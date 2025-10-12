@@ -19,7 +19,7 @@ let configList = null,
     enumName = null,
     attCanceledWorkingOvertime = null,
     attApproveWorkingOvertimeViewDetail = null,
-    attApproveWorkingOvertime = null,
+    attApprovedWorkingOvertime = null,
     keyListTask = null,
     pageSizeList = 20;
 
@@ -217,7 +217,7 @@ class AttCanceledWorkingOvertime extends Component {
 
     componentDidMount() {
         attCanceledWorkingOvertime = ScreenName.AttCanceledWorkingOvertime;
-        attApproveWorkingOvertime = ScreenName.AttApproveWorkingOvertime;
+        attApprovedWorkingOvertime = ScreenName.AttApprovedWorkingOvertime;
         attApproveWorkingOvertimeViewDetail = ScreenName.AttApproveWorkingOvertimeViewDetail;
         keyListTask = EnumTask.KT_AttCanceledWorkingOvertime;
         AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[attCanceledWorkingOvertime] = false;
@@ -265,9 +265,8 @@ class AttCanceledWorkingOvertime extends Component {
                                 ...styleContentFilterDesign,
                                 ...styleContentFilterDesignV3
                             }}
-                            screenName={attApproveWorkingOvertime}
+                            screenName={attApprovedWorkingOvertime}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Overtime_list'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 
@@ -277,7 +276,7 @@ class AttCanceledWorkingOvertime extends Component {
                                     detail={{
                                         dataLocal: false,
                                         screenDetail: attApproveWorkingOvertimeViewDetail,
-                                        screenName: attApproveWorkingOvertime
+                                        screenName: attApprovedWorkingOvertime
                                     }}
                                     scrollYAnimatedValue={this.scrollYAnimatedValue}
                                     rowActions={rowActions}

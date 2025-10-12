@@ -4,13 +4,15 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
+    Animated,
     TouchableWithoutFeedback,
     Dimensions,
     Platform
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { Colors, Size, styleSheets, CustomStyleSheet, stylesScreenDetailV3 } from '../../../../../constants/styleConfig';
+import { Colors, Size, styleSheets, CustomStyleSheet } from '../../../../../constants/styleConfig';
 import moment from 'moment';
+import format from 'number-format.js';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { translate } from '../../../../../i18n/translate';
 import {
@@ -19,11 +21,86 @@ import {
     IconDate,
     IconChat
 } from '../../../../../constants/Icons';
+import Color from 'color';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
-import VnrRenderListItem from '../../../../../componentsV3/VnrRenderList/VnrRenderListItem';
 
 
-export default class AttTakeLeaveDayListItem extends VnrRenderListItem {
+export default class AttTakeLeaveDayListItem extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            widthIconBack: new Animated.Value(Size.defineSpace),
+            heightIconNext: new Animated.Value(0),
+            springIconBack: new Animated.Value(1),
+            springIconNext: new Animated.Value(0)
+        };
+        this.formatStringType = this.formatStringType.bind(this);
+        this.setRightAction(props);
+        this.Swipe = null;
+    }
+
+    setRightAction = thisProps => {
+        const { dataItem } = thisProps;
+        this.sheetActions = [
+            {
+                title: translate('HRM_Common_Close'),
+                onPress: null
+            }
+        ];
+        if (!Vnr_Function.CheckIsNullOrEmpty(thisProps.rowActions)) {
+            this.rightListActions = thisProps.rowActions.filter(item => {
+                item.title = item?.title;
+                return (
+                    !Vnr_Function.CheckIsNullOrEmpty(dataItem.BusinessAllowAction) &&
+                    dataItem.BusinessAllowAction.indexOf(item.type) >= 0
+                );
+            });
+        }
+    };
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        if (nextProps.isPullToRefresh !== this.props.isPullToRefresh) {
+            this.setRightAction(nextProps);
+        }
+    }
+
+    shouldComponentUpdate(nextProps) {
+        if (
+            nextProps.isPullToRefresh !== this.props.isPullToRefresh ||
+            nextProps.isSelect !== this.props.isSelect ||
+            nextProps.isOpenAction !== this.props.isOpenAction ||
+            nextProps.isDisable !== this.props.isDisable
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    formatStringType = (data, col) => {
+        if (data[col.Name]) {
+            if (col.DataType && col.DataType.toLowerCase() == 'datetime') {
+                return moment(data[col.Name]).format(col.DataFormat);
+            }
+            if (col.DataType && col.DataType.toLowerCase() == 'double') {
+                return format(col.DataFormat, data[col.Name]);
+            } else {
+                return data[col.Name];
+            }
+        } else {
+            return '';
+        }
+    };
+
+    rightActionsEmpty = () => {
+        return <View style={styles.width0} />;
+    };
+
+    convertTextToColor = value => {
+        const [num1, num2, num3, opacity] = value.split(',');
+        return Color.rgb(parseFloat(num1), parseFloat(num2), parseFloat(num3), parseFloat(opacity));
+    };
+
     render() {
         const {
             dataItem,
@@ -152,31 +229,19 @@ export default class AttTakeLeaveDayListItem extends VnrRenderListItem {
             >
                 <View style={[styles.swipeableLayout]}>
                     <View style={styles.left_isCheckbox}>
-                        {rowActions === null || (Array.isArray(rowActions) && rowActions.length === 0) ? null : (
-                            <View
-                                style={[
-                                    styles.styRadiusCheck,
-                                    this.props.isSelect && stylesScreenDetailV3.checkAll
-                                ]}
-                            >
-                                {this.props.isSelect && <IconCheck size={Size.iconSize - 10} color={Colors.white} />}
-                            </View>
-                        )}
-                        <TouchableOpacity
+                        <View
                             style={[
-                                styles.btnLeft_check,
-                                (rowActions === null || (Array.isArray(rowActions) && rowActions.length === 0)) && {
-                                    ...CustomStyleSheet.zIndex(1),
-                                    ...CustomStyleSheet.elevation(1)
-                                }
+                                styles.styRadiusCheck,
+                                this.props.isSelect && styles.borderRadius100
                             ]}
+                        >
+                            {this.props.isSelect && <IconCheck size={Size.iconSize - 10} color={Colors.white} />}
+                        </View>
+                        <TouchableOpacity
+                            style={styles.btnLeft_check}
                             activeOpacity={isDisable ? 1 : 0.8}
                             onPress={() => {
-                                if (rowActions === null || (Array.isArray(rowActions) && rowActions.length === 0)) {
-                                    this.props.onMoveDetail();
-                                } else {
-                                    this.props.onClick();
-                                }
+                                this.props.onClick();
                             }}
                         />
                     </View>
@@ -216,7 +281,7 @@ export default class AttTakeLeaveDayListItem extends VnrRenderListItem {
                                                         numberOfLines={2}
                                                     >
                                                         {`${dataItem?.DurationTypeView ? dataItem?.DurationTypeView : ''
-                                                            }` +
+                                                        }` +
                                                             `${isHidetextFieldTime ? '' : ' '}` + //space nếu có textFieldTime
                                                             `${textFieldTime}`}
                                                         {dataItem?.LeaveDayTypeName
@@ -473,6 +538,14 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '600',
         color: Colors.blue
+    },
+    width0: {
+        width: 0
+    },
+    borderRadius100: {
+        backgroundColor: Colors.primary,
+        borderRadius: 100,
+        borderWidth: 0
     },
     flex1: { flex: 1 }
 });

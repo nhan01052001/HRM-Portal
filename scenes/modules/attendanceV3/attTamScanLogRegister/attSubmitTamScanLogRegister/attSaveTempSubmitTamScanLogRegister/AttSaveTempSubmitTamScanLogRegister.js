@@ -24,7 +24,6 @@ let configList = null,
     attSaveTempSubmitTamScanLogRegister = null,
     attSubmitTamScanLogRegister = null,
     attSubmitTamScanLogRegisterViewDetail = null,
-    dataRowActionAndSelected = null,
     attSaveTempSubmitTamScanLogRegisterKeyTask = null,
     pageSizeList = 20;
 
@@ -54,7 +53,7 @@ class AttSaveTempSubmitTamScanLogRegister extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitTamScanLogRegisterBusinessFunction.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttSubmitTamScanLogRegisterBusinessFunction.setThisForBusiness(this);
             if (AttSubmitTamScanLogRegisterBusinessFunction.checkForReLoadScreen[attSaveTempSubmitTamScanLogRegister]) {
                 this.reload();
             }
@@ -204,7 +203,7 @@ class AttSaveTempSubmitTamScanLogRegister extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attSaveTempSubmitTamScanLogRegister);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attSaveTempSubmitTamScanLogRegister);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -335,7 +334,6 @@ class AttSaveTempSubmitTamScanLogRegister extends Component {
                             }}
                             screenName={attSubmitTamScanLogRegister}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Tamscan_Log_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

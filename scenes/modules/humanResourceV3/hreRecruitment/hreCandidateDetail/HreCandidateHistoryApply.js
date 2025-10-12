@@ -32,13 +32,8 @@ export default class HreCandidateHistoryApply extends Component {
         props.navigation.setParams({
             headerLeft: (
                 <TouchableOpacity
-                    onPress={() => {
-                        const _params = this.props.navigation.state.params,
-                            { beforeScreen } = typeof _params == 'object' ? _params : JSON.parse(_params);
-                        if (beforeScreen != null) DrawerServices.navigate(beforeScreen);
-                        else DrawerServices.goBack();
-                    }}
-                >
+                    onPress={() => props.navigation.navigate(DrawerServices.getBeforeScreen())}>
+
                     <View style={styleSheets.bnt_HeaderRight}>
                         <IconBack color={Colors.gray_10} size={Size.iconSizeHeader} />
                     </View>
@@ -73,7 +68,7 @@ export default class HreCandidateHistoryApply extends Component {
     getDataItem = async () => {
         try {
             const _params = this.props.navigation.state.params,
-                { dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params);
+                { dataId, dataItem } = typeof _params == 'object' ? _params : _params ? JSON.parse(_params) : {};
 
             let id = null;
             if (!Vnr_Function.CheckIsNullOrEmpty(dataId)) {
@@ -82,7 +77,7 @@ export default class HreCandidateHistoryApply extends Component {
                 id = dataItem?.CandidateProfileID;
             }
 
-            if (!id || !Vnr_Services.checkPermissions('New_PortalV3_Rec_CandidateProfileDetail_HistoryCandidateTab', 'View')) {
+            if (!id) {
                 this.setState({ dataItem: 'EmptyData' });
                 return;
             }
@@ -112,24 +107,6 @@ export default class HreCandidateHistoryApply extends Component {
         this.getDataItem();
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const _params = nextProps.navigation.state.params,
-            { dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params);
-
-        if (dataItem != null) {
-            this.getDataItem();
-        }
-    }
-
-    reload = () => {
-        const { reloadScreenList } = this.props.navigation.state.params;
-
-        !Vnr_Function.CheckIsNullOrEmpty(reloadScreenList) && reloadScreenList('E_KEEP_FILTER');
-        this.setState({ dataItem: null }, () => {
-            this.getDataItem(true);
-        });
-    };
-
     convertTextToColor = value => {
         const [num1, num2, num3, opacity] = value.split(',');
         return Color.rgb(parseFloat(num1), parseFloat(num2), parseFloat(num3), parseFloat(opacity));
@@ -148,9 +125,6 @@ export default class HreCandidateHistoryApply extends Component {
                         <View style={[containerItemDetail, CustomStyleSheet.backgroundColor(Colors.gray_2)]}>
                             {
                                 dataItem.map((item, index) => {
-                                    item.CandidateID = item?.ID;
-                                    if (!item?.BusinessAllowAction)
-                                        item.BusinessAllowAction = '';
                                     const { colorStatus, bgStatus } = Vnr_Services.formatStyleStatusApp(item.Status);
                                     let colorStatusView = colorStatus ? colorStatus : null,
                                         bgStatusView = bgStatus ? bgStatus : null;
@@ -242,30 +216,12 @@ export default class HreCandidateHistoryApply extends Component {
                                                             >
                                                                 <TouchableOpacity
                                                                     style={styles.button}
-                                                                    onPress={() => {
-                                                                        DrawerServices.navigate('HreInterviewResult', {
-                                                                            dataItem: item,
-                                                                            screenName: null,
-                                                                            listActions: [],
-                                                                            reloadScreenList: null,
-                                                                            beforeScreen: null
-                                                                        });
-                                                                    }}
                                                                 >
                                                                     <Text style={styleSheets.text}>{translate('HRM_PortalApp_InterviewResult')}</Text>
                                                                 </TouchableOpacity>
 
                                                                 <TouchableOpacity
                                                                     style={styles.button}
-                                                                    onPress={() => {
-                                                                        DrawerServices.navigate('HreApproveRecruitmentProposalViewDetail', {
-                                                                            dataItem: item,
-                                                                            screenName: null,
-                                                                            listActions: [],
-                                                                            reloadScreenList: null,
-                                                                            beforeScreen: null
-                                                                        });
-                                                                    }}
                                                                 >
                                                                     <Text style={styleSheets.text}>{translate('HRM_PortalApp_ProposalInformation')}</Text>
                                                                 </TouchableOpacity>
@@ -275,7 +231,7 @@ export default class HreCandidateHistoryApply extends Component {
                                                 </View>
                                             </View>
                                         </View>
-                                    );
+                                    )
                                 })
                             }
                         </View>

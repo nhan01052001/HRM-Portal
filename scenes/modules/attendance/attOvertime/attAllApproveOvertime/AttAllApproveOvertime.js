@@ -301,7 +301,7 @@ export default class AttAllApproveOvertime extends Component {
                             objValid.strResultID && typeof objValid.strResultID === 'string'
                                 ? objValid.strResultID
                                 : '';
-                        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedRoster', {
+                        HttpService.Post('[URI_POR]/New_Att_Roster/RemoveSelected', {
                             selectedIds: strId.split(','),
                             reason
                         })
@@ -343,7 +343,7 @@ export default class AttAllApproveOvertime extends Component {
         } else {
             VnrLoadingSevices.show();
             let strId = objValid.strResultID && typeof objValid.strResultID === 'string' ? objValid.strResultID : '';
-            HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedRoster', {
+            HttpService.Post('[URI_POR]/New_Att_Roster/RemoveSelected', {
                 selectedIds: strId.split(',')
             })
                 .then(res => {

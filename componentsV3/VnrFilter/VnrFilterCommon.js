@@ -27,7 +27,8 @@ import VnrSuperFilterWithTextInput from '../VnrSuperFilterWithTextInput/VnrSuper
 import Vnr_Function from '../../utils/Vnr_Function';
 import HttpService from '../../utils/HttpService';
 
-const DEFAULT_FILTER = {};
+const DEFAULT_FILTER = {
+};
 
 let configListFilter = null,
     enumName = null,
@@ -40,7 +41,6 @@ export default class VnrFilterCommon extends Component {
         super(props);
         this.state = {
             spreadTextFilterCommon: '',
-            textFilterNotification: '',
             filterCommon: null,
             filterAdvance: null,
             refreshTextCommon: false,
@@ -75,70 +75,7 @@ export default class VnrFilterCommon extends Component {
         }
     }
 
-    applyConfigHiddenFilter = async (filterAdvance, tblName) => {
-        filterAdvance = filterAdvance.map((item) => {
-            return {
-                ...item,
-                ControlGroup: [
-                    ...item.ControlGroup.map((control) => {
-                        return { ...control };
-                    })
-                ],
-                order: -1
-            };
-        });
-        if (tblName != null) {
-            const configPortal = await HttpService.Get(
-                `[URI_CENTER]/api/Sys_common/GetValidateJson?listFormId=${tblName}`
-            );
-
-            if (tblName && configPortal?.Data && configPortal.Data[tblName] && filterAdvance) {
-                const filterConfig = configPortal.Data[tblName];
-                const newConfig = filterAdvance.filter((item) => {
-                    const control = item.ControlGroup && item.ControlGroup[0] ? item.ControlGroup[0] : null;
-                    if (
-                        control &&
-                        filterConfig[control.fieldName] &&
-                        filterConfig[control.fieldName].hasInApp == true &&
-                        control.fieldName !== 'isFilterFromNotify'
-                    ) {
-                        return false;
-                    }
-
-                    return true;
-                });
-
-                Object.keys(filterConfig).forEach((key) => {
-                    const item = filterConfig[key];
-
-                    if (item.hasInApp == true && item.hidden == false) {
-                        let itemMatch = filterAdvance.find((itemFilter) => {
-                            const control =
-                                itemFilter.ControlGroup && itemFilter.ControlGroup[0]
-                                    ? itemFilter.ControlGroup[0]
-                                    : null;
-                            if (key == control.fieldName) {
-                                return true;
-                            }
-                            return false;
-                        });
-                        if (itemMatch != null) {
-                            itemMatch.order = item.order;
-                            newConfig.push(itemMatch);
-                        }
-                    }
-                });
-
-                return newConfig.sort((a, b) => a.order > b.order);
-            }
-
-            return filterAdvance;
-        }
-
-        return filterAdvance;
-    };
-
-    initStateFilter = async (nexProps) => {
+    initStateFilter = (nexProps) => {
         enumName = EnumName;
         filterList = ScreenName.FilterListV3;
         controlName = ControlName;
@@ -146,7 +83,7 @@ export default class VnrFilterCommon extends Component {
             ...ConfigListFilter.value,
             ...DEFAULT_FILTER
         };
-        const { screenName, dataBody, tblName } = nexProps ? nexProps : this.props;
+        const { screenName, dataBody } = nexProps ? nexProps : this.props;
         if (dataBody == null) {
             return;
         }
@@ -157,13 +94,20 @@ export default class VnrFilterCommon extends Component {
             numberCountFilter = 0;
 
         if (_configListFilter && _configListFilter.FilterAdvance) {
-            // Hieu.Tran 0186263: Đồng bộ cấu hình ẩn hiện và sắp xếp Tìm kiếm các màn hình của nghiệp vụ công trên app với portal
-            FilterAdvance = await this.applyConfigHiddenFilter(_configListFilter.FilterAdvance, tblName);
+            FilterAdvance = _configListFilter.FilterAdvance.map((item) => {
+                return {
+                    ...item,
+                    ControlGroup: [
+                        ...item.ControlGroup.map((control) => {
+                            return { ...control };
+                        })
+                    ]
+                };
+            });
         }
 
         let _placeHolder = '',
             _spreadTextFilterCommon = '',
-            _textFilterNotification = '',
             isFilterFromNotify = false;
 
         // kiểm tra tìm kiếm theo notificaiton
@@ -255,8 +199,8 @@ export default class VnrFilterCommon extends Component {
             const arrPlaceHolder = FilterCommon.placeholder;
 
             if (isFilterFromNotify) {
+                _spreadTextFilterCommon += translate('HRM_PortalApp_Filter_From_notification');
                 numberCountFilter += 1;
-                _textFilterNotification += translate('HRM_PortalApp_Filter_From_notification');
             }
 
             if (arrPlaceHolder && Array.isArray(arrPlaceHolder)) {
@@ -284,20 +228,14 @@ export default class VnrFilterCommon extends Component {
             }
         }
 
-        this.setState(
-            {
-                textFilterNotification: _textFilterNotification,
-                numberCountFilter: numberCountFilter,
-                filterCommon: FilterCommon,
-                filterAdvance: FilterAdvance,
-                spreadTextFilterCommon: _spreadTextFilterCommon,
-                refreshFilter: !this.state.refreshFilter,
-                refreshTextCommon: !this.state.refreshTextCommon
-            },
-            () => {
-                this.applyConfigHiddenFilter();
-            }
-        );
+        this.setState({
+            numberCountFilter: numberCountFilter,
+            filterCommon: FilterCommon,
+            filterAdvance: FilterAdvance,
+            spreadTextFilterCommon: _spreadTextFilterCommon,
+            refreshFilter: !this.state.refreshFilter,
+            refreshTextCommon: !this.state.refreshTextCommon
+        });
     };
 
     componentDidMount() {
@@ -355,7 +293,7 @@ export default class VnrFilterCommon extends Component {
         this.setState({ spreadTextFilterCommon: text, refreshTextCommon: !this.state.refreshTextCommon }, () => {
             Vnr_Function.delay(() => {
                 this.onFilterCommon();
-            }, 400);
+            }, 200);
         });
     };
 
@@ -401,7 +339,10 @@ export default class VnrFilterCommon extends Component {
         filterAdvance.forEach((item) => {
             if (item && item.ControlGroup && item.ControlGroup.length == 1) {
                 const control = item.ControlGroup[0],
-                    fieldName = control['fieldName'];
+                    fieldName =
+                        control.Name == ControlName.VnrDateFromTo && control.fieldForFilter
+                            ? control.fieldForFilter[0]
+                            : control['fieldName'];
 
                 if (
                     fieldName &&
@@ -411,9 +352,14 @@ export default class VnrFilterCommon extends Component {
                 )
                     numberCount += 1;
 
-                if (control.fieldForFilter && paramsFilter[control.fieldName] != null && numberCount > 0) {
+                // Trường hợp đặc thù configFilter HreAllAccidentManage DateffectiveType
+                if (
+                    fieldName == 'DateffectiveType' &&
+                    paramsFilter[fieldName] &&
+                    paramsFilter[fieldName] != null &&
+                    ['E_DATETO', 'E_INFORCE'].indexOf(paramsFilter[fieldName]) > -1
+                )
                     numberCount -= 1;
-                }
             }
         });
 
@@ -423,10 +369,9 @@ export default class VnrFilterCommon extends Component {
     //nhấn lọc từ màn hình nâng cao, gọi hàm spreadParamsFilter xử lý cho text common và lọc
     onFilterAdvance = (dataDisplay, dataFilter, pureData) => {
         const { filterCommon, spreadTextFilterCommon, filterAdvance } = this.state;
-        let numberCountFilter = 0,
-            _textFilterNotification = '';
+        let numberCountFilter = 0;
         //gán obj filter cho biến
-        //dataFilter;
+        this.objParamAdvance = dataFilter;
         // nhannguyen: handle filter when filter textinput first and then choose filter advanced
         let tempPramsFromTextInput = {};
         if (
@@ -469,17 +414,13 @@ export default class VnrFilterCommon extends Component {
                 (item) => item.ControlGroup && item.ControlGroup[0]?.fieldName == 'isFilterFromNotify'
             );
             const dataNoti = control && control.ControlGroup ? control.ControlGroup[0]?.data : dataNoti;
+
             paramsFilter = {
                 ...paramsFilter,
                 NotificationIDs: dataFilter.isFilterFromNotify ? dataNoti.NotificationID : null,
                 NotificationID: dataFilter.isFilterFromNotify ? dataNoti.NotificationID : null,
                 tokenEncodedParam: dataFilter.isFilterFromNotify ? dataNoti.tokenEncodedParam : null
             };
-            if (dataFilter.isFilterFromNotify) {
-                _textFilterNotification = translate('HRM_PortalApp_Filter_From_notification');
-            } else {
-                _textFilterNotification = '';
-            }
         }
 
         //dùng trong trường hợp khi có controll chọn từ ngày đến ngày
@@ -499,7 +440,7 @@ export default class VnrFilterCommon extends Component {
 
         // Lấy số filter áp dụng
         numberCountFilter = this.getNumberCountFilterAdvance(paramsFilter);
-        this.objParamAdvance = paramsFilter;
+
         //lặp các điều kiện lọc
         filterAdvance.forEach((item) => {
             let label = item.Label && item.Label !== '' ? translate(item.Label) : '',
@@ -540,14 +481,14 @@ export default class VnrFilterCommon extends Component {
         this.spreadTextFilterParams = arrDisplayTextCommon.length > 0 ? arrDisplayTextCommon.join(' ') : '';
 
         //gọi hàm gán state cho FilterCommon và giá trị mới cho FilterAdvance
-        this.spreadParamsFilter(filterAdvance, numberCountFilter, _textFilterNotification);
+        this.spreadParamsFilter(filterAdvance, numberCountFilter);
         //#endregion
         //về lại danh sách
         //const { screenName } = this.props;
         //DrawerServices.navigate(screenName);
     };
 
-    spreadParamsFilter = (newFilterAdvanceState, numberCountFilter, _textFilterNotification) => {
+    spreadParamsFilter = (newFilterAdvanceState, numberCountFilter) => {
         const { filterCommon, spreadTextFilterCommon } = this.state;
         let _textCommon = this.textFilterCommon;
 
@@ -558,7 +499,6 @@ export default class VnrFilterCommon extends Component {
             nextSpreadTextFilterParams += ' ' + this.spreadTextFilterParams;
         }
         this.setState({
-            textFilterNotification: _textFilterNotification,
             activeFilterAdvance: this.spreadTextFilterParams != '' && !filterCommon?.IsShowFilterCommon ? true : false,
             spreadTextFilterCommon: !filterCommon?.IsShowFilterCommon
                 ? nextSpreadTextFilterParams
@@ -652,7 +592,6 @@ export default class VnrFilterCommon extends Component {
                 {
                     filterAdvance: newFilterAdvanceState,
                     spreadTextFilterCommon: '',
-                    textFilterNotification: '',
                     refreshTextCommon: !this.state.refreshTextCommon,
                     numberCountFilter: 0
                 },
@@ -681,7 +620,6 @@ export default class VnrFilterCommon extends Component {
 
             this.setState({
                 spreadTextFilterCommon: '',
-                textFilterNotification: '',
                 filterAdvance: newFilterAdvanceState,
                 refreshTextCommon: !this.state.refreshTextCommon,
                 dataFilter: null,
@@ -776,7 +714,7 @@ export default class VnrFilterCommon extends Component {
                         key={control.fieldName}
                         {...controlVnrMonthYear}
                         lable={Label}
-                        value={this.state[control.fieldName]?.value}
+                        value={this.state[control.fieldName].value}
                         stylePicker={index == 1 ? stylesVnrFilter.controlDate_To : stylesVnrFilter.controlDate_from}
                         onFinish={() => { }}
                         refresh={this.state.refresh}
@@ -862,7 +800,7 @@ export default class VnrFilterCommon extends Component {
                     <VnrTreeView
                         {...control}
                         lable={Label}
-                        value={this.state[control.fieldName]?.value}
+                        value={this.state[control.fieldName].value}
                         onSelect={() => {
                             // const fieldControl = this.state[control.fieldName];
                             // fieldControl.value = listItem
@@ -974,8 +912,7 @@ export default class VnrFilterCommon extends Component {
                 spreadTextFilterCommon,
                 refreshTextCommon,
                 activeFilterAdvance,
-                numberCountFilter,
-                textFilterNotification
+                numberCountFilter
             } = this.state,
             { style } = this.props,
             { styBoxFilter, contentFilter, filter, search, viewFilter } = style ? style : styleContentFilter;
@@ -986,22 +923,14 @@ export default class VnrFilterCommon extends Component {
         //         : 0;
 
         if (filterCommon && filterCommon.IsShowFilterCommon == true) {
-            let isFilterCommonInput = false;
-            if (
-                filterCommon.fieldName &&
-                filterCommon.IsShowFilterCommon &&
-                !activeFilterAdvance &&
-                !textFilterNotification
-            ) {
-                isFilterCommonInput = true;
-            }
-
+            const isFilterCommonInput =
+                filterCommon.fieldName && filterCommon.IsShowFilterCommon && !activeFilterAdvance;
             const viewInput = (
                 <VnrTextInput
                     editable={isFilterCommonInput ? true : false}
                     refresh={refreshTextCommon}
                     style={[styleSheets.text, CustomStyleSheet.flex(1)]}
-                    value={textFilterNotification ? textFilterNotification : spreadTextFilterCommon}
+                    value={spreadTextFilterCommon}
                     onClearText={() => {
                         this.onClearText();
                     }}

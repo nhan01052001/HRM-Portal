@@ -13,6 +13,7 @@ import VnrText from '../../../../../components/VnrText/VnrText';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import VnrDate from '../../../../../componentsV3/VnrDate/VnrDate';
 import VnrTextInput from '../../../../../componentsV3/VnrTextInput/VnrTextInput';
+import VnrAttachFile from '../../../../../componentsV3/VnrAttachFile/VnrAttachFile';
 import HttpService from '../../../../../utils/HttpService';
 import { EnumName } from '../../../../../assets/constant';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
@@ -64,7 +65,7 @@ const initSateDefault = {
     },
     WorkDate: {
         value: null,
-        lable: 'HRM_PortalApp_AttLeaveFund_OvertimeDate',
+        lable: 'HRM_PortalApp_TSLRegister_WorkDate',
         disable: false,
         refresh: false,
         visible: true,
@@ -84,7 +85,7 @@ const initSateDefault = {
         value: null,
         data: [],
         visible: false,
-        visibleConfig: false
+        visibleConfig: true
     },
     TempShiftID: {
         disable: false,
@@ -100,7 +101,7 @@ const initSateDefault = {
         refresh: false,
         value: null,
         data: [],
-        visible: false,
+        visible: true,
         visibleConfig: true
     },
     IsOverTimeBreak: {
@@ -125,7 +126,7 @@ const initSateDefault = {
         value: null,
         refresh: false,
         disable: false,
-        visible: false,
+        visible: true,
         visibleConfig: true
     },
     TimeTo: {
@@ -133,7 +134,7 @@ const initSateDefault = {
         value: null,
         refresh: false,
         disable: false,
-        visible: false,
+        visible: true,
         visibleConfig: true
     },
     RegisterHours: {
@@ -141,7 +142,7 @@ const initSateDefault = {
         data: null,
         refresh: false,
         value: null,
-        visible: false,
+        visible: true,
         visibleConfig: true
     },
     RegisterHoursConfig: {
@@ -262,7 +263,7 @@ const initSateDefault = {
         refresh: false,
         disable: false,
         value: false,
-        visible: false,
+        visible: true,
         visibleConfig: true
     },
     HoursOverTime: null,
@@ -382,46 +383,7 @@ const initSateDefault = {
     },
 
     // task 0166648: [TB W47][APP] [Hotfix HRM.8.11.27] Thêm tính năng đăng ký tăng ca theo khung giờ cấu hình
-    isRegisterOvertimeByTimeConfig: false,
-
-    Emp: {
-        lable: 'HRM_PortalApp_Employee',
-        disable: false,
-        refresh: false,
-        value: null,
-        visible: false,
-        visibleConfig: true,
-        data: []
-    },
-    OvertimeHour: {
-        lable: 'HRM_PortalApp_OvertimeHour',
-        value: null,
-        refresh: false,
-        disable: false,
-        visible: true,
-        visibleConfig: true
-    },
-    WorkPlace: {
-        lable: 'HRM_PortalApp_TSLRegister_PlaceID',
-        visible: true,
-        visibleConfig: true,
-        disable: false,
-        value: '',
-        refresh: false
-    },
-
-    WorkPlan: {
-        lable: 'HRM_PortalApp_OT_WorkPlan',
-        visible: true,
-        visibleConfig: true,
-        disable: false,
-        value: '',
-        refresh: false
-    },
-
-    InfoHour: {
-        visible: false
-    }
+    isRegisterOvertimeByTimeConfig: false
 };
 
 class AttSubmitWorkingOvertimeComponent extends Component {
@@ -479,7 +441,8 @@ class AttSubmitWorkingOvertimeComponent extends Component {
 
     //change ngày công
     onChangeWorkDate = (item) => {
-        const { WorkDate } = this.state;
+        const { WorkDate } = this.state,
+            { isSimilarRegistration, indexDay } = this.props;
         let nextState = {
             WorkDate: {
                 ...WorkDate,
@@ -489,7 +452,13 @@ class AttSubmitWorkingOvertimeComponent extends Component {
         };
 
         this.setState(nextState, () => {
-            return this.checkExistsShift(item);
+            if (isSimilarRegistration) {
+                this.props.onSubmitDateRegister(item, this.isStatusVnrDateFromTo);
+                // trường hợp đăng ký tương tự và thay đổi ngày công nhưng không refresh lại được data.
+                return this.checkExistsShift(item);
+            } else {
+                this.props.onUpdateDateRegister(item, indexDay);
+            }
         });
     };
 
@@ -590,7 +559,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                 ShiftID: {
                     ...ShiftID,
                     disable: true,
-                    refresh: !ShiftID.refresh,
+                    refresh: false,
                     visible: true,
                     value: record.ShiftID
                         ? {
@@ -630,10 +599,14 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                 },
                 TransferDepartment: {
                     ...TransferDepartment,
-                    value: record.OrgStructureTransID ? [{
-                        id: record.OrgStructureTransID,
-                        Name: record.OrgStructureTransName
-                    }] : null,
+                    value: record.OrgStructureTransID
+                        ? [
+                            {
+                                id: record.OrgStructureTransID,
+                                Name: record.OrgStructureTransName
+                            }
+                        ]
+                        : null,
                     refresh: !TransferDepartment.refresh
                 },
                 IsOverTimeBreak: {
@@ -647,22 +620,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     refresh: !IsNotCheckInOut.refresh
                 }
             };
-
-            // 	0186001: [TB W42][hot fix LTP_v8.12.30.01.08] Tách từ task 185934 Task APP
-            if (record?.MaxEndHourOT)
-                this.maxTimeRegister = {
-                    ...this.maxTimeRegister,
-                    maxEndOT: new Date(
-                        `${moment(record.WorkDate).format('YYYY-MM-DD')} ${record?.MaxEndHourOT}`)
-                };
-
-            if (record?.MinStartHourOT)
-                this.maxTimeRegister = {
-                    ...this.maxTimeRegister,
-                    minStartOT: new Date(
-                        `${moment(record.WorkDate).format('YYYY-MM-DD')} ${record?.MinStartHourOT}`)
-                };
-
 
             // nhan.nguyen: task: 	0166648: [APP] [Hotfix HRM.8.11.27] Thêm tính năng đăng ký tăng ca theo khung giờ cấu hình
             if (typeof record?.ListRegisterHours === 'string' && record?.ListRegisterHours.length > 0) {
@@ -845,7 +802,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                 }
                             };
                         }
-
                     }
                 })
                 .catch(() => {
@@ -884,16 +840,20 @@ class AttSubmitWorkingOvertimeComponent extends Component {
             this.setState(
                 {
                     ...initSateDefault,
-                    isShowBtnOtherInformation: false,
+                    isShowBtnOtherInformation: isShowBtnOtherInformation,
                     Profiles: {
                         ...Profiles,
                         ..._profile
+                    },
+                    WorkDate: {
+                        ...WorkDate,
+                        value: value ? value : null,
+                        refresh: !WorkDate.refresh
                     },
                     isRefreshState: !isRefreshState
                 },
                 () => {
                     this.checkExistsShift(value);
-                    this.getProfileDetailForAttendance();
                 }
             );
         }
@@ -955,32 +915,17 @@ class AttSubmitWorkingOvertimeComponent extends Component {
 
     //#region [chọn Giờ bắt đầu tăng ca - TimeFrom, TimeTo]
     onTimeChangeWorkDateIn = (time) => {
-        const { TimeFrom, TimeTo, isRegisterOvertimeByTimeConfig, RegisterByHours, DurationType, RegisterHours } = this.state;
+        const { TimeFrom, TimeTo, isRegisterOvertimeByTimeConfig, RegisterByHours, DurationType } = this.state;
 
         // 	0186001: [TB W42][hot fix LTP_v8.12.30.01.08] Tách từ task 185934 Task APP
         let tempTime = time;
-        if (DurationType.value?.ID === 'E_OT_LATE'
-            && (!!this.maxTimeRegister.minStartOT)
-            && (moment(time, 'HH:mm').isBefore(moment(this.maxTimeRegister.minStartOT, 'HH:mm')))) {
+        if (
+            DurationType.value?.ID === 'E_OT_LATE' &&
+            !!this.maxTimeRegister.minStartOT &&
+            moment(time, 'HH:mm').isBefore(moment(this.maxTimeRegister.minStartOT, 'HH:mm'))
+        ) {
             tempTime = TimeFrom.value ?? this.maxTimeRegister.minStartOT;
-            this.props.ToasterSevice().showWarning(`${translate(TimeFrom.lable)} ${translate('HRM_PortalApp_CannotEarlierThan')} ${moment(this.maxTimeRegister.minStartOT).format('HH:mm')}`, 3000);
         }
-
-        if (DurationType.value?.ID === 'E_OT_EARLY'
-            && (!!this.maxTimeRegister.maxEndOT)
-            && RegisterByHours.value
-            && moment(time, 'HH:mm').add(RegisterHours.value, 'hours').isAfter(moment(this.maxTimeRegister.maxEndOT, 'HH:mm'))) {
-            this.props.ToasterSevice().showWarning(`${translate('HRM_PortalApp_EndTime')} ${translate('HRM_PortalApp_MusNotLaterThan')} ${moment(this.maxTimeRegister.maxEndOT).format('HH:mm')}`, 3000);
-            this.setState({
-                TimeFrom: {
-                    ...TimeFrom,
-                    refresh: !TimeFrom.refresh
-                }
-            });
-
-            return;
-        }
-
 
         this.setState(
             {
@@ -1009,11 +954,12 @@ class AttSubmitWorkingOvertimeComponent extends Component {
 
         // 	0186001: [TB W42][hot fix LTP_v8.12.30.01.08] Tách từ task 185934 Task APP
         let tempTime = time;
-        if (DurationType.value?.ID === 'E_OT_EARLY'
-            && (!!this.maxTimeRegister.maxEndOT)
-            && moment(time, 'HH:mm').isAfter(moment(this.maxTimeRegister.maxEndOT, 'HH:mm'))) {
+        if (
+            DurationType.value?.ID === 'E_OT_EARLY' &&
+            !!this.maxTimeRegister.maxEndOT &&
+            moment(time, 'HH:mm').isAfter(moment(this.maxTimeRegister.maxEndOT, 'HH:mm'))
+        ) {
             tempTime = TimeTo.value ?? this.maxTimeRegister.maxEndOT;
-            this.props.ToasterSevice().showWarning(`${translate('HRM_PortalApp_EndTime')} ${translate('HRM_PortalApp_MusNotLaterThan')} ${moment(this.maxTimeRegister.maxEndOT).format('HH:mm')}`, 3000);
         }
 
         this.setState(
@@ -1043,6 +989,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
         const {
             RegisterHours,
             IsOverTimeBreak,
+            IsNotCheckInOut,
             DurationType,
             ShiftID,
             TempShiftID,
@@ -1051,13 +998,13 @@ class AttSubmitWorkingOvertimeComponent extends Component {
             Profiles,
             WorkDate,
             workDateAllowe,
-            IsIncludeBenefitsHours,
-            IsNotCheckInOut
+            IsIncludeBenefitsHours
         } = this.state;
         let shiftID = TempShiftID.value ? TempShiftID.value.ID : ShiftID.value ? ShiftID.value.ID : null,
             timeStart = TimeFrom.value ? moment(TimeFrom.value).format('HH:mm') : null,
             timeEnd = TimeTo.value ? moment(TimeTo.value).format('HH:mm') : null,
             durationType = DurationType.value ? DurationType.value.ID : null;
+
         HttpService.Post('[URI_CENTER]/api/Att_GetData/UpdateRegisterHours', {
             timeStart: timeStart,
             timeEnd: timeEnd,
@@ -1097,8 +1044,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                     WorkDate.value.length === 1
                                     ? true
                                     : false,
-                            PregnancyHours:
-                                data.Data?.PregnancyHours ? data.Data?.PregnancyHours.toString() : null,
+                            PregnancyHours: data.Data?.PregnancyHours ? data.Data?.PregnancyHours.toString() : null,
                             PregnanyType: data.Data?.PregnanyType ? data.Data?.PregnanyType : null,
                             BenefitsMessage: data.Data?.BenefitsMessage ? data.Data?.BenefitsMessage : null,
                             refresh: !IsIncludeBenefitsHours.refresh
@@ -1162,7 +1108,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
             ShiftID: shiftID,
             DurationType2: durationType,
             WorkDateRoot: workdateRoot,
-            // IsOverTimeBreak: false,
+            IsOverTimeBreak: IsOverTimeBreak.value,
             IsChangeByTimeOut: isChangeByTimeOut,
             IsChangeByRegisterHours: true,
             ProfileID: Profiles.ID,
@@ -1173,12 +1119,13 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                 let [timeStart, timeEnd] = [null, null];
 
                 if (data?.Data?.StartEndTime.includes('|')) [timeStart, timeEnd] = data?.Data?.StartEndTime.split('|');
-                else if (DurationType.value?.ID === 'E_OT_EARLY'
-                    && (!!this.maxTimeRegister.maxEndOT) && !RegisterByHours.value) {
+                else if (
+                    DurationType.value?.ID === 'E_OT_EARLY' &&
+                    !!this.maxTimeRegister.maxEndOT
+                ) {
                     timeStart = data?.Data?.StartEndTime;
                     timeEnd = moment(this.maxTimeRegister.maxEndOT).format('HH:mm');
-                } else
-                    timeEnd = data?.Data?.StartEndTime;
+                } else timeEnd = data?.Data?.StartEndTime;
 
                 let nextState = {};
 
@@ -1216,8 +1163,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                     WorkDate.value.length === 1
                                     ? true
                                     : false,
-                            PregnancyHours:
-                                data.Data?.PregnancyHours ? data.Data?.PregnancyHours.toString() : null,
+                            PregnancyHours: data.Data?.PregnancyHours ? data.Data?.PregnancyHours.toString() : null,
                             PregnanyType: data.Data?.PregnanyType ? data.Data?.PregnanyType : null,
                             BenefitsMessage: data.Data?.BenefitsMessage ? data.Data?.BenefitsMessage : null,
                             refresh: !IsIncludeBenefitsHours.refresh
@@ -1331,7 +1277,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     this.props.ToasterSevice().showWarning(translate('HRM_Message_GetDataServices_Error'), 3000);
                 });
 
-
             this.showLoading(false);
             if (isSimilarRegistration === false && indexAllowe.length > 0) {
                 indexAllowe.map((day) => {
@@ -1366,8 +1311,8 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                 if (valueShiftID) {
                     let isNotCheckInOut = valueShiftID.find((item) => item?.IsNotCheckInOut),
                         nextState = {},
-                        isDayNotShift = Array.isArray(valueShiftID) && valueShiftID.length > 0 && valueShiftID[0]?.IsDayNotShift,
-                        valueShift = valueShiftID.length == 1 ? valueShiftID[0] : null;
+                        isDayNotShift =
+                            Array.isArray(valueShiftID) && valueShiftID.length > 0 && valueShiftID[0]?.IsDayNotShift;
 
                     if (isNotCheckInOut)
                         nextState = {
@@ -1380,20 +1325,25 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                             }
                         };
 
+                    if (this.props?.fieldConfig?.ShiftID && isDayNotShift) {
+                        this.props.fieldConfig.ShiftID.isValid = true;
+                    } else {
+                        this.props.fieldConfig.ShiftID.isValid = false;
+                    }
+
                     this.setState({
                         ...nextState,
                         ShiftID: {
                             ...ShiftID,
-                            disable: isDayNotShift == false, // ngày có ca disable = true, ngày không ca mới cho chọn
-                            refresh: !ShiftID.refresh,
+                            disable: valueShiftID.length === 1,
+                            refresh: false,
                             visible: true,
-                            value: valueShift,
+                            value: !isDayNotShift ? valueShiftID[0] : null,
                             data: valueShiftID
                         },
                         IsOverTimeBreak: {
                             ...IsOverTimeBreak,
-                            visible: !isDayNotShift
-                                ? false : true,
+                            visible: !isDayNotShift ? false : true,
                             refresh: !IsOverTimeBreak.refresh
                         }
                     });
@@ -1470,7 +1420,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                         resDurationOverTime.Data &&
                         Array.isArray(resDurationOverTime.Data)
                     ) {
-
                         if (resDurationOverTime.Data.length > 0) {
                             if (resDurationOverTime.Data.length === 1) {
                                 valueDurationDefault = resDurationOverTime.Data[0];
@@ -1537,7 +1486,8 @@ class AttSubmitWorkingOvertimeComponent extends Component {
 
     // get hour start hour end
     getRegistHourOrEndHourOT = (isSwitchRegisterByHours = false) => {
-        const { ShiftID, DurationType, TimeFrom, TimeTo, workDateAllowe, RegisterHours, RegisterByHours, Profiles } = this.state;
+        const { ShiftID, DurationType, TimeFrom, TimeTo, workDateAllowe, RegisterHours, RegisterByHours, Profiles } =
+            this.state;
         if (
             (ShiftID.value && ShiftID.value?.ID && DurationType.value && DurationType.value?.ID) ||
             RegisterHours.value
@@ -1565,7 +1515,6 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     ProfileID: Profiles.ID
                 };
             }
-
 
             HttpService.Post('[URI_CENTER]/api/Att_GetData/GetRegistHourOrEndHourOT', {
                 ...dataBody,
@@ -1600,20 +1549,14 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                             };
 
                             // 	0186001: [TB W42][hot fix LTP_v8.12.30.01.08] Tách từ task 185934 Task APP
-                            if (res.Data?.MaxEndHourOT)
-                                this.maxTimeRegister = {
-                                    ...this.maxTimeRegister,
-                                    maxEndOT: new Date(
-                                        `${moment(workDateAllowe[0]).format('MM/DD/YYYY')} ${res.Data?.MaxEndHourOT}`)
-                                };
-
-                            if (res.Data?.MinStartHourOT)
-                                this.maxTimeRegister = {
-                                    ...this.maxTimeRegister,
-                                    minStartOT: new Date(
-                                        `${moment(workDateAllowe[0]).format('MM/DD/YYYY')} ${res.Data?.MinStartHourOT}`)
-                                };
-
+                            this.maxTimeRegister = {
+                                maxEndOT: new Date(
+                                    `${moment(workDateAllowe[0]).format('MM/DD/YYYY')} ${res.Data.EndHourOT}`
+                                ),
+                                minStartOT: new Date(
+                                    `${moment(workDateAllowe[0]).format('MM/DD/YYYY')} ${res.Data.StartHourOT}`
+                                )
+                            };
                         }
 
                         // nhan.nguyen: task: 	0166648: [APP] [Hotfix HRM.8.11.27] Thêm tính năng đăng ký tăng ca theo khung giờ cấu hình
@@ -1726,6 +1669,9 @@ class AttSubmitWorkingOvertimeComponent extends Component {
             (fieldConfig?.MethodPayment?.visibleConfig &&
                 fieldConfig?.MethodPayment?.isValid &&
                 !MethodPayment.value) ||
+            (fieldConfig?.ShiftID?.visibleConfig &&
+                fieldConfig?.ShiftID?.isValid &&
+                !ShiftID.value) ||
             (fieldConfig?.TransferDepartment?.visibleConfig &&
                 fieldConfig?.TransferDepartment?.isValid &&
                 !TransferDepartment.value) ||
@@ -1936,31 +1882,16 @@ class AttSubmitWorkingOvertimeComponent extends Component {
         }
     };
 
-    getProfileDetailForAttendance = () => {
-        HttpService.Post('[URI_CENTER]/api/Att_GetData/GetProfileDetailForAttendance', {
-            'page': 1,
-            'pageSize': 100
-        }).then((res) => {
-            if (res?.Status === EnumName.E_SUCCESS) {
-                this.setState({
-                    Emp: {
-                        ...this.state.Emp,
-                        lable: 'HRM_PortalApp_Employee',
-                        data: res?.Data?.Data?.length > 0 ? res?.Data?.Data : [],
-                        refresh: !this.state.Emp.refresh
-                    }
-                });
-            }
-        });
-    }
-
     render() {
         const {
                 isShowDelete,
                 fieldConfig,
+                isSimilarRegistration,
+                value,
                 onDeleteItemDay,
                 indexDay,
-                onScrollToInputIOS
+                onScrollToInputIOS,
+                onGetHighSupervisorFromOrgStructureTransID
             } = this.props,
             {
                 WorkDate,
@@ -1970,6 +1901,9 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                 TimeTo,
                 RegisterHours,
                 RegisterByHours,
+                MethodPayment,
+                ReasonOT,
+                FileAttachment,
                 OvertimeReasonID,
                 isError,
                 IsRequestEntryExitGate,
@@ -1986,14 +1920,25 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                 IsIncludeBenefitsHours,
                 TransferDepartment,
                 IsOverTimeBreak,
-                IsNotCheckInOut,
-                Emp,
-                OvertimeHour,
-                WorkPlace,
-                WorkPlan,
-                InfoHour
+                IsNotCheckInOut
             } = this.state,
             { viewInputMultiline } = stylesVnrPickerV3;
+        let dataObject = {};
+        if (this.isStatusVnrDateFromTo === true) {
+            if (WorkDate.value && Array.isArray(WorkDate.value) && WorkDate.value.length > 0) {
+                if (WorkDate.value.length === 1) {
+                    dataObject = {
+                        startDate: WorkDate.value[0],
+                        endDate: WorkDate.value[0]
+                    };
+                } else {
+                    dataObject = {
+                        startDate: WorkDate.value[0],
+                        endDate: WorkDate.value[WorkDate.value.length - 1]
+                    };
+                }
+            }
+        }
 
         return (
             <View
@@ -2003,60 +1948,41 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     this.layoutHeightItem = layout.height;
                 }}
             >
+                {/* Thời gian */}
                 {/* Title group for time */}
-                <View style={[styles.flRowSpaceBetween, CustomStyleSheet.justifyContent('flex-end')]}>
+                <View style={[styles.flRowSpaceBetween, {}]}>
+                    <VnrText style={[styleSheets.lable, styles.styLableGp]} i18nKey={'HRM_PortalApp_LableTime'} />
+
                     {isShowDelete && (
                         <TouchableOpacity onPress={() => onDeleteItemDay(indexDay)}>
                             <VnrText
-                                style={[styleSheets.lable, styles.styLableDeleteGp, CustomStyleSheet.fontSize(16)]}
+                                style={[styleSheets.lable, styles.styLableDeleteGp]}
                                 i18nKey={'HRM_PortalApp_Delete'}
                             />
                         </TouchableOpacity>
                     )}
                 </View>
 
-                {(Emp.visible && Emp.visibleConfig || 1 === 1) && (
-                    <VnrPickerQuickly
-                        isNewUIValue={true}
-                        dataLocal={Emp.data}
-                        fieldValid={true}
-                        isCheckEmpty={fieldConfig?.Emp?.isValid && isError && !Emp.value ? true : false}
-                        refresh={Emp.refresh}
-                        textField="JoinProfileNameCode"
-                        valueField="ID"
-                        filter={true}
-                        autoFilter={true}
-                        filterLocal={true}
-                        value={Emp.value}
-                        disable={Emp.disable}
-                        lable={Emp.lable}
-                        onFinish={(item) => {
-                            this.setState(
-                                {
-                                    Emp: {
-                                        ...Emp,
-                                        value: item ? { ...item } : null,
-                                        refresh: !Emp.refresh
-                                    }
-                                });
-                        }}
-                    />
-                )}
-
-                {/* Ngày tăng ca */}
+                {/* Ngày đăng ký */}
                 {WorkDate.visible && fieldConfig?.WorkDate?.visibleConfig && (
                     <VnrDateFromTo
-                        isNewUIValue={true}
-                        isHiddenIcon={true}
                         fieldValid={fieldConfig?.WorkDate?.isValid}
                         isCheckEmpty={fieldConfig?.WorkDate?.isValid && !WorkDate.value ? true : false}
                         key={WorkDate.id}
                         lable={WorkDate.lable}
                         refresh={WorkDate.refresh}
-                        value={WorkDate.value ?? {}}
-                        displayOptions={false}
+                        value={
+                            isSimilarRegistration === false
+                                ? value
+                                : !Array.isArray(WorkDate.value) && WorkDate.value === null
+                                    ? {}
+                                    : this.isStatusVnrDateFromTo === true
+                                        ? dataObject
+                                        : WorkDate.value
+                        }
+                        displayOptions={true}
                         onlyChooseEveryDay={false}
-                        onlyChooseOneDay={true}
+                        onlyChooseOneDay={!isSimilarRegistration}
                         disable={WorkDate.disable}
                         isControll={true}
                         onFinish={(value) => {
@@ -2065,109 +1991,14 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     />
                 )}
 
-                {OvertimeHour.visible && fieldConfig?.OvertimeHour?.visibleConfig && (
-                    <VnrDate
-                        isNewUIValue={true}
-                        isHiddenIcon={true}
-                        fieldValid={fieldConfig?.OvertimeHour?.isValid}
-                        refresh={OvertimeHour.refresh}
-                        response={'string'}
-                        format={'HH:mm'}
-                        type={'time'}
-                        value={OvertimeHour.value}
-                        lable={OvertimeHour.lable}
-                        placeHolder={'SELECT_ITEM'}
-                        disable={OvertimeHour.disable}
-                        stylePicker={[styles.resetBorder, CustomStyleSheet.borderBottomWidth(1)]}
-                        onFinish={(item) => {
-                            this.onTimeChangeWorkDateIn(item);
-                        }}
-                    />
-                )}
-
-                {/* Nơi làm việc */}
-                {WorkPlace.visible && fieldConfig?.WorkPlace.visibleConfig && (
-                    <VnrTextInput
-                        fieldValid={fieldConfig?.WorkPlace?.isValid}
-                        isCheckEmpty={
-                            fieldConfig?.WorkPlace?.isValid && isError && WorkPlace.value.length === 0 ? true : false
-                        }
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={WorkPlace.disable}
-                        lable={WorkPlace.lable}
-                        style={[
-                            styleSheets.text,
-                            stylesVnrPickerV3.viewInputMultiline,
-                            CustomStyleSheet.paddingHorizontal(Size.defineSpace),
-                            CustomStyleSheet.maxHeight(200)
-                        ]}
-                        styleLabel={[
-                            CustomStyleSheet.paddingHorizontal(Size.defineSpace)
-                        ]}
-                        styleContent={[
-                            CustomStyleSheet.paddingHorizontal(0),
-                            CustomStyleSheet.flex(0)
-                        ]}
-                        multiline={true}
-                        value={WorkPlace.value}
-                        maxLength={500}
-                        onChangeText={(text) => {
-                            this.setState({
-                                WorkPlace: {
-                                    ...WorkPlace,
-                                    value: text,
-                                    refresh: !WorkPlace.refresh
-                                }
-                            });
-                        }}
-                        refresh={WorkPlace.refresh}
-                    />
-                )}
-
-                {/* Kế hoạch công việc */}
-                {WorkPlan.visible && fieldConfig?.WorkPlan.visibleConfig && (
-                    <VnrTextInput
-                        fieldValid={fieldConfig?.WorkPlan?.isValid}
-                        isCheckEmpty={
-                            fieldConfig?.WorkPlan?.isValid && isError && WorkPlan.value.length === 0 ? true : false
-                        }
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={WorkPlan.disable}
-                        lable={WorkPlan.lable}
-                        style={[
-                            styleSheets.text,
-                            stylesVnrPickerV3.viewInputMultiline,
-                            CustomStyleSheet.paddingHorizontal(Size.defineSpace),
-                            CustomStyleSheet.maxHeight(200)
-                        ]}
-                        styleLabel={[
-                            CustomStyleSheet.paddingHorizontal(Size.defineSpace)
-                        ]}
-                        styleContent={[
-                            CustomStyleSheet.paddingHorizontal(0),
-                            CustomStyleSheet.flex(0)
-                        ]}
-                        multiline={true}
-                        value={WorkPlan.value}
-                        maxLength={500}
-                        onChangeText={(text) => {
-                            this.setState({
-                                WorkPlan: {
-                                    ...WorkPlan,
-                                    value: text,
-                                    refresh: !WorkPlan.refresh
-                                }
-                            });
-                        }}
-                        refresh={WorkPlan.refresh}
-                    />
-                )}
-
                 {/* ca - ShiftID */}
                 {ShiftID.visible && ShiftID.visibleConfig && (
                     <VnrPickerQuickly
                         dataLocal={ShiftID.data}
-                        isCheckEmpty={false}
+                        fieldValid={fieldConfig?.ShiftID?.isValid}
+                        isCheckEmpty={
+                            fieldConfig?.ShiftID?.isValid && isError && !ShiftID.value ? true : false
+                        }
                         refresh={ShiftID.refresh}
                         textField="ShiftName"
                         valueField="ID"
@@ -2257,7 +2088,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                     if (value) {
                                         this.getRegistHourOrEndHourOT(true);
                                     } else {
-                                        this.UpdateEndOT(true, true);
+                                        this.UpdateEndOT();
                                     }
                                 }
                             )
@@ -2292,23 +2123,8 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                         placeholder={' '}
                                         onFinish={(value) => {
                                             if (value) {
-                                                // 	0186001: [TB W42][hot fix LTP_v8.12.30.01.08] Tách từ task 185934 Task APP
-                                                let nextState = {};
-                                                if (this.maxTimeRegister?.maxEndOT && DurationType.value?.ID === 'E_OT_EARLY') {
-                                                    let timeStart = moment(this.maxTimeRegister?.maxEndOT, 'HH:mm').subtract(value?.Value, 'hours');
-                                                    nextState = {
-                                                        ...nextState,
-                                                        TimeFrom: {
-                                                            ...TimeFrom,
-                                                            value: timeStart,
-                                                            refresh: !TimeFrom.refresh
-                                                        }
-                                                    };
-                                                }
-
                                                 this.setState(
                                                     {
-                                                        ...nextState,
                                                         RegisterHours: {
                                                             ...RegisterHours,
                                                             value: value?.Value,
@@ -2363,23 +2179,8 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                                             if (value === RegisterHours.value)
                                                 return;
 
-                                            let nextState = {};
-
-                                            if (this.maxTimeRegister?.maxEndOT && DurationType.value?.ID === 'E_OT_EARLY') {
-                                                let timeStart = moment(this.maxTimeRegister?.maxEndOT, 'HH:mm').subtract(value, 'hours');
-                                                nextState = {
-                                                    ...nextState,
-                                                    TimeFrom: {
-                                                        ...TimeFrom,
-                                                        value: timeStart,
-                                                        refresh: !TimeFrom.refresh
-                                                    }
-                                                };
-                                            }
-
                                             this.setState(
                                                 {
-                                                    ...nextState,
                                                     RegisterHours: {
                                                         ...RegisterHours,
                                                         value: value,
@@ -2439,7 +2240,7 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                         </View>
                     )}
                 </View>
-                {TimeFrom.value && (RegisterHours.value || TimeTo.value) && InfoHour.visible ? (
+                {TimeFrom.value && (RegisterHours.value || TimeTo.value) ? (
                     <View style={styles.caculatorHour}>
                         <Text
                             style={[
@@ -2519,11 +2320,9 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                         </Text>
                     </View>
                 )}
-                {
-                    fieldConfig?.Explanation?.visibleConfig && <View style={styles.flRowSpaceBetween}>
-                        <VnrText style={[styleSheets.lable, styles.styLableGp]} i18nKey={'HRM_PortalApp_Explanation'} />
-                    </View>
-                }
+                <View style={styles.flRowSpaceBetween}>
+                    <VnrText style={[styleSheets.lable, styles.styLableGp]} i18nKey={'HRM_PortalApp_Explanation'} />
+                </View>
                 {/* Loại tăng ca */}
                 {OvertimeTypeID.visible && fieldConfig?.OvertimeTypeID?.visibleConfig && (
                     <VnrPickerLittle
@@ -2564,49 +2363,103 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                     />
                 )}
 
-                {(IsOverTimeBreak.visible && fieldConfig?.IsOverTimeBreak?.visibleConfig) && (
-                    <View style={[CustomStyleSheet.borderBottomColor(Colors.gray_5), CustomStyleSheet.borderBottomWidth(0.5)]}>
+                {IsOverTimeBreak.visible && fieldConfig?.IsOverTimeBreak?.visibleConfig && (
+                    <View
+                        style={[
+                            CustomStyleSheet.borderBottomColor(Colors.gray_5),
+                            CustomStyleSheet.borderBottomWidth(0.5)
+                        ]}
+                    >
                         <VnrSwitch
                             lable={IsOverTimeBreak.lable}
                             isDisable={IsOverTimeBreak.disable}
                             value={IsOverTimeBreak.value}
-                            onFinish={(value) => this.setState({
-                                IsOverTimeBreak: {
-                                    ...IsOverTimeBreak,
-                                    value: value,
-                                    refresh: !IsOverTimeBreak.refresh
-                                }
-                            }, () => {
-                                if (RegisterByHours.value) {
-                                    this.UpdateEndOT();
-                                } else {
-                                    this.UpdateRegisterHours();
-                                }
-                            })}
+                            onFinish={(value) =>
+                                this.setState(
+                                    {
+                                        IsOverTimeBreak: {
+                                            ...IsOverTimeBreak,
+                                            value: value,
+                                            refresh: !IsOverTimeBreak.refresh
+                                        }
+                                    },
+                                    () => {
+                                        if (RegisterByHours.value) {
+                                            this.UpdateEndOT();
+                                        } else {
+                                            this.UpdateRegisterHours();
+                                        }
+                                    }
+                                )
+                            }
                         />
                     </View>
                 )}
 
                 {/* không kiểm tra in/out */}
                 {IsNotCheckInOut.visible && fieldConfig?.IsNotCheckInOut?.visibleConfig && (
-                    <View style={[CustomStyleSheet.borderBottomColor(Colors.gray_5), CustomStyleSheet.borderBottomWidth(0.5)]}>
+                    <View
+                        style={[
+                            CustomStyleSheet.borderBottomColor(Colors.gray_5),
+                            CustomStyleSheet.borderBottomWidth(0.5)
+                        ]}
+                    >
                         <VnrSwitch
                             lable={IsNotCheckInOut.lable}
                             isDisable={IsNotCheckInOut.disable}
                             value={IsNotCheckInOut.value}
-                            onFinish={(value) => this.setState({
-                                IsNotCheckInOut: {
-                                    ...IsNotCheckInOut,
-                                    value: value,
-                                    refresh: !IsNotCheckInOut.refresh
-                                }
-                            })}
+                            onFinish={(value) =>
+                                this.setState({
+                                    IsNotCheckInOut: {
+                                        ...IsNotCheckInOut,
+                                        value: value,
+                                        refresh: !IsNotCheckInOut.refresh
+                                    }
+                                })
+                            }
                         />
                     </View>
                 )}
 
+                {/* Phương thức thanh toán */}
+                {MethodPayment.visible && fieldConfig?.MethodPayment.visibleConfig && (
+                    <VnrPickerLittle
+                        fieldValid={fieldConfig?.MethodPayment?.isValid}
+                        isCheckEmpty={
+                            fieldConfig?.MethodPayment?.isValid && isError && !MethodPayment.value ? true : false
+                        }
+                        refresh={MethodPayment.refresh}
+                        dataLocal={MethodPayment.data}
+                        // api={{
+                        //     urlApi:
+                        //         '[URI_CENTER]/api/Att_GetData/GetEnum',
+                        //     type: 'E_GET',
+                        // }}
+                        value={MethodPayment.value}
+                        textField="Text"
+                        valueField="Value"
+                        filter={true}
+                        filterServer={true}
+                        filterParams="text"
+                        params="MethodPayment"
+                        disable={MethodPayment.disable}
+                        lable={MethodPayment.lable}
+                        stylePicker={styles.resetBorder}
+                        isChooseQuickly={true}
+                        onFinish={(item) => {
+                            this.setState({
+                                MethodPayment: {
+                                    ...MethodPayment,
+                                    value: item ? { ...item } : null,
+                                    refresh: !MethodPayment.refresh
+                                }
+                            });
+                        }}
+                    />
+                )}
+
                 {/* Phong ban điều chuyển */}
-                {TransferDepartment.visible && fieldConfig?.TransferDepartment.visibleConfig &&
+                {TransferDepartment.visible && fieldConfig?.TransferDepartment.visibleConfig && (
                     <View>
                         <VnrTreeView
                             api={{
@@ -2631,17 +2484,23 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                             value={TransferDepartment.value}
                             lable={TransferDepartment.lable}
                             onSelect={(listItem) => {
-                                this.setState({
-                                    TransferDepartment: {
-                                        ...TransferDepartment,
-                                        value: listItem,
-                                        refresh: !TransferDepartment.refresh
+                                this.setState(
+                                    {
+                                        TransferDepartment: {
+                                            ...TransferDepartment,
+                                            value: listItem,
+                                            refresh: !TransferDepartment.refresh
+                                        }
+                                    },
+                                    () => {
+                                        if (typeof onGetHighSupervisorFromOrgStructureTransID === 'function')
+                                            onGetHighSupervisorFromOrgStructureTransID(listItem[0]?.id);
                                     }
-                                });
+                                );
                             }}
                         />
                     </View>
-                }
+                )}
 
                 {/* OPTION Lý do tăng ca */}
                 {/* default hide */}
@@ -2677,6 +2536,62 @@ class AttSubmitWorkingOvertimeComponent extends Component {
                             });
                         }}
                     />
+                )}
+
+                {/* Lý do tăng ca */}
+                {ReasonOT.visible && fieldConfig?.ReasonOT.visibleConfig && (
+                    <VnrTextInput
+                        fieldValid={fieldConfig?.ReasonOT?.isValid}
+                        isCheckEmpty={
+                            fieldConfig?.ReasonOT?.isValid && isError && ReasonOT.value.length === 0 ? true : false
+                        }
+                        placeHolder={'HRM_PortalApp_PleaseInput'}
+                        disable={ReasonOT.disable}
+                        lable={ReasonOT.lable}
+                        style={[styleSheets.text, viewInputMultiline, CustomStyleSheet.paddingHorizontal(0)]}
+                        multiline={true}
+                        value={ReasonOT.value}
+                        onChangeText={(text) => {
+                            this.setState({
+                                ReasonOT: {
+                                    ...ReasonOT,
+                                    value: text,
+                                    refresh: !ReasonOT.refresh
+                                }
+                            });
+                        }}
+                        onFocus={() => {
+                            Platform.OS == 'ios' && onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
+                        }}
+                        refresh={ReasonOT.refresh}
+                    />
+                )}
+
+                {/* Tập tin đính kèm */}
+                {FileAttachment.visible && fieldConfig?.FileAttachment.visibleConfig && (
+                    <View style={{}}>
+                        <VnrAttachFile
+                            fieldValid={fieldConfig?.FileAttachment?.isValid}
+                            isCheckEmpty={
+                                fieldConfig?.FileAttachment?.isValid && isError && !FileAttachment.value ? true : false
+                            }
+                            lable={FileAttachment.lable}
+                            disable={FileAttachment.disable}
+                            refresh={FileAttachment.refresh}
+                            value={FileAttachment.value}
+                            multiFile={true}
+                            uri={'[URI_CENTER]/api/Sys_Common/saveFileFromApp'}
+                            onFinish={(file) => {
+                                this.setState({
+                                    FileAttachment: {
+                                        ...FileAttachment,
+                                        value: file,
+                                        refresh: !FileAttachment.refresh
+                                    }
+                                });
+                            }}
+                        />
+                    </View>
                 )}
 
                 {isOtherInformation === false && isShowBtnOtherInformation && (

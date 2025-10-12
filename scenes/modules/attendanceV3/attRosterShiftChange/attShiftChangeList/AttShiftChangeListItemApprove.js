@@ -18,11 +18,11 @@ import { translate } from '../../../../../i18n/translate';
 import {
     IconInfo,
     IconCheck,
+    IconDate,
     IconChat
 } from '../../../../../constants/Icons';
 import Color from 'color';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
-import VnrFormatStringTypeItem from '../../../../../componentsV3/VnrFormatStringType/VnrFormatStringTypeItem';
 
 export default class AttShiftChangeListItemApprove extends React.Component {
     constructor(props) {
@@ -119,19 +119,13 @@ export default class AttShiftChangeListItemApprove extends React.Component {
             isOpenAction,
             isDisable,
             hiddenFiled,
-            handerOpenSwipeOut,
-            renderConfig
+            handerOpenSwipeOut
         } = this.props;
-
-        let _renderConfig = [];
 
         let colorStatusView = null,
             textIn4Register = null,
             textTypeOvertime_MethhoadPayment = <View />,
             bgStatusView = null;
-
-        if (renderConfig && renderConfig.length > 0)
-            _renderConfig = renderConfig.filter(config => config.TypeView !== 'E_STATUS');
 
         hiddenFiled &&
             typeof hiddenFiled == 'object' &&
@@ -153,12 +147,12 @@ export default class AttShiftChangeListItemApprove extends React.Component {
 
         let permissionRightAction =
             rowActions != null &&
-                Array.isArray(rowActions) &&
-                rowActions.length > 0 &&
-                !isOpenAction &&
-                this.rightListActions &&
-                Array.isArray(this.rightListActions) &&
-                this.rightListActions.length > 0
+            Array.isArray(rowActions) &&
+            rowActions.length > 0 &&
+            !isOpenAction &&
+            this.rightListActions &&
+            Array.isArray(this.rightListActions) &&
+            this.rightListActions.length > 0
                 ? true
                 : false;
 
@@ -166,13 +160,14 @@ export default class AttShiftChangeListItemApprove extends React.Component {
 
         if (dataItem?.DataTimeRegister?.RegisterHours || dataItem?.DataTimeRegister?.TimeOvertimeRegister) {
             textIn4Register =
-                `${dataItem?.DataTimeRegister?.RegisterHours
-                    ? dataItem?.DataTimeRegister?.RegisterHours + ' ' + translate('HRM_PortalApp_Hour_Lowercase')
-                    : null
+                `${
+                    dataItem?.DataTimeRegister?.RegisterHours
+                        ? dataItem?.DataTimeRegister?.RegisterHours + ' ' + translate('HRM_PortalApp_Hour_Lowercase')
+                        : null
                 }` +
                 ' ' +
                 `${dataItem?.DataTimeRegister?.TimeOvertimeRegister &&
-                '(' + dataItem?.DataTimeRegister?.TimeOvertimeRegister + ')'}`;
+                    '(' + dataItem?.DataTimeRegister?.TimeOvertimeRegister + ')'}`;
         }
 
         if (dataItem?.DataRegister?.OvertimeTypeName || dataItem?.MethodPaymentView) {
@@ -257,26 +252,30 @@ export default class AttShiftChangeListItemApprove extends React.Component {
                                     {/* top */}
                                     <View style={styles.styViewTop}>
                                         {/* Top - left */}
-                                        <View style={[styles.wh69]}>
-                                            {
-                                                dataItem?.ProfileInfo2?.ProfileName2 && (
-                                                    <View>
-                                                        {Vnr_Function.renderAvatarCricleByName(
-                                                            dataItem?.ProfileInfo2?.ImagePath2,
-                                                            dataItem?.ProfileInfo2?.ProfileName2,
-                                                            38
-                                                        )}
-                                                    </View>
-                                                )
-                                            }
+                                        <View style={styles.wh69}>
+                                            <Text
+                                                numberOfLines={1}
+                                                adjustsFontSizeToFit
+                                                allowFontScaling
+                                                style={[styleSheets.lable, styles.styleTextViewTop]}
+                                            >
+                                                {dataItem?.DataRegister?.WorkDateRoot + ' '}
+                                                <Text
+                                                    style={[
+                                                        styleSheets.lable,
+                                                        styles.styleTextNum,
+                                                        { backgroundColor: Colors.gray_5 }
+                                                    ]}
+                                                >
+                                                    {' ' + textIn4Register + ' '}
+                                                </Text>
+                                            </Text>
 
-                                            {
-                                                dataItem?.ProfileInfo2?.ProfileName2 && (
-                                                    <View style={[CustomStyleSheet.marginLeft(6), CustomStyleSheet.justifyContent('center')]}>
-                                                        <Text numberOfLines={2} style={[styleSheets.lable, CustomStyleSheet.fontSize(16)]}>{dataItem?.ProfileInfo2?.ProfileName2}</Text>
-                                                    </View>
-                                                )
-                                            }
+                                            <View style={CustomStyleSheet.flex(1)}>
+                                                <View style={styles.styleFlex1_row_AlignCenter}>
+                                                    {textTypeOvertime_MethhoadPayment}
+                                                </View>
+                                            </View>
                                         </View>
 
                                         {/* Top - right */}
@@ -305,16 +304,8 @@ export default class AttShiftChangeListItemApprove extends React.Component {
                                         </View>
                                     </View>
 
-                                    {(_renderConfig.length > 0) && (
-                                        _renderConfig.map((item, index) => {
-                                            return (
-                                                <View style={[CustomStyleSheet.paddingRight(16)]} key={index}>
-                                                    <VnrFormatStringTypeItem key={index} data={dataItem} col={item} allConfig={_renderConfig} />
-                                                </View>
-                                            );
-                                        })
-                                    )}
-                                    {dataItem.Comment != null && (
+                                    {/* cennter */}
+                                    {dataItem.DataNote != null && (
                                         <View style={styles.wrapContentCenter}>
                                             <View style={styles.styIconMess}>
                                                 <IconChat size={Size.text + 1} color={Colors.gray_8} />
@@ -324,11 +315,61 @@ export default class AttShiftChangeListItemApprove extends React.Component {
                                                     numberOfLines={2}
                                                     style={[styleSheets.text, styles.viewReason_text]}
                                                 >
-                                                    {dataItem.Comment ? `${dataItem.Comment}` : ''}
+                                                    {dataItem.DataNote ? `${dataItem.DataNote}` : ''}
                                                 </Text>
                                             </View>
                                         </View>
                                     )}
+
+                                    {dataItem?.AccumulateHour !== null &&
+                                        dataItem?.AccumulateHour !== undefined &&
+                                        (dataItem?.AccumulateHour?.UdLimitColorDate ||
+                                            dataItem?.AccumulateHour?.UdLimitColorMonth ||
+                                            dataItem?.AccumulateHour?.UdLimitColorYear) && (
+                                            <View
+                                                style={styles.AccumulateHour}
+                                            >
+                                                <Text
+                                                    numberOfLines={2}
+                                                    style={[styleSheets.lable, { fontSize: Size.text - 1 }]}
+                                                >
+                                                    <Text style={{ color: Colors.red }}>
+                                                        {translate('HRM_PortalApp_AccumulatedOT')}{' '}
+                                                    </Text>
+                                                    (<Text>{translate('HRM_PortalApp_AccumulatedOvertime')}:</Text>
+                                                    <Text
+                                                        style={[
+                                                            dataItem?.AccumulateHour?.UdLimitColorDate ||
+                                                                (dataItem?.UdLimitColorDay && { color: Colors.red })
+                                                        ]}
+                                                    >
+                                                        {' '}
+                                                        {dataItem?.AccumulateHour?.UdHourByDate}
+                                                    </Text>{' '}
+                                                    |
+                                                    <Text
+                                                        style={[
+                                                            (dataItem?.AccumulateHour?.UdLimitColorMonth ||
+                                                                dataItem?.UdLimitColorMonth) && { color: Colors.red }
+                                                        ]}
+                                                    >
+                                                        {' '}
+                                                        {dataItem?.AccumulateHour?.UdHourByMonth}
+                                                    </Text>{' '}
+                                                    |
+                                                    <Text
+                                                        style={[
+                                                            (dataItem?.AccumulateHour?.UdLimitColorYear ||
+                                                                dataItem?.UdLimitColorYear) && { color: Colors.red }
+                                                        ]}
+                                                    >
+                                                        {' '}
+                                                        {dataItem?.AccumulateHour?.UdHourByYear}{' '}
+                                                    </Text>
+                                                    <Text>{translate('HRM_PortalApp_Hour_Lowercase')}</Text>)
+                                                </Text>
+                                            </View>
+                                        )}
                                 </View>
                                 <View style={styles.viewStatusBottom}>
                                     <View style={[styles.leftContent, isDisable ? styleSheets.opacity05 : styleSheets.opacity1]}>
@@ -343,6 +384,18 @@ export default class AttShiftChangeListItemApprove extends React.Component {
                                             {`${dataItem.ProfileName ? dataItem.ProfileName : ''} `}
                                         </Text>
                                     </View>
+
+                                    {dataItem?.DateCreate && (
+                                        <View style={styles.styViewDate}>
+                                            <Text style={[styleSheets.text, styles.dateTimeSubmit_Text]}>{'|  '}</Text>
+
+                                            <IconDate size={Size.text - 1} color={Colors.gray_7} />
+
+                                            <Text style={[styleSheets.text, styles.dateTimeSubmit_Text]}>
+                                                {moment(dataItem.DateCreate).format('DD/MM/YYYY')}
+                                            </Text>
+                                        </View>
+                                    )}
                                 </View>
                                 {dataItem.WarningViolation && (
                                     <View style={styles.viewLimitTitle}>
@@ -368,6 +421,11 @@ const PADDING_DEFINE = Size.defineSpace;
 const styles = StyleSheet.create({
     styUserApprove: {
         flexShrink: 1
+    },
+    styViewDate: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 2
     },
     swipeable: {
         flex: 1
@@ -403,6 +461,10 @@ const styles = StyleSheet.create({
         color: Colors.red,
         marginLeft: 5
     },
+    viewReason_text: {
+        fontSize: Size.textSmall,
+        color: Colors.gray_9
+    },
     lineSatus_text: {
         fontSize: Size.text - 3,
         fontWeight: '500'
@@ -416,6 +478,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    dateTimeSubmit_Text: {
+        fontSize: Size.text - 2,
+        color: Colors.gray_8,
+        marginLeft: 3
+    },
     contentMain: {
         flex: 1,
         paddingTop: Size.defineSpace
@@ -428,6 +495,20 @@ const styles = StyleSheet.create({
     },
     leftContent: {
         marginRight: 5
+    },
+    styleFlex1_row_AlignCenter: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingRight: 6
+    },
+    styleTextViewTop: {
+        // fontWeight: fw,
+        color: Colors.gray_10,
+        fontSize: Size.text + 1
+    },
+    styleTextNum: {
+        fontSize: Size.text - 1
     },
     styleTextType: {
         fontWeight: Platform.OS == 'android' ? '600' : '500',
@@ -464,24 +545,6 @@ const styles = StyleSheet.create({
         paddingRight: 12
     },
 
-    textProfileName: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: Colors.blue
-    },
-    wh100: {
-        width: '100%',
-        maxWidth: '100%'
-    },
-
-    wh69: {
-        width: '69%',
-        maxWidth: '69%',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start'
-    },
-
     wrapContentCenter: {
         flex: 1,
         flexDirection: 'row',
@@ -497,8 +560,21 @@ const styles = StyleSheet.create({
         paddingLeft: 6,
         marginTop: 2
     },
-    viewReason_text: {
-        fontSize: Size.textSmall,
-        color: Colors.gray_9
+
+    textProfileName: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: Colors.blue
+    },
+    wh100: {
+        width: '100%',
+        maxWidth: '100%'
+    },
+
+    wh69: { width: '69%', maxWidth: '69%' },
+    AccumulateHour: {
+        width: '100%',
+        paddingRight: 12,
+        marginVertical: 4
     }
 });

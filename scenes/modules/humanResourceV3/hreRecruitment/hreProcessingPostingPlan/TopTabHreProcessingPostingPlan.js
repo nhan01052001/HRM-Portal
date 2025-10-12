@@ -15,11 +15,11 @@ const navigationOptionsCogfig = (navigation, Title_Key) => {
 
 const data = [
     {
-        title: 'HRM_PortalApp_WaitingApproval', //HRM_PortalApp_TopTab_ProcessingPostingPlan_Wait
+        title: 'HRM_PortalApp_HreRecruitmentProposal_ProcessingWaitingApproved', //HRM_PortalApp_TopTab_ProcessingPostingPlan_Wait
         screenName: ScreenName.HreWaitProcessingPostingPlan
     },
     {
-        title: 'HRM_PortalApp_HreProcessingPostingPlan_Approved', //HRM_PortalApp_TopTab_ProcessingPostingPlan_Done
+        title: 'HRM_PortalApp_HreRecruitmentProposal_ProcessedApproved', //HRM_PortalApp_TopTab_ProcessingPostingPlan_Done
         screenName: ScreenName.HreDoneProcessingPostingPlan
     }
 ];

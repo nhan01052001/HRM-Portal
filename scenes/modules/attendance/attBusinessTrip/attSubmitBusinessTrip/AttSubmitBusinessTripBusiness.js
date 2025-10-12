@@ -25,7 +25,7 @@ export const generateRowActionAndSelected = () => {
     const permission = PermissionForAppMobile.value;
 
     if (ConfigList.value != null && ConfigList.value != undefined) {
-
+        debugger;
         const _configList = ConfigList.value[attSubmitBusinessTrip],
             businessAction = _configList[enumName.E_BusinessAction],
             {
@@ -39,13 +39,13 @@ export const generateRowActionAndSelected = () => {
                 E_BUSINESSTRIPVIEWCOST,
                 E_BUSINESSTRIPADDCOST
             } = enumName;
-
+        debugger;
         const actionEdit = businessAction ? businessAction.find(action => action.Type === E_MODIFY) : null,
             actionEditResource = actionEdit ? actionEdit[E_ResourceName][E_Name] : null,
             actionEditRule = actionEdit ? actionEdit[E_ResourceName][E_Rule] : null, // 'Modify'
             actionEditPer =
                 actionEditResource && actionEditRule ? permission[actionEditResource][actionEditRule] : null;
-
+        debugger;
         if (actionEditPer) {
             _rowActions = [
                 ..._rowActions,
@@ -58,7 +58,7 @@ export const generateRowActionAndSelected = () => {
                 }
             ];
         }
-
+        debugger;
         //action send mail
         const actionSendMail = businessAction ? businessAction.find(action => action.Type === E_SENDMAIL) : null,
             actionSendMailResource = actionSendMail ? actionSendMail[E_ResourceName][E_Name] : null,
@@ -218,7 +218,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
     },
     //#region [action delete]
     businessDeleteRecords: (items, dataBody) => {
-
+        debugger;
         if (items.length === 0 && !dataBody) {
             ToasterSevice.showWarning('HRM_Common_Select', 4000);
         } else {
@@ -280,7 +280,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
                     }
                 });
             } else {
-
+                debugger;
                 VnrLoadingSevices.show();
                 HttpService.Post('[URI_HR]/Att_GetData/BusinessAllowActionDelete', {
                     selectedID,
@@ -318,7 +318,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
     },
 
     confirmDelete: objValid => {
-
+        debugger;
         const { E_DELETE, E_isInputText, E_isValidInputText, E_string, E_Confirm } = enumName;
 
         let actionCancel = _rowActions.find(item => item.Type === E_DELETE),
@@ -338,7 +338,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
                 isInputText: isInputText,
                 onCancel: () => {},
                 onConfirm: reason => {
-
+                    debugger;
                     if (isValidInputText && (!reason || reason === '')) {
                         let mesNotEmpty = placeholder + translate('FieldNotAllowNull');
                         ToasterSevice.showWarning(mesNotEmpty, 4000, null, false);
@@ -362,11 +362,11 @@ export const AttSubmitBusinessTripBusinessFunction = {
             reason = objValid.reason;
 
         // api xóa đi cogn tac
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedLeaveDay', {
+        HttpService.Post('[URI_POR]/Att_Leaveday/RemoveSelected', {
             selectedIds,
             reason
         }).then(res => {
-
+            debugger;
             VnrLoadingSevices.hide();
             try {
                 if (res && res !== '') {
@@ -390,7 +390,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
 
     //#region [action send mail]
     businessSendMailRecords: (items, dataBody) => {
-
+        debugger;
         if (items.length === 0 && !dataBody) {
             ToasterSevice.showWarning('HRM_Common_Select', 4000);
         } else {
@@ -400,7 +400,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
 
             //view detail hoặc chọn 1 dòng từ lưới
             if (selectedID.length === 1) {
-
+                debugger;
                 VnrLoadingSevices.show();
                 HttpService.Post('[URI_HR]/Att_GetData/GetBusinessTripById', {
                     id: selectedID[0],
@@ -446,7 +446,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
                     }
                 });
             } else {
-
+                debugger;
                 VnrLoadingSevices.show();
                 HttpService.Post('[URI_HR]/Att_GetData/BusinessAllowActionSendEmail', {
                     selectedID,
@@ -496,7 +496,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
                 message: message,
                 onCancel: () => {},
                 onConfirm: reason => {
-
+                    debugger;
                     if (isValidInputText && (!reason || reason === '')) {
                         let mesNotEmpty = placeholder + translate('FieldNotAllowNull');
                         ToasterSevice.showWarning(mesNotEmpty, 4000, null, false);
@@ -528,7 +528,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
                 }
             });
         } else {
-
+            debugger;
             const { apiConfig } = dataVnrStorage,
                 _uriPor = apiConfig ? apiConfig.uriPor : null;
 
@@ -558,7 +558,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
 
     //#region [action cancel]
     businessCancelRecords: (items, dataBody, isShowMultiRecord) => {
-
+        debugger;
         if (items.length === 0 && !dataBody) {
             ToasterSevice.showWarning('HRM_Common_Select', 4000);
         } else {
@@ -701,7 +701,7 @@ export const AttSubmitBusinessTripBusinessFunction = {
 
         const { apiConfig } = dataVnrStorage,
             _uriPor = apiConfig ? apiConfig.uriPor : null;
-
+        debugger;
         VnrLoadingSevices.show();
         HttpService.Post('[URI_HR]/Att_GetData/ChangeStatusCancelLeavedayBusiness', {
             selectedIds,

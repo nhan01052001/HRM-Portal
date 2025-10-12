@@ -1,5 +1,4 @@
 // customer date
-import BlockLoginIden from '../../scenes/auth/BlockLoginIden.js';
 import CustomerDate from '../../scenes/customer/CustomerDate';
 import Feedback from '../../scenes/modules/feedback/Feedback.js';
 import TakePictureFace from '../../scenes/faceAuthentication/TakePictureFace.js';
@@ -605,13 +604,6 @@ import AttSubmitTakeBusinessTripViewDetail from '../../scenes/modules/attendance
 import AttApproveTakeBusinessTripViewDetail from '../../scenes/modules/attendanceV3/attTakeBusinessTrip/attApproveTakeBusinessTrip/AttApproveTakeBusinessTripViewDetail';
 //#endregion
 
-//#region [module/attendanceV3/attBackWorkBeforeMaternity
-import TopTabAttSubmitBackWorkBeforeMaternity from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/TopTabAttSubmitBackWorkBeforeMaternity.js';
-import TopTabAttApproveBackWorkBeforeMaternity from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/TopTabAttApproveBackWorkBeforeMaternity.js';
-import AttSubmitBackWorkBeforeMaternityViewDetail from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/attSubmitBackWorkBeforeMaternity/AttSubmitBackWorkBeforeMaternityViewDetail';
-import AttApproveBackWorkBeforeMaternityViewDetail from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/attApproveBackWorkBeforeMaternity/AttApproveBackWorkBeforeMaternityViewDetail';
-//#endregion
-
 // V3
 // #region [module/attendanceV3/attWokringOvertime
 // import AttSubmitWorkingOvertime from '../../scenes/modules/attendanceV3/attWorkingOvertime/attSubmitWorkingOvertime/AttSubmitWorkingOvertime';
@@ -675,8 +667,6 @@ import RenderTopTab from './RenderTopTab.js';
 //#region [attV3/attLeaveFundManagement]
 import AttLeaveFundManagement from '../../scenes/modules/attendanceV3/attLeaveFundManagement/AttLeaveFundManagement.js';
 import AttLeaveFundManagementViewDetail from '../../scenes/modules/attendanceV3/attLeaveFundManagement/attLeaveFundManagementList/AttLeaveFundManagementViewDetail.js';
-import AttLeaveFundCompensatoryViewDetail from '../../scenes/modules/attendanceV3/attLeaveFundManagement/attLeaveFundManagementList/AttLeaveFundCompensatoryViewDetail.js';
-import AttLeaveFundSeniorBonusViewDetail from '../../scenes/modules/attendanceV3/attLeaveFundManagement/attLeaveFundManagementList/AttLeaveFundSeniorBonusViewDetail.js';
 //#endregion
 
 //#region [module/profileInfo/profileAddition]
@@ -769,8 +759,6 @@ import HreProfileBadge from '../../scenes/modules/humanResource/hreProfileBadge/
 //region [module/attendanceV3/attRosterShiftChange]
 import TopTabAttSubmitShiftChange from '../../scenes/modules/attendanceV3/attRosterShiftChange/TopTabAttSubmitShiftChange.js';
 import AttSubmitShiftChangeViewDetail from '../../scenes/modules/attendanceV3/attRosterShiftChange/attSubmitShiftChange/AttSubmitShiftChangeViewDetail.js';
-import TopTabAttApproveShiftChange from '../../scenes/modules/attendanceV3/attRosterShiftChange/TopTabAttApproveShiftChange.js';
-import AttApproveShiftChangeViewDetail from '../../scenes/modules/attendanceV3/attRosterShiftChange/attApproveShiftChange/AttApproveShiftChangeViewDetail.js';
 //#endregion
 
 //region [module/attendanceV3/attTakeDailyTask]
@@ -815,14 +803,9 @@ import TopTabAttLeaveDayReplacement from '../../scenes/modules/attendanceV3/attL
 import AttLeaveDayReplacementViewDetail from '../../scenes/modules/attendanceV3/attLeaveDayReplacement/AttLeaveDayReplacementViewDetail.js';
 //#endregion
 
-// #region [module/attv3/attConfirmShiftChange]
-import TopTabAttConfirmShiftChange from '../../scenes/modules/attendanceV3/attConfirmShiftChange/TopTabAttConfirmShiftChange.js';
-import AttConfirmShiftChangeViewDetail from '../../scenes/modules/attendanceV3/attConfirmShiftChange/AttConfirmShiftChangeViewDetail.js';
-//#endregion
-
 // #region [module/humanResourceV3/hreReceiveJob
 import TopTabHreReceiveJob from '../../scenes/modules/humanResourceV3/hreRecruitment/hreReceiveJob/TopTabHreReceiveJob.js';
-import HreInterviewResult from '../../scenes/modules/humanResourceV3/hreRecruitment/hreReceiveJob/HreInterviewResult.js';
+
 //#endregion
 
 //region [module/humanResourceV3/hreRecruitmentProposalProcessing]
@@ -835,29 +818,10 @@ import TopTabHreProcessingPostingPlan from '../../scenes/modules/humanResourceV3
 import HreProcessingPostingPlanViewDetail from '../../scenes/modules/humanResourceV3/hreRecruitment/hreProcessingPostingPlan/HreProcessingPostingPlanViewDetail.js';
 //#endregion
 
-//region [module/humanResourceV3/hreProcessingJobPosting]
-import TopTabHreProcessingJobPosting from '../../scenes/modules/humanResourceV3/hreRecruitment/hreProcessingJobPosting/TopTabHreProcessingJobPosting.js';
-import HreProcessingJobPostingViewDetail from '../../scenes/modules/humanResourceV3/hreRecruitment/hreProcessingJobPosting/HreProcessingJobPostingViewDetail.js';
-import HrePostChanelViewDetail from '../../scenes/modules/humanResourceV3/hreRecruitment/hreProcessingJobPosting/HrePostChanelViewDetail.js';
-import HrePostPreviewViewDetail from '../../scenes/modules/humanResourceV3/hreRecruitment/hreProcessingJobPosting/HrePostPreviewViewDetail.js';
-//#endregion
-
 import Loan from '../../scenes/modules/generalInfo/profileInfo/loan/Loan.js';
-import TopTabHreJobPosting from '../../scenes/modules/humanResourceV3/hreRecruitment/hreJobPosting/TopTabHreJobPosting.js';
-import SalFeeCheck from '../../scenes/modules/salary/salPaymentCostRegister/salFeeCheck/SalFeeCheck.js';
-import SalApprovedPaymentCostRegister from '../../scenes/modules/salary/salPaymentCostRegister/salApprovePaymentCostRegister/salApprovedPaymentCostRegister/SalApprovedPaymentCostRegister.js';
-import SalWaitApprovePaymentCostRegister from '../../scenes/modules/salary/salPaymentCostRegister/salApprovePaymentCostRegister/salWaitApprovePaymentCostRegister/SalWaitApprovePaymentCostRegister.js';
-import SalApprovePaymentCostRegisterViewDetail from '../../scenes/modules/salary/salPaymentCostRegister/salApprovePaymentCostRegister/SalApprovePaymentCostRegisterViewDetail.js';
 
-// uỷ quyền duyệt
-import TopTabAttSubmitDelegationApproval from '../../scenes/modules/attendanceV3/attDelegationApproval/TopTabAttSubmitDelegationApproval.js';
-import TopTabAttConfirmDelegationApproval from '../../scenes/modules/attendanceV3/attDelegationApproval/TopTabAttConfirmDelegationApproval.js';
-import AttConfirmDelegationApprovalViewDetail from '../../scenes/modules/attendanceV3/attDelegationApproval/attConfirmDelegationApproval/AttConfirmDelegationApprovalViewDetail.js';
-import AttSubmitDelegationApprovalViewDetail from '../../scenes/modules/attendanceV3/attDelegationApproval/attSubmitDelegationApproval/AttSubmitDelegationApprovalViewDetail.js';
-
-//region [module/others/RecruitmentReport]
-import RecruitmentReport from '../../scenes/modules/other/recruitmentReport/RecruitmentReport.js';
-//#endregion
+import AttNumberOfMeals from '../../scenes/modules/attendanceV3/attNumberOfMeals/AttNumberOfMeals.js';
+import AttNumberOfMealsHistory from '../../scenes/modules/attendanceV3/attNumberOfMeals/AttNumberOfMealsHistory.js';
 
 const TopTabProfileInfoUpdate = createMaterialTopTabNavigator(
     {
@@ -1051,11 +1015,11 @@ const navigationOptionsProfileUpdate = (navigation, Title_Key) => {
                                 const updateIndex = currentScreen.indexOf('Update');
                                 const tobTabInfoScreen = currentScreen.substring(0, updateIndex);
                                 DrawerServices.navigate(tobTabInfoScreen);
-                            };
+                            }
 
                             //kiểm tra có thông tin thay đổi ở 3 tab
                             if (!dataBasic && !dataContact && !dataPersonal) {
-                                handleGoBack();
+                                handleGoBack()
                             } else {
                                 AlertSevice.alert({
                                     iconType: EnumIcon.E_CONFIRM,
@@ -1088,7 +1052,7 @@ const navigationOptionsProfileUpdate = (navigation, Title_Key) => {
                                             navContactInfoUpdate.state.params.undoUpdate();
                                         }
 
-                                        handleGoBack();
+                                        handleGoBack()
                                     },
                                     onConfirm: () => {
                                         let arrRequest = [];
@@ -1135,7 +1099,7 @@ const navigationOptionsProfileUpdate = (navigation, Title_Key) => {
                                                         );
 
                                                         //back về
-                                                        handleGoBack();
+                                                        handleGoBack()
                                                         // DrawerServices.navigate('ProfileInfo');
 
                                                         //reload lại ProfileInfo
@@ -2358,39 +2322,6 @@ const navigationOptionsQuicklyEvaluateCreate = (navigation, Title_Key) => {
     };
 };
 
-//#region [Duyệt thanh toán chi phí]
-const TopTabSalApprovePaymentCostRegister = createMaterialTopTabNavigator(
-    {
-        SalWaitApprovePaymentCostRegister: {
-            screen: SalWaitApprovePaymentCostRegister,
-            navigationOptions: () => FunctionCommon.navigationOptionsTopTab('HRM_PortalApp_WaitingApproved')
-        },
-        SalApprovedPaymentCostRegister: {
-            screen: SalApprovedPaymentCostRegister,
-            navigationOptions: () => FunctionCommon.navigationOptionsTopTab('HRM_Portal_Leaveday_IsApproved')
-        }
-    },
-    {
-        tabBarOptions: {
-            style: {
-                backgroundColor: Colors.white,
-                borderTopColor: Colors.white,
-                borderTopWidth: 0
-            },
-            activeTintColor: Colors.primary,
-            inactiveTintColor: Colors.gray_10,
-            labelStyle: styleSheets.lable,
-            indicatorStyle: {
-                borderBottomColor: Colors.primary,
-                borderBottomWidth: 2.5
-            },
-            upperCaseLabel: false
-        },
-        lazy: true
-    }
-);
-//#endregion
-
 //#region [tạo tab danh sách quản lý công việc Theo mẫu]
 const TopTabHreTaskCreateConfirm = createMaterialTopTabNavigator(
     {
@@ -2429,10 +2360,6 @@ let objStack = {
         screen: HomeScene,
         //path: '../../scenes/home/Home',
         navigationOptions: ({ navigation }) => FunctionCommon.navigationOptionsConfigHeaderNull(navigation, 'home')
-    },
-    BlockLoginIden: {
-        screen: BlockLoginIden,
-        navigationOptions: ({ navigation }) => FunctionCommon.navigationOptionsConfigHeaderNull(navigation, 'BlockLoginIden')
     },
     // ScanFaceViewDetail : {
     //     screen: ScanFaceViewDetail,
@@ -2498,29 +2425,6 @@ let objStack = {
     },
     //#endregion
 
-    //#region [module/attendanceV3/attBackWorkBeforeMaternity
-    TopTabAttSubmitBackWorkBeforeMaternity: {
-        screen: TopTabAttSubmitBackWorkBeforeMaternity,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_BackWorkBeforeMaternity_Title')
-    },
-    TopTabAttApproveBackWorkBeforeMaternity: {
-        screen: TopTabAttApproveBackWorkBeforeMaternity,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_BackWorkBeforeMaternityApprove_Title')
-    },
-    AttSubmitBackWorkBeforeMaternityViewDetail: {
-        screen: AttSubmitBackWorkBeforeMaternityViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_BackWorkBeforeMaternity_TitleDetail')
-    },
-    AttApproveBackWorkBeforeMaternityViewDetail: {
-        screen: AttApproveBackWorkBeforeMaternityViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_BackWorkBeforeMaternity_TitleDetail')
-    },
-    //#endregion
-
     //#region [module/attendanceV3/attTSLRegisterV3
     TopTabAttSubmitTamScanLogRegister: {
         screen: TopTabAttSubmitTamScanLogRegister,
@@ -2547,7 +2451,7 @@ let objStack = {
     TopTabAttSubmitWorkingOvertime: {
         screen: TopTabAttSubmitWorkingOvertime,
         navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_Attendance_PlanOvertime', true)
+            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_Attendance_PlanOvertime')
     },
     TopTabAttApproveWorkingOvertime: {
         screen: TopTabAttApproveWorkingOvertime,
@@ -4382,22 +4286,6 @@ let objStack = {
         navigationOptions: ({ navigation }) =>
             FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_Common_ViewMore')
     },
-    SalFeeCheck: {
-        screen: SalFeeCheck,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_FeeCheck')
-    },
-    TopTabSalApprovePaymentCostRegister: {
-        screen: TopTabSalApprovePaymentCostRegister,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsTopTabCustomHeaderRight(navigation, 'HRM_PortalApp_ApprovalOfCostPayment')
-    },
-
-    SalApprovePaymentCostRegisterViewDetail: {
-        screen: SalApprovePaymentCostRegisterViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_CostPaymentDetails')
-    },
     //#endregion
 
     //#region [module/humanResource/HreApproveEvaluationDoc]
@@ -4727,16 +4615,6 @@ let objStack = {
         screen: AttLeaveFundManagementViewDetail,
         navigationOptions: ({ navigation }) =>
             FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_Common_ViewMore')
-    },
-    AttLeaveFundCompensatoryViewDetail: {
-        screen: AttLeaveFundCompensatoryViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_AttLeaveFund_CompensatoryDetail')
-    },
-    AttLeaveFundSeniorBonusViewDetail: {
-        screen: AttLeaveFundSeniorBonusViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_AttLeaveFund_SeniorBonusDetail')
     },
     //#endregion
 
@@ -5097,18 +4975,7 @@ let objStack = {
     AttSubmitShiftChangeViewDetail: {
         screen: AttSubmitShiftChangeViewDetail,
         navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_AttSubmitShiftChangeViewDetail')
-    },
-
-    TopTabAttApproveShiftChange: {
-        screen: TopTabAttApproveShiftChange,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_ApproveChangeShift')
-    },
-    AttApproveShiftChangeViewDetail: {
-        screen: AttApproveShiftChangeViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_DetailChangeShift')
+            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'AttSubmitShiftChangeViewDetail')
     },
     //#endregion
 
@@ -5222,17 +5089,6 @@ let objStack = {
         navigationOptions: ({ navigation }) =>
             FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_AttLeaveDayReplacement_ViewDetail')
     },
-    //region [module/attV3/AttConfirmShiftChange]
-    TopTabAttConfirmShiftChange: {
-        screen: TopTabAttConfirmShiftChange,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_AttConfirmShiftChange_Title')
-    },
-    AttConfirmShiftChangeViewDetail: {
-        screen: AttConfirmShiftChangeViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_AttSubmitShiftChangeViewDetail')
-    },
     //region [module/humanResourceV3/hreRecruitmentProposalProcessing]
     HreCandidateProfile: {
         screen: HreCandidateProfile,
@@ -5271,73 +5127,17 @@ let objStack = {
     },
     //#endregion
 
-    //region [module/humanResourceV3/hreProcessingJobPosting]
-    TopTabHreProcessingJobPosting: {
-        screen: TopTabHreProcessingJobPosting,
+    AttNumberOfMeals: {
+        screen: AttNumberOfMeals,
         navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_HreProcessingJobPosting')
+            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_MealVouchers')
     },
-    HreProcessingJobPostingViewDetail: {
-        screen: HreProcessingJobPostingViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_HreProcessingJobPosting_ViewDetail')
-    },
-    HrePostChanelViewDetail: {
-        screen: HrePostChanelViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, '')
-    },
-    HrePostPreviewViewDetail: {
-        screen: HrePostPreviewViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, '')
-    },
-    //#endregion
 
-    //region [module/humanResourceV3/hreJobPosting]
-    TopTabHreJobPosting: {
-        screen: TopTabHreJobPosting,
+    AttNumberOfMealsHistory: {
+        screen: AttNumberOfMealsHistory,
         navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_JobPosting_UC')
-    },
-    //#endregion
-
-    //region [module/humanResourceV3/Interview]
-    HreInterviewResult: {
-        screen: HreInterviewResult,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_InterviewResult')
-    },
-    //#endregion
-
-    //region [module/AttendanceV3/DelegationApproval]
-    TopTabAttSubmitDelegationApproval: {
-        screen: TopTabAttSubmitDelegationApproval,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_DelegationApproval')
-    },
-    TopTabAttConfirmDelegationApproval: {
-        screen: TopTabAttConfirmDelegationApproval,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_DelegationApprovalConfirmation_Title')
-    },
-    AttConfirmDelegationApprovalViewDetail: {
-        screen: AttConfirmDelegationApprovalViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_DelegationApprovalConfirmation_TitleDetail')
-    },
-    AttSubmitDelegationApprovalViewDetail: {
-        screen: AttSubmitDelegationApprovalViewDetail,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_ApprovalDelegationDetails')
-    },
-    //region [module/Others/RecruitmentReport]
-    RecruitmentReport: {
-        screen: RecruitmentReport,
-        navigationOptions: ({ navigation }) =>
-            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_RecruitmentReport_Title')
+            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_MealHistory')
     }
-    //#endregion
 };
 
 const NavigatorStack0 = createStackNavigator(objStack, {

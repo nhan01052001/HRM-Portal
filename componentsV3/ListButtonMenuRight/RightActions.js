@@ -17,11 +17,7 @@ import {
     IconComment,
     IconHeart,
     IconRequestCancel,
-    IconReturnUpBack,
-    IconCriclePlay,
-    IconTimerRecruitment,
-    IconPause,
-    IconCalendarEdit
+    IconReturnUpBack
 } from '../../constants/Icons';
 
 // giới hạn số lượng nút ở bên phải item
@@ -73,11 +69,7 @@ export default class RightActions extends Component {
                 E_APPROVE: [],
                 E_CONFIRM: [],
                 E_REJECT: [],
-                E_REQUEST_CHANGE: [],
-                E_REPOST: [],
-                E_POSTPONE: [],
-                E_EXPIRE: [],
-                E_STOP_POSTING: []
+                E_REQUEST_CHANGE: []
             },
             notInAction = [],
             { rowActions, dataItem } = nextProps ? nextProps : this.props;
@@ -152,9 +144,9 @@ export default class RightActions extends Component {
                                 iconName = <IconEdit size={Size.iconSize} color={Colors.white} />;
                                 break;
                             case 'E_REQUEST_CANCEL':
-                                buttonColor = Colors.yellow_6;
-                                textColor = Colors.black;
-                                iconName = <IconRequestCancel size={Size.iconSize} color={Colors.black} />;
+                                buttonColor = Colors.green;
+                                textColor = Colors.white;
+                                iconName = <IconRequestCancel size={Size.iconSize} color={Colors.white} />;
                                 break;
                             case 'E_REQUESTCANCEL':
                                 buttonColor = Colors.yellow_6;
@@ -194,26 +186,9 @@ export default class RightActions extends Component {
                                 iconName = <IconComment size={Size.iconSize} color={Colors.white} />;
                                 break;
                             case 'E_REQUEST_CHANGE':
-                                buttonColor = Colors.purple;
-                                iconName = <IconReturnUpBack size={Size.iconSize} color={Colors.white} />;
-                                break;
-                            case 'E_REPOST':
-                                buttonColor = Colors.success;
-                                iconName = <IconCriclePlay size={Size.iconSize} color={Colors.white} />;
-                                break;
-                            case 'E_POSTPONE':
-                                buttonColor = Colors.orange;
-                                iconName = <IconCalendarEdit size={Size.iconSize} color={Colors.white} />;
-                                break;
-                            case 'E_EXPIRE':
-                                buttonColor = Colors.purple;
-                                iconName = <IconTimerRecruitment size={Size.iconSize} color={Colors.white} />;
-                                break;
-                            case 'E_STOP_POSTING':
-                                buttonColor = Colors.volcano;
-                                iconName = <IconPause size={Size.iconSize} color={Colors.white} />;
-                                break;
-
+                                    buttonColor = Colors.purple;
+                                    iconName = <IconReturnUpBack size={Size.iconSize} color={Colors.white} />;
+                                    break;
                             default:
                                 buttonColor = Colors.info;
                                 iconName = <IconInfo size={Size.iconSize} color={Colors.white} />;

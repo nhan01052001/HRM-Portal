@@ -36,8 +36,7 @@ export default class HreInterviewList extends VnrRenderList {
                 dataItem: item,
                 screenName: detail.screenName,
                 listActions: rowActions,
-                reloadScreenList: reloadScreenList,
-                beforeScreen : detail.screenName
+                reloadScreenList: reloadScreenList
             });
         }
     };

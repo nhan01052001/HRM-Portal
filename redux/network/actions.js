@@ -1,14 +1,14 @@
 export const actions = {
     SET_IS_CONNECTED: '@NETWORK/SET_IS_CONNECTED',
     SET_INFO_NETWORK: '@SET_INFO_NETWORK',
-    setIsConnected: isConnected => {
+    setIsConnected: (isConnected) => {
         return {
             type: actions.SET_IS_CONNECTED,
             isConnected
         };
     },
     // data = { isConnected : bool , detailsNetwork }
-    setInfoNetwork: data => {
+    setInfoNetwork: (data) => {
         return {
             type: actions.SET_INFO_NETWORK,
             data

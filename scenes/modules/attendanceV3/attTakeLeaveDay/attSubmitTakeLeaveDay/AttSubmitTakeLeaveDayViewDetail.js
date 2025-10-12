@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, ScrollView, TouchableOpacity, Clipboard } from 'react-native';
-import { styleSheets, styleScreenDetail, styleSafeAreaView, CustomStyleSheet, Size, Colors } from '../../../../../constants/styleConfig';
+import { View, ScrollView } from 'react-native';
+import { styleSheets, styleScreenDetail, styleSafeAreaView } from '../../../../../constants/styleConfig';
 import { ConfigListDetail } from '../../../../../assets/configProject/ConfigListDetail';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { generateRowActionAndSelected, AttSubmitTakeLeaveDayBusinessFunction } from './AttSubmitTakeLeaveDayBusiness';
@@ -9,14 +9,11 @@ import EmptyData from '../../../../../components/EmptyData/EmptyData';
 import HttpService from '../../../../../utils/HttpService';
 import DrawerServices from '../../../../../utils/DrawerServices';
 import ListButtonMenuRight from '../../../../../components/ListButtonMenuRight/ListButtonMenuRight';
-import { EnumName, ScreenName } from '../../../../../assets/constant';
+import { EnumName } from '../../../../../assets/constant';
 import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import AttSubmitTakeLeaveDayAddOrEdit from './AttSubmitTakeLeaveDayAddOrEdit';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import SafeAreaViewDetail from '../../../../../components/safeAreaView/SafeAreaViewDetail';
-import { IconCopy } from '../../../../../constants/Icons';
-import { VnrLoadingSevices } from '../../../../../components/VnrLoading/VnrLoadingPages';
-import { ToasterSevice } from '../../../../../components/Toaster/Toaster';
 
 const configDefault = [
     {
@@ -130,12 +127,6 @@ const configDefault = [
         'DataType': 'FileAttach'
     },
     {
-        'TypeView': 'E_FILEATTACH',
-        'Name': 'lstDocumentToSubmit',
-        'DisplayKey': 'HRM_PortalApp_DocumentToSubmit',
-        'DataType': 'FileAttach'
-    },
-    {
         'TypeView': 'E_GROUP_APPROVE',
         'DisplayKey': 'HRM_HRE_Concurrent_ApproveHistory',
         'DataType': 'string'
@@ -147,51 +138,12 @@ export default class AttSubmitTakeLeaveDayViewDetail extends Component {
         this.state = {
             dataItem: null,
             configListDetail: null,
-            dataRowActionAndSelected: generateRowActionAndSelected(this.props.navigation.state.params?.screenName ?? ScreenName.AttSubmitTakeLeaveDay),
+            dataRowActionAndSelected: generateRowActionAndSelected(this.props.navigation.state.params?.screenName),
             listActions: this.resultListActionHeader()
         };
 
         this.AttSubmitTakeLeaveDayAddOrEdit = null;
-
-        props.navigation.setParams({
-            headerRight: (
-                <View style={CustomStyleSheet.marginRight(16)}>
-                    <TouchableOpacity
-                        onPress={this.copyLink}
-                    >
-                        <IconCopy size={Size.iconSize} color={Colors.black} />
-                    </TouchableOpacity>
-                </View>
-            )
-        });
     }
-
-    copyLink = async () => {
-        if (this.state?.dataItem?.ID) {
-            let link = `portal4hrm://main/AttSubmitTakeLeaveDayViewDetail?encoding=true&dataId=${Vnr_Services.encryptCode(this.state?.dataItem?.ID, [0, 1, 2, 3])}&screenName=${ScreenName.AttSubmitTakeLeaveDay}`;
-
-            if (this.state?.dataItem?.ProcessApproval?.length > 0) {
-                this.state?.dataItem?.ProcessApproval?.map((item) => {
-                    if (item?.StatusProcess === 'process' && item?.UserApproveID) {
-                        link += `&current=${Vnr_Services.encryptCode(item?.UserApproveID, [0, 1, 2, 3])}`;
-                    }
-                });
-            }
-
-            Clipboard.setString(link);
-            // verify
-            VnrLoadingSevices.show();
-            const copied = await Clipboard.getString();
-            VnrLoadingSevices.hide();
-            if (copied === link) {
-                ToasterSevice.showSuccess('HRM_PortalApp_CopySuccess');
-            } else {
-                ToasterSevice.showError('HRM_PortalApp_CopyFailed!');
-            }
-        } else {
-            ToasterSevice.showWarning('HRM_PortalApp_DataLoading');
-        }
-    };
 
     onEdit = (item) => {
         if (item) {
@@ -240,26 +192,20 @@ export default class AttSubmitTakeLeaveDayViewDetail extends Component {
                 const getDetailConfig = await Vnr_Function.HandleConfigListDetailATT(_configListDetail, 'Detail_List_LeaveDay');
                 if (response && response.Status == EnumName.E_SUCCESS) {
                     let data = response.Data;
-                    data = { ...dataItem, ...data, ...data.SingleWordDetail[0] };
+                    data = { ...data, ...data.SingleWordDetail[0] };
 
                     data.BusinessAllowAction = Vnr_Services.handleStatus(
                         data.Status,
-                        dataItem?.SendEmailStatus ? dataItem?.SendEmailStatus : false,
-                        dataItem?.TypeApprove
+                        dataItem?.SendEmailStatus ? dataItem?.SendEmailStatus : false
                     );
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachment);
-                    data.lstDocumentToSubmit = ManageFileSevice.setFileAttachApp(data.FileAttach);
                     data.ImagePath = data?.AvatarUserRegister
                         ? data.AvatarUserRegister
                         : dataItem?.ProfileInfo?.ImagePath;
 
                     const _listActions = await this.rowActionsHeaderRight(data);
-                    let configFinish = getDetailConfig;
-                    if (Array.isArray(configFinish) && configFinish.length > 0) {
-                        configFinish = configFinish.filter((item) => item !== null && item !== undefined);
-                    }
-                    this.setState({ configListDetail: configFinish, dataItem: data, listActions: _listActions });
+                    this.setState({ configListDetail: getDetailConfig, dataItem: data, listActions: _listActions });
                 } else {
                     this.setState({ dataItem: 'EmptyData' });
                 }

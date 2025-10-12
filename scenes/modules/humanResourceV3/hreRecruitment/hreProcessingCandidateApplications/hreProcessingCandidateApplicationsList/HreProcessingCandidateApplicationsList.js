@@ -267,8 +267,7 @@ export default class HreProcessingCandidateApplicationsList extends VnrRenderLis
                     dataItem: item,
                     screenName: detail.screenName,
                     listActions: _listActions,
-                    reloadScreenList: reloadScreenList,
-                    beforeScreen : detail.screenName
+                    reloadScreenList: reloadScreenList
                 }
             );
         }

@@ -26,7 +26,6 @@ class VnrRenderApproverAtt extends Component {
 
     render() {
         const { dataApprover, lable, isCollapse } = this.props;
-
         const { isShowMore } = this.state;
         let styTextLable = { ...styleSheets.text, ...{ textAlign: 'left' } };
         if (Array.isArray(dataApprover) && dataApprover.length > 0) {
@@ -58,9 +57,8 @@ class VnrRenderApproverAtt extends Component {
                     {isShowMore &&
                         (Array.isArray(dataApprover) && dataApprover.length > 0) &&
                         dataApprover.map((item, index) => {
-                            let isUserRequiredCancel = (item?.IsRequestCancel && !(dataApprover[index - 1]?.IsRequestCancel));
                             return (
-                                <View key={index} style={{ marginBottom: Size.defineSpace - 4 }}>
+                                <View key={index} style={{ marginBottom: Size.defineSpace - 4, paddingHorizontal: 16 }}>
                                     <View style={stylesScreenDetailV3.wrapLevelApproveAndDisplaykey}>
                                         <View
                                             style={[
@@ -69,14 +67,13 @@ class VnrRenderApproverAtt extends Component {
                                                     item?.StatusProcess === EnumName.E_process) && {
                                                     backgroundColor: Colors.green
                                                 },
-                                                item?.StatusProcess === EnumName.E_error && { backgroundColor: Colors.red },
-                                                (item?.IsRequestCancel && item?.StatusProcess === EnumName.E_success && isUserRequiredCancel) && CustomStyleSheet.backgroundColor('#fdf09b')
+                                                item?.StatusProcess === EnumName.E_error && { backgroundColor: Colors.red }
                                             ]}
                                         >
                                             {item?.StatusProcess === EnumName.E_error ? (
                                                 <IconCancel size={Size.iconSize - 10} color={Colors.white} />
                                             ) : item?.StatusProcess === EnumName.E_success ? (
-                                                <IconCheck size={Size.iconSize - 10} color={item?.IsRequestCancel ? Colors.black : Colors.white} />
+                                                <IconCheck size={Size.iconSize - 10} color={Colors.white} />
                                             ) : (
                                                 <Text
                                                     style={[
@@ -119,16 +116,16 @@ class VnrRenderApproverAtt extends Component {
                                                                 <View
                                                                     style={[
                                                                         stylesScreenDetailV3.wrapLevelApprove,
-                                                                        (ListItem?.StatusProcess === EnumName.E_success) && {
+                                                                        (ListItem?.StatusProcess === EnumName.E_success ) && {
                                                                             backgroundColor: Colors.green
                                                                         },
-                                                                        ListItem?.StatusProcess === EnumName.E_error && {
+                                                                    ListItem?.StatusProcess === EnumName.E_error && {
                                                                             backgroundColor: Colors.red
                                                                         },
-                                                                        (ListItem?.StatusProcess === '' ||
-                                                                            ListItem?.StatusProcess === EnumName.E_process) && {
-                                                                            backgroundColor: Colors.gray_4
-                                                                        }
+                                                                    (ListItem?.StatusProcess === '' ||
+                                                                    ListItem?.StatusProcess === EnumName.E_process) && {
+                                                                        backgroundColor: Colors.gray_4
+                                                                    }
                                                                     ]}
                                                                 >
                                                                     {ListItem?.StatusProcess === EnumName.E_error ? (
@@ -152,9 +149,9 @@ class VnrRenderApproverAtt extends Component {
                                                             <View style={{ flex: 1 }}>
                                                                 <View style={stylesVnrFilter.viewLable}>
                                                                     {Vnr_Function.renderAvatarCricleByName(
-                                                                        ListItem?.ImagePath,
-                                                                        ListItem.UserInfoName ? ListItem.UserInfoName : 'A',
-                                                                        sizeImg
+                                                                    ListItem?.ImagePath,
+                                                                    ListItem.UserInfoName ? ListItem.UserInfoName : 'A',
+                                                                    sizeImg
                                                                     )}
                                                                     <View style={styleSheets.wrapNameAndSubtitle}>
                                                                         <View style={{ flex: 1 }}>
@@ -168,13 +165,9 @@ class VnrRenderApproverAtt extends Component {
                                                                                 {ListItem?.Content ? ListItem?.Content : ''}
                                                                             </Text>
                                                                         </View>
-                                                                        {
-                                                                            (item.PositionName && index !== 0 && !isUserRequiredCancel) ? (
-                                                                                <Text style={[styleSheets.detailPositionApprover]}>
-                                                                                    {item.PositionName}
-                                                                                </Text>
-                                                                            ) : null
-                                                                        }
+                                                                        <Text style={[styleSheets.detailPositionApprover]}>
+                                                                            {ListItem.PositionName ? ListItem.PositionName : ''}
+                                                                        </Text>
                                                                     </View>
                                                                 </View>
                                                                 {ListItem?.Comment ? (
@@ -221,13 +214,9 @@ class VnrRenderApproverAtt extends Component {
                                                                 {item?.Content ? item?.Content : ''}
                                                             </Text>
                                                         </View>
-                                                        {
-                                                            (item.PositionName && index !== 0 && !isUserRequiredCancel) ? (
-                                                                <Text style={[styleSheets.detailPositionApprover]}>
-                                                                    {item.PositionName}
-                                                                </Text>
-                                                            ) : null
-                                                        }
+                                                        <Text style={[styleSheets.detailPositionApprover]}>
+                                                            {item.PositionName ? item.PositionName : ''}
+                                                        </Text>
                                                     </View>
                                                 </View>
                                                 {item?.Comment ? (
@@ -256,7 +245,7 @@ class VnrRenderApproverAtt extends Component {
                         })}
                 </View>
             );
-        } else return <View></View>;
+        } else return <View></View>
         //#endregion
     }
 }

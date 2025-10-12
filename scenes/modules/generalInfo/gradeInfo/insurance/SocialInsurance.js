@@ -169,7 +169,7 @@ class SocialInsurance extends Component {
                         <FlatList
                             showsVerticalScrollIndicator={false}
                             data={_configList['SocialInsurance']}
-                            renderItem={({ item }) => Vnr_Function.formatStringTypeV2(dataInsurance, item, _configList['SocialInsurance'])}
+                            renderItem={({ item }) => Vnr_Function.formatStringTypeV3(dataInsurance, item, _configList['SocialInsurance'])}
                             keyExtractor={(item, index) => index}
                             refreshControl={
                                 <RefreshControl

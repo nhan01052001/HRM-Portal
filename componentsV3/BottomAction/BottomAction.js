@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors, CustomStyleSheet, Size, styleSheets } from '../../constants/styleConfig';
+import { Colors, Size, styleSheets } from '../../constants/styleConfig';
 import {
     IconEdit,
     IconColse,
@@ -10,12 +10,7 @@ import {
     IconMoreHorizontal,
     IconInfo,
     IconCancelMarker,
-    IconReturnUpBack,
-    IconCriclePlay,
-    IconTimerRecruitment,
-    IconPause,
-    IconRequestCancel,
-    IconCalendarEdit
+    IconReturnUpBack
 } from '../../constants/Icons';
 import ActionSheet from 'react-native-actionsheet';
 import Vnr_Function from '../../utils/Vnr_Function';
@@ -65,13 +60,9 @@ export default class BottomAction extends React.Component {
                 E_APPROVE: {},
                 E_CONFIRM: {},
                 E_REJECT: {},
-                E_REQUEST_CANCEL: {},
-                E_REQUEST_CHANGE: {},
                 E_CANCEL: {},
-                E_REPOST: {},
-                E_POSTPONE: {},
-                E_EXPIRE: {},
-                E_STOP_POSTING: {}
+                E_REQUEST_CANCEL: {},
+                E_REQUEST_CHANGE: {}
             },
             { listActions } = nextProps ? nextProps : this.props;
 
@@ -140,7 +131,7 @@ export default class BottomAction extends React.Component {
                             case 'E_REQUEST_CANCEL':
                                 buttonColor = Colors.yellow_6;
                                 textColor = Colors.black;
-                                iconName = <IconRequestCancel size={iconSize} color={Colors.black} />;
+                                iconName = <IconCancelMarker size={iconSize} color={Colors.black} />;
                                 break;
                             case 'E_CANCEL':
                                 buttonColor = Colors.red;
@@ -166,22 +157,6 @@ export default class BottomAction extends React.Component {
                                 buttonColor = Colors.purple;
                                 iconName = <IconReturnUpBack size={Size.iconSize} color={Colors.white} />;
                                 break;
-                            case 'E_REPOST':
-                                buttonColor = Colors.success;
-                                iconName = <IconCriclePlay size={Size.iconSize} color={Colors.white} />;
-                                break;
-                            case 'E_POSTPONE':
-                                buttonColor = Colors.orange;
-                                iconName = <IconCalendarEdit size={Size.iconSize} color={Colors.white} />;
-                                break;
-                            case 'E_EXPIRE':
-                                buttonColor = Colors.purple;
-                                iconName = <IconTimerRecruitment size={Size.iconSize} color={Colors.white} />;
-                                break;
-                            case 'E_STOP_POSTING':
-                                buttonColor = Colors.volcano;
-                                iconName = <IconPause size={Size.iconSize} color={Colors.white} />;
-                                break;
                             default:
                                 buttonColor = Colors.info;
                                 iconName = <IconInfo size={iconSize} color={Colors.white} />;
@@ -199,29 +174,25 @@ export default class BottomAction extends React.Component {
                                 underlayColor={Colors.lightAccent}
                                 style={[
                                     styles.buttonAction,
-                                    CustomStyleSheet.backgroundColor(buttonColor),
-                                    styles.btnIcon
+                                    {
+                                        backgroundColor: buttonColor
+                                    }
                                     // (!Vnr_Function.CheckIsNullOrEmpty(sheetActions) && sheetActions.length > 1) && { width: '75%' },
                                     // listActionsTop.length === 1 && sheetActions.length === 1 && { width: '100%' }
                                 ]}
                             >
-                                <View>
-                                    {iconName}
-                                </View>
-                                <View>
-                                    <Text
-                                        style={[
-                                            styleSheets.text,
-                                            styles.iconLeftAction_title,
-                                            textColor && { color: textColor }
-                                        ]}
-                                    >
-                                        {item.title}{' '}
-                                        {itemSelected && Array.isArray(itemSelected) && itemSelected.length > 0
-                                            ? `(${itemSelected.length})`
-                                            : null}
-                                    </Text>
-                                </View>
+                                <Text
+                                    style={[
+                                        styleSheets.text,
+                                        styles.iconLeftAction_title,
+                                        textColor && { color: textColor }
+                                    ]}
+                                >
+                                    {item.title}{' '}
+                                    {itemSelected && Array.isArray(itemSelected) && itemSelected.length > 0
+                                        ? `(${itemSelected.length})`
+                                        : null}
+                                </Text>
                             </TouchableOpacity>
                         );
                         // }
@@ -291,11 +262,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: Size.borderRadiusBotton
-    },
-
-    btnIcon: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
     }
 });

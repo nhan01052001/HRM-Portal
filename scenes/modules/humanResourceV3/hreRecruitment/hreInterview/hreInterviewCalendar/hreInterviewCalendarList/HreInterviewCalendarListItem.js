@@ -6,7 +6,6 @@ import { translate } from '../../../../../../../i18n/translate';
 import Vnr_Function from '../../../../../../../utils/Vnr_Function';
 import { IconCopy, IconDot } from '../../../../../../../constants/Icons';
 import DrawerServices from '../../../../../../../utils/DrawerServices';
-import { ScreenName } from '../../../../../../../assets/constant';
 
 export class HreInterviewCalendarListItem extends Component {
     onPress = (item) => {
@@ -18,18 +17,11 @@ export class HreInterviewCalendarListItem extends Component {
                     reloadScreenList: reloadScreenList
                 });
             else {
-                const params = {
+                DrawerServices.navigate('HreCandidateInterview', {
                     dataItem: item,
                     listActions: rowActions,
-                    reloadScreenList: reloadScreenList,
-                    beforeScreen : ScreenName.HreInterviewCalendar
-                };
-
-                DrawerServices.navigateToTab(
-                    ScreenName.TopTabHreCandidateDetail,
-                    ScreenName.HreCandidateInterview,
-                    params
-                );
+                    reloadScreenList: reloadScreenList
+                });
             }
         }
     };
@@ -47,6 +39,7 @@ export class HreInterviewCalendarListItem extends Component {
                     <View style={styles.stickViewVertical} />
                 </View>
 
+
                 <View style={styles.itemContent}>
                     <View style={styles.itemHeader}>
                         {/* {moment(dataItem.day).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') && (
@@ -60,9 +53,7 @@ export class HreInterviewCalendarListItem extends Component {
                     </View>
                     <View style={styles.containerBody}>
                         {listInterview.map((item, index) => {
-                            const bgColorStatus = item.ColorRGB
-                                ? Vnr_Function.convertTextToColor(item.ColorRGB)
-                                : Colors.white;
+                            const bgColorStatus = item.ColorRGB ? Vnr_Function.convertTextToColor(item.ColorRGB) : Colors.white;
                             return (
                                 <TouchableWithoutFeedback key={index} onPress={() => this.onPress(item)}>
                                     <View style={styles.styViewBodyItem}>
@@ -78,11 +69,8 @@ export class HreInterviewCalendarListItem extends Component {
                                                     <Text style={[styleSheets.lable, styles.styTextItem]}>
                                                         {item.InterviewTypeView || ''}
                                                     </Text>
-                                                    <TouchableOpacity
-                                                        style={styles.styBtnCopy}
-                                                        onPress={() => Clipboard.setString(item.InterviewLink || '')}
-                                                    >
-                                                        <IconCopy size={Size.text} color={Colors.gray_10} />
+                                                    <TouchableOpacity style={styles.styBtnCopy} onPress={() => Clipboard.setString(item.InterviewLink || '') }>
+                                                        <IconCopy size={Size.text} color={Colors.gray_10}/>
                                                     </TouchableOpacity>
                                                 </View>
                                             ) : (
@@ -100,7 +88,7 @@ export class HreInterviewCalendarListItem extends Component {
                                             </Text>
                                         </View>
 
-                                        {!item.TotalCandidate ? (
+                                        {(!item.TotalCandidate) ? (
                                             <View View style={styles.styViewCandicateContent}>
                                                 <View>
                                                     {Vnr_Function.renderAvatarCricleByName(
@@ -135,8 +123,7 @@ export class HreInterviewCalendarListItem extends Component {
                                                         <View
                                                             style={[
                                                                 styles.styViewSuiStatus,
-                                                                bgColorStatus &&
-                                                                    CustomStyleSheet.backgroundColor(bgColorStatus)
+                                                                bgColorStatus&& CustomStyleSheet.backgroundColor(bgColorStatus)
                                                             ]}
                                                         >
                                                             <Text
@@ -166,6 +153,7 @@ export class HreInterviewCalendarListItem extends Component {
                         })}
                     </View>
                 </View>
+
             </View>
         );
     }
@@ -227,10 +215,10 @@ const styles = StyleSheet.create({
     },
     styTextTypeView: {
         fontSize: Size.text - 1,
-        textAlign: 'right'
+        textAlign : 'right'
     },
-    styBtnCopy: {
-        marginLeft: 5
+    styBtnCopy :{
+        marginLeft :5
     },
     stickViewHonrizontal: {
         flex: 1,
@@ -278,10 +266,10 @@ const styles = StyleSheet.create({
         flexShrink: 1
     },
     styRightText: {
-        flexDirection: 'row',
+        flexDirection :'row',
         flexShrink: 1,
         justifyContent: 'flex-end',
-        alignItems: 'center'
+        alignItems : 'center'
     }
 });
 

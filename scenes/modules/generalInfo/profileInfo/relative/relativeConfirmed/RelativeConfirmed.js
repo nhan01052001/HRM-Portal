@@ -73,7 +73,7 @@ class RelativeConfirmed extends Component {
             keyQuery: _keyQuery,
             isRefreshList: !this.state.isRefreshList, // reload lại ds.
             dataBody: {
-                ..._paramsDefault.dataBody,
+                ..._paramsDefault?.dataBody,
                 ...paramsFilter
             }
         };
@@ -195,7 +195,7 @@ class RelativeConfirmed extends Component {
         RelativeConfirmedBusinessFunction.setThisForBusiness(this, false);
 
         let _paramsDefault = this.paramsDefault(),
-            paramStore = { ..._paramsDefault, dataBody: { ..._paramsDefault.dataBody } },
+            paramStore = { ..._paramsDefault, dataBody: { ..._paramsDefault?.dataBody } },
             dataFromParams = this.checkDataFormNotify();
 
         // xoa filter defaule

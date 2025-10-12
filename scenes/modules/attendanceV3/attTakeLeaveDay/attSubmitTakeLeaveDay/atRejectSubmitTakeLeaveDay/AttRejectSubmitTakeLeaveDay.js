@@ -289,7 +289,6 @@ class AttRejectSubmitTakeLeaveDay extends Component {
                             }}
                             screenName={attSubmitTakeLeaveDay}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Attendance_Leave_Day_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

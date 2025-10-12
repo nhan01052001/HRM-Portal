@@ -47,8 +47,9 @@ export default class ChartAttendance extends React.Component {
                             // eslint-disable-next-line react-native/no-inline-styles
                             {
                                 color: item.chartColor ? item.chartColor : Colors.primary,
-                                maxWidth: '84%'
-                            }]}
+                                maxWidth: '93%'
+                            }
+                        ]}
                         numberOfLines={2}
                         i18nKey={item['Name']}
                     />

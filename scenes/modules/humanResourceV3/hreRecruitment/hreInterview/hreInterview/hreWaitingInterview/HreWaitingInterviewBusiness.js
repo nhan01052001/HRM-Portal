@@ -11,14 +11,16 @@ let _this = null,
     _rowActions = [],
     _selected = [];
 
-export const generateRowActionAndSelected = (screenName) => {
+const { apiConfig } = dataVnrStorage;
+
+export const generateRowActionAndSelected = () => {
     _rowActions = [];
     _selected = [];
-    screenName = screenName != null ? screenName : ScreenName.HreWaitingInterview;
+
     const permission = PermissionForAppMobile.value;
-    if (ConfigList.value != null && ConfigList.value != undefined && screenName != null) {
-        const _configList = ConfigList.value[screenName]
-            ? ConfigList.value[screenName]
+    if (ConfigList.value != null && ConfigList.value != undefined) {
+        const _configList = ConfigList.value[ScreenName.HreWaitingInterview]
+            ? ConfigList.value[ScreenName.HreWaitingInterview]
             : {
                 Api: {
                     urlApi: '[URI_CENTER]/api/Att_GetData/New_GetAnnualDetailPersonal',
@@ -135,9 +137,11 @@ export const generateRowActionAndSelected = (screenName) => {
             }
 
         }
+
+        return { rowActions: _rowActions, selected: _selected };
     }
 
-    return { rowActions: _rowActions, selected: _selected };
+
 };
 
 export const HreWaitingInterviewBusiness = {

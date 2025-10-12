@@ -24,7 +24,6 @@ let configList = null,
     attSubmitTakeLateEarlyAllowed = null,
     attSubmitTakeLateEarlyAllowedViewDetail = null,
     attSubmitTakeLateEarlyAllowedKeyTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttSubmitTakeLateEarlyAllowed extends Component {
@@ -53,7 +52,7 @@ class AttSubmitTakeLateEarlyAllowed extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitTakeLateEarlyAllowedBusinessFunction.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttSubmitTakeLateEarlyAllowedBusinessFunction.setThisForBusiness(this);
             if (AttSubmitTakeLateEarlyAllowedBusinessFunction.checkForReLoadScreen[attSubmitTakeLateEarlyAllowed]) {
                 this.reload();
             }
@@ -197,7 +196,7 @@ class AttSubmitTakeLateEarlyAllowed extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeLateEarlyAllowed);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeLateEarlyAllowed);
         let _params = {
             // IsPortal: true,
             // sort: orderBy,
@@ -329,7 +328,6 @@ class AttSubmitTakeLateEarlyAllowed extends Component {
                             }}
                             screenName={attSubmitTakeLateEarlyAllowed}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Attendance_Late_Early_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

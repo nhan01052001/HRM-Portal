@@ -182,7 +182,7 @@ export default class AttApproveTakeLateEarlyAllowedViewDetail extends Component 
                     let data = response.Data;
                     data = { ...data, ...data.SingleWordDetail[0] };
 
-                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(data.Status, data?.TypeApprove);
+                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(data.Status, dataItem?.TypeApprove);
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.Attachment = ManageFileSevice.setFileAttachApp(data.Attachment);
                     data.ImagePath = data?.AvatarUserRegister

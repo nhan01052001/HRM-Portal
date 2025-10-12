@@ -10,7 +10,6 @@ import AttApprovedSubmitTakeLeaveDay from './attSubmitTakeLeaveDay/attApprovedSu
 import AttRejectSubmitTakeLeaveDay from './attSubmitTakeLeaveDay/atRejectSubmitTakeLeaveDay/AttRejectSubmitTakeLeaveDay';
 import AttCanceledSubmitTakeLeaveDay from './attSubmitTakeLeaveDay/attCanceledSubmitTakeLeaveDay/AttCanceledSubmitTakeLeaveDay';
 import RenderTopTab from '../../../../navigation/tabar/RenderTopTab';
-import { PermissionForAppMobile } from '../../../../assets/configProject/PermissionForAppMobile';
 
 const navigationOptionsCogfig = (navigation, Title_Key) => {
     return {
@@ -82,30 +81,29 @@ const TopTabAttSubmitTakeLeaveDay = createMaterialTopTabNavigator(
     {
         lazy: true,
         swipeEnabled: false,
-        tabBarComponent: (navigationAll) => {
+        tabBarComponent: navigationAll => {;
+
             let perTabApprove = true,
                 perTabWaitApproved = true,
                 perTabReject = true;
 
-            let perTabSaveTemp = false;
+            // if (PermissionForAppMobile && PermissionForAppMobile.value['Personal_RelativeConfirmed']
+            //     && PermissionForAppMobile.value['Personal_RelativeConfirmed']['View']) {
+            //     perTabApprove = true;
+            // }
 
-            if (
-                PermissionForAppMobile &&
-                PermissionForAppMobile.value['HRM_PortalV3_Att_LeaveDay_BtnSaveTemp'] &&
-                PermissionForAppMobile.value['HRM_PortalV3_Att_LeaveDay_BtnSaveTemp']['View']
-            ) {
-                perTabSaveTemp = true;
-            }
+            // if (PermissionForAppMobile && PermissionForAppMobile.value['Personal_RelativeWaitConfirm']
+            //     && PermissionForAppMobile.value['Personal_RelativeWaitConfirm']['View']) {
+            //     perTabWaitApproved = true;
+            // }
 
-            let filteredData = data;
-            if (perTabSaveTemp) {
-                filteredData = filteredData.filter(
-                    (item) => item.title !== 'HRM_PortalApp_TopTab_AttSubmitTakeLeaveDay_SaveTemporary'
-                );
-            }
+            // if (PermissionForAppMobile && PermissionForAppMobile.value['Personal_RelativeEdit']
+            //     && PermissionForAppMobile.value['Personal_RelativeEdit']['View']) {
+            //     perTabReject = true;
+            // }
 
             if ((perTabApprove || perTabWaitApproved || perTabReject) && Array.isArray(data) && data.length > 0) {
-                return <RenderTopTab data={filteredData} navigationAll={navigationAll} />;
+                return <RenderTopTab data={data} navigationAll={navigationAll} />;
             } else {
                 return <View />;
             }

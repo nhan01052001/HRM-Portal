@@ -178,8 +178,7 @@ class SalSubmitPaymentCostRegister extends Component {
                     Create: true
                 },
                 New_Sal_PaymentCostRegister_btnSendMailHR: { View: true },
-                New_Sal_PaymentCostRegister_btnCancel: { View: true },
-                New_Sal_ConfirmPaymentCost_New_Index_btnFeeCheck: { View: true }
+                New_Sal_PaymentCostRegister_btnCancel: { View: true }
             };
             ConfigList.value[ScreenName.SalSubmitPaymentCostRegister] = {
                 Api: {
@@ -228,17 +227,6 @@ class SalSubmitPaymentCostRegister extends Component {
                         Type: 'E_CANCEL',
                         Resource: {
                             Name: 'New_Sal_PaymentCostRegister_btnCancel',
-                            Rule: 'View'
-                        },
-                        Confirm: {
-                            isInputText: true,
-                            isValidInputText: false
-                        }
-                    },
-                    {
-                        Type: 'E_FEECHECK',
-                        Resource: {
-                            Name: 'New_Sal_ConfirmPaymentCost_New_Index_btnFeeCheck',
                             Rule: 'View'
                         },
                         Confirm: {

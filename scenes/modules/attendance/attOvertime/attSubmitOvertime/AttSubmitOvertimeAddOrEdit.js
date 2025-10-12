@@ -1075,12 +1075,12 @@ export default class AttSubmitOvertimeAddOrEdit extends Component {
     getRecordAndConfigByID = async (record, _handleSetState) => {
         VnrLoadingSevices.show();
         const { ID } = record,
-            getRecord = await HttpService.Get('[URI_HR]/api/Att_Overtime/New_Edit?id=' + ID);
+            getRecord = await HttpService.Get('[URI_POR]/Att_Overtime/New_Edit?id=' + ID);
 
         VnrLoadingSevices.hide();
 
-        if (getRecord) {
-            let objRecord = getRecord,
+        if (getRecord && getRecord[0]) {
+            let objRecord = getRecord[0],
                 { ProfileID, WorkDate, WorkDateIn, WorkDateOut, ShiftID } = {
                     ...objRecord
                 };
@@ -1107,7 +1107,7 @@ export default class AttSubmitOvertimeAddOrEdit extends Component {
                     Key: 'HRM_ATT_OT_LISTREGISTERHOURS'
                 }),
                 HttpService.Get('[URI_SYS]/Sys_GetData/GetEnum?text=MethodPayment'),
-                HttpService.Get('[URI_HR]/Att_GetData/GetMultiDurationType'),
+                HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiDurationType'),
                 HttpService.Post('[URI_HR]/Sal_GetData/GetConfigElement', {
                     Key: 'HRM_ATT_CONFIG_NUMBER_LEAVE_APPROVE_OVERTIME'
                 }),
@@ -1195,7 +1195,7 @@ export default class AttSubmitOvertimeAddOrEdit extends Component {
                 Key: 'HRM_ATT_OT_LISTREGISTERHOURS'
             }),
             HttpService.Get('[URI_SYS]/Sys_GetData/GetEnum?text=MethodPayment'),
-            HttpService.Get('[URI_HR]/Att_GetData/GetMultiDurationType'),
+            HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiDurationType'),
             HttpService.Post('[URI_HR]/Sal_GetData/GetConfigElement', {
                 Key: 'HRM_ATT_CONFIG_NUMBER_LEAVE_APPROVE_OVERTIME'
             }),
@@ -11119,7 +11119,7 @@ export default class AttSubmitOvertimeAddOrEdit extends Component {
 
             return HttpService.Post('[URI_HR]/api/Att_Overtime', models);
         }
-        // return HttpService.Post('[URI_HR]/Att_GetData/CreateAnalysis', dataBody);
+        // return HttpService.Post('[URI_POR]//Att_Overtime/CreateAnalysis', dataBody);
     };
 
     onSaveEdit = dataBody => {

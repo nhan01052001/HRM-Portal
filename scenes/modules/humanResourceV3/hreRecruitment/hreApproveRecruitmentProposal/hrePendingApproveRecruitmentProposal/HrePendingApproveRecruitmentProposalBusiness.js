@@ -11,7 +11,6 @@ import DrawerServices from '../../../../../../utils/DrawerServices';
 import NotificationsService from '../../../../../../utils/NotificationsService';
 import store from '../../../../../../store';
 import badgesNotification from '../../../../../../redux/badgesNotification';
-import { HreProcesedApproveRecruitmentProposalBusiness } from '../hreProcesedApproveRecruitmentProposal/HreProcesedApproveRecruitmentProposalBusiness';
 
 let enumName = EnumName,
     apiConfig = null,
@@ -286,7 +285,7 @@ export const HrePendingApproveRecruitmentProposalBusiness = {
                                         NotificationsService.getListUserPushNotify();
                                         _this.reload('E_KEEP_FILTER');
                                         // set true để refresh HrePendingApproveRecruitmentProposal
-                                        HreProcesedApproveRecruitmentProposalBusiness.checkForReLoadScreen[
+                                        HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
                                             ScreenName.HreProcesedApproveRecruitmentProposal
                                         ] = true;
                                         HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
@@ -331,7 +330,7 @@ export const HrePendingApproveRecruitmentProposalBusiness = {
                             NotificationsService.getListUserPushNotify();
                             _this.reload('E_KEEP_FILTER');
                             // set true để refresh HrePendingApproveRecruitmentProposal
-                            HreProcesedApproveRecruitmentProposalBusiness.checkForReLoadScreen[
+                            HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
                                 ScreenName.HreProcesedApproveRecruitmentProposal
                             ] = true;
                             HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
@@ -440,7 +439,7 @@ export const HrePendingApproveRecruitmentProposalBusiness = {
                                         NotificationsService.getListUserPushNotify();
                                         _this.reload('E_KEEP_FILTER');
                                         // set true để refresh HrePendingApproveRecruitmentProposal
-                                        HreProcesedApproveRecruitmentProposalBusiness.checkForReLoadScreen[
+                                        HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
                                             ScreenName.HreProcesedApproveRecruitmentProposal
                                         ] = true;
                                         HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
@@ -484,7 +483,7 @@ export const HrePendingApproveRecruitmentProposalBusiness = {
                             NotificationsService.getListUserPushNotify();
                             _this.reload('E_KEEP_FILTER');
                             // set true để refresh HrePendingApproveRecruitmentProposal
-                            HreProcesedApproveRecruitmentProposalBusiness.checkForReLoadScreen[
+                            HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
                                 ScreenName.HreProcesedApproveRecruitmentProposal
                             ] = true;
                             HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
@@ -592,7 +591,7 @@ export const HrePendingApproveRecruitmentProposalBusiness = {
                                         NotificationsService.getListUserPushNotify();
                                         _this.reload('E_KEEP_FILTER');
                                         // set true để refresh HrePendingApproveRecruitmentProposal
-                                        HreProcesedApproveRecruitmentProposalBusiness.checkForReLoadScreen[
+                                        HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
                                             ScreenName.HreProcesedApproveRecruitmentProposal
                                         ] = true;
                                         HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
@@ -636,7 +635,7 @@ export const HrePendingApproveRecruitmentProposalBusiness = {
                             NotificationsService.getListUserPushNotify();
                             _this.reload('E_KEEP_FILTER');
                             // set true để refresh HrePendingApproveRecruitmentProposal
-                            HreProcesedApproveRecruitmentProposalBusiness.checkForReLoadScreen[
+                            HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[
                                 ScreenName.HreProcesedApproveRecruitmentProposal
                             ] = true;
                             HrePendingApproveRecruitmentProposalBusiness.checkForReLoadScreen[

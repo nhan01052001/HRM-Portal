@@ -398,7 +398,17 @@ class AttTamScanLogRegisterComponent extends React.Component {
         const { E_ProfileID, E_FullName } = EnumName,
             _profile = { ID: profileInfo[E_ProfileID], ProfileName: profileInfo[E_FullName] };
 
-        const { WorkDate, InTime, OutTime, PlaceID, MissInOutReason, FileAttachment, Comment, Type, OrgStructureTransID } = this.state;
+        const {
+            WorkDate,
+            InTime,
+            OutTime,
+            PlaceID,
+            MissInOutReason,
+            FileAttachment,
+            Comment,
+            Type,
+            OrgStructureTransID
+        } = this.state;
 
         if (record) {
             // Dữ liệu trả ra sai thêm 1 field DataNote
@@ -447,10 +457,14 @@ class AttTamScanLogRegisterComponent extends React.Component {
                 },
                 OrgStructureTransID: {
                     ...OrgStructureTransID,
-                    value: record.OrgStructureTransID ? [{
-                        id: record.OrgStructureTransID,
-                        Name: record.OrgStructureTransName
-                    }] : null,
+                    value: record.OrgStructureTransID
+                        ? [
+                            {
+                                id: record.OrgStructureTransID,
+                                Name: record.OrgStructureTransName
+                            }
+                        ]
+                        : null,
                     refresh: !OrgStructureTransID.refresh
                 }
             };
@@ -524,7 +538,7 @@ class AttTamScanLogRegisterComponent extends React.Component {
         } else {
             this.setState(
                 {
-                    ...JSON.parse(JSON.stringify(initSateDefault)),
+                    ...initSateDefault,
                     Profile: {
                         ...Profile,
                         ..._profile
@@ -584,7 +598,9 @@ class AttTamScanLogRegisterComponent extends React.Component {
                 fieldConfig?.MissInOutReason?.isValid &&
                 !MissInOutReason.value) ||
             (fieldConfig?.Comment.visibleConfig && fieldConfig?.Comment?.isValid && !Comment.value) ||
-            (fieldConfig?.FileAttachment.visibleConfig && fieldConfig?.FileAttachment?.isValid && !FileAttachment.value) ||
+            (fieldConfig?.FileAttachment.visibleConfig &&
+                fieldConfig?.FileAttachment?.isValid &&
+                !FileAttachment.value) ||
             (fieldConfig?.OrgStructureTransID?.visibleConfig &&
                 fieldConfig?.OrgStructureTransID?.isValid &&
                 !OrgStructureTransID.value)
@@ -605,6 +621,10 @@ class AttTamScanLogRegisterComponent extends React.Component {
             let orgStructureTransID = null;
             if (Array.isArray(OrgStructureTransID.value) && OrgStructureTransID.value.length > 0)
                 orgStructureTransID = OrgStructureTransID.value[0][configOrgStructureTransID.valueField];
+            let tempTypeIO = '';
+            if ((Type.value === 'E_OUT' && lstIntime.length > 0) || (Type.value === 'E_IN' && lstOuttime.length > 0)) {
+                tempTypeIO = 'E_INOUT';
+            } else tempTypeIO = Type.value;
 
             return {
                 ProfileID: Profile.ID,
@@ -612,7 +632,7 @@ class AttTamScanLogRegisterComponent extends React.Component {
                 WorkDate: WorkDate.value ? Vnr_Function.formatDateAPI(WorkDate.value, false, true) : null,
                 InTime: InTime.value && !InTime.disable ? Vnr_Function.formatDateAPI(InTime.value) : null,
                 OutTime: OutTime.value && !OutTime.disable ? Vnr_Function.formatDateAPI(OutTime.value) : null,
-                Type: Type.value,
+                Type: tempTypeIO,
                 MissInOutReason: MissInOutReason.value ? MissInOutReason.value.ID : null,
                 PlaceID: PlaceID.value ? PlaceID.value.ID : null,
                 FileAttachment: FileAttachment.value
@@ -754,7 +774,14 @@ class AttTamScanLogRegisterComponent extends React.Component {
             OrgStructureTransID
         } = this.state;
 
-        const { fieldConfig, isShowDelete, onDeleteItemDay, indexDay, onScrollToInputIOS } = this.props,
+        const {
+                fieldConfig,
+                isShowDelete,
+                onDeleteItemDay,
+                indexDay,
+                onScrollToInputIOS,
+                onGetHighSupervisorFromOrgStructureTransID
+            } = this.props,
             { viewInputMultiline } = stylesVnrPickerV3;
 
         return (
@@ -965,7 +992,7 @@ class AttTamScanLogRegisterComponent extends React.Component {
                 )}
 
                 {/* Phong ban điều chuyển */}
-                {OrgStructureTransID.visible && fieldConfig?.OrgStructureTransID?.visibleConfig &&
+                {OrgStructureTransID.visible && fieldConfig?.OrgStructureTransID?.visibleConfig && (
                     <View>
                         <VnrTreeView
                             api={{
@@ -990,17 +1017,23 @@ class AttTamScanLogRegisterComponent extends React.Component {
                             value={OrgStructureTransID.value}
                             lable={OrgStructureTransID.lable}
                             onSelect={(listItem) => {
-                                this.setState({
-                                    OrgStructureTransID: {
-                                        ...OrgStructureTransID,
-                                        value: listItem,
-                                        refresh: !OrgStructureTransID.refresh
+                                this.setState(
+                                    {
+                                        OrgStructureTransID: {
+                                            ...OrgStructureTransID,
+                                            value: listItem,
+                                            refresh: !OrgStructureTransID.refresh
+                                        }
+                                    },
+                                    () => {
+                                        if (typeof onGetHighSupervisorFromOrgStructureTransID === 'function')
+                                            onGetHighSupervisorFromOrgStructureTransID(listItem[0]?.id);
                                     }
-                                });
+                                );
                             }}
                         />
                     </View>
-                }
+                )}
 
                 {/* Lý do quyên */}
                 {MissInOutReason.visible && fieldConfig?.MissInOutReason.visibleConfig && (

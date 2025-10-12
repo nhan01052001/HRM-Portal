@@ -268,8 +268,7 @@ class GoogleMaps extends Component {
                 let { latitude, longitude } = this.state;
                 latitude = position.coords.latitude;
                 longitude = position.coords.longitude;
-                // latitude = 10.8125404088;
-                // longitude = 106.687186911;
+
                 this.saveIsAcceptCoordinate(true);
                 this.handleAddress(latitude, longitude);
             },
@@ -395,14 +394,9 @@ class GoogleMaps extends Component {
     };
 
     getDistanceWithingRadious = (GeolocationInput, GeolocationCenter, radious) => {
-        try {
-            // checks if GeolocationInput is within a radius of 5 km from GeolocationCenter
-            const pointWithinRadius = isPointWithinRadius(GeolocationInput, GeolocationCenter, radious);
-            return pointWithinRadius;
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
+        // checks if GeolocationInput is within a radius of 5 km from GeolocationCenter
+        const pointWithinRadius = isPointWithinRadius(GeolocationInput, GeolocationCenter, radious);
+        return pointWithinRadius;
     };
 
     takePhoto = () => {
@@ -481,52 +475,41 @@ class GoogleMaps extends Component {
     };
 
     checkCoodinateInListCatShop = () => {
-        try {
-            const { configConstraintDistanceWithRadious, latitude, longitude } = this.state,
-                { listCatShop } = configConstraintDistanceWithRadious ? configConstraintDistanceWithRadious : {},
-                geolocationInput = { latitude: latitude, longitude: longitude };
+        const { configConstraintDistanceWithRadious, latitude, longitude } = this.state,
+            { listCatShop } = configConstraintDistanceWithRadious ? configConstraintDistanceWithRadious : {},
+            geolocationInput = { latitude: latitude, longitude: longitude };
 
-            console.log(configConstraintDistanceWithRadious, 'checkCoodinateInListCatShop');
-            if (Array.isArray(listCatShop) && listCatShop.length > 0) {
-                let psssCheckPosition = false;
-                let itemShopPasss = null;
+        if (Array.isArray(listCatShop) && listCatShop.length > 0) {
+            let psssCheckPosition = false;
+            let itemShopPasss = null;
 
-                // eslint-disable-next-line no-unused-vars
-                for (let item of listCatShop) {
-                    if (item.Coodinate && item.CoordinateDistance) {
-                        let geolocationCenter = {
-                            latitude: item.Coodinate.split(',')[0], //37.785834,
-                            longitude: item.Coodinate.split(',')[1] //-122.406417
-                        };
-                        let radious = item.CoordinateDistance;
-                        if (this.getDistanceWithingRadious(geolocationInput, geolocationCenter, radious)) {
-                            psssCheckPosition = true;
-                            itemShopPasss = item;
-                            break;
-                        }
+            // eslint-disable-next-line no-unused-vars
+            for (let item of listCatShop) {
+                if (item.Coodinate && item.CoordinateDistance) {
+                    let geolocationCenter = {
+                        latitude: item.Coodinate.split(',')[0], //37.785834,
+                        longitude: item.Coodinate.split(',')[1] //-122.406417
+                    };
+                    let radious = item.CoordinateDistance;
+                    if (this.getDistanceWithingRadious(geolocationInput, geolocationCenter, radious)) {
+                        psssCheckPosition = true;
+                        itemShopPasss = item;
+                        break;
                     }
                 }
-
-                if (!psssCheckPosition) {
-                    return null;
-                } else {
-                    return itemShopPasss;
-                }
             }
-        } catch (error) {
-            console.log(error);
-            throw error;
+
+            if (!psssCheckPosition) {
+                return null;
+            } else {
+                return itemShopPasss;
+            }
         }
     };
 
     getDistanceCalculate = (GeolibInputCoordinates, GeolocationCenter) => {
-        try {
-            const distance = getDistance(GeolibInputCoordinates, GeolocationCenter);
-            return distance;
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
+        const distance = getDistance(GeolibInputCoordinates, GeolocationCenter);
+        return distance;
     };
 
     requestData = async (imageMap, typeData, distance = '') => {
@@ -805,7 +788,7 @@ class GoogleMaps extends Component {
         this.isConfirmMACAdressNotMatch = false;
         this.isConfirmCoodinateNotMatch = false;
         VnrLoadingSevices.hide();
-        DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
+        if (error && error != EnumName.E_REQUEST_NO_RESPONSE) DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
     };
 
     requestGetCoondinateInBeforce = () => {
@@ -818,49 +801,53 @@ class GoogleMaps extends Component {
     };
 
     onConfirm = async (typeData) => {
-        // chup anh map
-        const { latitude, longitude, configConstraintDistanceTwoPoint } = this.state;
-        if (!Vnr_Function.CheckIsNullOrEmpty(this.viewShot)) {
-            this.isProcessing = true;
-            VnrLoadingSevices.show();
-            const uri = await this.viewShot.capture();
-            const title = uri.split('/').pop().split('#')[0].split('?')[0];
-            const ext = title.substring(title.indexOf('.') + 1, title.length);
-            const file = {
-                uri: uri,
-                name: title,
-                type: 'image/' + ext
-            };
+        try {
+            // chup anh map
+            const { latitude, longitude, configConstraintDistanceTwoPoint } = this.state;
+            if (!Vnr_Function.CheckIsNullOrEmpty(this.viewShot)) {
+                this.isProcessing = true;
+                VnrLoadingSevices.show();
+                const uri = await this.viewShot.capture();
+                const title = uri.split('/').pop().split('#')[0].split('?')[0];
+                const ext = title.substring(title.indexOf('.') + 1, title.length);
+                const file = {
+                    uri: uri,
+                    name: title,
+                    type: 'image/' + ext
+                };
 
-            // co cau hinh tinhs khoanr cach giua 2 lan check in
-            if (configConstraintDistanceTwoPoint && typeData === EnumName.E_IN) {
-                const dataOrigin = await this.requestGetCoondinateInBeforce();
+                // co cau hinh tinhs khoanr cach giua 2 lan check in
+                if (configConstraintDistanceTwoPoint && typeData === EnumName.E_IN) {
+                    const dataOrigin = await this.requestGetCoondinateInBeforce();
 
-                // lay vi tri checkin gan nhat
-                const origin = dataOrigin ? `${dataOrigin.split('|')[0]},${dataOrigin.split('|')[1]}` : '';
-                // lay vi tri hien tai
-                const destination = `${latitude},${longitude}`;
-                // tinh khoan cach
-                const dataDistance = origin
-                    ? await this.getDistanceCoordinate(origin.split('|')[0], destination)
-                    : null;
-                if (
-                    dataDistance &&
-                    dataDistance.rows[0] &&
-                    dataDistance.rows[0].elements &&
-                    dataDistance.rows[0].elements[0] &&
-                    dataDistance.rows[0].elements[0].distance
-                ) {
-                    const distance = dataDistance.rows[0].elements[0].distance.text;
-                    this.requestData(file, typeData, distance);
+                    // lay vi tri checkin gan nhat
+                    const origin = dataOrigin ? `${dataOrigin.split('|')[0]},${dataOrigin.split('|')[1]}` : '';
+                    // lay vi tri hien tai
+                    const destination = `${latitude},${longitude}`;
+                    // tinh khoan cach
+                    const dataDistance = origin
+                        ? await this.getDistanceCoordinate(origin.split('|')[0], destination)
+                        : null;
+                    if (
+                        dataDistance &&
+                        dataDistance.rows[0] &&
+                        dataDistance.rows[0].elements &&
+                        dataDistance.rows[0].elements[0] &&
+                        dataDistance.rows[0].elements[0].distance
+                    ) {
+                        const distance = dataDistance.rows[0].elements[0].distance.text;
+                        this.requestData(file, typeData, distance);
+                    } else {
+                        this.requestData(file, typeData);
+                    }
+                    // 37.785856, -122.406456mmm37.785834,-122.406417
+                    VnrLoadingSevices.hide();
                 } else {
                     this.requestData(file, typeData);
                 }
-                // 37.785856, -122.406456mmm37.785834,-122.406417
-                VnrLoadingSevices.hide();
-            } else {
-                this.requestData(file, typeData);
             }
+        } catch (error) {
+            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
         }
     };
 
@@ -1259,92 +1246,29 @@ class GoogleMaps extends Component {
     };
 
     checkConstraintPhotoSaveInOut = (typeRequest) => {
-        // const options = {
-        //   AppleAppID: "6450327312",
-        //   GooglePackageName: "com.hrmeportal",
-        //   OtherAndroidURL: "https://play.google.com/store/apps/details?id=com.hrmeportal",
-        //   preferredAndroidMarket: AndroidMarket.Google,
-        //   preferInApp: true,
-        //   openAppStoreIfInAppFails: true,
-        //   fallbackPlatformURL: PlatformURL,
-        // }
-        // Rate.rate(options, (success, errorMessage) => {
-        //   if (success) {
-        //     console.log(success, 'success');
-        //     // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
-        //     // this.setState({ rated: true })
-        //   }
-        //   if (errorMessage) {
-        //     // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
-        //     console.error(`Example page Rate.rate() error: ${errorMessage}`)
-        //   }
-        // })
+        try {
+            const { configConstraintDistanceWithRadious, configLoadWorkPlace, latitude, longitude, address } =
+                    this.state,
+                { listCatCoodinate, configCheckInCoondinate, isCheckingByCoordinates } =
+                    configConstraintDistanceWithRadious ? configConstraintDistanceWithRadious : {},
+                geolocationInput = { latitude: latitude, longitude: longitude };
 
-        const { configConstraintDistanceWithRadious, configLoadWorkPlace, latitude, longitude, address } = this.state,
-            { listCatCoodinate, configCheckInCoondinate, isCheckingByCoordinates } = configConstraintDistanceWithRadious
-                ? configConstraintDistanceWithRadious
-                : {},
-            geolocationInput = { latitude: latitude, longitude: longitude };
+            // kiem tra config validate
+            if (this.isProcessing) {
+                return;
+            }
 
-        // kiem tra config validate
-        if (this.isProcessing) {
-            return;
-        }
+            // Ràng buộc truy cập vị trí.
+            if (address == '' || address == null || address === 'PERMISSION_DENIED') {
+                this.alertContrainPermission();
+                return;
+            }
 
-        // Ràng buộc truy cập vị trí.
-        if (address == '' || address == null || address === 'PERMISSION_DENIED') {
-            this.alertContrainPermission();
-            return;
-        }
+            // Chấm công trong phạm vi cho phép
+            if (isCheckingByCoordinates && this.isConfirmCoodinateNotMatch === false) {
+                let isBlock = configCheckInCoondinate && configCheckInCoondinate == EnumName.E_BLOCK;
 
-        // Chấm công trong phạm vi cho phép
-        if (isCheckingByCoordinates && this.isConfirmCoodinateNotMatch === false) {
-            let isBlock = configCheckInCoondinate && configCheckInCoondinate == EnumName.E_BLOCK;
-
-            if (listCatCoodinate == null || (Array.isArray(listCatCoodinate) && listCatCoodinate.length == 0)) {
-                if (isBlock) {
-                    ToasterSevice.showError('Block_NotMatch_Coodinate');
-                    return;
-                } else {
-                    AlertSevice.alert({
-                        iconType: EnumIcon.E_WARNING,
-                        title: 'E_WARNING',
-                        message: 'Warning_NotMatch_Coodinate',
-                        textRightButton: 'HRM_Common_Continue',
-                        textLeftButton: 'HRM_Common_Close',
-                        onCancel: () => {
-                            this.reload();
-                        },
-                        onConfirm: () => {
-                            this.isConfirmCoodinateNotMatch = true;
-                            this.fbCheckConstraintPhoto(typeRequest);
-                        }
-                    });
-                    this.coodinateCheckPass = null;
-                    return;
-                }
-            } else if (Array.isArray(listCatCoodinate) && listCatCoodinate.length > 0) {
-                let psssCheckPosition = false;
-                let coodinateCheckPass = null;
-
-                // eslint-disable-next-line no-unused-vars
-                for (let item of listCatCoodinate) {
-                    if (item.Coodinate && item.CoordinateDistance) {
-                        let geolocationCenter = {
-                            latitude: item.Coodinate.split(',')[0], //37.785834,
-                            longitude: item.Coodinate.split(',')[1] //-122.406417
-                        };
-                        let radious = item.CoordinateDistance;
-                        if (this.getDistanceWithingRadious(geolocationInput, geolocationCenter, radious)) {
-                            psssCheckPosition = true;
-                            coodinateCheckPass = geolocationCenter;
-                            break;
-                        }
-                    }
-                }
-
-                if (!psssCheckPosition) {
-                    // vị trí hợp lệ
+                if (listCatCoodinate == null || (Array.isArray(listCatCoodinate) && listCatCoodinate.length == 0)) {
                     if (isBlock) {
                         ToasterSevice.showError('Block_NotMatch_Coodinate');
                         return;
@@ -1366,106 +1290,116 @@ class GoogleMaps extends Component {
                         this.coodinateCheckPass = null;
                         return;
                     }
-                } else {
-                    this.coodinateCheckPass = coodinateCheckPass;
-                }
-            }
-        }
+                } else if (Array.isArray(listCatCoodinate) && listCatCoodinate.length > 0) {
+                    let psssCheckPosition = false;
+                    let coodinateCheckPass = null;
 
-        // kiểm tra xem có cấu hình load nơi làm việc khi chấm công GPS không
-        // nếu còn configLoadWorkPlace.data !== null thì có check
-        if (
-            configLoadWorkPlace.data !== null &&
-            Array.isArray(configLoadWorkPlace.data) &&
-            configLoadWorkPlace.value == null
-        ) {
-            let subjectPosition = [];
+                    // eslint-disable-next-line no-unused-vars
+                    for (let item of listCatCoodinate) {
+                        if (item.Coodinate && item.CoordinateDistance) {
+                            let geolocationCenter = {
+                                latitude: item.Coodinate.split(',')[0], //37.785834,
+                                longitude: item.Coodinate.split(',')[1] //-122.406417
+                            };
+                            let radious = item.CoordinateDistance;
+                            if (this.getDistanceWithingRadious(geolocationInput, geolocationCenter, radious)) {
+                                psssCheckPosition = true;
+                                coodinateCheckPass = geolocationCenter;
+                                break;
+                            }
+                        }
+                    }
 
-            configLoadWorkPlace.data.forEach((item) => {
-                if (item.Coodinate && item.CoordinateDistance) {
-                    let geolocationCenter = {
-                            latitude: item.Coodinate.split(',')[0], //37.785834,
-                            longitude: item.Coodinate.split(',')[1] //-122.406417
-                        },
-                        radious = item.CoordinateDistance;
-                    if (this.getDistanceWithingRadious(geolocationInput, geolocationCenter, radious)) {
-                        subjectPosition.push(item);
+                    if (!psssCheckPosition) {
+                        // vị trí hợp lệ
+                        if (isBlock) {
+                            ToasterSevice.showError('Block_NotMatch_Coodinate');
+                            return;
+                        } else {
+                            AlertSevice.alert({
+                                iconType: EnumIcon.E_WARNING,
+                                title: 'E_WARNING',
+                                message: 'Warning_NotMatch_Coodinate',
+                                textRightButton: 'HRM_Common_Continue',
+                                textLeftButton: 'HRM_Common_Close',
+                                onCancel: () => {
+                                    this.reload();
+                                },
+                                onConfirm: () => {
+                                    this.isConfirmCoodinateNotMatch = true;
+                                    this.fbCheckConstraintPhoto(typeRequest);
+                                }
+                            });
+                            this.coodinateCheckPass = null;
+                            return;
+                        }
+                    } else {
+                        this.coodinateCheckPass = coodinateCheckPass;
                     }
                 }
-            });
+            }
 
-            if (subjectPosition.length > 1) {
-                let minDistance = null,
-                    indexDistance = null;
+            // kiểm tra xem có cấu hình load nơi làm việc khi chấm công GPS không
+            // nếu còn configLoadWorkPlace.data !== null thì có check
+            if (
+                configLoadWorkPlace.data !== null &&
+                Array.isArray(configLoadWorkPlace.data) &&
+                configLoadWorkPlace.value == null
+            ) {
+                let subjectPosition = [];
 
-                subjectPosition.forEach((item, index) => {
-                    let geolocationCenter = {
-                        latitude: item.Coodinate.split(',')[0], //37.785834,
-                        longitude: item.Coodinate.split(',')[1] //-122.406417
-                    };
-
-                    let calcDistance = getDistance(geolocationInput, geolocationCenter);
-
-                    if (minDistance == null && indexDistance == null) {
-                        minDistance = calcDistance;
-                        indexDistance = index;
-                    } else if (minDistance != null && calcDistance < minDistance) {
-                        minDistance = calcDistance;
-                        indexDistance = index;
+                configLoadWorkPlace.data.forEach((item) => {
+                    if (item.Coodinate && item.CoordinateDistance) {
+                        let geolocationCenter = {
+                                latitude: item.Coodinate.split(',')[0], //37.785834,
+                                longitude: item.Coodinate.split(',')[1] //-122.406417
+                            },
+                            radious = item.CoordinateDistance;
+                        if (this.getDistanceWithingRadious(geolocationInput, geolocationCenter, radious)) {
+                            subjectPosition.push(item);
+                        }
                     }
                 });
-                subjectPosition = [subjectPosition[indexDistance]];
+
+                if (subjectPosition.length > 1) {
+                    let minDistance = null,
+                        indexDistance = null;
+
+                    subjectPosition.forEach((item, index) => {
+                        let geolocationCenter = {
+                            latitude: item.Coodinate.split(',')[0], //37.785834,
+                            longitude: item.Coodinate.split(',')[1] //-122.406417
+                        };
+
+                        let calcDistance = getDistance(geolocationInput, geolocationCenter);
+
+                        if (minDistance == null && indexDistance == null) {
+                            minDistance = calcDistance;
+                            indexDistance = index;
+                        } else if (minDistance != null && calcDistance < minDistance) {
+                            minDistance = calcDistance;
+                            indexDistance = index;
+                        }
+                    });
+                    subjectPosition = [subjectPosition[indexDistance]];
+                }
+
+                this.setState({
+                    configLoadWorkPlace: {
+                        ...configLoadWorkPlace,
+                        value: subjectPosition.length > 0 ? subjectPosition[0] : null,
+                        visible: true
+                    },
+                    typeRequestData: typeRequest
+                });
+
+                return;
             }
 
-            this.setState({
-                configLoadWorkPlace: {
-                    ...configLoadWorkPlace,
-                    value: subjectPosition.length > 0 ? subjectPosition[0] : null,
-                    visible: true
-                },
-                typeRequestData: typeRequest
-            });
-
-            return;
+            this.fbCheckConstraintPhoto(typeRequest);
+        } catch (error) {
+            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
         }
-
-        // checking với địaw chỉ mac;
-        // if (isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false) {
-        //     // trường hợp có cấu hình kiểm tra địa chỉ mac nhưng false
-
-        //     if (Object.keys(networkInfo).length == 0) {
-        //         ToasterSevice.showError('HRM_Alert_Please_Check_NetWork');
-        //         return;
-        //     }
-        //     const resultCompare = this.handleCompareBssid(macID, _bssid);
-        //     if (resultCompare && resultCompare['actionStatus'] === false) {
-        //         if (configCheckInWifi && configCheckInWifi == EnumName.E_BLOCK) {
-        //             ToasterSevice.showError('Block_NotMatch_MAC_Wifi');
-        //             return;
-        //         } else {
-        //             AlertSevice.alert({
-        //                 iconType: EnumIcon.E_WARNING,
-        //                 title: 'E_WARNING',
-        //                 message: 'Warning_NotMatch_MAC_Wifi',
-        //                 textRightButton: 'HRM_Common_Continue',
-        //                 textLeftButton: 'HRM_Common_Close',
-        //                 onCancel: () => {
-        //                     this.reload();
-        //                 },
-        //                 onConfirm: () => {
-        //                     this.isConfirmMACAdressNotMatch = true;
-        //                     this.fbCheckConstraintPhoto(typeRequest);
-        //                 }
-        //             });
-        //             this.macAddressCheckPass = null;
-        //             return;
-        //         }
-        //     } else if (resultCompare && resultCompare['actionStatus'] === true && resultCompare['macAddressEqua']) {
-        //         this.macAddressCheckPass = resultCompare['macAddressEqua'];
-        //     }
-        // }
-
-        this.fbCheckConstraintPhoto(typeRequest);
     };
 
     fbCheckConstraintPhoto = (typeRequest) => {

@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { View, Animated, DeviceEventEmitter } from 'react-native';
-import PlanResultState from '../../PlanResultState';
+import { View, Animated } from 'react-native';
 import AttWorkingOvertimeList from '../../attWorkingOvertimeList/AttWorkingOvertimeList';
 import {
     styleSheets,
-    styleSafeAreaView
+    styleSafeAreaView,
+    styleContentFilterDesign,
+    styleContentFilterDesignV3
 } from '../../../../../../constants/styleConfig';
+import VnrFilterCommon from '../../../../../../componentsV3/VnrFilter/VnrFilterCommon';
 import { ConfigList } from '../../../../../../assets/configProject/ConfigList';
 import { ScreenName, EnumName, EnumTask } from '../../../../../../assets/constant';
 import {
@@ -61,10 +63,6 @@ class AttCanceledSubmitWorkingOvertime extends Component {
     componentWillUnmount() {
         if (this.willFocusScreen) {
             this.willFocusScreen.remove();
-        }
-        if (this.planResultListener) {
-            this.planResultListener.remove();
-            this.planResultListener = null;
         }
     }
 
@@ -169,8 +167,7 @@ class AttCanceledSubmitWorkingOvertime extends Component {
             IsPortalNew: true,
             filter: filter,
             pageSize: pageSizeList,
-            Status: 'E_CANCEL',
-            IsPlan: PlanResultState.isPlan === true
+            Status: 'E_CANCEL'
         };
 
         return {
@@ -257,18 +254,6 @@ class AttCanceledSubmitWorkingOvertime extends Component {
         this.storeParamsDefault = _paramsDefault;
         this.setState(_paramsDefault);
 
-        // Listen plan/result toggle to reload with status
-        this.planResultListener = DeviceEventEmitter.addListener(
-            'ATT_WO_PLAN_RESULT_CHANGED',
-            ({ isPlan }) => {
-                const nextFilter = {
-                    ...(this.paramsFilter || {}),
-                    IsPlan: isPlan
-                };
-                this.reload(nextFilter);
-            }
-        );
-
         startTask({
             keyTask: attCanceledSubmitWorkingOvertimeKeyTask,
             payload: {
@@ -299,6 +284,17 @@ class AttCanceledSubmitWorkingOvertime extends Component {
             <SafeAreaViewDetail style={styleSafeAreaView.style}>
                 {attCanceledSubmitWorkingOvertime && attSubmitWorkingOvertimeViewDetail && enumName && (
                     <View style={[styleSheets.containerGrey]}>
+                        <VnrFilterCommon
+                            dataBody={dataBody}
+                            style={{
+                                ...styleContentFilterDesign,
+                                ...styleContentFilterDesignV3
+                            }}
+                            screenName={attSubmitWorkingOvertime}
+                            onSubmitEditing={this.reload}
+                            scrollYAnimatedValue={this.scrollYAnimatedValue}
+                        />
+
                         <View style={[styleSheets.container]}>
                             {keyQuery && (
                                 <AttWorkingOvertimeList

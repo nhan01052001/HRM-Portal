@@ -215,7 +215,7 @@ export const AttSubmitTSLRegisterBusinessFunction = {
                                 : '';
 
                         VnrLoadingSevices.show();
-                        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedTamScanLogRegister', {
+                        HttpService.Post('[URI_POR]/Att_TamScanLogRegister/RemoveSelected', {
                             selectedIds: strId.split(','),
                             reason
                         }).then(res => {
@@ -244,7 +244,7 @@ export const AttSubmitTSLRegisterBusinessFunction = {
             let strId = objValid.strResultID && typeof objValid.strResultID === 'string' ? objValid.strResultID : '';
 
             VnrLoadingSevices.show();
-            HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedTamScanLogRegister', {
+            HttpService.Post('[URI_POR]/Att_TamScanLogRegister/RemoveSelected', {
                 selectedIds: strId.split(',')
             }).then(res => {
                 VnrLoadingSevices.hide();

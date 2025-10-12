@@ -9,7 +9,6 @@ import DrawerServices from '../../utils/DrawerServices';
 import codePush from 'react-native-code-push';
 import { resetTaskRunning } from '../../factories/BackGroundTask';
 import { VnrBalloonService } from '../VnrBalloon/VnrBalloon';
-import ManageFileSevice from '../../utils/ManageFileSevice';
 
 export default class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -128,41 +127,9 @@ export default class ErrorBoundary extends React.Component {
                                                 }
                                             ]}
                                         >
-                                            {
-                                                translate('HRM_Common_SendFeedback') == 'HRM_Common_SendFeedback' ?
-                                                    'Gửi phản hồi' :
-                                                    translate('HRM_Common_SendFeedback')
-                                            }
+                                            {translate('HRM_Common_SendFeedback')}
                                         </Text>
                                     </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                        style={[styles.styActionBtn, CustomStyleSheet.backgroundColor(Colors.orange)]}
-                                        onPress={() => {
-                                            ManageFileSevice.writeLogToFile({
-                                                ErrorDisplay,
-                                                StatusError,
-                                                ScreenName: DrawerServices.getBeforeScreen()
-                                            });
-                                        }}
-                                    >
-                                        <Text
-                                            style={[
-                                                styleSheets.lable,
-                                                {
-                                                    color: Colors.white,
-                                                    fontSize: Size.text + 1
-                                                }
-                                            ]}
-                                        >
-                                            {
-                                                translate('HRM_Common_Download_Log') == 'HRM_Common_Download_Log' ?
-                                                    'Tải mô tả lỗi' :
-                                                    translate('HRM_Common_Download_Log')
-                                            }
-                                        </Text>
-                                    </TouchableOpacity>
-
                                     <TouchableOpacity
                                         accessibilityLabel={'ERROR_BACK_HOME'}
                                         style={styles.stybtnConfirm}

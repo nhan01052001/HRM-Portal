@@ -137,8 +137,8 @@ class SalaryViewDetail extends Component {
 
         this.monthPayroll =
             props.navigation.state.params &&
-            props.navigation.state.params.dataItem &&
-            props.navigation.state.params.dataItem.MonthYear
+                props.navigation.state.params.dataItem &&
+                props.navigation.state.params.dataItem.MonthYear
                 ? moment(props.navigation.state.params.dataItem.MonthYear).format('MM/YYYY')
                 : null;
 
@@ -270,12 +270,15 @@ class SalaryViewDetail extends Component {
                                 configListDetail: _configListDetail,
                                 dataItem: {
                                     ...data,
-                                    CutOffDurationID: dataItem.CutOffDurationID
-                                }
+                                    CutOffDurationID: dataItem?.CutOffDurationID ?? CutOffDurationID
+                                },
+                                isLoading: false
                             });
                         } else {
                             this.setState({ dataItem: 'EmptyData' });
                         }
+                    }).catch(() => {
+                        this.setState({ dataItem: 'EmptyData' });
                     });
                 } else if (screenName === ScreenName.SalaryTempViewDetail) {
                     // let listCode = {};

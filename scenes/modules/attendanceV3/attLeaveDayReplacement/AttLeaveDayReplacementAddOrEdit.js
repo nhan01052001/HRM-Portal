@@ -11,7 +11,7 @@ import {
 import styleComonAddOrEdit from '../../../../constants/styleComonAddOrEdit';
 import { Colors, CustomStyleSheet, Size, styleSheets } from '../../../../constants/styleConfig';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ToasterInModal } from '../../../../components/Toaster/Toaster';
+import { ToasterInModal, ToasterSevice } from '../../../../components/Toaster/Toaster';
 import { AlertInModal } from '../../../../components/Alert/Alert';
 import VnrText from '../../../../components/VnrText/VnrText';
 import { IconCancel, IconCloseCircle } from '../../../../constants/Icons';
@@ -22,13 +22,8 @@ import { translate } from '../../../../i18n/translate';
 import HttpService from '../../../../utils/HttpService';
 import { ScrollView } from 'react-native';
 import VnrIndeterminate from '../../../../components/VnrLoading/VnrIndeterminate';
-import { dataVnrStorage } from '../../../../assets/auth/authentication';
 
 const initSateDefault = {
-    Profile: {
-        ID: null,
-        ProfileName: ''
-    },
     paramsBackup: null,
     params: null,
     isShowModal: false,
@@ -59,6 +54,8 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
             showWarning: null,
             showInfo: null
         };
+
+        this.isProcessing = false;
     }
 
     showLoading = isShow => {
@@ -68,11 +65,11 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
     };
 
     _renderHeaderLoading = () => {
-        if (this.state.isShowLoading) {
+        if (this.state.isShowLoading || this.isProcessing) {
             return (
-                <View style={styleComonAddOrEdit.styLoadingHeader}>
-                    <View style={styleComonAddOrEdit.styViewLoading} />
-                    <VnrIndeterminate isVisible={this.state.isShowLoading} />
+                <View style={[styleComonAddOrEdit.styLoadingHeader, Platform.OS === 'ios' && CustomStyleSheet.zIndex(99)]}>
+                    <View style={styles.styViewLoading} />
+                    <VnrIndeterminate isVisible={this.state.isShowLoading || this.isProcessing} />
                 </View>
             );
         } else return <View />;
@@ -80,27 +77,8 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
 
     // Step 1: Gọi hàm onShow để tạo mới hoặc chỉnh sửa hoặc onShowFromWorkDay để tạo mới
     onShow = params => {
-        const profileInfo = dataVnrStorage
-            ? dataVnrStorage.currentUser
-                ? dataVnrStorage.currentUser.info
-                : null
-            : null;
-
-        const { E_ProfileID, E_FullName } = EnumName,
-            _profile = { ID: profileInfo[E_ProfileID], ProfileName: profileInfo[E_FullName] };
-
-        const { Profile } = this.state;
-
-        let nextState = {
-            Profile: {
-                ...Profile,
-                ..._profile
-            }
-        };
-
         this.setState(
             {
-                ...nextState,
                 ...{ ...initSateDefault },
                 params: { ...params },
                 paramsBackup: { ...params },
@@ -135,29 +113,13 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
                 ref={refs => (this.refFlatList = refs)}
                 style={styles.styFlatListContainer}
                 data={params?.record}
-                renderItem={({ item, index }) => {
-                    if (Array.isArray(item?.ListDate) && item?.ListDate.length > 0) {
-                        item?.ListDate.map((value) => {
-                            if (Array.isArray(value?.ListDurationType) && value?.ListDurationType.length > 0) {
-                                if (value?.ListDurationType.length > 1) {
-                                    // k set lại isSelect khi nhấn save vì khi nhấn save sẽ set lại state.
-                                    let rsFindSelect = value?.ListDurationType.find((element) => element.isSelect);
-                                    if (!rsFindSelect)
-                                        value?.ListDurationType.forEach((element) => {
-                                            element.isSelect = element?.Value === 'E_FULLSHIFT';
-                                        });
-                                } else {
-                                    value.ListDurationType[0].isSelect = true;
-                                }
-                            }
-                        });
-                    }
-                    return <AttLeaveDayReplacementComponent dataItem={item} onScrollToInputIOS={this.onScrollToInputIOS} key={index} index={index} />;
-                }}
+                renderItem={({ item, index }) => (
+                    <AttLeaveDayReplacementComponent dataItem={item} onScrollToInputIOS={this.onScrollToInputIOS} key={index} />
+                )}
                 keyExtractor={(item, index) => index}
                 ItemSeparatorComponent={() => <View style={styleComonAddOrEdit.separate} />}
             />
-        );
+        )
     }
 
     getIsSelect = (value = []) => {
@@ -178,16 +140,8 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
                 'IsAddNewAndSendMail': true
             },
             ReplacementConfirmItem = [];
-        let isError = false;
 
         params?.record.map((item) => {
-            if (!!item?.Note && typeof item?.Note === 'string' && item?.Note.length > 500) {
-                let keyTrans = translate('HRM_Sytem_MaxLength500');
-                let errorMax500 = keyTrans.replace('[E_NAME]', `[${[translate('Note')]}]`);
-                this.ToasterSevice.showWarning(errorMax500);
-                isError = true;
-            }
-
             let DateConfirm = [];
 
             if (item?.ListDate) {
@@ -196,8 +150,8 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
                         'Date': value?.Date,
                         'DurationType': this.getIsSelect(value?.ListDurationType)?.Value ? this.getIsSelect(value?.ListDurationType)?.Value : null,
                         'ShiftID': value?.ShiftID
-                    });
-                });
+                    })
+                })
             }
 
             ReplacementConfirmItem.push({
@@ -205,12 +159,8 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
                 'ProfileID': item?.ProfileID,
                 'Note': item?.Note ? item?.Note : null,
                 'DateConfirm': DateConfirm
-            });
-        });
-
-        if (isError)
-            return;
-
+            })
+        })
 
         payload = {
             ...payload,
@@ -219,7 +169,7 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
             IsRemoveAndContinue: this.IsRemoveAndContinue,
             CacheID: this.CacheID,
             IsContinueSave: this.IsContinueSave
-        };
+        }
 
         const callSave = () => {
             this.isProcessing = true;
@@ -232,7 +182,7 @@ export default class AttLeaveDayReplacementAddOrEdit extends Component {
                     if (res.Status == EnumName.E_SUCCESS) {
                         this.onClose();
 
-                        this.ToasterSevice.showSuccess('Hrm_Succeed', 5500);
+                        ToasterSevice.showSuccess('Hrm_Succeed', 5500);
 
                         const { reload } = params;
                         if (reload && typeof reload === 'function') {

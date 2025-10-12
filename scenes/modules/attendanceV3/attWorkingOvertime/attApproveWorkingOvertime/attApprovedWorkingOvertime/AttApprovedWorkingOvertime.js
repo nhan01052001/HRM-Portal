@@ -21,7 +21,6 @@ let configList = null,
     attApproveWorkingOvertime = null,
     attApproveWorkingOvertimeViewDetail = null,
     keyListTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttApprovedWorkingOvertime extends Component {
@@ -47,7 +46,7 @@ class AttApprovedWorkingOvertime extends Component {
         this.paramsFilter = null;
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // reload danh sách khi có approve hoặc reject dữ liệu
-            AttApproveWorkingOvertimeBusiness.setThisForBusiness(this, false, dataRowActionAndSelected?.rowActions);
+            AttApproveWorkingOvertimeBusiness.setThisForBusiness(this);
             if (AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[attApprovedWorkingOvertime]) {
                 this.reload();
             }
@@ -142,7 +141,7 @@ class AttApprovedWorkingOvertime extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attApprovedWorkingOvertime);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attApprovedWorkingOvertime);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -281,7 +280,6 @@ class AttApprovedWorkingOvertime extends Component {
                             }}
                             screenName={attApproveWorkingOvertime}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Overtime_list'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

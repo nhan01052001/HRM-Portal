@@ -4,7 +4,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Modal, Image } from 'react-native';
 import {
     Colors,
-    CustomStyleSheet,
     Size,
     styleSheets,
     styleValid,
@@ -44,7 +43,7 @@ export default class VnrPickerLittle extends React.Component {
         this.dataConfirm = { data: {}, index: null };
         this.isModalOpened = false;
     }
-    setDataConfirm = (data) => {
+    setDataConfirm = data => {
         this.dataConfirm = data;
     };
     getDataConfirm = () => {
@@ -53,17 +52,14 @@ export default class VnrPickerLittle extends React.Component {
 
     opentModal = () => {
         let isVisibleLoading = this.isModalOpened ? false : true;
-        if (
-            HttpService.checkConnectInternet() == false &&
-            !Object.prototype.hasOwnProperty.call(this.props, 'dataLocal')
-        ) {
+        if (HttpService.checkConnectInternet() == false && !Object.prototype.hasOwnProperty.call(this.props, 'dataLocal')) {
             HttpService.showAlertNoNetwork(this.opentModal);
             return;
         }
         this.setState({ isModalVisible: true, isVisibleLoading: isVisibleLoading });
     };
 
-    handelDataSelect = (data) => {
+    handelDataSelect = data => {
         const { valueField, textField, filter, filterServer } = this.state.stateProps,
             { value } = this.props,
             { searchText, itemSelected } = this.state;
@@ -78,7 +74,7 @@ export default class VnrPickerLittle extends React.Component {
 
         if (!Vnr_Function.CheckIsNullOrEmpty(value) && Object.keys(value).length > 0) {
             if (
-                data.findIndex((item) => {
+                data.findIndex(item => {
                     return value[valueField] == item[valueField];
                 }) > -1
             ) {
@@ -100,7 +96,7 @@ export default class VnrPickerLittle extends React.Component {
                 this.oldItemIndex = 0;
                 data = [
                     ...[value],
-                    ...data.map((item) => {
+                    ...data.map(item => {
                         item.isSelect = false;
                         return item;
                     })
@@ -108,7 +104,7 @@ export default class VnrPickerLittle extends React.Component {
                 itemSelected.push(value);
             }
         } else {
-            data = data.map((item) => {
+            data = data.map(item => {
                 item.isSelect = false;
                 return item;
             });
@@ -161,7 +157,7 @@ export default class VnrPickerLittle extends React.Component {
         }
 
         HttpFactory.getDataPicker(url)
-            .then((res) => {
+            .then(res => {
                 let data = [];
                 if (res.Status == EnumName.E_SUCCESS) {
                     data = res.Data;
@@ -172,7 +168,7 @@ export default class VnrPickerLittle extends React.Component {
                 this.isModalOpened = true;
                 this.handelDataSelect(data);
             })
-            .catch((error) => console.log(error));
+            .catch(error => console.log(error));
     };
 
     closeModal = () => {
@@ -214,7 +210,7 @@ export default class VnrPickerLittle extends React.Component {
         }
     };
 
-    addItemChecked = (indexItem) => {
+    addItemChecked = indexItem => {
         let { itemSelected, dataPicker } = this.state;
         itemSelected.length = 0; // dua mang ve rong
         let itemChecked = dataPicker[indexItem];
@@ -266,7 +262,7 @@ export default class VnrPickerLittle extends React.Component {
     //     }
     // }
 
-    changeSearchBar = (textValue) => {
+    changeSearchBar = textValue => {
         const { autoFilter, filterServer } = this.props;
         let callBackFilter = null;
         if (!filterServer) {
@@ -294,7 +290,7 @@ export default class VnrPickerLittle extends React.Component {
             { value } = this.props,
             { fullData, searchText, itemSelected } = this.state;
         if (filter && !filterServer && searchText != null) {
-            let data = fullData.filter((item) => {
+            let data = fullData.filter(item => {
                 if (!Vnr_Function.CheckIsNullOrEmpty(filterParams)) {
                     return Vnr_Function.CheckContains(item, filterParams, searchText);
                 } else {
@@ -304,7 +300,7 @@ export default class VnrPickerLittle extends React.Component {
             if (!Vnr_Function.CheckIsNullOrEmpty(value) && Object.keys(value).length > 0) {
                 itemSelected.length = 0; // dua mang ve rong
                 if (
-                    data.findIndex((item) => {
+                    data.findIndex(item => {
                         return value[valueField] == item[valueField];
                     }) > -1
                 ) {
@@ -325,7 +321,7 @@ export default class VnrPickerLittle extends React.Component {
                     this.oldItemIndex = 0;
                     data = [
                         ...[value],
-                        ...data.map((item) => {
+                        ...data.map(item => {
                             item.isSelect = false;
                             return item;
                         })
@@ -333,7 +329,7 @@ export default class VnrPickerLittle extends React.Component {
                     itemSelected.push(value);
                 }
             } else {
-                data = data.map((item) => {
+                data = data.map(item => {
                     item.isSelect = false;
                     return item;
                 });
@@ -353,7 +349,7 @@ export default class VnrPickerLittle extends React.Component {
         }
     }
 
-    onRefreshControl = (nextProps) => {
+    onRefreshControl = nextProps => {
         let _state = this.state;
         _state = defaultState;
         _state.stateProps = nextProps;
@@ -374,7 +370,10 @@ export default class VnrPickerLittle extends React.Component {
     }
 
     render() {
-        const { bntPickerDisable, stylePlaceholder } = stylesVnrPickerV3;
+        const {
+            bntPickerDisable,
+            stylePlaceholder
+        } = stylesVnrPickerV3;
 
         const { isModalVisible, isVisibleLoading, dataPicker, itemSelected, stateProps } = this.state;
 
@@ -475,13 +474,12 @@ export default class VnrPickerLittle extends React.Component {
                     <View
                         style={[
                             stylesVnrPickerV3.styLeftPicker,
-                            stateProps.lable && stylesVnrPickerV3.onlyFlRowSpaceBetween,
-                            CustomStyleSheet.alignItems('center')
+                            stateProps.lable && stylesVnrPickerV3.onlyFlRowSpaceBetween
                         ]}
                     >
                         {isShowIcon && icon && icon !== '' ? <Image source={{ uri: icon }} /> : null}
                         {stateProps.lable && (
-                            <View style={[stylesVnrPickerV3.styLbPicker, { maxWidth: '50%', maxHeight: '100%' }]}>
+                            <View style={[stylesVnrPickerV3.styLbPicker, { width: '50%', maxHeight: '100%' }]}>
                                 <VnrText
                                     numberOfLines={2}
                                     style={[
@@ -507,60 +505,41 @@ export default class VnrPickerLittle extends React.Component {
                                 stylesVnrPickerV3.styVlPicker,
                                 isOptionFilterQuicly === true
                                     ? { width: '100%' }
-                                    : {
-                                        flex: 1,
-                                        minWidth: '50%',
-                                        maxWidth: '80%',
-                                        justifyContent: 'flex-end',
-                                        alignItems: 'center'
-                                    }
+                                    : { width: '50%', justifyContent: 'flex-end', alignItems: 'center' }
                             ]}
                         >
-                            <View
-                                style={[
-                                    stylesVnrPickerV3.wrapRightLabel,
-                                    !this.props?.isNewUIValue && CustomStyleSheet.backgroundColor('transparent')
-                                ]}
-                            >
-                                {textValue != null ? (
-                                    <Text style={[styleSheets.text, stylesVnrPickerV3.styLableValue]} numberOfLines={1}>
-                                        {translate(textValue)}
-                                    </Text>
-                                ) : (
-                                    <VnrText
-                                        style={[styleSheets.text, stylePlaceholder, stateProps.stylePlaceholder]}
-                                        i18nKey={
-                                            !Vnr_Function.CheckIsNullOrEmpty(stateProps.placeholder)
-                                                ? stateProps.placeholder
-                                                : 'SELECT_ITEM'
-                                        }
-                                    />
-                                )}
-
-                                <View style={stylesVnrPickerV3.styRightPicker}>
-                                    {isShowErr === true ? (
-                                        <View style={stylesVnrPickerV3.styBtnClear}>
-                                            <IconWarn color={Colors.red} size={Size.iconSize - 2} />
-                                        </View>
-                                    ) : // nút clear
-                                        stateProps.clearText == true && textValue != null ? (
-                                            <TouchableOpacity
-                                                onPress={this.clearDate}
-                                                style={stylesVnrPickerV3.styBtnClear}
-                                            >
-                                                <IconCancel size={Size.iconSize - 2} color={Colors.grey} />
-                                            </TouchableOpacity>
-                                        ) : isOptionFilterQuicly === true ? null : (
-                                            <View style={stylesVnrPickerV3.styBtnClear}>
-                                                <IconDown
-                                                    size={Size.iconSize}
-                                                    color={disable ? Colors.gray_7 : Colors.gray_8}
-                                                />
-                                            </View>
-                                        )}
-                                </View>
-                            </View>
+                            {textValue != null ? (
+                                <Text style={[styleSheets.text, stylesVnrPickerV3.styLableValue]} numberOfLines={1}>
+                                    {translate(textValue)}
+                                </Text>
+                            ) : (
+                                <VnrText
+                                    style={[styleSheets.text, stylePlaceholder, stateProps.stylePlaceholder]}
+                                    i18nKey={
+                                        !Vnr_Function.CheckIsNullOrEmpty(stateProps.placeholder)
+                                            ? stateProps.placeholder
+                                            : 'SELECT_ITEM'
+                                    }
+                                />
+                            )}
                         </View>
+                    </View>
+
+                    <View style={stylesVnrPickerV3.styRightPicker}>
+                        {isShowErr === true ? (
+                            <View style={stylesVnrPickerV3.styBtnClear}>
+                                <IconWarn color={Colors.red} size={Size.iconSize - 2} />
+                            </View>
+                        ) : // nút clear
+                            stateProps.clearText == true && textValue != null ? (
+                                <TouchableOpacity onPress={this.clearDate} style={stylesVnrPickerV3.styBtnClear}>
+                                    <IconCancel size={Size.iconSize - 2} color={Colors.grey} />
+                                </TouchableOpacity>
+                            ) : isOptionFilterQuicly === true ? null : (
+                                <View style={stylesVnrPickerV3.styBtnClear}>
+                                    <IconDown size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_8} />
+                                </View>
+                            )}
                     </View>
                 </TouchableOpacity>
                 <Modal
@@ -577,7 +556,7 @@ export default class VnrPickerLittle extends React.Component {
                             style={[styleComonAddOrEdit.bgOpacity, { backgroundColor: Colors.black, opacity: 0.5 }]}
                             onPress={this.closeModal}
                         />
-                        <View style={{ width: '100%', backgroundColor: Colors.white }}>
+                        <View style={{ width: '100%', backgroundColor:  Colors.white }}>
                             <View
                                 style={{
                                     flexDirection: 'row',
@@ -592,13 +571,16 @@ export default class VnrPickerLittle extends React.Component {
                                             styleSheets.text,
                                             styleComonAddOrEdit.styRegister,
                                             styleComonAddOrEdit.fS16fW600,
-                                            { color: Colors.black }
+                                            { color:  Colors.black }
                                         ]}
                                         i18nKey={`${stateProps.lable}`}
                                     />
                                 )}
                                 {!this.props.isChooseQuickly && (
-                                    <TouchableOpacity accessibilityLabel={'VnrPicker-Confirm'} onPress={this.onOK}>
+                                    <TouchableOpacity
+                                        accessibilityLabel={'VnrPicker-Confirm'}
+                                        onPress={this.onOK}
+                                    >
                                         <VnrText
                                             style={[
                                                 styleSheets.text,

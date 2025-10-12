@@ -214,31 +214,6 @@ export default class HreCandidateProfileList extends VnrRenderList {
         );
     };
 
-    moveToDetail = item => {
-        const { detail, rowTouch, reloadScreenList } = this.props;
-        if (!this.stateEndScroll) {
-            // Phải scroll xong thì bấm mới hiệu lực
-            return;
-        }
-
-        if (!Vnr_Function.CheckIsNullOrEmpty(rowTouch) && typeof rowTouch == 'function') {
-            rowTouch();
-        } else if (
-            !Vnr_Function.CheckIsNullOrEmpty(detail) &&
-            !Vnr_Function.CheckIsNullOrEmpty(detail.screenDetail) &&
-            !Vnr_Function.CheckIsNullOrEmpty(detail.screenName)
-        ) {
-            const _listActions = this.handelListActionParamsScreenDetail(item);
-            DrawerServices.navigateToTab(ScreenName.TopTabHreCandidateDetail, detail.screenDetail, {
-                dataItem: item,
-                screenName: detail.screenName,
-                listActions: _listActions,
-                reloadScreenList: reloadScreenList,
-                beforeScreen : detail.screenName
-            });
-        }
-    };
-
     render() {
         const {
                 dataSource,

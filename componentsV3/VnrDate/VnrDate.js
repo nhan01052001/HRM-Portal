@@ -177,7 +177,7 @@ export default class VnrDate extends Component {
 
     render() {
         const { stateProps, valueDate } = this.state;
-        const { isOptionFilterQuicly, layoutFilter, placeHolder, lable, fieldValid, isCheckEmpty, isHiddenIcon } = this.props;
+        const { isOptionFilterQuicly, layoutFilter, placeHolder, lable, fieldValid, isCheckEmpty } = this.props;
 
         let textValue = null;
         // let displayControl = true;
@@ -211,11 +211,11 @@ export default class VnrDate extends Component {
                 style={[
                     { width: '100%' },
                     isOptionFilterQuicly === true ? { height: '100%' } : stylesVnrPickerV3.styContentPicker,
-                    layoutFilter && { height: 65 }
+                    layoutFilter && { height : 65 }
                 ]}
             >
                 {
-                    layoutFilter && (
+                    layoutFilter &&(
                         <View
                             style={CustomStyleSheet.marginHorizontal(Size.defineSpace)}
                         >
@@ -236,20 +236,19 @@ export default class VnrDate extends Component {
                         stateProps.stylePicker,
                         isShowErr && stylesVnrPickerV3.styBntPickerError,
                         disable && stylesVnrPickerV3.bntPickerDisable,
-                        (isOptionFilterQuicly === true || layoutFilter) && { borderBottomWidth: 0 }
+                        (isOptionFilterQuicly === true || layoutFilter)&& { borderBottomWidth: 0 }
                     ]}
                     activeOpacity={!disable ? 0.2 : 1}
                 >
                     <View
                         style={[
                             stylesVnrPickerV3.styLeftPicker,
-                            lable && stylesVnrPickerV3.onlyFlRowSpaceBetween,
-                            CustomStyleSheet.alignItems('center')
+                            lable && stylesVnrPickerV3.onlyFlRowSpaceBetween
                         ]}
                     >
                         {lable && (
                             <View style={stylesVnrPickerV3.styLbPicker}>
-                                {isHiddenIcon ? <View /> : stateProps.type && stateProps.type === 'time' ? (
+                                {stateProps.type && stateProps.type === 'time' ? (
                                     <IconTime size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_8} />
                                 ) : (
                                     <IconDate size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_8} />
@@ -258,8 +257,7 @@ export default class VnrDate extends Component {
                                 <VnrText
                                     style={[
                                         styleSheets.text,
-                                        stylesVnrPickerV3.styLbNotHaveValuePicker,
-                                        CustomStyleSheet.marginLeft(0)
+                                        stylesVnrPickerV3.styLbNotHaveValuePicker
                                         // { marginLeft: 12 },
                                         // textValue === null
                                         //     ? stylesVnrPickerV3.styLbHaveValuePicker
@@ -273,7 +271,7 @@ export default class VnrDate extends Component {
                             </View>
                         )}
 
-                        <View style={[stylesVnrPickerV3.styVlPicker, this.props?.isNewUIValue && stylesVnrPickerV3.wrapRightLabel]}>
+                        <View style={stylesVnrPickerV3.styVlPicker}>
                             {textValue != null ? (
                                 <Text style={[styleSheets.text, stylesVnrPickerV3.styLableValue]} numberOfLines={1}>
                                     {textValue}
@@ -300,6 +298,12 @@ export default class VnrDate extends Component {
                                 </TouchableOpacity>
                             )
                         )}
+
+                        {/* {stateProps.clearText == true && textValue != null && (
+                            <TouchableOpacity onPress={this.clearDate} style={stylesVnrPickerV3.styBtnClear}>
+                                <IconCancel size={Size.iconSize - 2} color={Colors.gray_8} />
+                            </TouchableOpacity>
+                        )} */}
                     </View>
                 </TouchableOpacity>
                 {this.returnPickerType(stateProps.type)}

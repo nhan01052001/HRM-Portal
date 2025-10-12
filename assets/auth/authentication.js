@@ -11,9 +11,6 @@ import MessagingSoketIO from '../../utils/MessagingSoketIO';
 import badgesNotification from '../../redux/badgesNotification';
 import { logout as logoutIds4 } from 'react-native-app-auth';
 import SignalRService from '../../utils/SignalRService';
-import Vnr_Function from '../../utils/Vnr_Function';
-import _ from 'lodash';
-import { EnumUser } from '../constant';
 
 /**
  * Class VnrStorageSingleton - quản lý dữ liệu người dùng
@@ -31,7 +28,6 @@ class VnrStorageSingleton {
             apiConfig: null,
             providerSso: null,
             deviceToken: null,
-            deviceID: null,
             languageApp: 'VN',
             useLanguage: 'VN,EN',
             topNavigate: [],
@@ -104,7 +100,7 @@ class VnrStorageSingleton {
      */
     async setValueByKey(property, value) {
         this._data[property] = value;
-        await SInfoService.setItem(EnumUser.DATA_VNR_SECUR_LTM, this._data);
+        await AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(this._data));
         return true;
     }
 
@@ -117,23 +113,8 @@ class VnrStorageSingleton {
         Object.keys(dataFormStorage).forEach((key) => {
             this._data[key] = dataFormStorage[key];
         });
-        await SInfoService.setItem(EnumUser.DATA_VNR_SECUR_LTM, this._data);
+        await AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(this._data));
         return true;
-    }
-
-    /**
-     * Phương thức cập nhật toàn bộ dữ liệu trừ currentUser lưu vào Storage
-     * @param {Object} dataFormStorage - Dữ liệu cần cập nhật
-     * @returns {Promise<boolean>} Kết quả cập nhật
-     */
-    async setDataQRStorage(dataFormStorage) {
-        const cloneData = _.cloneDeep(this._data);
-        Object.keys(dataFormStorage).forEach((key) => {
-            cloneData[key] = dataFormStorage[key];
-        });
-        cloneData['currentUser'] = null;
-        await AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(cloneData));
-        return;
     }
 
     /**
@@ -160,7 +141,7 @@ class VnrStorageSingleton {
                 }
             };
 
-            await SInfoService.setItem(EnumUser.DATA_VNR_SECUR_LTM, this._data);
+            await AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(this._data));
             return true;
         }
 
@@ -207,7 +188,6 @@ class VnrStorageSingleton {
             this._data.linkSSO = dataUser.linkSSO;
         }
 
-        this._data.deviceID = await Vnr_Function.getUnitIdApp();
         this._data.languageApp = dataUser.Language;
         this._data.versionApi = dataUser.versionApi;
         const { uriNews, serviceEndpointApi, chatEndpointApi, surveyEndpointApi, uriStorage, uriNewsWordPress } =
@@ -251,7 +231,7 @@ class VnrStorageSingleton {
             this._data.apiConfig.uriStorage = uriStorage;
         }
 
-        await SInfoService.setItem(EnumUser.DATA_VNR_SECUR_LTM, this._data);
+        await AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(this._data));
         return true;
     }
 
@@ -326,88 +306,83 @@ const dataVnrStorageInstance = VnrStorageSingleton.getInstance();
  * @returns {Promise<void>}
  */
 export const logout = async (params) => {
-    try {
-        VnrLoadingSevices.show();
+    VnrLoadingSevices.show();
 
-        let _dataVnrStorage = getDataVnrStorage(),
-            { currentUser } = _dataVnrStorage,
-            _idToken = null;
+    let _dataVnrStorage = getDataVnrStorage(),
+        { currentUser } = _dataVnrStorage,
+        _idToken = null;
 
-        //disconnect socket
-        MessagingSoketIO.send({}, 'CLIENT-LOGOUT');
-        if (currentUser) {
-            const dataLogout = {
-                userID: currentUser.headers.userid,
-                deviceToken: _dataVnrStorage.deviceToken
-            };
+    //disconnect socket
+    MessagingSoketIO.send({}, 'CLIENT-LOGOUT');
+    if (currentUser) {
+        const dataLogout = {
+            userID: currentUser.headers.userid,
+            deviceToken: _dataVnrStorage.deviceToken
+        };
 
-            if (dataLogout && dataLogout.deviceToken && dataLogout.userID)
-                HttpService.Post('[URI_HR]/Por_GetData/LogoutAppMobile', dataLogout);
-        }
+        if (dataLogout && dataLogout.deviceToken && dataLogout.userID)
+            HttpService.Post('[URI_POR]/Portal/LogoutAppMobile', dataLogout);
+    }
 
-        // Xóa dữ liệu cache trên server
-        if (_dataVnrStorage.currentUser && _dataVnrStorage.currentUser.headers)
-            await HttpService.Post(
-                '[URI_POR]/Portal/ResetCacheApp',
-                {
-                    userLogin: _dataVnrStorage.currentUser.headers.userlogin,
-                    isActiveUser: params && params.isActiveUser == false ? false : true,
-                    deviceID: dataVnrStorage.deviceID ? dataVnrStorage.deviceID : ''
-                },
-                {
-                    headers: _dataVnrStorage.currentUser.headers
-                }
-            );
-
-        // kiểm tra login Ids4 và có tokent id
-        if (
-            currentUser &&
-            currentUser.info &&
-            currentUser.info.isLoginSSO &&
-            currentUser.headers &&
-            currentUser.headers.tokenportalapp
-        ) {
-            _idToken = currentUser.headers.idToken;
-        }
-
-        // logout SSO
-        _dataVnrStorage.currentUser = null;
-        // Xoá topNavigate 4 Item Menu
-        _dataVnrStorage.topNavigate = [];
-
-        await setdataVnrStorage(_dataVnrStorage);
-
-        // clear current token
-        HttpService.resetToken();
-        //set number chuông thông báo về 0
-        store.dispatch(badgesNotification.actions.clearStateAllBadges(0));
-
-        //Đưa data Profile về null
-        store.dispatch(generalProfileInfo.actions.setGeneralProfileInfo(null));
-        // Xoá tất cả notification của user hiện tạn khi logout
-        NotificationsService.removeAllNotifications();
-
-        SignalRService.disconnect(); // disconnect signal
-
-        const removeCacheData = await removeMultiKey();
-        if (removeCacheData.actionStatus) {
-            // Xoá dữ liệu cache
-            DrawerServices.navigate('Login');
-            VnrLoadingSevices.hide();
-
-            // Có id Token thì mới logout
-            if (_idToken) {
-                const configIdentity = await getConfigSSO();
-
-                logoutIds4(configIdentity, {
-                    idToken: _idToken,
-                    postLogoutRedirectUrl: configIdentity.redirectUrl
-                });
+    // Xóa dữ liệu cache trên server
+    if (_dataVnrStorage.currentUser && _dataVnrStorage.currentUser.headers)
+        await HttpService.Post(
+            '[URI_POR]/Portal/ResetCacheApp',
+            {
+                userLogin: _dataVnrStorage.currentUser.headers.userlogin,
+                isActiveUser: params && params.isActiveUser == false ? false : true
+            },
+            {
+                headers: _dataVnrStorage.currentUser.headers
             }
-        }
-    } catch (error) {
+        );
+
+    // kiểm tra login Ids4 và có tokent id
+    if (
+        currentUser &&
+        currentUser.info &&
+        currentUser.info.isLoginSSO &&
+        currentUser.headers &&
+        currentUser.headers.tokenportalapp
+    ) {
+        _idToken = currentUser.headers.idToken;
+    }
+
+    // logout SSO
+    _dataVnrStorage.currentUser = null;
+    // Xoá topNavigate 4 Item Menu
+    _dataVnrStorage.topNavigate = [];
+
+    await setdataVnrStorage(_dataVnrStorage);
+
+    // clear current token
+    HttpService.resetToken();
+
+    //set number chuông thông báo về 0
+    store.dispatch(badgesNotification.actions.clearStateAllBadges(0));
+
+    //Đưa data Profile về null
+    store.dispatch(generalProfileInfo.actions.setGeneralProfileInfo(null));
+    // Xoá tất cả notification của user hiện tạn khi logout
+    NotificationsService.removeAllNotifications();
+
+    SignalRService.disconnect(); // disconnect signal
+
+    const removeCacheData = await removeMultiKey();
+    if (removeCacheData.actionStatus) {
+        // Xoá dữ liệu cache
+        DrawerServices.navigate('Login');
         VnrLoadingSevices.hide();
-        DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
+
+        // Có id Token thì mới logout
+        if (_idToken) {
+            const configIdentity = await getConfigSSO();
+
+            logoutIds4(configIdentity, {
+                idToken: _idToken,
+                postLogoutRedirectUrl: configIdentity.redirectUrl
+            });
+        }
     }
 };
 
@@ -445,16 +420,6 @@ export const setdataVnrStorageFromDataUser = async (dataUser) => {
  */
 export const setdataVnrStorage = async (dataFormStorage) => {
     return await dataVnrStorageInstance.setData(dataFormStorage);
-};
-
-
-/**
- * Cập nhật toàn bộ dữ liệu trừ current user lưu vào Storage
- * @param {Object} dataFormStorage - Dữ liệu cần cập nhật
- * @returns {Promise<boolean>} Kết quả cập nhật
- */
-export const setdataDataQrStorage = async (dataFormStorage) => {
-    return await dataVnrStorageInstance.setDataQRStorage(dataFormStorage);
 };
 
 /**

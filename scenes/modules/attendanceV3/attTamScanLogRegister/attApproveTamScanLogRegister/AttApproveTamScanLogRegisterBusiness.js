@@ -147,10 +147,10 @@ export const AttApproveTamScanLogRegisterBusinessFunction = {
         [ScreenName.AttCanceledTamScanLogRegister]: false,
         [ScreenName.AttAllTamScanLogRegister]: false
     },
-    setThisForBusiness: (dataThis, isNotification, rowActionsFromScreen = _rowActions) => {
+    setThisForBusiness: (dataThis, isNotification) => {
         if (isNotification) _isOnScreenNotification = true;
         else _isOnScreenNotification = false;
-        _rowActions = rowActionsFromScreen ?? [];
+
         _this = dataThis;
     },
     checkRequireNote: async (field) => {
@@ -249,7 +249,7 @@ export const AttApproveTamScanLogRegisterBusinessFunction = {
         let actionCancel = _rowActions.find(item => item.Type === 'E_APPROVE'),
             isConfirm = actionCancel['Confirm'];
 
-        const isNote = await AttApproveTamScanLogRegisterBusinessFunction.checkRequireNote('IsRequiredApproveNote');
+        const isNote = await AttApproveTamScanLogRegisterBusinessFunction.checkRequireNote('IsRequiredApproveNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -438,7 +438,7 @@ export const AttApproveTamScanLogRegisterBusinessFunction = {
         let actionCancel = _rowActions.find(item => item.Type === 'E_REJECT'),
             isConfirm = actionCancel['Confirm'];
 
-        const isNote = await AttApproveTamScanLogRegisterBusinessFunction.checkRequireNote('IsRequiredRejectNote');
+        const isNote = await AttApproveTamScanLogRegisterBusinessFunction.checkRequireNote('IsRequiredRejectNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -621,7 +621,7 @@ export const AttApproveTamScanLogRegisterBusinessFunction = {
         let actionCancel = _rowActions.find(item => item.Type === 'E_CANCEL'),
             isConfirm = actionCancel['Confirm'];
 
-        const isNote = await AttApproveTamScanLogRegisterBusinessFunction.checkRequireNote('IsRequiredCancelNote');
+        const isNote = await AttApproveTamScanLogRegisterBusinessFunction.checkRequireNote('IsRequiredCancelNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],

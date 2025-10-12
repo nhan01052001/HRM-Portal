@@ -21,7 +21,6 @@ let configList = null,
     attSubmitTakeLeaveDay = null,
     attSubmitTakeLeaveDayViewDetail = null,
     attSubmitTakeLeaveDayKeyTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttSubmitTakeLeaveDay extends Component {
@@ -50,7 +49,7 @@ class AttSubmitTakeLeaveDay extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitTakeLeaveDayBusinessFunction.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttSubmitTakeLeaveDayBusinessFunction.setThisForBusiness(this);
             if (AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[attSubmitTakeLeaveDay]) {
                 this.reload();
             }
@@ -213,7 +212,7 @@ class AttSubmitTakeLeaveDay extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeLeaveDay);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeLeaveDay);
         let _params = {
             // IsPortal: true,
             // sort: orderBy,
@@ -345,7 +344,6 @@ class AttSubmitTakeLeaveDay extends Component {
                             }}
                             screenName={attSubmitTakeLeaveDay}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Attendance_Leave_Day_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

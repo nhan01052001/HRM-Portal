@@ -1,8 +1,7 @@
-/* eslint-disable react-native/split-platform-components */
 /* eslint-disable no-console */
 import RNFetchBlob from 'rn-fetch-blob';
 import FileViewer from 'react-native-file-viewer';
-import { PermissionsAndroid, Platform, Alert } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import { VnrLoadingSevices } from '../components/VnrLoading/VnrLoadingPages';
 import { ToasterSevice } from '../components/Toaster/Toaster';
 import DocumentPicker from 'react-native-document-picker';
@@ -10,56 +9,8 @@ import RNFS from 'react-native-fs';
 import base64 from 'react-native-base64';
 import { dataVnrStorage } from '../assets/auth/authentication';
 import Vnr_Services from './Vnr_Services';
-import moment from 'moment';
 
 export default class ManageFileSevice {
-    // Hàm ghi log vào file
-    static writeLogToFile = async (logMessage, isOpen = true) => {
-        try {
-            // Kiểm tra quyền truy cập trên Android
-            if (Platform.OS === 'android') {
-                const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-                    ToasterSevice.showError('WRITE_EXTERNAL_STORAGE_DENIED', 5000);
-                    return;
-                }
-            }
-
-            if (!logMessage) return;
-
-            const userName = dataVnrStorage?.currentUser?.headers?.userlogin || '',
-                newDate = moment(new Date()).format('DD_MM_YY');
-            // Đường dẫn file log (Lưu vào thư mục Documents trên Android hoặc iOS)
-            const path = `${RNFetchBlob.fs.dirs.DocumentDir}/app_logs_${userName}_${newDate}.txt`;
-
-            // Kiểm tra nếu file đã tồn tại, thêm log mới vào file
-            const exists = await RNFS.exists(path),
-                contentLog = typeof logMessage == 'string' ? logMessage : JSON.stringify(logMessage);
-
-            if (exists) {
-                await RNFS.appendFile(path, `\n${contentLog}`);
-            } else {
-                // Tạo file mới nếu chưa tồn tại
-                await RNFS.writeFile(path, contentLog);
-            }
-
-            !isOpen && ToasterSevice.showError('WRITE_EXTERNAL_STORAGE_SAVE', 5000);
-
-            isOpen &&
-                FileViewer.open(path, {
-                    showOpenWithDialog: true,
-                    showAppsSuggestions: true
-                })
-                    .then(() => {
-                        VnrLoadingSevices.hide();
-                    })
-                    .catch(() => {
-                        VnrLoadingSevices.hide();
-                    });
-        } catch (error) {
-            console.error('Failed to write log to file', error);
-        }
-    };
     static reverse = (s) => {
         return s.split('').reverse().join('');
     };
@@ -117,48 +68,7 @@ export default class ManageFileSevice {
             })
             .catch(() => {
                 VnrLoadingSevices.hide();
-            });
-    }
-
-    static async DownloadFileBase64(fileUrlBase64, fileName) {
-        if (!fileUrlBase64) {
-            return;
-        }
-
-        const { dirs } = RNFetchBlob.fs;
-        VnrLoadingSevices.show();
-
-        // Define a file path to save the file
-        let parts = fileName.split(/\.(?=[^.]+$)/); // Tách ở dấu chấm cuối cùng
-
-        let namePart = parts[0].replace(/[/\s]+/g, '_'), //phần tên file thay ký tự ' ' và / bằng dấu '_'
-            extPart = parts[1], // phần đuôi file
-            fileDirecName = `${namePart}${moment(new Date()).format('DDMMYYYY_HHmmss')}.${extPart}`;
-
-        const path =
-            Platform.OS === 'android'
-                ? `${dirs.DownloadDir}` // Android: Lưu vào thư mục Download
-                : `${dirs.DocumentDir}`; // iOS: Lưu vào Document directory
-
-        const filePath = `${path}/${fileDirecName}`;
-
-        // Xác định vị trí của ';base64,'
-        const base64Marker = ';base64,',
-            startIndex = fileUrlBase64.indexOf(base64Marker) + base64Marker.length,
-            base64Data = fileUrlBase64.slice(startIndex);
-
-        RNFetchBlob.fs
-            .writeFile(filePath, base64Data, 'base64')
-            .then(() => {
-                VnrLoadingSevices.hide();
-                ToasterSevice.showSuccess('DownloadSucceesfull', 5000);
-                console.log('File saved successfully at', filePath);
             })
-            .catch((error) => {
-                VnrLoadingSevices.hide();
-                ToasterSevice.showError('HRM_Payroll_ErrorInProcessing', 5000);
-                console.log('Error saving file:', error);
-            });
     }
 
     static ActionDownLoad(urlFile) {

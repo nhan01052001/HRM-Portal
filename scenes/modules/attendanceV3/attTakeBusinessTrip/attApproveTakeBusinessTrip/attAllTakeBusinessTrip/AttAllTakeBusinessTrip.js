@@ -23,7 +23,6 @@ let configList = null,
     enumName = null,
     attAllTakeBusinessTrip = null,
     attApproveTakeBusinessTrip = null,
-    dataRowActionAndSelected = null,
     attApproveTakeBusinessTripViewDetail = null,
     keyListTask = null,
     pageSizeList = 20;
@@ -51,7 +50,7 @@ class AttAllTakeBusinessTrip extends Component {
         this.paramsFilter = null;
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // reload danh sách khi có approve hoặc reject dữ liệu
-            AttApproveTakeBusinessTripBusinessFunction.setThisForBusiness(this, false, dataRowActionAndSelected?.rowActions);
+            AttApproveTakeBusinessTripBusinessFunction.setThisForBusiness(this);
             if (AttApproveTakeBusinessTripBusinessFunction.checkForReLoadScreen[attAllTakeBusinessTrip]) {
                 this.reload();
             }
@@ -155,7 +154,7 @@ class AttAllTakeBusinessTrip extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attAllTakeBusinessTrip);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attAllTakeBusinessTrip);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -295,7 +294,6 @@ class AttAllTakeBusinessTrip extends Component {
                             }}
                             screenName={attApproveTakeBusinessTrip}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Business'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

@@ -19,7 +19,7 @@ class InsuranceComponent extends Component {
         };
     }
 
-    remoteData = () => {
+    remoteData = (param = {}) => {
         const { keyQuery } = this.state;
         getDataLocal(EnumTask.KT_GeneralInfomation)
             .then(resData => {
@@ -69,6 +69,7 @@ class InsuranceComponent extends Component {
 
     UNSAFE_componentWillReceiveProps(nextProps) {
         const { keyQuery } = this.state;
+        console.log(nextProps, 'nextProps');
         if (nextProps.reloadScreenName == EnumTask.KT_GeneralInfomation) {
             //khi màn hình đang reload thì messsage phải là filter thì màn hình mới reload
             if (nextProps.message && keyQuery == nextProps.message.keyQuery) {
@@ -134,7 +135,7 @@ const mapStateToProps = state => {
     };
 };
 
-const mapDispatchToProps = () => {
+const mapDispatchToProps = dispatch => {
     return {};
 };
 

@@ -17,6 +17,7 @@ import {
 } from '../../../../../constants/Icons';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
 import VnrRenderListItem from '../../../../../componentsV3/VnrRenderList/VnrRenderListItem';
+import Vnr_Services from '../../../../../utils/Vnr_Services';
 
 export default class AttWorkingOvertimeListItemApprove extends VnrRenderListItem {
     render() {
@@ -161,14 +162,14 @@ export default class AttWorkingOvertimeListItemApprove extends VnrRenderListItem
                                     {/* top */}
                                     <View style={styles.styViewTop}>
                                         {/* Top - left */}
-                                        <View style={styles.wh69}>
+                                        <View style={CustomStyleSheet.width('75%')}>
                                             <Text
                                                 numberOfLines={1}
                                                 adjustsFontSizeToFit
                                                 allowFontScaling
                                                 style={[styleSheets.lable, styles.styleTextViewTop]}
                                             >
-                                                {dataItem?.DataRegister?.WorkDateRoot + ' '}
+                                                {dataItem?.WorkDateOfWeek ? `${dataItem?.WorkDateOfWeek}, ` : ''}{dataItem?.DataRegister?.WorkDateRoot + ' '}
                                                 <Text
                                                     style={[
                                                         styleSheets.lable,
@@ -301,7 +302,7 @@ export default class AttWorkingOvertimeListItemApprove extends VnrRenderListItem
                                             <IconDate size={Size.text - 1} color={Colors.gray_7} />
 
                                             <Text style={[styleSheets.text, styles.dateTimeSubmit_Text]}>
-                                                {moment(dataItem.DateCreate).format('DD/MM/YYYY')}
+                                                {Vnr_Services.getDayOfWeek(dataItem.DateCreate) ? `${Vnr_Services.getDayOfWeek(dataItem.DateCreate)}, ` : ''}{moment(dataItem.DateCreate).format('DD/MM/YYYY')}
                                             </Text>
                                         </View>
                                     )}

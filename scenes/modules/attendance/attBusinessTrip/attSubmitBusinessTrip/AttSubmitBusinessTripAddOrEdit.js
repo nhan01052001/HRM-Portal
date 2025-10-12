@@ -95,7 +95,7 @@ const initSateDefault = {
         TempLeaveDayTypeID: {
             label: 'HRM_Fin_PurchaseRequest_Type',
             api: {
-                urlApi: '[URI_HR]/Att_GetData/GetMultiDurationType',
+                urlApi: '[URI_POR]/New_Att_Overtime/GetMultiDurationType',
                 type: 'E_GET'
             },
             valueField: 'ID',
@@ -112,7 +112,7 @@ const initSateDefault = {
         DurationType: {
             label: 'HRM_Attendance_Leaveday_DurationType',
             api: {
-                urlApi: '[URI_HR]/Att_GetData/GetMultiLeaveDayDurationType',
+                urlApi: '[URI_POR]/New_Att_Leaveday/GetMultiDurationType',
                 type: 'E_GET'
             },
             valueField: 'Value',
@@ -182,7 +182,7 @@ const initSateDefault = {
         TypeHalfShift: {
             label: 'HRM_Attendance_Leaveday_TypeHalfShift',
             api: {
-                urlApi: '[URI_HR]/Att_GetData/GetMultiTypeHalfShift',
+                urlApi: '[URI_POR]/New_Att_Overtime/GetMultiTypeHalfShift',
                 type: 'E_GET'
             },
             valueField: 'Value',
@@ -701,11 +701,11 @@ export default class AttSubmitBusinessTripAddOrEdit extends Component {
             //UserApproveID
             HttpService.Get('[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_LEAVE_DAY_BUSINESSTRAVEL'),
             //DurationType
-            HttpService.Get('[URI_HR]/Att_GetData/GetMultiLeaveDayDurationType'),
+            HttpService.Get('[URI_POR]/New_Att_Leaveday/GetMultiDurationType'),
             //TempLeaveDayTypeID
-            HttpService.Get('[URI_HR]/Att_GetData/GetMultiDurationType'),
+            HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiDurationType'),
             //TypeHalfShift
-            HttpService.Get('[URI_HR]/Att_GetData/GetMultiTypeHalfShift')
+            HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiTypeHalfShift')
             //HttpService.Post('[URI_HR]/Cat_GetData/GetMultiLeaveDayTypeInPortal'),
         ]).then(resAll => {
             VnrLoadingSevices.hide();
@@ -2469,7 +2469,7 @@ export default class AttSubmitBusinessTripAddOrEdit extends Component {
         VnrLoadingSevices.show();
         HttpService.MultiRequest([
             HttpService.Get(
-                '[URI_HR]/Att_GetData/GetByIDLeaveDay?id=' + ID + '&profileID=' + profileID + '&_isPortalApp=' + true
+                '[URI_POR]/Att_Leaveday/New_Edit?id=' + ID + '&profileID=' + profileID + '&_isPortalApp=' + true
             ),
             //this.dataDurationType
             HttpService.Post('[URI_HR]/Sys_GetEnumData/GetEnum', { text: 'LeaveDayDurationType' }),
@@ -2478,11 +2478,11 @@ export default class AttSubmitBusinessTripAddOrEdit extends Component {
             //UserApproveID
             HttpService.Get('[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_LEAVE_DAY_BUSINESSTRAVEL'),
             //DurationType
-            HttpService.Get('[URI_HR]/Att_GetData/GetMultiLeaveDayDurationType'),
+            HttpService.Get('[URI_POR]/New_Att_Leaveday/GetMultiDurationType'),
             //TypeHalfShift
-            HttpService.Get('[URI_HR]/Att_GetData/GetMultiTypeHalfShift'),
+            HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiTypeHalfShift'),
             //TempLeaveDayTypeID
-            HttpService.Get('[URI_HR]/Att_GetData/GetMultiDurationType'),
+            HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiDurationType'),
             //IsChangeLevelAprpoved
             HttpService.Post('[URI_HR]/Att_GetData/GetHighSupervisor', {
                 ProfileID: profileID,

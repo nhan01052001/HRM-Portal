@@ -81,27 +81,21 @@ export default class AttWorkdayFilter extends Component {
                                                     ]}
                                                     onPress={() => this.onFilter(key)}
                                                 >
-                                                    <View
-                                                        style={CustomStyleSheet.maxWidth('90%')}
+                                                    <VnrText
+                                                        style={[
+                                                            styleSheets.text,
+                                                            item.isSelect && { color: Colors.primary }
+                                                        ]}
+                                                        i18nKey={item.keyTras}
+                                                    />
+                                                    <Text
+                                                        style={[
+                                                            styleSheets.lable,
+                                                            item.isSelect && { color: Colors.primary }
+                                                        ]}
                                                     >
-                                                        <VnrText
-                                                            style={[
-                                                                styleSheets.text,
-                                                                item.isSelect && { color: Colors.primary }
-                                                            ]}
-                                                            i18nKey={item.keyTras}
-                                                        />
-                                                    </View>
-                                                    <View>
-                                                        <Text
-                                                            style={[
-                                                                styleSheets.lable,
-                                                                item.isSelect && { color: Colors.primary }
-                                                            ]}
-                                                        >
-                                                            {item?.number ?? 0}
-                                                        </Text>
-                                                    </View>
+                                                        {Object.keys(item.data).length}
+                                                    </Text>
                                                 </TouchableOpacity>
                                             );
                                         }

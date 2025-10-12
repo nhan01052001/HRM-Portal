@@ -1,22 +1,15 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import {
-    Colors,
-    Size,
-    styleSafeAreaView,
-    styleSheets,
-    CustomStyleSheet
-} from '../../constants/styleConfig';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Colors, Size, styleSafeAreaView, stylesListPickerControl } from '../../constants/styleConfig';
 import NtfNotificationList from './ntfNotificationfList/NtfNotificationList';
+import DrawerServices from '../../utils/DrawerServices';
+import { IconNotify } from '../../constants/Icons';
 import { SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { startTask } from '../../factories/BackGroundTask';
-import { EnumName, EnumTask } from '../../assets/constant';
+import { ConfigVersionBuild } from '../../assets/configProject/ConfigVersionBuild';
+import { EnumName, EnumTask, ScreenName } from '../../assets/constant';
 import { NtfNotificationBusinessFunction, generateRowActionAndSelected } from './NtfNotificationBusiness';
-import { translate } from '../../i18n/translate';
-import store from '../../store';
-import badgesNotification from '../../redux/badgesNotification';
-
 
 class NtfPersonal extends Component {
     constructor(props) {
@@ -39,36 +32,7 @@ class NtfPersonal extends Component {
         });
 
         this.pageSize = 20;
-
-        props.navigation.setParams({
-            headerRight: (
-                <TouchableOpacity onPress={() => this.handleUpdateAllSeen()}>
-                    <View style={[styleSheets.bnt_HeaderRight, CustomStyleSheet.marginRight(8)]}>
-                        <Text
-                            style={
-                                ([styleSheets.lable, CustomStyleSheet.fontSize(Size.text - 1)],
-                                CustomStyleSheet.color(Colors.blue))
-                            }
-                        >
-                            {translate('HRM_PortalApp_ReadAllNotify')}
-                        </Text>
-                    </View>
-                </TouchableOpacity>
-            )
-        });
     }
-    handleUpdateAllSeen = async () => {
-        const { rowActions } = this.state
-        let totalIDs = this.NtfNotificationListRef.getAllIDNotify()
-        // cập nhật trạng thái đã xem tin
-        const actionUpdateAllSeen = rowActions.find(item => item.type == EnumName.E_UPDATESTATUS);
-        if (actionUpdateAllSeen && actionUpdateAllSeen.onPress) {
-            let dataAll = { lstID: totalIDs }
-            await actionUpdateAllSeen.onPress(dataAll);
-            this.NtfNotificationListRef.updateAllStatusSeen()
-            store.dispatch(badgesNotification.actions.setNumberBadgesNotify(0));
-        }
-    };
 
     componentWillUnmount() {
         if (this.willFocusScreen) {
@@ -98,6 +62,7 @@ class NtfPersonal extends Component {
     };
 
     pullToRefresh = () => {
+        debugger;
         const { dataBody, keyQuery } = this.state;
         this.setState(
             {
@@ -141,6 +106,8 @@ class NtfPersonal extends Component {
 
     initState = () => {
         const dataRowActionAndSelected = generateRowActionAndSelected();
+        console.log('init');
+        debugger;
         this.setState(
             {
                 // listConfigModule: initState,
@@ -161,8 +128,10 @@ class NtfPersonal extends Component {
         );
     };
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps) {
         const { keyQuery } = this.state;
+        debugger;
+        console.log(nextProps, 'nextProps');
         if (nextProps.reloadScreenName == EnumTask.KT_NtfPersonal) {
             //khi màn hình đang reload thì messsage phải là filter thì màn hình mới reload
             if (keyQuery === EnumName.E_FILTER && nextProps.message && keyQuery == nextProps.message.keyQuery) {
@@ -194,7 +163,6 @@ class NtfPersonal extends Component {
                 <View style={styles.container}>
                     {keyQuery && (
                         <NtfNotificationList
-                            ref={(ref) => this.NtfNotificationListRef = ref}
                             //listConfigModule={listConfigModule}
                             reloadScreenList={this.reload.bind(this)}
                             keyDataLocal={EnumTask.KT_NtfPersonal}
@@ -221,7 +189,7 @@ const styles = StyleSheet.create({
     }
 });
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
     return {
         reloadScreenName: state.lazyLoadingReducer.reloadScreenName,
         isChange: state.lazyLoadingReducer.isChange,
@@ -229,4 +197,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, null)(NtfPersonal);
+export default connect(
+    mapStateToProps,
+    null
+)(NtfPersonal);

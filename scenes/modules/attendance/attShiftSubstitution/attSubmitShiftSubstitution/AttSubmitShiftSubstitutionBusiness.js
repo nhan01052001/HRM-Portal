@@ -245,7 +245,7 @@ export const AttSubmitShiftSubstitutionBusinessFunction = {
                                 ? objValid.strResultID
                                 : '';
 
-                        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedShiftSubstitution', {
+                        HttpService.Post('[URI_POR]/New_Att_ShiftSubstitution/RemoveSelected', {
                             selectedIds: strId.split(','),
                             reason
                         }).then(res => {
@@ -276,7 +276,7 @@ export const AttSubmitShiftSubstitutionBusinessFunction = {
 
             VnrLoadingSevices.show();
 
-            HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedShiftSubstitution', {
+            HttpService.Post('[URI_POR]/New_Att_ShiftSubstitution/RemoveSelected', {
                 selectedIds: strId.split(',')
             }).then(res => {
                 VnrLoadingSevices.hide();

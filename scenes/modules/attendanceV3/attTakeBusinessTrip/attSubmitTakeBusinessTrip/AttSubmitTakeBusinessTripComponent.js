@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, Platform } from 'react-native';
-import { Colors, CustomStyleSheet, styleSheets, stylesVnrPickerV3 } from '../../../../../constants/styleConfig';
+import { View, TouchableOpacity, Text, Platform } from 'react-native';
+import { styleSheets, stylesVnrPickerV3 } from '../../../../../constants/styleConfig';
 import VnrText from '../../../../../components/VnrText/VnrText';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import VnrDate from '../../../../../componentsV3/VnrDate/VnrDate';
@@ -14,15 +14,14 @@ import moment from 'moment';
 import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import { translate } from '../../../../../i18n/translate';
-// import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle';
+import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle';
 import styleComonAddOrEdit from '../../../../../constants/styleComonAddOrEdit';
 import DrawerServices from '../../../../../utils/DrawerServices';
-import VnrPickerLittle from '../../../../../componentsV3/VnrPickerLittle/VnrPickerLittle';
 
 const initSateDefault = {
     DateRage: {
         value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_TotalBizTripDays',
+        lable: 'HRM_PortalApp_TakeBusinessTrip_WorkDate',
         disable: false,
         refresh: false,
         visible: true,
@@ -30,18 +29,18 @@ const initSateDefault = {
     },
     HoursFrom: {
         value: null,
-        lable: 'Thời gian từ',
+        lable: 'HRM_PortalApp_TakeBusinessTrip_HoursFrom',
         disable: false,
         refresh: false,
-        visible: true,
+        visible: false,
         visibleConfig: true
     },
     HoursTo: {
         value: null,
-        lable: 'Thời gian đến',
+        lable: 'HRM_PortalApp_TakeBusinessTrip_HoursTo',
         disable: false,
         refresh: false,
-        visible: true,
+        visible: false,
         visibleConfig: true
     },
     DurationType: {
@@ -59,7 +58,7 @@ const initSateDefault = {
         disable: true,
         refresh: false,
         visible: false,
-        visibleConfig: false
+        visibleConfig: true
     },
     PlaceFrom: {
         value: null,
@@ -69,12 +68,12 @@ const initSateDefault = {
         visible: false,
         visibleConfig: true
     },
-    ContactInfo: {
+    PlaceTo: {
         value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_ContactInfo',
-        disable: false,
+        lable: 'PlaceTo',
+        disable: true,
         refresh: false,
-        visible: true,
+        visible: false,
         visibleConfig: true
     },
     PlaceInFromID: {
@@ -87,7 +86,7 @@ const initSateDefault = {
     },
     PlaceInToID: {
         value: null,
-        lable: 'ContactInfo',
+        lable: 'PlaceTo',
         disable: true,
         refresh: false,
         visible: false,
@@ -95,7 +94,7 @@ const initSateDefault = {
     },
     PlaceOutToID: {
         value: null,
-        lable: 'ContactInfo',
+        lable: 'PlaceTo',
         disable: true,
         refresh: false,
         visible: false,
@@ -141,7 +140,7 @@ const initSateDefault = {
         visibleConfig: true
     },
     FileAttachment: {
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Attachments',
+        lable: 'HRM_PortalApp_TakeBusinessTrip_FileAttachment',
         visible: true,
         visibleConfig: true,
         disable: true,
@@ -215,34 +214,7 @@ const initSateDefault = {
     },
     timeRangeFromRoster: null,
     lstLeaveDaysHours: {},
-    SumDays: 1,
-
-    Location: {
-        value: null,
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Location',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true,
-        data: []
-    },
-    Content: {
-        value: '',
-        lable: 'HRM_PortalApp_TakeBusinessTrip_Content',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    },
-
-    PreparationWork: {
-        value: '',
-        lable: 'HRM_PortalApp_TakeBusinessTrip_PreparationWork',
-        disable: false,
-        refresh: false,
-        visible: true,
-        visibleConfig: true
-    }
+    SumDays: 1
 };
 
 const DATA_DURATION_FULL = ['E_FULLSHIFT', 'E_FIRSTHALFSHIFT', 'E_LASTHALFSHIFT', 'E_BYHOURS'],
@@ -282,19 +254,17 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             nextState.DurationType.value !== this.state.DurationType.value ||
             nextState.BusinessReason.value !== this.state.BusinessReason.value ||
             nextState.BusinessTripTypeID.value !== this.state.BusinessTripTypeID.value ||
-            nextState.Location.value !== this.state.Location.value ||
             nextState.FileAttachment.value !== this.state.FileAttachment.value ||
             nextState.LeaveDays.value !== this.state.LeaveDays.value ||
             nextState.LeaveHours.value !== this.state.LeaveHours.value ||
             nextState.PlaceFrom !== this.state.PlaceFrom ||
-            nextState.ContactInfo !== this.state.ContactInfo ||
+            nextState.PlaceTo !== this.state.PlaceTo ||
             nextState.PlaceInFromID !== this.state.PlaceInFromID ||
             nextState.PlaceInToID !== this.state.PlaceInToID ||
             nextState.PlaceOutToID !== this.state.PlaceOutToID ||
             nextState.PlaceSendToID !== this.state.PlaceSendToID ||
-            nextState.BusinessTripReasonID !== this.state.BusinessTripReasonID ||
-            nextState.Content.value !== this.state.Content.value ||
-            nextState.PreparationWork.value !== this.state.PreparationWork.value
+            nextState.BusinessTripReasonID !== this.state.BusinessTripReasonID
+
         ) {
             return true;
         } else {
@@ -420,21 +390,18 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 isRefreshState,
                 LeaveDays,
                 LeaveHours,
+                HoursFrom,
+                HoursTo,
                 DurationType,
                 BusinessTripTypeID,
                 PlaceFrom,
-                ContactInfo,
+                PlaceTo,
                 PlaceInFromID,
                 PlaceInToID,
                 // eslint-disable-next-line no-unused-vars
                 PlaceOutToID,
                 PlaceSendToID,
-                BusinessTripReasonID,
-                Content,
-                PreparationWork,
-                Location,
-                HoursFrom,
-                HoursTo
+                BusinessTripReasonID
             } = this.state;
 
         const profileInfo = dataVnrStorage
@@ -446,7 +413,11 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
         const { E_ProfileID, E_FullName } = EnumName,
             _profile = { ID: profileInfo[E_ProfileID], ProfileName: profileInfo[E_FullName] };
 
-        const { DateRage, FileAttachment, BusinessReason } = this.state;
+        const {
+            DateRage,
+            FileAttachment,
+            BusinessReason
+        } = this.state;
 
         if (record) {
             // Modify
@@ -486,6 +457,33 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         }
                     };
                 }
+
+                // đk theo giờ
+                if (record.DurationType == EnumName.E_BYHOURS) {
+                    nextState = {
+                        ...nextState,
+                        HoursFrom: {
+                            ...HoursFrom,
+                            visible: true
+                        },
+                        HoursTo: {
+                            ...HoursTo,
+                            visible: true
+                        }
+                    };
+                } else {
+                    nextState = {
+                        ...nextState,
+                        HoursFrom: {
+                            ...HoursFrom,
+                            visible: false
+                        },
+                        HoursTo: {
+                            ...HoursTo,
+                            visible: false
+                        }
+                    };
+                }
             }
 
             let nextState = {
@@ -502,7 +500,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 BusinessTripTypeID: {
                     ...BusinessTripTypeID,
                     disable: false,
-                    visible: false,
+                    visible: true,
                     value: record.BusinessTripTypeID
                         ? { BusinessTravelName: record.BusinessTravelName, ID: record.BusinessTripTypeID }
                         : null,
@@ -531,16 +529,12 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     value: record.LeaveHours ? record.LeaveHours : 0
                 },
                 HoursFrom: {
-                    ...HoursFrom,
-                    visible: true,
-                    value: record.HourFrom ? moment(record.HourFrom) : null,
-                    refresh: !HoursFrom.refresh
+                    ...nextState.HoursFrom,
+                    value: record.HourFrom ? moment(record.HourFrom) : null
                 },
                 HoursTo: {
-                    ...HoursTo,
-                    visible: true,
-                    value: record.HourTo ? moment(record.HourTo) : null,
-                    refresh: !HoursTo.refresh
+                    ...nextState.HoursTo,
+                    value: record.HourTo ? moment(record.HourTo) : null
                 },
                 PlaceSendToID: {
                     ...PlaceSendToID,
@@ -559,36 +553,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         : null,
                     visible: true,
                     refresh: !BusinessTripReasonID.refresh
-                },
-                Content: {
-                    ...Content,
-                    disable: false,
-                    visible: true,
-                    value: record.Content ? record.Content : null,
-                    refresh: !Content.refresh
-                },
-                PreparationWork: {
-                    ...PreparationWork,
-                    disable: false,
-                    visible: true,
-                    value: record.PreparationWork ? record.PreparationWork : null,
-                    refresh: !PreparationWork.refresh
-                },
-                ContactInfo: {
-                    ...ContactInfo,
-                    disable: false,
-                    visible: true,
-                    value: record.ContactInfo ?? null,
-                    refresh: !ContactInfo.refresh
-                },
-                Location: {
-                    ...Location,
-                    disable: false,
-                    visible: true,
-                    value: record.WorkPlaceBussinessID
-                        ? { WorkPlaceCodeName: record.WorkPlaceBussinessName, ID: record.WorkPlaceBussinessID }
-                        : null,
-                    refresh: !Location.refresh
                 }
             };
 
@@ -599,17 +563,21 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         ...PlaceFrom,
                         disable: false,
                         visible: true,
-                        value: record.PlaceFrom ? record.PlaceFrom : null,
+                        value: record.PlaceFrom
+                            ? record.PlaceFrom
+                            : null,
                         refresh: !PlaceFrom.refresh
                     },
-                    ContactInfo: {
-                        ...ContactInfo,
+                    PlaceTo: {
+                        ...PlaceTo,
                         disable: false,
                         visible: true,
-                        value: record.ContactInfo ? record.ContactInfo : null,
-                        refresh: !ContactInfo.refresh
+                        value: record.PlaceTo
+                            ? record.PlaceTo
+                            : null,
+                        refresh: !PlaceTo.refresh
                     }
-                };
+                }
             } else if (record.IsDomesticTravel) {
                 nextState = {
                     ...nextState,
@@ -631,9 +599,9 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             : null,
                         refresh: !PlaceInToID.refresh
                     }
-                };
+                }
             } else if (record.IsOutTravel) {
-                this.getDataPlaceOutTo(record);
+                this.getDataPlaceOutTo(record)
             }
 
             // Value Acttachment
@@ -664,7 +632,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             this.setState(nextState, () => {
                 this.getDataLeavedayType(true);
                 this.getDataBusinessTripReason();
-                this.getDataPlaceSend();
+                this.getDataPlaceSend()
             });
         } else {
             this.setState(
@@ -685,10 +653,8 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
     };
 
     getDataPlaceSend = async () => {
-        const { PlaceSendToID } = this.state;
-        const resPlaceSend = await HttpService.Get(
-            '[URI_CENTER]/api/Att_GetData/GetMultiWorkPlaceCodeNameWhichEmailNotNull?text=&TextField=SendToID'
-        );
+        const { PlaceSendToID } = this.state
+        const resPlaceSend = await HttpService.Get('[URI_CENTER]/api/Att_GetData/GetMultiWorkPlaceCodeNameWhichEmailNotNull?text=&TextField=SendToID');
         this.setState({
             PlaceSendToID: {
                 ...PlaceSendToID,
@@ -696,14 +662,12 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 disable: false,
                 visible: true
             }
-        });
-    };
+        })
+    }
 
     getDataBusinessTripReason = async () => {
-        const { BusinessTripReasonID } = this.state;
-        const resBusinessTripReasonID = await HttpService.Get(
-            '[URI_CENTER]/api/Att_GetData/GetMultiBussinessTripReason?text=&TextField=BusinessTripReasonName'
-        );
+        const { BusinessTripReasonID } = this.state
+        const resBusinessTripReasonID = await HttpService.Get('[URI_CENTER]/api/Att_GetData/GetMultiBussinessTripReason?text=&TextField=BusinessTripReasonName');
         this.setState({
             BusinessTripReasonID: {
                 ...BusinessTripReasonID,
@@ -711,8 +675,8 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 disable: false,
                 visible: true
             }
-        });
-    };
+        })
+    }
 
     componentDidMount() {
         this.initState();
@@ -748,7 +712,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             () => {
                 this.getDataLeavedayType();
                 this.getDataBusinessTripReason();
-                this.getDataPlaceSend();
+                this.getDataPlaceSend()
                 // gọi từ componentsDidmount thì k cần gọi
                 if (!isFromInit) {
                     // Cập nhật lại ngày đăng ký bên ngoài
@@ -762,7 +726,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
     };
 
     getDataPlaceOutTo = async (record) => {
-        const { PlaceOutToID } = this.state;
+        const { PlaceOutToID } = this.state
         const resCountry = await HttpService.Get('[URI_CENTER]/api/Cat_GetData/GetMultiCountry');
         this.setState({
             PlaceOutToID: {
@@ -770,11 +734,13 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 disable: false,
                 data: resCountry.Data,
                 visible: true,
-                value: record.PlaceOutToID ? { CountryCodeName: record.PlaceOutToName, ID: record.PlaceOutToID } : null,
+                value: record.PlaceOutToID
+                    ? { CountryCodeName: record.PlaceOutToName, ID: record.PlaceOutToID }
+                    : null,
                 refresh: !PlaceOutToID.refresh
             }
-        });
-    };
+        })
+    }
 
     getDataLeavedayType = async (isFromModify) => {
         const {
@@ -1020,12 +986,12 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                                     HoursFrom: {
                                         ...HoursFrom,
                                         value: dataRoster && dataRoster.HoursFrom ? dataRoster.HoursFrom : null,
-                                        refresh: !HoursFrom.refresh
+                                        visible: false
                                     },
                                     HoursTo: {
                                         ...HoursTo,
                                         value: dataRoster && dataRoster.HoursTo ? dataRoster.HoursTo : null,
-                                        refresh: !HoursTo.refresh
+                                        visible: false
                                     }
                                 };
                             }
@@ -1058,7 +1024,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
     //#region Step 3: Change Loại ĐK
     onchangeDuration = (item) => {
-        const { DurationType, DateRage, LeaveDays, LeaveHours } = this.state;
+        const { DurationType, DateRage, LeaveDays, LeaveHours, HoursFrom, HoursTo } = this.state;
         let nextState = {
             DurationType: {
                 ...DurationType,
@@ -1098,6 +1064,32 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     LeaveHours: {
                         ...LeaveHours,
                         visible: true
+                    }
+                };
+            }
+
+            if (item.Value == EnumName.E_BYHOURS) {
+                nextState = {
+                    ...nextState,
+                    HoursFrom: {
+                        ...HoursFrom,
+                        visible: true
+                    },
+                    HoursTo: {
+                        ...HoursTo,
+                        visible: true
+                    }
+                };
+            } else {
+                nextState = {
+                    ...nextState,
+                    HoursFrom: {
+                        ...HoursFrom,
+                        visible: false
+                    },
+                    HoursTo: {
+                        ...HoursTo,
+                        visible: false
                     }
                 };
             }
@@ -1276,7 +1268,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
         try {
             const { HoursFrom, HoursTo, Profile } = this.state;
             const { DateStart, DateEnd } = this.getDate();
-            if (HoursFrom.value && HoursTo.value && DateStart && DateEnd) {
+            if ((HoursFrom.value && HoursTo.value && DateStart && DateEnd)) {
                 const payload = {
                     DateFrom: moment(DateStart).format('YYYY/MM/DD'),
                     DateTo: moment(DateEnd).format('YYYY/MM/DD'),
@@ -1285,9 +1277,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     HourTo: Vnr_Function.formatDateAPI(HoursTo.value),
                     ProfileID: Profile.ID
                 };
-                HttpService.Post('[URI_CENTER]/api/Att_BussinessTravel/TotalBusinesDayByBusinessTripType', {
-                    ...payload
-                })
+                HttpService.Post('[URI_CENTER]/api/Att_BussinessTravel/TotalBusinesDayByBusinessTripType', { ...payload })
                     .then((res) => {
                         if (res?.Status !== EnumName.E_SUCCESS) {
                             this.ToasterSevice().showWarning(res?.Message);
@@ -1295,11 +1285,10 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         }
                         this.setState({
                             SumDays: res?.Data ? res.Data : 0
-                        });
-                    })
-                    .catch((err) => {
+                        })
+                    }).catch((err) => {
                         DrawerServices.navigate('ErrorScreen', { ErrorDisplay: err });
-                    });
+                    })
             }
         } catch (error) {
             DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
@@ -1309,7 +1298,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
     //#region Step 4: Các xử lý còn lại
     onChangeBusinessType = async () => {
-        const { BusinessTripTypeID, PlaceFrom, PlaceInFromID, PlaceInToID, PlaceOutToID } = this.state;
+        const { BusinessTripTypeID, PlaceFrom, PlaceTo, PlaceInFromID, PlaceInToID, PlaceOutToID } = this.state;
         if (BusinessTripTypeID.value) {
             let businessTripType = BusinessTripTypeID.value;
             if (businessTripType.Location) {
@@ -1334,17 +1323,28 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             disable: false,
                             visible: false
                         },
+                        PlaceTo: {
+                            ...PlaceTo,
+                            value: null,
+                            disable: false,
+                            visible: false
+                        },
                         PlaceOutToID: {
                             ...PlaceOutToID,
                             value: null,
                             disable: false,
                             visible: false
                         }
-                    });
+                    })
                 } else if (businessTripType.Location === 'E_IN') {
                     this.setState({
                         PlaceFrom: {
                             ...PlaceFrom,
+                            disable: false,
+                            visible: true
+                        },
+                        PlaceTo: {
+                            ...PlaceTo,
                             disable: false,
                             visible: true
                         },
@@ -1366,12 +1366,18 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             disable: false,
                             visible: false
                         }
-                    });
+                    })
                 } else if (businessTripType.Location === 'E_OUT') {
                     const resCountry = await HttpService.Get('[URI_CENTER]/api/Cat_GetData/GetMultiCountry');
                     this.setState({
                         PlaceFrom: {
                             ...PlaceFrom,
+                            value: null,
+                            disable: false,
+                            visible: false
+                        },
+                        PlaceTo: {
+                            ...PlaceTo,
                             value: null,
                             disable: false,
                             visible: false
@@ -1394,12 +1400,17 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             disable: false,
                             visible: true
                         }
-                    });
+                    })
                 }
             } else {
                 this.setState({
                     PlaceFrom: {
                         ...PlaceFrom,
+                        disable: false,
+                        visible: true
+                    },
+                    PlaceTo: {
+                        ...PlaceTo,
                         disable: false,
                         visible: true
                     },
@@ -1418,12 +1429,17 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         disable: false,
                         visible: false
                     }
-                });
+                })
             }
         } else {
             this.setState({
                 PlaceFrom: {
                     ...PlaceFrom,
+                    disable: false,
+                    visible: false
+                },
+                PlaceTo: {
+                    ...PlaceTo,
                     disable: false,
                     visible: false
                 },
@@ -1442,19 +1458,18 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                     disable: false,
                     visible: false
                 }
-            });
+            })
         }
     };
     renderWorkDate = () => {
         const { DateRage } = this.state,
-            { record, fieldConfig } = this.props;
+            { record } = this.props;
 
         let isModify = record ? true : false;
         if (DateRage.value && Array.isArray(DateRage.value) && DateRage.value.length > 1) {
             // Đăng ký nhiều ngày cùng lúc
             return (
                 <VnrDateFromTo
-                    fieldValid={fieldConfig?.RegisterDate?.isValid}
                     isControll={true}
                     lable={DateRage.lable}
                     refresh={DateRage.refresh}
@@ -1474,7 +1489,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             // Đăng ký nhiều ngày liên tục
             return (
                 <VnrDateFromTo
-                    fieldValid={fieldConfig?.RegisterDate?.isValid}
                     isControll={true}
                     lable={DateRage.lable}
                     refresh={DateRage.refresh}
@@ -1489,7 +1503,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             // Đăng ký từng ngày, 1 ngày
             return (
                 <VnrDateFromTo
-                    fieldValid={fieldConfig?.RegisterDate?.isValid}
                     lable={DateRage.lable}
                     isControll={true}
                     refresh={DateRage.refresh}
@@ -1507,17 +1520,23 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
         }
     };
 
-    getDataVisible = () => {
-        const { PlaceFrom, ContactInfo, PlaceInFromID, PlaceInToID, PlaceOutToID } = this.state;
-
-        return {
+    getDataVisible= () => {
+        const {
             PlaceFrom,
-            ContactInfo,
+            PlaceTo,
             PlaceInFromID,
             PlaceInToID,
             PlaceOutToID
-        };
-    };
+        } = this.state
+
+        return {
+            PlaceFrom,
+            PlaceTo,
+            PlaceInFromID,
+            PlaceInToID,
+            PlaceOutToID
+        }
+    }
 
     getAllData = () => {
         const {
@@ -1529,15 +1548,12 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 HoursFrom,
                 HoursTo,
                 PlaceFrom,
-                ContactInfo,
+                PlaceTo,
                 PlaceInFromID,
                 PlaceInToID,
                 PlaceOutToID,
                 PlaceSendToID,
-                BusinessTripReasonID,
-                Location,
-                Content,
-                PreparationWork
+                BusinessTripReasonID
             } = this.state,
             { levelApprove, record } = this.props;
         const { DateStart, DateEnd } = this.getDate();
@@ -1545,12 +1561,11 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
 
         if (DurationType?.value?.Value === 'E_FIRSTHALFSHIFT' || DurationType?.value?.Value === 'E_LASTHALFSHIFT') {
             // nữa ca trước || nữa ca sau
-            SumDays = 0.5;
+            SumDays = 0.5
         }
 
-        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = (Math.random() * 16) | 0,
-                v = c == 'x' ? r : (r & 0x3) | 0x8;
+        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
 
@@ -1569,7 +1584,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             FileAttachment: FileAttachment.value ? FileAttachment.value.map((item) => item.fileName).join(',') : null,
             Note: BusinessReason.value ? BusinessReason.value : null,
             PlaceFrom: PlaceFrom.value ? PlaceFrom.value : null,
-            ContactInfo: ContactInfo.value ? ContactInfo.value : null,
+            PlaceTo: PlaceTo.value ? PlaceTo.value : null,
             PlaceFromCombobox: PlaceInFromID.value ? PlaceInFromID.value.ID : null,
             PlaceToCombobox: PlaceInToID.value ? PlaceInToID.value.ID : null,
             PlaceFromCountry: PlaceOutToID.value ? PlaceOutToID.value.ID : null,
@@ -1577,10 +1592,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             BusinessTripReasonID: BusinessTripReasonID.value ? BusinessTripReasonID.value.ID : null,
             LevelApproved: levelApprove,
             SumDays,
-            RegisterDate: DateStart ? moment(DateStart).format('YYYY/MM/DD') : null,
-            Content: Content.value ? Content.value : null,
-            WorkPlaceBussinessID: Location.value?.ID ?? null,
-            PreparationWork: PreparationWork.value ? PreparationWork.value : null
+            RegisterDate: DateStart ? moment(DateStart).format('YYYY/MM/DD') : null
         };
     };
 
@@ -1592,48 +1604,31 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
             BusinessReason,
             DurationType,
             BusinessTripTypeID,
-            // LeaveDays,
+            LeaveDays,
             HoursFrom,
             HoursTo,
             PlaceFrom,
-            ContactInfo,
+            PlaceTo,
             PlaceInFromID,
             PlaceInToID,
             PlaceOutToID,
             PlaceSendToID,
-            BusinessTripReasonID,
-            Location,
-            Content,
-            PreparationWork
+            BusinessTripReasonID
         } = this.state;
 
-        const {
-                fieldConfig,
-                isShowDelete,
-                onDeleteItemDay,
-                indexDay,
-                acIsCheckEmpty,
-                onScrollToInputIOS,
-                isSimilarRegistration
-            } = this.props,
+        const { fieldConfig, isShowDelete, onDeleteItemDay, indexDay, acIsCheckEmpty, onScrollToInputIOS } = this.props,
             { viewInputMultiline } = stylesVnrPickerV3;
 
         return (
             <View
-                style={[styles.wrapItem, CustomStyleSheet.marginTop(0)]}
+                style={styles.wrapItem}
                 onLayout={(event) => {
                     const layout = event.nativeEvent.layout;
                     this.layoutHeightItem = layout.height;
                 }}
             >
                 {/* Title group for time */}
-                <View
-                    style={[
-                        styles.flRowSpaceBetween,
-                        CustomStyleSheet.borderTopColor(Colors.gray_5),
-                        CustomStyleSheet.borderTopWidth(isSimilarRegistration ? 0.5 : 0)
-                    ]}
-                >
+                <View style={styles.flRowSpaceBetween}>
                     <VnrText style={[styleSheets.lable, styles.styLableGp]} i18nKey={'HRM_PortalApp_LableTime'} />
 
                     {isShowDelete && (
@@ -1675,7 +1670,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         {/* Giờ vào */}
                         <View style={styles.styRowDate}>
                             <VnrDate
-                                isHiddenIcon={true}
                                 fieldValid={fieldConfig?.HoursFrom?.isValid}
                                 refresh={HoursFrom.refresh}
                                 response={'string'}
@@ -1683,7 +1677,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                                 type={'time'}
                                 value={HoursFrom.value}
                                 lable={HoursFrom.lable}
-                                placeHolder={'HH:mm'}
+                                placeHolder={'HRM_PortalApp_TSLRegister_Time'}
                                 disable={HoursFrom.disable}
                                 onFinish={(item) => {
                                     this.setState(
@@ -1705,7 +1699,6 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         {/* Giờ ra */}
                         <View style={styles.styRowDate}>
                             <VnrDate
-                                isHiddenIcon={true}
                                 isCheckEmpty={acIsCheckEmpty}
                                 fieldValid={fieldConfig?.HoursTo?.isValid}
                                 refresh={HoursTo.refresh}
@@ -1714,7 +1707,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                                 type={'time'}
                                 value={HoursTo.value}
                                 lable={HoursTo.lable}
-                                placeHolder={'HH:mm'}
+                                placeHolder={'HRM_PortalApp_TSLRegister_Time'}
                                 disable={HoursTo.disable}
                                 onFinish={(item) => {
                                     this.setState(
@@ -1734,144 +1727,21 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                 )}
 
                 {/* Tổng ngày nghỉ - Tổng giờ */}
-                {/* {(LeaveDays.visible || fieldConfig?.LeaveHours?.visible) && (
+                {(LeaveDays.visible || fieldConfig?.LeaveHours?.visible) && (
                     <View style={styles.styViewLeaveDayCount}>
                         <Text style={[styleSheets.lable, styles.styViewLeaveDayCountLable]}>
                             {this.getTxtTotalCount()}
                         </Text>
                     </View>
-                )} */}
+                )}
 
                 {/* diễn giải */}
                 <View style={styles.styRowControl}>
                     {/* Title group for Explanation */}
                     <View style={styles.flRowSpaceBetween}>
-                        <VnrText
-                            style={[styleSheets.lable, styles.styLableGp, CustomStyleSheet.fontWeight('600')]}
-                            i18nKey={'HRM_PortalApp_Explanation'}
-                        />
+                        <VnrText style={[styleSheets.lable, styles.styLableGp]} i18nKey={'HRM_PortalApp_Explanation'} />
                     </View>
                 </View>
-
-                {/* Địa điểm */}
-                {((Location.visible && fieldConfig?.Location?.visibleConfig)) && (
-                    <VnrPickerQuickly
-                        api={{
-                            urlApi: '[URI_CENTER]/api/Cat_GetData/GetMultiWorkPlace',
-                            type: 'E_GET'
-                        }}
-                        stylePlaceholder={{
-                            colors: Colors.gray_6
-                        }}
-                        isCheckEmpty={acIsCheckEmpty}
-                        refresh={Location.refresh}
-                        value={Location.value}
-                        textField="WorkPlaceCodeName"
-                        valueField="ID"
-                        filter={true}
-                        filterLocal={true}
-                        autoFilter={true}
-                        filterParams="WorkPlaceCodeName"
-                        disable={Location.disable}
-                        lable={Location.lable}
-                        onFinish={(item) => {
-                            this.setState({
-                                Location: {
-                                    ...Location,
-                                    value: item,
-                                    refresh: !Location.refresh
-                                }
-                            });
-                        }}
-                    />
-                )}
-
-                {/* Thông tin liên hệ */}
-                {((ContactInfo.visible && fieldConfig?.ContactInfo?.visibleConfig)) && (
-                    <VnrTextInput
-                        isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.ContactInfo?.isValid}
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={ContactInfo.disable}
-                        lable={ContactInfo.lable}
-                        style={[styleSheets.text]}
-                        value={ContactInfo.value}
-                        isTextRow={true}
-                        onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
-                        }}
-                        onChangeText={(text) => {
-                            this.setState({
-                                ContactInfo: {
-                                    ...ContactInfo,
-                                    value: text,
-                                    refresh: !ContactInfo.refresh
-                                }
-                            });
-                        }}
-                        refresh={ContactInfo.refresh}
-                    />
-                )}
-
-                {/* Nội dung */}
-                {((Content.visible && fieldConfig?.Content?.visibleConfig)) && (
-                    <VnrTextInput
-                        isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.Content?.isValid}
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={Content.disable}
-                        lable={Content.lable}
-                        style={[styleSheets.text, viewInputMultiline]}
-                        multiline={true}
-                        value={Content.value}
-                        onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
-                        }}
-                        onChangeText={(text) => {
-                            this.setState({
-                                Content: {
-                                    ...Content,
-                                    value: text,
-                                    refresh: !Content.refresh
-                                }
-                            });
-                        }}
-                        refresh={Content.refresh}
-                    />
-                )}
-
-                {/* Công tác chuẩn bị */}
-                {((PreparationWork.visible && fieldConfig?.PreparationWork?.visibleConfig)) && (
-                    <VnrTextInput
-                        isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.PreparationWork?.isValid}
-                        placeHolder={'HRM_PortalApp_PleaseInput'}
-                        disable={PreparationWork.disable}
-                        lable={PreparationWork.lable}
-                        style={[styleSheets.text, viewInputMultiline]}
-                        multiline={true}
-                        value={PreparationWork.value}
-                        onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
-                        }}
-                        onChangeText={(text) => {
-                            this.setState({
-                                PreparationWork: {
-                                    ...PreparationWork,
-                                    value: text,
-                                    refresh: !PreparationWork.refresh
-                                }
-                            });
-                        }}
-                        refresh={PreparationWork.refresh}
-                    />
-                )}
 
                 {/* Loại Công tác */}
                 {BusinessTripTypeID.visible && fieldConfig?.BusinessTripTypeID?.visibleConfig && (
@@ -1915,9 +1785,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         multiline={true}
                         value={PlaceFrom.value}
                         onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
+                            (Platform.OS == 'ios' && typeof onScrollToInputIOS === 'function') && onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
                         }}
                         onChangeText={(text) => {
                             this.setState({
@@ -1929,6 +1797,33 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                             });
                         }}
                         refresh={PlaceFrom.refresh}
+                    />
+                )}
+
+                {/* Nơi đến */}
+                {PlaceTo.visible && fieldConfig?.PlaceTo?.visibleConfig && (
+                    <VnrTextInput
+                        isCheckEmpty={acIsCheckEmpty}
+                        fieldValid={fieldConfig?.PlaceTo?.isValid}
+                        placeHolder={'HRM_PortalApp_PleaseInput'}
+                        disable={PlaceTo.disable}
+                        lable={PlaceTo.lable}
+                        style={[styleSheets.text, viewInputMultiline]}
+                        multiline={true}
+                        value={PlaceTo.value}
+                        onFocus={() => {
+                            (Platform.OS == 'ios' && typeof onScrollToInputIOS === 'function') && onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
+                        }}
+                        onChangeText={(text) => {
+                            this.setState({
+                                PlaceTo: {
+                                    ...PlaceTo,
+                                    value: text,
+                                    refresh: !PlaceTo.refresh
+                                }
+                            });
+                        }}
+                        refresh={PlaceTo.refresh}
                     />
                 )}
 
@@ -1975,13 +1870,15 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         disable={PlaceInToID.disable}
                         lable={PlaceInToID.lable}
                         onFinish={(item) => {
-                            this.setState({
-                                PlaceInToID: {
-                                    ...PlaceInToID,
-                                    value: item,
-                                    refresh: !PlaceInToID.refresh
+                            this.setState(
+                                {
+                                    PlaceInToID: {
+                                        ...PlaceInToID,
+                                        value: item,
+                                        refresh: !PlaceInToID.refresh
+                                    }
                                 }
-                            });
+                            );
                         }}
                     />
                 )}
@@ -2002,13 +1899,15 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         disable={PlaceOutToID.disable}
                         lable={PlaceOutToID.lable}
                         onFinish={(item) => {
-                            this.setState({
-                                PlaceOutToID: {
-                                    ...PlaceOutToID,
-                                    value: item,
-                                    refresh: !PlaceOutToID.refresh
+                            this.setState(
+                                {
+                                    PlaceOutToID: {
+                                        ...PlaceOutToID,
+                                        value: item,
+                                        refresh: !PlaceOutToID.refresh
+                                    }
                                 }
-                            });
+                            );
                         }}
                     />
                 )}
@@ -2029,13 +1928,15 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         disable={PlaceSendToID.disable}
                         lable={PlaceSendToID.lable}
                         onFinish={(item) => {
-                            this.setState({
-                                PlaceSendToID: {
-                                    ...PlaceSendToID,
-                                    value: item,
-                                    refresh: !PlaceSendToID.refresh
+                            this.setState(
+                                {
+                                    PlaceSendToID: {
+                                        ...PlaceSendToID,
+                                        value: item,
+                                        refresh: !PlaceSendToID.refresh
+                                    }
                                 }
-                            });
+                            );
                         }}
                     />
                 )}
@@ -2056,21 +1957,23 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         disable={BusinessTripReasonID.disable}
                         lable={BusinessTripReasonID.lable}
                         onFinish={(item) => {
-                            this.setState({
-                                BusinessTripReasonID: {
-                                    ...BusinessTripReasonID,
-                                    value: item,
-                                    refresh: !BusinessTripReasonID.refresh
+                            this.setState(
+                                {
+                                    BusinessTripReasonID: {
+                                        ...BusinessTripReasonID,
+                                        value: item,
+                                        refresh: !BusinessTripReasonID.refresh
+                                    }
                                 }
-                            });
+                            );
                         }}
                     />
                 )}
 
-                {BusinessReason.visible && fieldConfig?.Note?.visibleConfig && (
+                {BusinessReason.visible && fieldConfig?.BusinessReason?.visibleConfig && (
                     <VnrTextInput
                         isCheckEmpty={acIsCheckEmpty}
-                        fieldValid={fieldConfig?.Note?.isValid}
+                        fieldValid={fieldConfig?.BusinessReason?.isValid}
                         placeHolder={'HRM_PortalApp_PleaseInput'}
                         disable={BusinessReason.disable}
                         lable={BusinessReason.lable}
@@ -2078,9 +1981,7 @@ class AttSubmitTakeBusinessTripComponent extends React.Component {
                         multiline={true}
                         value={BusinessReason.value}
                         onFocus={() => {
-                            Platform.OS == 'ios' &&
-                                typeof onScrollToInputIOS === 'function' &&
-                                onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
+                            (Platform.OS == 'ios' && typeof onScrollToInputIOS === 'function') && onScrollToInputIOS(indexDay + 1, this.layoutHeightItem);
                         }}
                         onChangeText={(text) => {
                             this.setState({

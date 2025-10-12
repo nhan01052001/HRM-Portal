@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { Component } from 'react';
 import { View, StyleSheet, Image, StatusBar, Platform } from 'react-native';
 import { Colors, Size } from '../../constants/styleConfig';
@@ -17,8 +18,8 @@ import { ConfigChart } from '../../assets/configProject/ConfigChart';
 import { dataVnrStorage, getDataVnrStorage, logout, setdataVnrStorage } from '../../assets/auth/authentication';
 import store from '../../store';
 import { startTask } from '../../factories/BackGroundTask';
-import { getDataLocal, saveDataLocal, SInfoService } from '../../factories/LocalData';
-import { EnumIcon, EnumName, EnumTask, EnumUser, ScreenName } from '../../assets/constant';
+import { getDataLocal, saveDataLocal } from '../../factories/LocalData';
+import { EnumIcon, EnumName, EnumTask, ScreenName } from '../../assets/constant';
 import { connect } from 'react-redux';
 import badgesNotification from '../../redux/badgesNotification';
 import { UpdateVersionApi } from '../../components/modalUpdateVersion/ModalUpdateVersion';
@@ -28,7 +29,8 @@ import DrawerServices from '../../utils/DrawerServices';
 import { setDataLang } from '../../i18n/setDataLang';
 import SignalRService from '../../utils/SignalRService';
 import Vnr_Services from '../../utils/Vnr_Services';
-import ManageFileSevice from '../../utils/ManageFileSevice';
+import { SaveLogError } from '../modules/feedback/Api';
+
 const sourceLogo = '../../assets/images/LogoPlashScreen.png';
 
 class PermissionScene extends Component {
@@ -114,7 +116,7 @@ class PermissionScene extends Component {
 
         // trường hợp không có internet, lắng nghe sự kiện bấm "thử lại"
         if (nextProps.reloadScreenName == ScreenName.Permission) {
-            Vnr_Services.startTaskGetDataConfig(dataVnrStorage, false);
+            Vnr_Services.startTaskGetDataConfig(dataVnrStorage, true);
         }
 
         // Tắt mở lại app không có internet khi có internet tự chạy lại
@@ -122,6 +124,10 @@ class PermissionScene extends Component {
             this.handelPermission();
         }
     }
+
+    // startTaskGetDataConfig = (_dataCurrentUser, isHaveData) => {
+    //     Vnr_Services.startTaskGetDataConfig(_dataCurrentUser, isHaveData);
+    // };
 
     getCountNumberNotify = () => {
         const { fetchCountNotifyInfo } = this.props;
@@ -139,7 +145,7 @@ class PermissionScene extends Component {
 
     getLangCodeByUser = () => {
         HttpService.Get(
-            `[URI_HR]/Por_GetData/GetLangCodeByUser?userLogin=${dataVnrStorage.currentUser.headers.userlogin}`
+            `[URI_POR]/Portal/GetLangCodeByUser?userLogin=${dataVnrStorage.currentUser.headers.userlogin}`
         ).then((language) => {
             if (
                 language &&
@@ -167,7 +173,7 @@ class PermissionScene extends Component {
 
     checkUserActive = () => {
         const _dataVnrStorage = getDataVnrStorage();
-        HttpService.Post('[URI_HR]/Por_GetData/CheckUserActive', {
+        HttpService.Post('[URI_POR]/Portal/CheckUserActive', {
             userID: _dataVnrStorage.currentUser.headers.userid
         }).then((res) => {
             if (res !== null && res === false) {
@@ -175,6 +181,22 @@ class PermissionScene extends Component {
                 logout({ isActiveUser: false });
             }
         });
+    };
+
+    checkGetConfig = (_dataCurrentUser) => {
+        const _params =
+                this.props.navigation?.state && this.props.navigation?.state?.params
+                    ? this.props.navigation?.state?.params
+                    : {},
+            { isFromLogin } = _params && typeof _params == 'object' ? _params : JSON.parse(_params);
+
+        if (isFromLogin) {
+            // Từ login vào
+            Vnr_Services.startTaskGetDataConfig(_dataCurrentUser, false);
+        } else {
+            // Get data Lcoal
+            this.requestDataConfig(false, _dataCurrentUser);
+        }
     };
 
     requestDataConfig = async (isReload = false, _dataCurrentUser) => {
@@ -186,41 +208,49 @@ class PermissionScene extends Component {
                 this.configureApp(getDataConfig, isReload);
 
                 // Có dữ liệu => Check dateUpdate
-                !isReload && Vnr_Services.startTaskGetDataConfig(_dataCurrentUser);
+                !isReload && Vnr_Services.startTaskGetDataConfig(_dataCurrentUser, true);
             } else {
                 // Không có config => Lấy dữ liệu mới
                 Vnr_Services.startTaskGetDataConfig(_dataCurrentUser, false);
             }
         } catch (error) {
-            ManageFileSevice.writeLogToFile(error, false);
+            console.log(error);
+
+            SaveLogError(error);
         }
     };
 
     configureApp = (getDataConfig, isReload) => {
         try {
             const [configApp, configAppByUser, dataLang, dataLangEN] = getDataConfig || [];
+            if (getDataConfig[0]) {
+                let configListDetailRes = JSON.parse(configApp[2]);
 
-            let configListDetailRes = JSON.parse(configApp[2]);
+                ConfigList.value = JSON.parse(configApp[0]);
+                ConfigListFilter.value = JSON.parse(configApp[1]);
+                ConfigListDetail.value = configListDetailRes;
+                ConfigListDetail.configAlign = configListDetailRes.StyleLineViewDetail
+                    ? configListDetailRes.StyleLineViewDetail
+                    : 'E_ALIGN_LAYOUT';
+                ConfigField.value = JSON.parse(configApp[3]);
+                ConfigMappingSalary.value = JSON.parse(configApp[4]);
+                ConfigChart.value = configApp[5] && JSON.parse(configApp[5]);
+                //config chart
+                if (configApp[5]) {
+                    ConfigChart.value = JSON.parse(configApp[5]);
+                }
 
-            ConfigList.value = JSON.parse(configApp[0]);
-            ConfigListFilter.value = JSON.parse(configApp[1]);
-            ConfigListDetail.value = configListDetailRes;
-            ConfigListDetail.configAlign = configListDetailRes.StyleLineViewDetail
-                ? configListDetailRes.StyleLineViewDetail
-                : 'E_ALIGN_LAYOUT';
-            ConfigField.value = JSON.parse(configApp[3]);
-            ConfigMappingSalary.value = JSON.parse(configApp[4]);
-            ConfigChart.value = configApp[5] && JSON.parse(configApp[5]);
+                if (UpdateVersionApi && typeof UpdateVersionApi.checkVersion === 'function') {
+                    UpdateVersionApi.checkVersion();
+                }
+            }
 
+            //config navigate
             if (configAppByUser) {
                 ConfigDashboard.value = configAppByUser[0];
                 // ConfigDrawer.value = configAppByUser[1];
                 PermissionForAppMobile.value = configAppByUser[2];
             }
-
-            //AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(dataVnrStorage));
-            UpdateVersionApi?.checkVersion();
-            //config navigate
 
             //config lang VN or EN or ...
             if (dataLang && typeof dataLang === 'object' && Object.keys(dataLang).length > 0) {
@@ -236,7 +266,17 @@ class PermissionScene extends Component {
                 setDataLang(dataLangEN, 'EN');
             }
 
-            ///AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(dataVnrStorage));
+            AsyncStorage.setItem('@DATA_VNR_STORAGE', JSON.stringify(dataVnrStorage));
+            if (dataVnrStorage.currentUser && dataVnrStorage.currentUser.headers) {
+                const { apiConfig } = dataVnrStorage;
+                if (apiConfig && apiConfig.uriIdentity != null) {
+                    // Refresh token
+                    //HttpService.startRefreshToken();
+                    SignalRService.startConnect();
+                } else {
+                    !isReload && this.checkUserActive();
+                }
+            }
             //config FCM
             NotificationsService.initAndroidFirebase(null);
 
@@ -246,15 +286,6 @@ class PermissionScene extends Component {
             // đồng bộ ngôn ngữ , trơờng hợp relooad thì kh4ng cần chạy hàm này
             if (!isReload && dataVnrStorage.currentUser && dataVnrStorage.currentUser.headers) {
                 this.getLangCodeByUser();
-            }
-
-            if (!isReload && dataVnrStorage.currentUser && dataVnrStorage.currentUser.headers) {
-                const { apiConfig } = dataVnrStorage;
-                if (apiConfig && apiConfig.uriIdentity != null) {
-                    SignalRService.startConnect();
-                } else {
-                    this.checkUserActive();
-                }
             }
 
             const getNavigationTo = DrawerServices.getNavigationTo();
@@ -267,7 +298,9 @@ class PermissionScene extends Component {
 
             DrawerServices.checkNavigationToNFC == false;
         } catch (error) {
-            ManageFileSevice.writeLogToFile(error, false);
+            SaveLogError(error);
+            console.log(error);
+            DrawerServices.navigate('Login');
         }
     };
 
@@ -293,79 +326,25 @@ class PermissionScene extends Component {
         }
     };
 
-    checkGetConfig = (_dataCurrentUser) => {
-        const _params =
-                this.props.navigation?.state && this.props.navigation?.state?.params
-                    ? this.props.navigation?.state?.params
-                    : {},
-            { isFromLogin } = _params && typeof _params == 'object' ? _params : JSON.parse(_params);
-
-        if (isFromLogin) {
-            Vnr_Services.startTaskGetDataConfig(_dataCurrentUser, false);
-        } else {
-            this.requestDataConfig(false, _dataCurrentUser);
-        }
-    };
-
     handleLogined = async (deviceToken, _dataCurrentUser) => {
-        try {
-            // Check permission E_Portal
-            if (
-                _dataCurrentUser?.currentUser?.info &&
-                Object.prototype.hasOwnProperty.call(_dataCurrentUser?.currentUser?.info, 'isAllowLogin') &&
-                !_dataCurrentUser.currentUser.info.isAllowLogin
-            ) {
+        if (deviceToken == null) {
+            // chua duoc cap quyen , da login
+            let newCalllBack = async (tokenFirebase) => {
+                _dataCurrentUser.deviceToken = tokenFirebase;
                 await this.permissionGranted(_dataCurrentUser);
-                this.router('BlockLoginIden');
-                return;
-            }
-
-            // Đổi pass lần đầu login
-            if (_dataCurrentUser?.currentUser?.info?.IsFirstLogin) {
-                await this.permissionGranted(_dataCurrentUser);
-                dataVnrStorage.isNewLayoutV3
-                    ? DrawerServices.navigate('UpdatePasswordV3', {
-                        IsFirstLogin: true,
-                        dataUser: _dataCurrentUser
-                    })
-                    : DrawerServices.navigate('UpdatePassword', {
-                        IsFirstLogin: true,
-                        dataUser: _dataCurrentUser
-                    });
-
-                return;
-            }
-
-            // const _params =
-            //         this.props.navigation?.state && this.props.navigation?.state?.params
-            //             ? this.props.navigation?.state?.params
-            //             : {},
-            //     { isFromLogin } = _params && typeof _params == 'object' ? _params : JSON.parse(_params);
-
-            if (deviceToken == null) {
-                // chua duoc cap quyen , da login
-                let newCalllBack = async (tokenFirebase) => {
-                    _dataCurrentUser.deviceToken = tokenFirebase;
-                    await this.permissionGranted(_dataCurrentUser);
-                    //!isFromLogin && this.requestDataConfig();
-                    this.updateTokenApp(_dataCurrentUser);
-                    this.checkGetConfig(_dataCurrentUser);
-                    // chạy Task GetDataConfig
-                    //this.startTaskGetDataConfig(_dataCurrentUser);
-                };
-
-                NotificationsService.initAndroidFirebase(newCalllBack);
-            } else {
-                // da duoc cap quyen , da login
-                await this.permissionGranted(_dataCurrentUser);
+                this.updateTokenApp(_dataCurrentUser);
                 this.checkGetConfig(_dataCurrentUser);
-                // !isFromLogin && this.requestDataConfig();
+            };
 
-                // // chạy Task GetDataConfig
-                // this.startTaskGetDataConfig(_dataCurrentUser);
-            }
-        } catch (error) {
-            ManageFileSevice.writeLogToFile(error, false);
+            NotificationsService.initAndroidFirebase(newCalllBack);
+        } else {
+            // da duoc cap quyen , da login
+            await this.permissionGranted(_dataCurrentUser);
+            this.checkGetConfig(_dataCurrentUser);
+            // !isFromLogin && this.requestDataConfig();
+
+            // // chạy Task GetDataConfig
+            // this.startTaskGetDataConfig(_dataCurrentUser);
         }
     };
 
@@ -378,16 +357,19 @@ class PermissionScene extends Component {
 
     handelPermission = async () => {
         try {
-            let dataSecur = await SInfoService.getItem(EnumUser.DATA_VNR_SECUR_LTM);
-            const dataStorage = await AsyncStorage.getItem('@DATA_VNR_STORAGE');
-            const dataVnrCheck = typeof dataStorage == 'string' ? JSON.parse(dataStorage) : dataStorage;
+            let dataStorage = await AsyncStorage.getItem('@DATA_VNR_STORAGE');
 
-            if (dataSecur && dataVnrCheck) {
-                dataSecur.apiConfig = dataVnrCheck.apiConfig;
-            }
+            // if (dataStorage == null) {
+            //   // Lấy cấu hình cũ lưu vào cái SInfoService. lưu trong SInfoService thông tin được bảo mật hơn
+            //   const dataCheck = await AsyncStorage.getItem('@DATA_VNR_STORAGE');
+            //   if (dataCheck !== null) {
+            //     const dataVnrCheck = typeof dataCheck == 'string' ? JSON.parse(dataCheck) : dataCheck;
+            //     dataStorage = dataVnrCheck;
+            //   }
+            // }
 
-            if (dataSecur !== null) {
-                const _dataCurrentUser = dataSecur;
+            if (dataStorage !== null) {
+                const _dataCurrentUser = typeof dataStorage == 'string' ? JSON.parse(dataStorage) : dataStorage;
                 const { apiConfig, currentUser, deviceToken } = _dataCurrentUser;
 
                 if (!Vnr_Function.CheckIsNullOrEmpty(apiConfig)) {
@@ -412,8 +394,9 @@ class PermissionScene extends Component {
             } else {
                 NotificationsService.initAndroidFirebase(this.callbackFirebase.bind(this));
             }
-        } catch (error) {
-            ManageFileSevice.writeLogToFile(error, false);
+        } catch (e) {
+            console.log(e);
+            SaveLogError(e);
         }
     };
 

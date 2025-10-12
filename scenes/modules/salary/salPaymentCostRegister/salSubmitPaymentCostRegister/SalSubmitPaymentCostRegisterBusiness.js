@@ -164,51 +164,11 @@ export const generateRowActionAndSelected = () => {
             ];
         }
 
-        // kiểm tra chi phí
-        if (permission['New_Sal_ConfirmPaymentCost_New_Index_btnFeeCheck'] && permission['New_Sal_ConfirmPaymentCost_New_Index_btnFeeCheck']['View']) {
-            _rowActions = [
-                ..._rowActions,
-                {
-                    title: translate('HRM_PortalApp_FeeCheck'),
-                    type: 'E_FEECHECK',
-                    onPress: (item, dataBody) => SalSubmitPaymentCostRegisterBusinessFunction.handleFeeCheck(item, dataBody),
-                    Type: 'E_FEECHECK',
-                    Resource: {
-                        Name: 'New_Sal_ConfirmPaymentCost_New_Index_btnFeeCheck',
-                        Rule: 'View'
-                    },
-                    Confirm: {
-                        isInputText: false,
-                        isValidInputText: false
-                    }
-                }
-            ];
-
-            _selected = [
-                ..._selected,
-                {
-                    title: translate('HRM_PortalApp_FeeCheck'),
-                    type: 'E_FEECHECK',
-                    onPress: (item, dataBody) => SalSubmitPaymentCostRegisterBusinessFunction.handleFeeCheck(item, dataBody),
-                    Type: 'E_FEECHECK',
-                    Resource: {
-                        Name: 'New_Sal_ConfirmPaymentCost_New_Index_btnFeeCheck',
-                        Rule: 'View'
-                    },
-                    Confirm: {
-                        isInputText: false,
-                        isValidInputText: false
-                    }
-                }
-            ];
-        }
-
         return { rowActions: _rowActions, selected: _selected };
     }
 };
 
 export const SalSubmitPaymentCostRegisterBusinessFunction = {
-    checkForReLoadScreen: {},
     setThisForBusiness: (dataThis) => {
         _this = dataThis;
     },
@@ -273,7 +233,7 @@ export const SalSubmitPaymentCostRegisterBusinessFunction = {
                 isValidInputText: isValidInputText,
                 message: message,
                 isInputText: isInputText,
-                onCancel: () => { },
+                onCancel: () => {},
                 onConfirm: (reason) => {
                     if (isValidInputText && (!reason || reason === '')) {
                         let mesNotEmpty = placeholder + translate('FieldNotAllowNull');
@@ -380,7 +340,7 @@ export const SalSubmitPaymentCostRegisterBusinessFunction = {
                 isValidInputText: isValidInputText,
                 message: message,
                 isInputText: isInputText,
-                onCancel: () => { },
+                onCancel: () => {},
                 onConfirm: (reason) => {
                     if (isValidInputText && (!reason || reason === '')) {
                         let mesNotEmpty = placeholder + translate('FieldNotAllowNull');
@@ -480,7 +440,7 @@ export const SalSubmitPaymentCostRegisterBusinessFunction = {
                 isValidInputText: isValidInputText,
                 isInputText: isInputText,
                 message: message,
-                onCancel: () => { },
+                onCancel: () => {},
                 onConfirm: (reason) => {
                     if (isValidInputText && (!reason || reason === '')) {
                         let mesNotEmpty = placeholder + translate('FieldNotAllowNull');
@@ -636,7 +596,7 @@ export const SalSubmitPaymentCostRegisterBusinessFunction = {
                 isValidInputText: isValidInputText,
                 isInputText: isInputText,
                 message: message,
-                onCancel: () => { },
+                onCancel: () => {},
                 onConfirm: (reason) => {
                     if (isValidInputText && (!reason || reason === '')) {
                         let mesNotEmpty = placeholder + translate('FieldNotAllowNull');
@@ -717,26 +677,11 @@ export const SalSubmitPaymentCostRegisterBusinessFunction = {
     //#endregion
 
     //#region [modify]
-    businessModifyRecord: (item, MasterData, fullDataCost) => {
-
-        if (item?.PaymentCostRegisterID && MasterData) {
-            const { reload } = _this;
-            _this.props.navigation.navigate('SalSubmitPaymentCostRegisterAddPay', { record: item, MasterData: MasterData, reload, fullDataCost });
-            return;
-        }
-
-
+    businessModifyRecord: (item) => {
         VnrLoadingSevices.show();
         const { ID } = item;
-
-        if (!ID) {
-            ToasterSevice.showWarning('StatusNotAction');
-            return;
-        }
-
         HttpService.Get('[URI_HR]/Sal_GetData/GetSalPaymentCostRegisterById?id=' + ID).then((res) => {
             VnrLoadingSevices.hide();
-
             try {
                 if (res && res.BusinessAllowAction && res.BusinessAllowAction.indexOf('E_MODIFY') >= 0) {
                     const { reload } = _this;
@@ -748,35 +693,6 @@ export const SalSubmitPaymentCostRegisterBusinessFunction = {
                 DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
             }
         });
-    },
-    //#endregion
-
-    // #region kiểm tra chi phí
-    handleFeeCheck: (item) => {
-        if (!item?.RequestPeriod) {
-
-            // không được bỏ trống!
-            ToasterSevice.showWarning('[Kỳ yêu cầu] không được bỏ trống!');
-            return;
-        }
-
-        try {
-            let params = {
-                CodeEmp: null,
-                RequestPeriod: item?.RequestPeriod,
-                RequestPeriodName: item?.RequestPeriodName,
-                PaymentPeriod: null,
-                page: 1,
-                pageSize: 20
-            };
-
-            DrawerServices.navigate('SalFeeCheck', params);
-
-        } catch (error) {
-            VnrLoadingSevices.hide();
-            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
-        }
-
     }
     //#endregion
 };

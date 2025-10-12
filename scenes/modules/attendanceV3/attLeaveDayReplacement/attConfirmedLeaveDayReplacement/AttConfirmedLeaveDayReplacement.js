@@ -21,7 +21,6 @@ let configList = null,
     attConfirmedLeaveDayReplacement = null,
     attLeaveDayReplacement = null,
     attLeaveDayReplacementViewDetail = null,
-    dataRowActionAndSelected = null,
     attConfirmedLeaveDayReplacementKeyTask = null,
     pageSizeList = 50;
 
@@ -50,7 +49,7 @@ class AttConfirmedLeaveDayReplacement extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttLeaveDayReplacementBusiness.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttLeaveDayReplacementBusiness.setThisForBusiness(this);
             if (AttLeaveDayReplacementBusiness.checkForReLoadScreen[attConfirmedLeaveDayReplacement]) {
                 this.reload();
             }
@@ -125,7 +124,7 @@ class AttConfirmedLeaveDayReplacement extends Component {
             tabEnum: 'E_PROCESSED',
             Year: `${parseInt(moment(new Date()).format('YYYY'))}/01/01`
         };
-        dataRowActionAndSelected = generateRowActionAndSelected(attConfirmedLeaveDayReplacement);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attConfirmedLeaveDayReplacement);
 
         return {
             rowActions: dataRowActionAndSelected.rowActions,
@@ -270,7 +269,6 @@ class AttConfirmedLeaveDayReplacement extends Component {
                             }}
                             screenName={attLeaveDayReplacement}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Register_Daily_Work '}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

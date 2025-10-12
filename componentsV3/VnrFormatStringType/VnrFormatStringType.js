@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { Component } from 'react';
-import { Text, View, TouchableOpacity, Platform } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import moment from 'moment';
-import ActionSheet from 'react-native-actionsheet';
 
 import {
     styleSheets,
@@ -33,7 +32,6 @@ import { ModalDataSevice } from '../../components/modal/ModalShowData';
 import VnrRenderApproverAtt from './VnrRenderApproverAtt';
 import { IconShowDownChevron, IconShowUpChevron } from '../../constants/Icons';
 import ViewHTML from '../../components/ViewHTML/ViewHTML';
-import VnrRenderApprover from './VnrRenderApprover';
 
 const EnumTypeFormatRender = {
     E_GROUP: 'E_GROUP', // hiểu thị tiêu đề group
@@ -64,24 +62,10 @@ class VnrFormatStringType extends Component {
         this.state = {
             isShowMore: true
         };
-        this.ActionSheet = null;
-        this.file = null;
-    }
-
-    handleActionSheetClick(index) {
-        if (!this.file)
-            return;
-
-        if (index === 0) {
-            ManageFileSevice.ReviewFile(this.file);
-        } else if (index === 1) {
-            ManageFileSevice.DownloadFile(this.file);
-        }
     }
 
     renderCommonString = (col) => {
         const { data, isAlignLayout } = this.props;
-        const option = [translate('HRM_PortalApp_ViewFile'), translate('HRM_PortalApp_DownloadFile'), translate('HRM_Common_Close')];
 
         //#region handle styles
         let styTextValue = {
@@ -155,14 +139,7 @@ class VnrFormatStringType extends Component {
                                     <TouchableOpacity
                                         key={index}
                                         style={styles.styContentFile}
-                                        onPress={() => {
-                                            if (Platform.OS === 'ios') {
-                                                Vnr_Function.downloadFileAttach(file?.path);
-                                            } else {
-                                                this.file = file?.path;
-                                                this.showActionSheet();
-                                            }
-                                        }}
+                                        onPress={() => Vnr_Function.downloadFileAttach(file.path)}
                                     >
                                         {Vnr_Function.renderIconTypeFile(file.ext)}
                                         <View style={[styles.viewLable, { marginRight: Size.defineSpace }]}>
@@ -175,16 +152,6 @@ class VnrFormatStringType extends Component {
                                 ))}
                             </View>
                         )}
-                        <View>
-                            <ActionSheet
-                                ref={o => this.ActionSheet = o}
-                                options={option}
-                                cancelButtonIndex={2}
-                                onPress={(index) => {
-                                    this.handleActionSheetClick(index);
-                                }}
-                            />
-                        </View>
                     </View>
                 );
             } else if (Array.isArray(data[col.Name]) && data[col.Name].length > 0) {
@@ -206,14 +173,7 @@ class VnrFormatStringType extends Component {
                                     <TouchableOpacity
                                         key={index}
                                         style={styles.styContentFile}
-                                        onPress={() => {
-                                            if (Platform.OS === 'ios') {
-                                                Vnr_Function.downloadFileAttach(file?.path);
-                                            } else {
-                                                this.file = file?.path;
-                                                this.showActionSheet();
-                                            }
-                                        }}
+                                        onPress={() => Vnr_Function.downloadFileAttach(file.path)}
                                     >
                                         {Vnr_Function.renderIconTypeFile(file.ext)}
                                         <View style={[styles.viewLable, { marginRight: Size.defineSpace }]}>
@@ -227,16 +187,6 @@ class VnrFormatStringType extends Component {
                                 ))}
                             </View>
                         )}
-                        <View>
-                            <ActionSheet
-                                ref={o => this.ActionSheet = o}
-                                options={option}
-                                cancelButtonIndex={2}
-                                onPress={(index) => {
-                                    this.handleActionSheetClick(index);
-                                }}
-                            />
-                        </View>
                     </View>
                 );
             } else if (col.DisplayKey) {
@@ -285,19 +235,13 @@ class VnrFormatStringType extends Component {
             Vnr_Function.CheckIsNullOrEmpty(data[col.NameOld]) === false ||
             (col.NameSecond && data[col.NameSecond])
         ) {
-            const value = data[col.Name];
-            const isString = typeof value === 'string';
-            const isPrimitive = typeof value !== 'object';
-            const isArrayWithTwoItems = Array.isArray(value) && value.length === 2;
-            const isMultiTextHorizontal = col.DataFormat === 'E_MULTITEXTHORIZONTAL';
-
-            if (isString) {
-                data[col.Name] = value.trim();
-            } else if (isPrimitive || isArrayWithTwoItems || isMultiTextHorizontal) {
-                data[col.Name] = value;
-            } else {
-                data[col.Name] = '';
-            }
+            data[col.Name] =
+                data[col.Name] && typeof data[col.Name] === 'string'
+                    ? data[col.Name].trim()
+                    : typeof data[col.Name] !== 'object' ||
+                        (Array.isArray(data[col.Name]) && data[col.Name].length == 2)
+                        ? data[col.Name]
+                        : '';
             if (col.Name == 'StatusView' || (col.DataType && col.DataType.toLowerCase() == 'status')) {
 
                 let _colorStatus = null,
@@ -698,10 +642,6 @@ class VnrFormatStringType extends Component {
         );
     };
 
-    showActionSheet = () => {
-        this.ActionSheet.show();
-    }
-
     render() {
         const { data, col, allConfig } = this.props;
         const { isShowMore } = this.state;
@@ -712,7 +652,7 @@ class VnrFormatStringType extends Component {
             // eslint-disable-next-line no-unused-vars
             for (const item of allConfig) {
                 //Lặp qua để chia các config con vào từng group nếu bắt đầu bằng chữ E_GROUP và có isCollapse = true
-                if (item?.TypeView?.startsWith('E_GROUP')) {
+                if (item.TypeView.startsWith('E_GROUP')) {
                     if (item.isCollapse) {
                         currentGroup = item.DisplayKey;
                         if (!groupedConfig[currentGroup]) {
@@ -721,7 +661,7 @@ class VnrFormatStringType extends Component {
                     } else {
                         continue; // Nếu là E_GROUP mà isCollapse = false thì đi tiếp vòng lặp kế
                     }
-                } else if (currentGroup && !item?.TypeView?.startsWith('E_GROUP')) {
+                } else if (currentGroup && !item.TypeView.startsWith('E_GROUP')) {
                     groupedConfig[currentGroup].push(item);
                 }
             }
@@ -789,14 +729,14 @@ class VnrFormatStringType extends Component {
             if (!Array.isArray(allConfig) || allConfig.length === 0)
                 return <View />;
 
-            configRemoveE_GROUP_PROFILE = allConfig.filter(item => item?.TypeView !== EnumTypeFormatRender.E_COMMON_PROFILE);
+            configRemoveE_GROUP_PROFILE = allConfig.filter(item => item?.TypeView !== EnumTypeFormatRender.E_COMMON_PROFILE)
 
             if (configRemoveE_GROUP_PROFILE.length === 0)
                 return <View />;
 
             // eslint-disable-next-line no-unused-vars
             for (const item of configRemoveE_GROUP_PROFILE) {
-                if (item?.TypeView?.startsWith('E_GROUP')) {
+                if (item.TypeView.startsWith('E_GROUP')) {
                     if (item.isCollapse) {
                         currentGroup = item.DisplayKey;
                         if (!groupProfile[currentGroup]) {
@@ -805,7 +745,7 @@ class VnrFormatStringType extends Component {
                     } else {
                         continue;
                     }
-                } else if (currentGroup && !item?.TypeView?.startsWith('E_GROUP_PROFILE')) {
+                } else if (currentGroup && !item.TypeView.startsWith('E_GROUP_PROFILE')) {
                     groupProfile[currentGroup].push(item);
                 }
             }
@@ -1009,15 +949,6 @@ class VnrFormatStringType extends Component {
 
         //#region render level approve
         if (col.TypeView == EnumTypeFormatRender.E_GROUP_APPROVE) {
-            if (data.ProcessApproval && data.ProcessApproval.length > 0 && Object.prototype.hasOwnProperty.call(data.ProcessApproval[0], 'ListDetails')) {
-                return (
-                    <VnrRenderApprover
-                        dataApprover={data.ProcessApproval}
-                        lable={col.DisplayKey}
-                        isCollapse={col.isCollapse}
-                    />
-                );
-            }
             return (
                 <VnrRenderApproverAtt
                     dataApprover={data.ProcessApproval}
@@ -1128,41 +1059,41 @@ class VnrFormatStringType extends Component {
                 ) {
                     // hiển thị ngày duyệt
                     if (data.DateApprove) {
-                        _timeStatus = `${translate('HRM_Attendance_Leaveday_DateApprove')}:  ${data.DateApprove ? moment(data.DateApprove).format('DD/MM/YYYY') : ''
+                        _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${data.DateApprove ? moment(data.DateApprove).format('DD/MM/YYYY') : ''
                         }`;
                     } else if (data.ApprovalDate) {
-                        _timeStatus = `${translate('HRM_Attendance_Leaveday_DateApprove')}:  ${data.ApprovalDate ? moment(data.ApprovalDate).format('DD/MM/YYYY') : ''
+                        _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${data.ApprovalDate ? moment(data.ApprovalDate).format('DD/MM/YYYY') : ''
                         }`;
                     } else {
-                        _timeStatus = `${translate('HRM_Attendance_Leaveday_DateApprove')}:  ${data.DateUpdate ? moment(data.DateUpdate).format('DD/MM/YYYY') : ''
+                        _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${data.DateUpdate ? moment(data.DateUpdate).format('DD/MM/YYYY') : ''
                         }`;
                     }
                 } else if (data.Status === EnumName.E_REJECT || data.Status === EnumName.E_REJECTED) {
                     // hiển thị ngày từ chối
-                    _timeStatus = `${translate('HRM_Attendance_Leaveday_DateReject')}:  ${data.DateReject ? moment(data.DateReject).format('DD/MM/YYYY') : ''
+                    _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${data.DateReject ? moment(data.DateReject).format('DD/MM/YYYY') : ''
                     }`;
                 } else if (data.Status === EnumName.E_CANCEL) {
                     // hiển thị ngày hủy
-                    _timeStatus = `${translate('DateCancel')}:  ${data.DateCancel ? moment(data.DateCancel).format('DD/MM/YYYY') : ''
+                    _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${data.DateCancel ? moment(data.DateCancel).format('DD/MM/YYYY') : ''
                     }`;
                 } else if (data.Status === EnumStatus.E_SUBMIT_TEMP) {
                     // hiển thị ngày lưu tạm
-                    _timeStatus = `${translate('HRM_Att_Leaveday_LeavedayList_DateSubmitTemp')}:  ${data.DateUpdate ? moment(data.DateUpdate).format('DD/MM/YYYY') : ''
+                    _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${data.DateUpdate ? moment(data.DateUpdate).format('DD/MM/YYYY') : ''
                     }`;
                 } else if (data.Status === EnumName.E_CONFIRM) {
                     // hiển thị ngày xác nhận
-                    _timeStatus = `${translate('HRM_Attendance_Overtime_WorkDateConfirm')}:  ${moment(data.DateConfirm).format(
+                    _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${moment(data.DateConfirm).format(
                         'DD/MM/YYYY'
                     )}`;
                 } else if (data.DateUpdate) {
                     // hiển thị ngày yêu cầu
-                    _timeStatus = `${translate('HRM_Att_Leaveday_LeavedayList_DateRequest')}:  ${moment(data.DateUpdate).format(
+                    _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${moment(data.DateUpdate).format(
                         'DD/MM/YYYY'
                     )}`;
                 }
             } else if (!_timeStatus && data[col.Name] && data.DateUpdate) {
                 // hiển thị ngày yêu cầu
-                _timeStatus = `${translate('HRM_Common_DateUpdate')}:  ${moment(data.DateUpdate).format(
+                _timeStatus = `${translate('HRM_PortalApp_DateCreate')}:  ${moment(data.DateUpdate).format(
                     'DD/MM/YYYY'
                 )}`;
             }

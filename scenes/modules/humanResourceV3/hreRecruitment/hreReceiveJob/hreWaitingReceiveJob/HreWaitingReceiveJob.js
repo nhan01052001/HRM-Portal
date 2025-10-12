@@ -322,7 +322,7 @@ class HreWaitingReceiveJob extends Component {
                                 <HreReceiveJobList
                                     detail={{
                                         dataLocal: false,
-                                        screenDetail: ScreenName.HreCandidateHistoryApply,
+                                        screenDetail: 'HreCandidateInformation',
                                         screenName: hreWaitingReceiveJob
                                     }}
                                     scrollYAnimatedValue={this.scrollYAnimatedValue}

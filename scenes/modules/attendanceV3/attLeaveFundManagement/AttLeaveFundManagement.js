@@ -18,9 +18,7 @@ const dataDefault = [
     { Type: 'E_COMPENSATORY_LEAVE', TypeName: 'E_COMPENSATORY_LEAVE' },
     { Type: 'E_SICK_LEAVE', TypeName: 'E_SICK_LEAVE' },
     { Type: 'E_PREGNANT_LEAVE', TypeName: 'E_PREGNANT_LEAVE' },
-    { Type: 'E_ADDITIONAL_LEAVE', TypeName: 'E_ADDITIONAL_LEAVE' },
-    { Type: 'E_COMPENSATORY_LEAVE_DETAIL', TypeName: 'Phép bù từng ngày' },
-    { Type: 'E_SENIORBONUS_LEAVE_DETAIL', TypeName: 'Phép thâm niên' }
+    { Type: 'E_ADDITIONAL_LEAVE', TypeName: 'E_ADDITIONAL_LEAVE' }
 ];
 
 const initSateDefault = {
@@ -45,7 +43,6 @@ class AttLeaveFundManagement extends Component {
                 }`
             )
                 .then(res => {
-
                     VnrLoadingSevices.hide();
                     if (
                         res &&
@@ -155,48 +152,6 @@ class AttLeaveFundManagement extends Component {
                                 data.push({
                                     ...item,
                                     color: '#475467',
-                                    Remain:
-                                        rsFindRemaining && rsFindRemaining[(item?.Type)]
-                                            ? rsFindRemaining[(item?.Type)]
-                                            : 0
-                                });
-                            }
-
-                            // Phép bù theo ngày
-                            if (
-                                item?.Type === EnumName.E_COMPENSATORY_LEAVE_DETAIL &&
-                                (PermissionForAppMobile &&
-                                    PermissionForAppMobile.value[
-                                        'ProfileQualification_Index_ProfileQualificationGird'
-                                    ] &&
-                                    PermissionForAppMobile.value['ProfileQualification_Index_ProfileQualificationGird'][
-                                        'View'
-                                    ])
-                            ) {
-                                data.push({
-                                    ...item,
-                                    color: '#175367',
-                                    Remain:
-                                        rsFindRemaining && rsFindRemaining[(item?.Type)]
-                                            ? rsFindRemaining[(item?.Type)]
-                                            : 0
-                                });
-                            }
-
-                            // Phép thâm niên
-                            if (
-                                item?.Type === EnumName.E_SENIORBONUS_LEAVE_DETAIL &&
-                                (PermissionForAppMobile &&
-                                    PermissionForAppMobile.value[
-                                        'ProfileQualification_Index_ProfileQualificationGird'
-                                    ] &&
-                                    PermissionForAppMobile.value['ProfileQualification_Index_ProfileQualificationGird'][
-                                        'View'
-                                    ])
-                            ) {
-                                data.push({
-                                    ...item,
-                                    color: '#713737',
                                     Remain:
                                         rsFindRemaining && rsFindRemaining[(item?.Type)]
                                             ? rsFindRemaining[(item?.Type)]

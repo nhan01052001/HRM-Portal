@@ -8,13 +8,11 @@ export const RenderButtonChangeShift = (props) => {
         isChangeShift,
         isChangeDate,
         handleChangeShift,
-        handleChangeDate,
-        isHiddenChooseEveryDay,
-        isHiddenChooseAboutDays
+        handleChangeDate
     } = props;
 
     return (
-        <View style={[styles.flexD_align_center, CustomStyleSheet.justifyContent('space-between'), (isHiddenChooseAboutDays || isHiddenChooseEveryDay) && { justifyContent: 'flex-start' }]}>
+        <View style={[styles.flexD_align_center, CustomStyleSheet.justifyContent('space-between')]}>
             <View style={CustomStyleSheet.maxWidth('30%')}>
                 <VnrText
                     numberOfLines={2}
@@ -24,57 +22,47 @@ export const RenderButtonChangeShift = (props) => {
             </View>
             <View>
                 <View style={[styles.flexD_align_center, CustomStyleSheet.marginLeft(12)]}>
-                    {
-                        !isHiddenChooseAboutDays && (
-                            <TouchableOpacity
-                                disabled={isHiddenChooseAboutDays || isHiddenChooseEveryDay}
-                                style={[
-                                    styles.btnOptionChoseDays,
-                                    CustomStyleSheet.marginRight(8),
-                                    isChangeShift
-                                        ? { backgroundColor: Colors.primary }
-                                        : { backgroundColor: Colors.Secondary95 }
-                                ]}
-                                onPress={() => handleChangeShift()}
-                            >
-                                <VnrText
-                                    numberOfLines={1}
-                                    style={[
-                                        styleSheets.text,
-                                        isChangeShift
-                                            ? { color: Colors.white }
-                                            : { color: Colors.black }
-                                    ]}
-                                    i18nKey={'HRM_PortalApp_ChangeShift'}
-                                />
-                            </TouchableOpacity>
-                        )
-                    }
-                    {
-                        !isHiddenChooseEveryDay && (
-                            <TouchableOpacity
-                                disabled={isHiddenChooseAboutDays || isHiddenChooseEveryDay}
-                                style={[
-                                    styles.btnOptionChoseDays,
-                                    isChangeDate
-                                        ? { backgroundColor: Colors.primary }
-                                        : { backgroundColor: Colors.Secondary95 }
-                                ]}
-                                onPress={() => handleChangeDate()}
-                            >
-                                <VnrText
-                                    numberOfLines={1}
-                                    style={[
-                                        styleSheets.text,
-                                        isChangeDate
-                                            ? { color: Colors.white }
-                                            : { color: Colors.black }
-                                    ]}
-                                    i18nKey={'HRM_PortalApp_ChangeSchedule'}
-                                />
-                            </TouchableOpacity>
-                        )
-                    }
+                    <TouchableOpacity
+                        style={[
+                            styles.btnOptionChoseDays,
+                            CustomStyleSheet.marginRight(8),
+                            isChangeShift
+                                ? { backgroundColor: Colors.primary }
+                                : { backgroundColor: Colors.Secondary95 }
+                        ]}
+                        onPress={() => handleChangeShift()}
+                    >
+                        <VnrText
+                            numberOfLines={1}
+                            style={[
+                                styleSheets.text,
+                                isChangeShift
+                                    ? { color: Colors.white }
+                                    : { color: Colors.black }
+                            ]}
+                            i18nKey={'HRM_PortalApp_ChangeShift'}
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[
+                            styles.btnOptionChoseDays,
+                            isChangeDate
+                                ? { backgroundColor: Colors.primary }
+                                : { backgroundColor: Colors.Secondary95 }
+                        ]}
+                        onPress={() => handleChangeDate()}
+                    >
+                        <VnrText
+                            numberOfLines={1}
+                            style={[
+                                styleSheets.text,
+                                isChangeDate
+                                    ? { color: Colors.white }
+                                    : { color: Colors.black }
+                            ]}
+                            i18nKey={'HRM_PortalApp_ChangeSchedule'}
+                        />
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>

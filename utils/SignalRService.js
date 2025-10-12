@@ -22,7 +22,7 @@ class SignalRService {
 
             // Nếu đã connect thì k connect nữa
             if (currentUser && (stateHub == null || stateHub == signalR.HubConnectionState.Disconnected)) {
-                const token = await HttpService.getToken();
+                let token = await HttpService.getToken();
                 if (token) {
                     this.connection = new signalR.HubConnectionBuilder()
                         .withUrl(HttpService.handelUrl('[URI_IDENTITY]identityHub'), {

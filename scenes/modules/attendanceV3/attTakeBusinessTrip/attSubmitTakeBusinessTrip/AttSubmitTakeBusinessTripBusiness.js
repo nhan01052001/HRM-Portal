@@ -169,8 +169,7 @@ export const AttSubmitTakeBusinessTripBusinessFunction = {
         AttApprovedSubmitTakeBusinessTrip: false,
         AttRejectSubmitTakeBusinessTrip: false
     },
-    setThisForBusiness: (dataThis, rowActionsFromScreen = _rowActions) => {
-        _rowActions = rowActionsFromScreen ?? [];
+    setThisForBusiness: dataThis => {
         _this = dataThis;
     },
     //#region [action delete]
@@ -330,7 +329,7 @@ export const AttSubmitTakeBusinessTripBusinessFunction = {
                 ToasterSevice.showError('HRM_Common_SendRequest_Error', 4000);
             }
         // eslint-disable-next-line no-console
-        }).catch(err => console.log(err));
+        }).catch(err => console.log(err))
     },
     //#endregion
 

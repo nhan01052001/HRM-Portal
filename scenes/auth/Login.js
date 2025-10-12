@@ -184,7 +184,7 @@ class LoginScene extends Component {
                     dataUser: dataUser
                 });
         } else {
-            navigation.navigate('Permission', { isFromLogin: true });
+            navigation.navigate('Permission');
         }
     };
 
@@ -419,7 +419,7 @@ class LoginScene extends Component {
 
         this.setState({ isLoading: true, txtError: '' });
 
-        HttpService.Post('[URI_HR]/Por_GetData/LoginAppMobile', data)
+        HttpService.Post('[URI_POR]/Portal/LoginAppMobile', data)
             .then((res) => {
                 try {
                     if (res && res.LoginStatus) {
@@ -507,7 +507,7 @@ class LoginScene extends Component {
                     .then(() => {
                         this.setState({ isLoading: true, txtError: '' });
 
-                        HttpService.Post('[URI_HR]/Por_GetData/LoginAppMobile', data)
+                        HttpService.Post('[URI_POR]/Portal/LoginAppMobile', data)
                             .then((res) => {
                                 try {
                                     if (res && res.LoginStatus) {
@@ -589,8 +589,7 @@ class LoginScene extends Component {
                     // chatEndpointApi: null,
                     // surveyEndpointApi: null,
                     // uriNewsWordPress: null,
-                    isLoginSSO: true,
-                    isAllowLogin: dataJWT?.hrm_type_user && dataJWT?.hrm_type_user.includes('E_Portal')
+                    isLoginSSO: true
                 };
 
                 VnrLoadingSevices.show();
@@ -618,6 +617,27 @@ class LoginScene extends Component {
             if (typeof error === 'string') ToasterSevice.showWarning(error, 5000);
             VnrLoadingSevices.hide();
         }
+    };
+
+    handleAuthorize = async (pro) => {
+        const { uriPor } = dataVnrStorage.apiConfig,
+            { listProviderSso } = this.state,
+            { language } = this.props;
+
+        let uriLink = `${uriPor}/Portal/ExternalLogin?langCode=${language}&authProviderId=${
+            pro.Id
+        }&returnUrl=${uriPor}/Portal/LoginFromAppMobile`;
+        this.setState(
+            {
+                listProviderSso: {
+                    ...listProviderSso,
+                    linkActive: uriLink
+                }
+            },
+            () => {
+                this.refAuthorize && this.refAuthorize.show();
+            }
+        );
     };
 
     toggleMenu = () => {
@@ -649,7 +669,7 @@ class LoginScene extends Component {
                 this.setLanguage(this.state.defaultLanguage)
             );
         }
-        //this.checkConfigLoginSSO();
+        // this.checkConfigLoginSSO();
         // this.checkIsConfirmCaptcha();
 
         this.checkTouchOrFace();
@@ -744,6 +764,24 @@ class LoginScene extends Component {
             });
         }
     };
+    //
+
+    // handleAuthorize = async provider => {
+    //   try {
+    //     const config = configs[provider];
+    //     const newAuthState = await authorize(config);
+
+    //     console.log(newAuthState, 'newAuthState')
+
+    //     // setAuthState({
+    //     //   hasLoggedInOnce: true,
+    //     //   provider: provider,
+    //     //   ...newAuthState
+    //     // });
+    //   } catch (error) {
+    //     Alert.alert('Failed to log in', error.message);
+    //   }
+    // }
 
     render() {
         // test animation
@@ -1035,11 +1073,7 @@ class LoginScene extends Component {
                                     }}
                                 >
                                     <View style={styles.styLoginSso}>
-                                        <VnrText
-                                            i18nKey={'Login'}
-                                            style={styles.textSignin}
-                                            numberOfLines={1}
-                                        />
+                                        <VnrText i18nKey={'Login'} style={styles.textSignin} numberOfLines={1} />
                                     </View>
                                 </TouchableOpacity>
                             )}

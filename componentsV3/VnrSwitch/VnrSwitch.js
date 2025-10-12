@@ -5,7 +5,7 @@ import { Colors, stylesVnrPickerV3, styleSheets, Size, CustomStyleSheet } from '
 import VnrText from '../../components/VnrText/VnrText';
 class VnrSwitch extends React.Component {
     shouldComponentUpdate(nextProps) {
-        if (this.props.value !== nextProps.value || this.props.isDisable !== nextProps.isDisable) {
+        if (this.props.value !== nextProps.value) {
             return true;
         }
         return false;
@@ -27,14 +27,10 @@ class VnrSwitch extends React.Component {
                 >
                     <View style={{ maxWidth: '80%' }}>
                         <VnrText style={[styleSheets.lable, stylesVnrPickerV3.styLableLayoutFilter]} i18nKey={lable} />
-                        {
-                            subLable && (
-                                <VnrText
-                                    style={[styleSheets.text, { fontSize: 12, fontWeight: '400', color: Colors.gray_6 }]}
-                                    i18nKey={subLable}
-                                />
-                            )
-                        }
+                        <VnrText
+                            style={[styleSheets.text, { fontSize: 12, fontWeight: '400', color: Colors.gray_6 }]}
+                            i18nKey={subLable}
+                        />
                     </View>
                     <Switch
                         disabled={isDisable}

@@ -9,11 +9,7 @@ export default class ErrorScreen extends Component {
         this.state = {
             ErrorDisplay: this.props.navigation.state.params.ErrorDisplay
                 ? this.props.navigation.state.params.ErrorDisplay
-                : null,
-            isShowMess: this.props.navigation.state.params.isShowMess,
-            isHiddenFeedback: this.props.navigation.state.params.isHiddenFeedback,
-            isHiddenDownloadError: this.props.navigation.state.params.isHiddenDownloadError,
-            isHiddenScanQrAgain: this.props.navigation.state.params.isHiddenScanQrAgain
+                : null
         };
     }
 
@@ -22,20 +18,14 @@ export default class ErrorScreen extends Component {
     }
 
     render() {
-        const { ErrorDisplay, isShowMess, isHiddenFeedback, isHiddenDownloadError, isHiddenScanQrAgain } = this.state;
+        const { ErrorDisplay } = this.state;
         // eslint-disable-next-line no-console
         console.log(ErrorDisplay, 'ErrorDisplay');
 
         if (ErrorDisplay === 'NO_INTERNET') {
             return <NoInternet />;
         } else if (ErrorDisplay != null) {
-            return <ErrorBoundary
-                error={ErrorDisplay}
-                isShowMess={isShowMess}
-                isHiddenFeedback={isHiddenFeedback}
-                isHiddenDownloadError={isHiddenDownloadError}
-                isHiddenScanQrAgain={isHiddenScanQrAgain}
-            />;
+            return <ErrorBoundary error={ErrorDisplay} />;
         } else {
             return null;
         }

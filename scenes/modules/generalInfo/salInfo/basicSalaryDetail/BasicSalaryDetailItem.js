@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Platform,
+    TouchableWithoutFeedback,
+    ScrollView
+} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import {
     Size,
@@ -20,9 +28,6 @@ import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import { ConfigField } from '../../../../../assets/configProject/ConfigField';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
 import DrawerServices from '../../../../../utils/DrawerServices';
-import VnrFormatStringTypeItem from '../../../../../componentsV3/VnrFormatStringType/VnrFormatStringTypeItem';
-
-const NUMBER_ALLOWANCEAMOUNT = 40;
 
 export default class BasicSalaryDetailItem extends React.Component {
     constructor(props) {
@@ -73,32 +78,160 @@ export default class BasicSalaryDetailItem extends React.Component {
         });
     };
 
-    viewListDetailSal = (dataItem) => {
-        //0182528: [hot fix OPA_v8.12.20.01.06] [App OPA] Lấy động thông tin tên phụ cấp của nhân viên để hiển thị lên app
-        let arr = [];
+    viewListDetailSal = dataItem => {
+        const {
+            AllowanceAmount1 = 0,
+            AllowanceAmount2 = 0,
+            AllowanceAmount3 = 0,
+            AllowanceAmount4 = 0,
+            AllowanceAmount5 = 0,
+            AllowanceAmount6 = 0,
+            AllowanceAmount7 = 0,
+            AllowanceAmount8 = 0,
+            AllowanceAmount9 = 0,
+            AllowanceAmount10 = 0,
+            AllowanceAmount11 = 0,
+            AllowanceAmount12 = 0,
+            AllowanceAmount13 = 0,
+            AllowanceAmount14 = 0,
+            AllowanceAmount15 = 0,
+            CurrencyCode1,
+            CurrencyCode2,
+            CurrencyCode3,
+            CurrencyCode4,
+            CurrencyCode5,
+            CurrencyCode6,
+            CurrencyCode7,
+            CurrencyCode8,
+            CurrencyCode9,
+            CurrencyCode10,
+            CurrencyCode11,
+            CurrencyCode12,
+            CurrencyCode13,
+            CurrencyCode14,
+            CurrencyCode15
+        } = dataItem;
 
-        for (let i = 0; i < NUMBER_ALLOWANCEAMOUNT; i++) {
-            if (
-                !!dataItem[`UsualAllowanceName${i + 1}Salary`] &&
-                dataItem[`AllowanceAmount${i + 1}`] &&
-                dataItem[`AllowanceAmount${i + 1}`] > 0
-            )
-                arr.push({
-                    lable: dataItem[`UsualAllowanceName${i + 1}Salary`],
-                    value: `${format('#,###.#', dataItem[`AllowanceAmount${i + 1}`])} ${dataItem[`CurrencyCode${i + 1}`] ? dataItem[`CurrencyCode${i + 1}`] : ''}`
-                });
-        }
+        let arr = [
+            {
+                lable: 'HRM_HR_Contract_AllowanceID1',
+                value:
+                    AllowanceAmount1 != null && AllowanceAmount1 > 0
+                        ? `${format('#,###.#', AllowanceAmount1)} ${CurrencyCode1 != null ? CurrencyCode1 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID2',
+                value:
+                    AllowanceAmount2 != null && AllowanceAmount2 > 0
+                        ? `${format('#,###.#', AllowanceAmount2)} ${CurrencyCode2 != null ? CurrencyCode2 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID3',
+                value:
+                    AllowanceAmount3 != null && AllowanceAmount3 > 0
+                        ? `${format('#,###.#', AllowanceAmount3)} ${CurrencyCode3 != null ? CurrencyCode3 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID4',
+                value:
+                    AllowanceAmount4 != null && AllowanceAmount4 > 0
+                        ? `${format('#,###.#', AllowanceAmount4)} ${CurrencyCode4 != null ? CurrencyCode4 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID5',
+                value:
+                    AllowanceAmount5 != null && AllowanceAmount5 > 0
+                        ? `${format('#,###.#', AllowanceAmount5)} ${CurrencyCode5 != null ? CurrencyCode5 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID6',
+                value:
+                    AllowanceAmount6 != null && AllowanceAmount6 > 0
+                        ? `${format('#,###.#', AllowanceAmount6)} ${CurrencyCode6 != null ? CurrencyCode6 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID7',
+                value:
+                    AllowanceAmount7 != null && AllowanceAmount7 > 0
+                        ? `${format('#,###.#', AllowanceAmount7)} ${CurrencyCode7 != null ? CurrencyCode7 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID8',
+                value:
+                    AllowanceAmount8 != null && AllowanceAmount8 > 0
+                        ? `${format('#,###.#', AllowanceAmount8)} ${CurrencyCode8 != null ? CurrencyCode8 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID9',
+                value:
+                    AllowanceAmount9 != null && AllowanceAmount9 > 0
+                        ? `${format('#,###.#', AllowanceAmount9)} ${CurrencyCode9 != null ? CurrencyCode9 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID10',
+                value:
+                    AllowanceAmount10 != null && AllowanceAmount10 > 0
+                        ? `${format('#,###.#', AllowanceAmount10)} ${CurrencyCode10 != null ? CurrencyCode10 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID11',
+                value:
+                    AllowanceAmount11 != null && AllowanceAmount11 > 0
+                        ? `${format('#,###.#', AllowanceAmount11)} ${CurrencyCode11 != null ? CurrencyCode11 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID12',
+                value:
+                    AllowanceAmount12 != null && AllowanceAmount12 > 0
+                        ? `${format('#,###.#', AllowanceAmount12)} ${CurrencyCode12 != null ? CurrencyCode12 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID13',
+                value:
+                    AllowanceAmount13 != null && AllowanceAmount13 > 0
+                        ? `${format('#,###.#', AllowanceAmount13)} ${CurrencyCode13 != null ? CurrencyCode13 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID14',
+                value:
+                    AllowanceAmount14 != null && AllowanceAmount14 > 0
+                        ? `${format('#,###.#', AllowanceAmount14)} ${CurrencyCode14 != null ? CurrencyCode14 : ''}`
+                        : ''
+            },
+            {
+                lable: 'HRM_HR_Contract_AllowanceID15',
+                value:
+                    AllowanceAmount15 != null && AllowanceAmount15 > 0
+                        ? `${format('#,###.#', AllowanceAmount15)} ${CurrencyCode15 != null ? CurrencyCode15 : ''}`
+                        : ''
+            }
+        ];
 
         return (
             <View style={styles.styContentViewSalList}>
-                {arr.map((item, index) => {
-                    return (
-                        <View style={styles.styRowSal} key={index}>
+                {arr.map((item) => {
+                    return item.value !== '' ? (
+                        <View style={styles.styRowSal}>
                             <VnrText i18nKey={item.lable} style={[styleSheets.text, styles.line_date_text]} />
                             <View style={styles.line_time_wrap}>
                                 <Text style={[styleSheets.text, styles.line_text]}>{item.value}</Text>
                             </View>
                         </View>
+                    ) : (
+                        <View />
                     );
                 })}
             </View>
@@ -106,18 +239,80 @@ export default class BasicSalaryDetailItem extends React.Component {
     };
 
     render() {
-        const { dataItem, index, renderRowConfig } = this.props,
+        const { dataItem, index } = this.props,
             { isVisibleModalSalary } = this.state;
-        let _renderRowConfig = renderRowConfig
 
-        //0182528: [hot fix OPA_v8.12.20.01.06] [App OPA] Lấy động thông tin tên phụ cấp của nhân viên để hiển thị lên app
-        let totalPC = 0,
+        const {
+            AllowanceAmount1 = 0,
+            AllowanceAmount2 = 0,
+            AllowanceAmount3 = 0,
+            AllowanceAmount4 = 0,
+            AllowanceAmount5 = 0,
+            AllowanceAmount6 = 0,
+            AllowanceAmount7 = 0,
+            AllowanceAmount8 = 0,
+            AllowanceAmount9 = 0,
+            AllowanceAmount10 = 0,
+            AllowanceAmount11 = 0,
+            AllowanceAmount12 = 0,
+            AllowanceAmount13 = 0,
+            AllowanceAmount14 = 0,
+            AllowanceAmount15 = 0,
+            CurrencyCode,
+            CurrencyCode1,
+            CurrencyCode2,
+            CurrencyCode3,
+            CurrencyCode4,
+            CurrencyCode5,
+            CurrencyCode6,
+            CurrencyCode7,
+            CurrencyCode8,
+            CurrencyCode9,
+            CurrencyCode10,
+            CurrencyCode11,
+            CurrencyCode12,
+            CurrencyCode13,
+            CurrencyCode14,
+            CurrencyCode15
+        } = dataItem;
+
+        let totalPC =
+                AllowanceAmount1 +
+                AllowanceAmount2 +
+                AllowanceAmount3 +
+                AllowanceAmount4 +
+                AllowanceAmount5 +
+                AllowanceAmount6 +
+                AllowanceAmount7 +
+                AllowanceAmount8 +
+                AllowanceAmount9 +
+                AllowanceAmount10 +
+                AllowanceAmount11 +
+                AllowanceAmount12 +
+                AllowanceAmount13 +
+                AllowanceAmount14 +
+                AllowanceAmount15,
+            isShowTotalAmount = false;
+
+        // kiểm tra có 1 đơn vị tiền tệ trong 15 phụ cấp khác đơn vị của LCB thì không hiển thị
+        if (
+            CurrencyCode1 == CurrencyCode &&
+            CurrencyCode2 == CurrencyCode &&
+            CurrencyCode3 == CurrencyCode &&
+            CurrencyCode4 == CurrencyCode &&
+            CurrencyCode5 == CurrencyCode &&
+            CurrencyCode6 == CurrencyCode &&
+            CurrencyCode7 == CurrencyCode &&
+            CurrencyCode8 == CurrencyCode &&
+            CurrencyCode9 == CurrencyCode &&
+            CurrencyCode10 == CurrencyCode &&
+            CurrencyCode11 == CurrencyCode &&
+            CurrencyCode12 == CurrencyCode &&
+            CurrencyCode13 == CurrencyCode &&
+            CurrencyCode14 == CurrencyCode &&
+            CurrencyCode15 == CurrencyCode
+        ) {
             isShowTotalAmount = true;
-
-        for (let i = 0; i < NUMBER_ALLOWANCEAMOUNT; i++) {
-            if (dataItem[`AllowanceAmount${i + 1}`]) totalPC += dataItem[`AllowanceAmount${i + 1}`];
-
-            if (dataItem?.CurrencyCode !== dataItem[`CurrencyCode${i + 1}`]) isShowTotalAmount = false;
         }
 
         const _configField =
@@ -129,27 +324,67 @@ export default class BasicSalaryDetailItem extends React.Component {
         const handleFiles = [];
 
         if (fileAttachment != null)
-            fileAttachment.split(',').map((nameFile) => {
+            fileAttachment.split(',').map(nameFile => {
                 handleFiles.push(`${dataVnrStorage.apiConfig.uriPor}/Uploads/${nameFile}`);
             });
 
         // Mặc định ẩn
-        let isShowCodeEmp = _configField.findIndex((key) => key == 'ReviewMail') > -1 ? false : true,
-            isAllowanceAmount = _configField.findIndex((key) => key == 'AllowanceAmount') > -1 ? false : true;
+        let isShowCodeEmp = _configField.findIndex(key => key == 'ReviewMail') > -1 ? false : true,
+            isAmountTotal = _configField.findIndex(key => key == 'AmountTotal') > -1 ? false : true,
+            isAllowanceAmount = _configField.findIndex(key => key == 'AllowanceAmount') > -1 ? false : true;
         return (
             <View style={styles.swipeable}>
                 <View style={[styles.swipeableLayout]}>
                     <View style={[styles.container]} key={index}>
                         <View style={styles.Line}>
                             <View style={styles.lineLeft}>
-                                {_renderRowConfig.map((col, index) => (
-                                    <VnrFormatStringTypeItem
-                                        key={index}
-                                        data={dataItem}
-                                        col={col}
-                                        allConfig={_renderRowConfig}
+                                <View style={styles.line_date_row}>
+                                    <VnrText
+                                        i18nKey={'HRM_Payroll_BasicSalary_DateOfEffect'}
+                                        style={[styleSheets.text, styles.line_date_text]}
                                     />
-                                ))}
+                                    <View style={styles.line_time_wrap}>
+                                        <Text style={[styleSheets.text, styles.line_text]} numberOfLines={1}>
+                                            {dataItem.DateOfEffect
+                                                ? moment(dataItem.DateOfEffect).format('DD/MM/YYYY')
+                                                : ''}
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                {isAmountTotal && (
+                                    <View style={styles.line_date_row}>
+                                        <VnrText
+                                            i18nKey={'HRM_Payroll_BasicSalary_AmountTotal'}
+                                            style={[styleSheets.text, styles.line_date_text]}
+                                        />
+                                        <View style={styles.line_time_wrap}>
+                                            <Text style={[styleSheets.text, styles.line_text]} numberOfLines={1}>
+                                                {dataItem.AmountTotal
+                                                    ? `${format('#,###.#', dataItem.AmountTotal)} ${
+                                                        dataItem.CurrencyCode
+                                                    }`
+                                                    : ''}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                )}
+
+                                <View style={styles.line_date_row}>
+                                    <VnrText
+                                        i18nKey={'HRM_Payroll_Basic_Salary'}
+                                        style={[styleSheets.text, styles.line_date_text]}
+                                    />
+                                    <View style={styles.line_time_wrap}>
+                                        <Text style={[styleSheets.text, styles.line_text]} numberOfLines={1}>
+                                            {dataItem.GrossAmountView != null
+                                                ? `${format('#,###.#', dataItem.GrossAmountView)} ${
+                                                    dataItem.CurrencyCode
+                                                }`
+                                                : ''}
+                                        </Text>
+                                    </View>
+                                </View>
 
                                 {isAllowanceAmount && (
                                     <View style={styles.line_date_row}>
@@ -183,8 +418,7 @@ export default class BasicSalaryDetailItem extends React.Component {
                                         </View>
                                         <View style={styles.styViewMail}>
                                             {handleFiles.map((link, index) => (
-                                                <TouchableOpacity
-                                                    key={index}
+                                                <TouchableOpacity key={index}
                                                     style={styles.styBtnViewMail}
                                                     onPress={() => {
                                                         Platform.OS == 'android'
@@ -217,7 +451,9 @@ export default class BasicSalaryDetailItem extends React.Component {
                         onBackdropPress={() => this.hideDetailSal()}
                         customBackdrop={
                             <TouchableWithoutFeedback onPress={() => this.hideDetailSal()}>
-                                <View style={stylesScreenDetailV3.modalBackdrop} />
+                                <View
+                                    style={stylesScreenDetailV3.modalBackdrop}
+                                />
                             </TouchableWithoutFeedback>
                         }
                         style={CustomStyleSheet.margin(0)}
@@ -321,8 +557,8 @@ const styles = StyleSheet.create({
     },
     line_date_text: {
         fontSize: Size.text - 1,
-        color: Colors.gray_10,
-        textAlign: 'left'
+        color: Colors.gray_8,
+        marginRight: 15
     },
     styContentViewSalList: {
         flex: 1,

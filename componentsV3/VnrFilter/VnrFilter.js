@@ -29,6 +29,7 @@ export default class VnrFilter extends React.Component {
         this.state = _state;
         this.state.refresh = false;
         this.state.isDisableBtnApply = true;
+        this.dataConfirm = {};
     }
 
     setDataConfirm = (data) => {
@@ -61,7 +62,7 @@ export default class VnrFilter extends React.Component {
             });
         });
 
-        !isClearValue && this.setDataConfirm(arrState);
+        this.setDataConfirm(arrState);
         return arrState;
     };
 
@@ -184,6 +185,7 @@ export default class VnrFilter extends React.Component {
                     control.Name == ControlName.VnrYearPicker &&
                     control.value
                 ) {
+                    // const dataFomart = await this.formatDataFromSever(control.value);
                     return {
                         Text: control.value,
                         Value: control.value
@@ -459,9 +461,7 @@ export default class VnrFilter extends React.Component {
         _state = this.createStateFilter(true);
         _state.refresh = !this.state.refresh;
         this.setState(_state, () => {
-            // Logic mới bỏ lọc phải confirm
-            // this.applyFilter(true);
-            this.handleApplyFilter();
+            this.applyFilter();
         });
     };
 
@@ -471,7 +471,6 @@ export default class VnrFilter extends React.Component {
 
     renderControl = (control, index, Label) => {
         // nhannguyen: no dispalay control when IsShowFilterCommon === true
-        let contentControl = <View />;
         if (!control?.IsShowFilterCommon) {
             const { ShowHideControl } = control;
             if (ShowHideControl && ShowHideControl.fieldName && ShowHideControl.valueField && ShowHideControl.value) {
@@ -486,248 +485,216 @@ export default class VnrFilter extends React.Component {
                 }
 
                 if (valueControl != value) {
-                    contentControl = null;
+                    return <View />;
                 }
             }
-
-            if (contentControl != null) {
-                switch (control.Name) {
-                    case ControlName.VnrText:
-                        contentControl = (
-                            <VnrTextInput
-                                {...control}
-                                lable={Label}
-                                value={this.state[control.fieldName].value}
-                                onChangeText={(text) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = text;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                key={control.fieldName}
-                                styleContent={CustomStyleSheet.borderBottomWidth(0)}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    case ControlName.VnrDate: {
-                        let controlVnrDate = { ...control };
-                        controlVnrDate.response = null;
-                        contentControl = (
-                            <VnrDate
-                                key={control.fieldName}
-                                {...controlVnrDate}
-                                placeHolder={'HRM_PortalApp_Limit'}
-                                lable={Label}
-                                layoutFilter={true}
-                                value={this.state[control.fieldName].value}
-                                stylePicker={
-                                    index == 1 ? stylesVnrFilter.controlDate_To : stylesVnrFilter.controlDate_from
-                                }
-                                onFinish={(value) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = value;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    }
-                    case ControlName.VnrMonthYear: {
-                        let controlVnrMonthYear = { ...control };
-                        controlVnrMonthYear.response = null;
-                        contentControl = (
-                            <VnrMonthYear
-                                key={control.fieldName}
-                                {...controlVnrMonthYear}
-                                lable={Label}
-                                value={this.state[control.fieldName]?.value}
-                                layoutFilter={true}
-                                stylePicker={
-                                    index == 1 ? stylesVnrFilter.controlDate_To : stylesVnrFilter.controlDate_from
-                                }
-                                onFinish={(value) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = value;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    }
-                    case ControlName.VnrYearPicker: {
-                        let controlVnrYearPicker = { ...control };
-                        controlVnrYearPicker.response = null;
-                        const valueDefault =
-                            controlVnrYearPicker?.defaultValue !== null &&
-                            controlVnrYearPicker?.defaultValue !== undefined
-                                ? parseInt(new Date().getFullYear()) + controlVnrYearPicker?.defaultValue
-                                : parseInt(new Date().getFullYear());
-                        contentControl = (
-                            <VnrYearPicker
-                                key={control.fieldName}
-                                {...controlVnrYearPicker}
-                                layoutFilter={true}
-                                //lable={Label}
-                                value={this.state[control.fieldName]?.value || valueDefault}
-                                //stylePicker={(index == 1) ? stylesVnrFilter.controlDate_To : stylesVnrFilter.controlDate_from}
-                                onFinish={(value) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = value?.year;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    }
-                    case ControlName.VnrTime:
-                        contentControl = (
-                            <VnrDate
-                                key={control.fieldName}
-                                {...control}
-                                placeHolder={'HRM_PortalApp_Limit'}
-                                lable={Label}
-                                layoutFilter={true}
-                                value={this.state[control.fieldName].value}
-                                onFinish={(value) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = value;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    case ControlName.VnrPicker:
-                        contentControl = (
-                            <VnrPicker
-                                key={control.fieldName}
-                                {...control}
-                                lable={Label}
-                                layoutFilter={true}
-                                value={this.state[control.fieldName].value}
-                                onFinish={(Item) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = Item;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    case ControlName.VnrPickerMulti:
-                        contentControl = (
-                            <VnrPickerMulti
-                                key={control.fieldName}
-                                {...control}
-                                lable={Label}
-                                autoBind={true}
-                                value={this.state[control.fieldName].value}
-                                layoutFilter={true}
-                                onFinish={(listItem) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = listItem;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    case ControlName.VnrTreeView:
-                        contentControl = (
-                            <VnrTreeView
-                                {...control}
-                                lable={Label}
-                                layoutFilter={true}
-                                value={this.state[control.fieldName].value}
-                                onSelect={(listItem) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = listItem;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-                    case ControlName.VnrDateFromTo:
-                        let controlVnrDateFromTo = { ...control };
-                        controlVnrDateFromTo.response = null;
-                        contentControl = (
-                            <VnrDateFromTo
-                                // ref={(ref) => (this.refVnrDateFromTo = ref)}
-                                {...controlVnrDateFromTo}
-                                placeHolder={'HRM_PortalApp_Limit'}
-                                layoutFilter={true}
-                                isControll={true}
-                                lable={Label}
-                                key={control.fieldName}
-                                refresh={this.state.refresh}
-                                value={this.state[control.fieldName].value ? this.state[control.fieldName].value : {}}
-                                displayOptions={control.displayOptions}
-                                onlyChooseEveryDay={control.onlyChooseEveryDay}
-                                stylePlaceholder={{ color: Colors.greySecondaryConstraint }}
-                                onFinish={(value) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value =
-                                        typeof value === 'object' && Object.keys(value).length > 0 ? value : null;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                            />
-                        );
-                        break;
-                    case ControlName.VnrSwitch:
-                        contentControl = (
-                            <VnrSwitch
-                                {...control}
-                                layoutFilter={true}
-                                lable={Label}
-                                trackColor={{ false: Colors.gray_5, true: Colors.primary }}
-                                thumbColor={Colors.white}
-                                ios_backgroundColor={Colors.gray_5}
-                                value={
-                                    this.state[control.fieldName]?.value ? this.state[control.fieldName].value : false
-                                }
-                                onFinish={() => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = fieldControl.value ? !fieldControl.value : true;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                            />
-                        );
-                        break;
-                    case ControlName.VnrSuperFilterWithTextInput:
-                        contentControl = (
-                            <VnrSuperFilterWithTextInput
-                                key={control.fieldName}
-                                {...control}
-                                lable={Label}
-                                layoutFilter={true}
-                                value={this.state[control.fieldName].value}
-                                onFinish={(listItem) => {
-                                    const fieldControl = this.state[control.fieldName];
-                                    fieldControl.value = listItem;
-                                    this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
-                                }}
-                                refresh={this.state.refresh}
-                            />
-                        );
-                        break;
-
-                    default:
-                        break;
+            switch (control.Name) {
+                case ControlName.VnrText:
+                    return (
+                        <VnrTextInput
+                            {...control}
+                            lable={Label}
+                            value={this.state[control.fieldName].value}
+                            onChangeText={(text) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = text;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            key={control.fieldName}
+                            styleContent={CustomStyleSheet.borderBottomWidth(0)}
+                            refresh={this.state.refresh}
+                        />
+                    );
+                case ControlName.VnrDate: {
+                    let controlVnrDate = { ...control };
+                    controlVnrDate.response = null;
+                    return (
+                        <VnrDate
+                            key={control.fieldName}
+                            {...controlVnrDate}
+                            placeHolder={'HRM_PortalApp_Limit'}
+                            lable={Label}
+                            layoutFilter={true}
+                            value={this.state[control.fieldName].value}
+                            stylePicker={index == 1 ? stylesVnrFilter.controlDate_To : stylesVnrFilter.controlDate_from}
+                            onFinish={(value) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = value;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
                 }
+                case ControlName.VnrMonthYear: {
+                    let controlVnrMonthYear = { ...control };
+                    controlVnrMonthYear.response = null;
+                    return (
+                        <VnrMonthYear
+                            key={control.fieldName}
+                            {...controlVnrMonthYear}
+                            lable={Label}
+                            value={this.state[control.fieldName]?.value}
+                            stylePicker={index == 1 ? stylesVnrFilter.controlDate_To : stylesVnrFilter.controlDate_from}
+                            onFinish={(value) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = value;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
+                }
+                case ControlName.VnrYearPicker: {
+                    let controlVnrYearPicker = { ...control };
+                    controlVnrYearPicker.response = null;
+                    const valueDefault =
+                        controlVnrYearPicker?.defaultValue !== null && controlVnrYearPicker?.defaultValue !== undefined
+                            ? parseInt(new Date().getFullYear()) + controlVnrYearPicker?.defaultValue
+                            : parseInt(new Date().getFullYear());
+                    return (
+                        <VnrYearPicker
+                            key={control.fieldName}
+                            {...controlVnrYearPicker}
+                            //lable={Label}
+                            value={this.state[control.fieldName]?.value || valueDefault}
+                            //stylePicker={(index == 1) ? stylesVnrFilter.controlDate_To : stylesVnrFilter.controlDate_from}
+                            onFinish={(value) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = value?.year;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
+                }
+                case ControlName.VnrTime:
+                    return (
+                        <VnrDate
+                            key={control.fieldName}
+                            {...control}
+                            placeHolder={'HRM_PortalApp_Limit'}
+                            lable={Label}
+                            layoutFilter={true}
+                            value={this.state[control.fieldName].value}
+                            onFinish={(value) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = value;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
+                case ControlName.VnrPicker:
+                    return (
+                        <VnrPicker
+                            key={control.fieldName}
+                            {...control}
+                            lable={Label}
+                            layoutFilter={true}
+                            value={this.state[control.fieldName].value}
+                            onFinish={(Item) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = Item;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
+                case ControlName.VnrPickerMulti:
+                    return (
+                        <VnrPickerMulti
+                            key={control.fieldName}
+                            {...control}
+                            lable={Label}
+                            autoBind={true}
+                            value={this.state[control.fieldName].value}
+                            layoutFilter={true}
+                            onFinish={(listItem) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = listItem;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
+                case ControlName.VnrTreeView:
+                    return (
+                        <VnrTreeView
+                            {...control}
+                            lable={Label}
+                            layoutFilter={true}
+                            value={this.state[control.fieldName].value}
+                            onSelect={(listItem) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = listItem;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
+                case ControlName.VnrDateFromTo:
+                    let controlVnrDateFromTo = { ...control };
+                    controlVnrDateFromTo.response = null;
+                    return (
+                        <VnrDateFromTo
+                            // ref={(ref) => (this.refVnrDateFromTo = ref)}
+                            {...controlVnrDateFromTo}
+                            placeHolder={'HRM_PortalApp_Limit'}
+                            layoutFilter={true}
+                            isControll={true}
+                            lable={Label}
+                            key={control.fieldName}
+                            refresh={this.state.refresh}
+                            value={this.state[control.fieldName].value ? this.state[control.fieldName].value : {}}
+                            displayOptions={control.displayOptions}
+                            onlyChooseEveryDay={control.onlyChooseEveryDay}
+                            stylePlaceholder={{ color: Colors.greySecondaryConstraint }}
+                            onFinish={(value) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = value;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                        />
+                    );
+                case ControlName.VnrSwitch:
+                    return (
+                        <VnrSwitch
+                            {...control}
+                            layoutFilter={true}
+                            lable={Label}
+                            trackColor={{ false: Colors.gray_5, true: Colors.primary }}
+                            thumbColor={Colors.white}
+                            ios_backgroundColor={Colors.gray_5}
+                            value={this.state[control.fieldName]?.value ? this.state[control.fieldName].value : false}
+                            onFinish={() => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = fieldControl.value ? !fieldControl.value : true;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                        />
+                    );
+                case ControlName.VnrSuperFilterWithTextInput:
+                    return (
+                        <VnrSuperFilterWithTextInput
+                            key={control.fieldName}
+                            {...control}
+                            lable={Label}
+                            layoutFilter={true}
+                            value={this.state[control.fieldName].value}
+                            onFinish={(listItem) => {
+                                const fieldControl = this.state[control.fieldName];
+                                fieldControl.value = listItem;
+                                this.setState({ [control.fieldName]: fieldControl }, this.handleApplyFilter);
+                            }}
+                            refresh={this.state.refresh}
+                        />
+                    );
+
+                default:
+                    break;
             }
         }
-
-        return contentControl != null ? (
-            <View key={Label} style={[stylesVnrFilter.contentViewControl, styles.styViewGp]}>
-                <View style={[stylesVnrFilter.viewControl]}>{contentControl}</View>
-            </View>
-        ) : (
-            <View />
-        );
     };
 
     closeModal = () => {
@@ -740,62 +707,18 @@ export default class VnrFilter extends React.Component {
         const state = this.state;
         const getDataConfirm = this.getDataConfirm();
         const listValue = {};
-        const { filterConfig } = this.props;
 
         Object.keys(state).forEach((key) => {
             if (state[key] && state[key].value && state[key].value != null && state[key].value != '')
                 listValue[key] = state[key];
         });
 
-        // xét lại value các control ẩn hiện theo control parent
-        let nextState = {};
-        {
-            filterConfig.forEach((e) => {
-                return e.ControlGroup.forEach((control) => {
-                    const { ShowHideControl } = control;
-                    if (
-                        ShowHideControl &&
-                        ShowHideControl.fieldName &&
-                        ShowHideControl.valueField &&
-                        ShowHideControl.value
-                    ) {
-                        const { fieldName, valueField, value } = ShowHideControl;
-
-                        const getControl = this.state[fieldName];
-                        let valueControl = null;
-                        if (
-                            getControl &&
-                            getControl.value &&
-                            Array.isArray(getControl.value) &&
-                            getControl.value.length > 0
-                        ) {
-                            valueControl = getControl.value[0][valueField];
-                        } else if (getControl && getControl.value) {
-                            valueControl = getControl.value[valueField];
-                        }
-
-                        if (valueControl != value) {
-                            nextState = {
-                                ...nextState,
-                                [control.fieldName]: {
-                                    ...control,
-                                    value: null
-                                }
-                            };
-                        }
-                    }
-                });
-            });
-        }
-
         if (!Vnr_Function.compare(listValue, getDataConfirm)) {
             this.setState({
-                ...nextState,
                 isDisableBtnApply: false
             });
         } else {
             this.setState({
-                ...nextState,
                 isDisableBtnApply: true
             });
         }
@@ -803,8 +726,6 @@ export default class VnrFilter extends React.Component {
         // if (listValue.length == 0) {
         //     this.applyFilter(true);
         // }
-        // th1 : Xoa roi chon laij dung du lieu da confirm
-        // Bo loc
     }
 
     render() {
@@ -813,15 +734,7 @@ export default class VnrFilter extends React.Component {
             { isDisableBtnApply } = this.state;
 
         const listValue = Object.keys(state).filter((key) => {
-                const control = state[key];
-
-                return (
-                    state[key] &&
-                    state[key].value &&
-                    state[key].value != null &&
-                    state[key].value != '' &&
-                    !control.fieldForFilter
-                );
+                return state[key] && state[key].value && state[key].value != null && state[key].value != '';
             }),
             isDisableBtnRemove = listValue.length > 0 ? false : true,
             numberValue = listValue.length > 0 ? `(${listValue.length})` : '';
@@ -858,9 +771,18 @@ export default class VnrFilter extends React.Component {
                             >
                                 <View style={{ flexDirection: EnumName.E_column }}>
                                     {this.props.filterConfig.map((e) => {
-                                        return e.ControlGroup.map((control, index) => {
-                                            return this.renderControl(control, index, e.Label);
-                                        });
+                                        return (
+                                            <View
+                                                key={e.Label}
+                                                style={[stylesVnrFilter.contentViewControl, styles.styViewGp]}
+                                            >
+                                                <View style={[stylesVnrFilter.viewControl]}>
+                                                    {e.ControlGroup.map((control, index) => {
+                                                        return this.renderControl(control, index, e.Label);
+                                                    })}
+                                                </View>
+                                            </View>
+                                        );
                                     })}
                                 </View>
                             </KeyboardAwareScrollView>
@@ -895,7 +817,7 @@ export default class VnrFilter extends React.Component {
                                                     color: Colors.gray_9
                                                 }
                                         ]}
-                                        i18nKey={textLeftButton != null ? textLeftButton : 'HRM_PortalApp_RemoveFilter'}
+                                        i18nKey={textLeftButton != null ? textLeftButton : 'HRM_RemoveFilter'}
                                     />
                                 </TouchableOpacity>
                                 <TouchableOpacity

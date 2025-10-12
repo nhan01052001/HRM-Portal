@@ -42,6 +42,14 @@ export default class Time extends React.Component {
         this.timer && clearInterval(this.timer);
     };
 
+    clearStartTime = () => {
+        this.StartTime && clearTimeout(this.StartTime);
+    };
+
+    clearSetTime = () => {
+        this.Start_SetTime && clearTimeout(this.Start_SetTime);
+    };
+
     setTime = () => {
         this.timer = setInterval(() => {
             this.setState({ time: new Date() });

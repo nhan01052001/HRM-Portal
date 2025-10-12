@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView, Keyboard } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { styleSheets, Size, Colors, CustomStyleSheet } from '../../../../constants/styleConfig';
 import { IconCancel } from '../../../../constants/Icons';
 import VnrText from '../../../../components/VnrText/VnrText';
@@ -271,7 +272,6 @@ export default class ComComplimentExchange extends Component {
                     onBackButtonPress={() => this.onClose()}
                     isVisible={isShowModal}
                     onBackdropPress={() => this.onClose()}
-                    avoidKeyboard={true}
                     customBackdrop={
                         <TouchableWithoutFeedback onPress={() => this.onClose()}>
                             <View
@@ -279,10 +279,9 @@ export default class ComComplimentExchange extends Component {
                             />
                         </TouchableWithoutFeedback>
                     }
-                    avoidKeyboard={true}
                     style={styles.styModal}
                 >
-                    <View style={styles.wrapInsideModal}>
+                    <SafeAreaView style={styles.wrapInsideModal}>
                         <ToasterInModal
                             ref={(refs) => {
                                 this.ToasterSevice = refs;
@@ -325,7 +324,6 @@ export default class ComComplimentExchange extends Component {
                                         styleContent={styles.styInput}
                                         style={[styleSheets.text, styles.styCost]}
                                         multiline={true}
-                                        onSubmitEditing={() => Keyboard.dismiss()}
                                         value={Cost.value}
                                         onFocus={() => {
                                             // Platform.OS == 'ios' && onScrollToInputIOS(indexDay + 1, this.layoutHeightItem)
@@ -346,7 +344,7 @@ export default class ComComplimentExchange extends Component {
                         </KeyboardAvoidingView>
 
                         {/* button */}
-                        <View style={[styles.wrapButtonHandler, CustomStyleSheet.paddingBottom(26)]}>
+                        <View style={styles.wrapButtonHandler}>
                             <TouchableOpacity
                                 style={[styles.wrapBtnRegister, styles.wrapRegister]}
                                 onPress={() => this.onSaveAndSend()}
@@ -357,7 +355,7 @@ export default class ComComplimentExchange extends Component {
                                 />
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </SafeAreaView>
                 </Modal>
             </View>
         );
@@ -380,7 +378,6 @@ const styles = {
         wrapInsideModal: {
             position: 'absolute',
             bottom: 0,
-            flex: 1,
             height: Size.deviceheight * 0.4,
             width: Size.deviceWidth,
             backgroundColor: Colors.white

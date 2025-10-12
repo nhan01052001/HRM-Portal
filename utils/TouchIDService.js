@@ -86,31 +86,16 @@ class TouchIDService {
             onBackDrop: () => {},
             onCancel: () => {},
             onConfirm: async () => {
-                this.isRemoveTouchID();
+                this.setEnable && this.setEnable(false);
+
+                const data = await SInfoService.getItem(EnumUser.DATASAVEID);
+                const appendData = data.map((m) => ({
+                    ...m,
+                    touchID: null
+                }));
+                await SInfoService.setItem(EnumUser.DATASAVEID, appendData);
             }
         });
-    }
-
-    static async isRemoveTouchID(setEnable) {
-        if (setEnable && typeof setEnable === 'function') {
-            this.setEnable = setEnable;
-        }
-
-        let dataVnrStorage = getDataVnrStorage();
-        const { userid } = dataVnrStorage.currentUser.headers;
-        const data = (await SInfoService.getItem(EnumUser.DATASAVEID)) || [];
-        const existedUser = data?.find((d) => d[EnumUser.USERID] === userid);
-        if (existedUser) {
-            const dataChanged = data.map((m) => {
-                if (m.userid === userid) {
-                    m.touchID = null;
-                }
-                return m;
-            }); //**************** */
-
-            await SInfoService.setItem(EnumUser.DATASAVEID, dataChanged);
-            this.setEnable && this.setEnable(false);
-        }
     }
 
     static async confirmPassWordSetting(passWord) {
@@ -139,15 +124,10 @@ class TouchIDService {
                     if (existedUser) {
                         target[EnumUser.TOUCHID] = DeviceInfo.getUniqueId();
 
-                        const dataChanged = data.map((m) => {
-                            if (m.userid === userid) {
-                                m.touchID = target.touchID;
-                                m[EnumUser.PASSWORD] = passWord;
-                            } else {
-                                m.touchID = null;
-                            }
-                            return m;
-                        }); //**************** */
+                        const dataChanged = data.map((m) => ({
+                            ...m,
+                            touchID: m.userid === userid ? target.touchID : null
+                        })); //**************** */
 
                         await SInfoService.setItem(EnumUser.DATASAVEID, dataChanged);
                         ToasterSevice.showSuccess('Hrm_Succeed', 4000);

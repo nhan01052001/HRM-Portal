@@ -341,11 +341,11 @@ class AttSubmitTakeLateEarlyAllowedComponent extends Component {
 
         if (
             (fieldConfig?.WorkDate?.isValid && !WorkDate.value) ||
-            (!LateEarlyType.value) ||
+            (fieldConfig?.LateEarlyType?.isValid && !LateEarlyType.value) ||
             (fieldConfig?.Note?.isValid && !Note.value) ||
             (fieldConfig?.Attachment?.isValid && !FileAttach.value) ||
-            (LateReasonID.visible && !LateReasonID.value) ||
-            (EarlyReasonID.visible && !EarlyReasonID.value)
+            (fieldConfig?.LateReasonID?.isValid && !LateReasonID.value) ||
+            (fieldConfig?.EarlyReasonID?.isValid && !EarlyReasonID.value)
         ) {
             this.setState(
                 {
@@ -747,9 +747,9 @@ class AttSubmitTakeLateEarlyAllowedComponent extends Component {
                 {/* Loại đăng ký */}
                 {LateEarlyType.visible && fieldConfig?.LateEarlyType?.visibleConfig && (
                     <VnrPickerLittle
-                        fieldValid={true}
+                        fieldValid={fieldConfig?.LateEarlyType?.isValid}
                         isCheckEmpty={
-                            isError && !LateEarlyType.value ? true : false
+                            fieldConfig?.LateEarlyType?.isValid && isError && !LateEarlyType.value ? true : false
                         }
                         refresh={LateEarlyType.refresh}
                         dataLocal={LateEarlyType.data ? LateEarlyType.data : []}
@@ -792,9 +792,9 @@ class AttSubmitTakeLateEarlyAllowedComponent extends Component {
                 {/* Lý do đi trễ */}
                 {LateReasonID.visible && fieldConfig?.LateReasonID?.visibleConfig && (
                     <VnrPickerLittle
-                        fieldValid={LateReasonID.visible}
+                        fieldValid={fieldConfig?.LateReasonID?.isValid}
                         isCheckEmpty={
-                            LateReasonID.visible && isError && !LateReasonID.value ? true : false
+                            fieldConfig?.LateReasonID?.isValid && isError && !LateReasonID.value ? true : false
                         }
                         refresh={LateReasonID.refresh}
                         //dataLocal={LateReasonID.data ? LateReasonID.data : []}
@@ -829,9 +829,9 @@ class AttSubmitTakeLateEarlyAllowedComponent extends Component {
                 {/* Lý do về sớm */}
                 {EarlyReasonID.visible && fieldConfig?.EarlyReasonID?.visibleConfig && (
                     <VnrPickerLittle
-                        fieldValid={EarlyReasonID.visible}
+                        fieldValid={fieldConfig?.EarlyReasonID?.isValid}
                         isCheckEmpty={
-                            EarlyReasonID.visible && isError && !EarlyReasonID.value ? true : false
+                            fieldConfig?.EarlyReasonID?.isValid && isError && !EarlyReasonID.value ? true : false
                         }
                         refresh={EarlyReasonID.refresh}
                         //dataLocal={EarlyReasonID.data ? EarlyReasonID.data : []}

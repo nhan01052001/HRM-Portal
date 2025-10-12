@@ -24,7 +24,6 @@ let configList = null,
     attApproveTakeLeaveDay = null,
     attApproveTakeLeaveDayViewDetail = null,
     keyListTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttAllTakeLeaveDay extends Component {
@@ -49,7 +48,7 @@ class AttAllTakeLeaveDay extends Component {
         this.paramsFilter = null;
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // reload danh sách khi có approve hoặc reject dữ liệu
-            AttApproveTakeLeaveDayBusinessFunction.setThisForBusiness(this, false, dataRowActionAndSelected?.rowActions);
+            AttApproveTakeLeaveDayBusinessFunction.setThisForBusiness(this);
             if (AttApproveTakeLeaveDayBusinessFunction.checkForReLoadScreen[attAllTakeLeaveDay]) {
                 this.reload();
             }
@@ -164,7 +163,7 @@ class AttAllTakeLeaveDay extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attAllTakeLeaveDay);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attAllTakeLeaveDay);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -303,7 +302,6 @@ class AttAllTakeLeaveDay extends Component {
                             }}
                             screenName={attApproveTakeLeaveDay}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Leave_Day_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

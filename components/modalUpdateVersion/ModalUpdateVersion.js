@@ -457,14 +457,14 @@ export default class ModalUpdateVersion extends Component {
                 case codePush.SyncStatus.UPDATE_INSTALLED:
                     this.isPendingProgress = false;
                     ToasterSevice.showSuccess('Hoàn tất quá trình tải bản cập nhật', 8000);
-                    if (this.state.isUpdate) {
-                        this.setState({ ...defaultState }, () => {
+                    if(this.state.isUpdate){
+                        this.setState({ ...defaultState },()=>{
                             setTimeout(() => {
                                 codePush.restartApp();
                             }, 200);
                         });
                     }
-                    else {
+                    else{
                         this.setUpdateStatus(STATUS_UPDATE_LATER.DONE);
                     }
                     console.log('Update installed and will be applied on restart.');

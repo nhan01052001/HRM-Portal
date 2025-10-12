@@ -225,7 +225,6 @@ export default class AttLeaveDayReplacementViewDetail extends Component {
                 const response = await HttpService.Get(
                     `[URI_CENTER]/api/Att_LeaveDay/GetDetailLeaveDayReplacementByID?ID=${id}`
                 );
-                const getDetailConfig = await Vnr_Function.HandleConfigListDetailATT(_configListDetail, 'Detail_List_DaysReplacement');
                 if (response && response.Status == EnumName.E_SUCCESS) {
                     let data = response.Data;
                     data = { ...data, ...data.SingleWordDetail[0] };
@@ -253,7 +252,7 @@ export default class AttLeaveDayReplacementViewDetail extends Component {
                             : translate('HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Confirmed');
 
                     const _listActions = await this.rowActionsHeaderRight(data);
-                    this.setState({ configListDetail: getDetailConfig, dataItem: data, listActions: _listActions });
+                    this.setState({ configListDetail: _configListDetail, dataItem: data, listActions: _listActions });
                 } else {
                     this.setState({ dataItem: 'EmptyData' });
                 }

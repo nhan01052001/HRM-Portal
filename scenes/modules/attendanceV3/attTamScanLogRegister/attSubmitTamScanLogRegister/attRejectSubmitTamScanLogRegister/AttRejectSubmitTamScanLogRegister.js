@@ -291,7 +291,6 @@ class AttRejectSubmitTamScanLogRegister extends Component {
                             }}
                             screenName={attSubmitTamScanLogRegister}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Tamscan_Log_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

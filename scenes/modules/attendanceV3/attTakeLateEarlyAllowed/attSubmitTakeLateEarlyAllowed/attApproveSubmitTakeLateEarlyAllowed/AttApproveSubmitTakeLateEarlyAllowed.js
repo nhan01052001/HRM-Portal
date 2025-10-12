@@ -24,7 +24,6 @@ let configList = null,
     attApproveSubmitTakeLateEarlyAllowed = null,
     attSubmitTakeLateEarlyAllowed = null,
     attSubmitTakeLateEarlyAllowedViewDetail = null,
-    dataRowActionAndSelected = null,
     attApproveSubmitTakeLateEarlyAllowedTask = null,
     pageSizeList = 20;
 
@@ -54,7 +53,7 @@ class AttApproveSubmitTakeLateEarlyAllowed extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitTakeLateEarlyAllowedBusinessFunction.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttSubmitTakeLateEarlyAllowedBusinessFunction.setThisForBusiness(this);
             if (
                 AttSubmitTakeLateEarlyAllowedBusinessFunction.checkForReLoadScreen[attApproveSubmitTakeLateEarlyAllowed]
             ) {
@@ -178,7 +177,7 @@ class AttApproveSubmitTakeLateEarlyAllowed extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attApproveSubmitTakeLateEarlyAllowed);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attApproveSubmitTakeLateEarlyAllowed);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -260,10 +259,12 @@ class AttApproveSubmitTakeLateEarlyAllowed extends Component {
 
     componentDidMount() {
         attApproveSubmitTakeLateEarlyAllowed = ScreenName.AttApproveSubmitTakeLateEarlyAllowed;
-        attSubmitTakeLateEarlyAllowed = ScreenName.AttSubmitTakeLateEarlyAllowed;
-        attSubmitTakeLateEarlyAllowedViewDetail = ScreenName.AttSubmitTakeLateEarlyAllowedViewDetail;
+        attSubmitTakeLateEarlyAllowed = ScreenName.AttSubmitLateEarlyAllowed;
+        attSubmitTakeLateEarlyAllowedViewDetail = ScreenName.AttSubmitLateEarlyAllowedViewDetail;
         attApproveSubmitTakeLateEarlyAllowedTask = EnumTask.KT_AttApproveSubmitTakeLateEarlyAllowed;
-        AttSubmitTakeLateEarlyAllowedBusinessFunction.checkForReLoadScreen[attApproveSubmitTakeLateEarlyAllowed] = false;
+        AttSubmitTakeLateEarlyAllowedBusinessFunction.checkForReLoadScreen[
+            attApproveSubmitTakeLateEarlyAllowed
+        ] = false;
         //set by config
         configList = ConfigList.value;
         enumName = EnumName;
@@ -309,7 +310,6 @@ class AttApproveSubmitTakeLateEarlyAllowed extends Component {
                             }}
                             screenName={attSubmitTakeLateEarlyAllowed}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Attendance_Late_Early_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 
@@ -320,7 +320,7 @@ class AttApproveSubmitTakeLateEarlyAllowed extends Component {
                                         dataLocal: false,
                                         screenDetail: attSubmitTakeLateEarlyAllowedViewDetail,
                                         screenName: attSubmitTakeLateEarlyAllowed,
-                                        screenNameRender:  attApproveSubmitTakeLateEarlyAllowed
+                                        screenNameRender: attApproveSubmitTakeLateEarlyAllowed
                                     }}
                                     scrollYAnimatedValue={this.scrollYAnimatedValue}
                                     rowActions={rowActions}

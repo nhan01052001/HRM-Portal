@@ -4,16 +4,15 @@ import { Size, Colors, styleSheets, styleSafeAreaView } from '../../../constants
 import styleComonAddOrEdit from '../../../constants/styleComonAddOrEdit';
 import { SafeAreaView } from 'react-navigation';
 import { translate } from '../../../i18n/translate';
-import { IconEyeV2, IconEyeOffV2, IconBack } from '../../../constants/Icons';
+import { IconEyeV2, IconEyeOffV2 } from '../../../constants/Icons';
 import { VnrLoadingSevices } from '../../../components/VnrLoading/VnrLoadingPages';
 import HttpService from '../../../utils/HttpService';
 import { EnumName } from '../../../assets/constant';
 import PasswordRules from './PasswordRules';
 import Vnr_Function from '../../../utils/Vnr_Function';
-import { logout, setdataVnrStorageFromDataUser } from '../../../assets/auth/authentication';
+import { setdataVnrStorageFromDataUser } from '../../../assets/auth/authentication';
 import { ToasterSevice } from '../../../components/Toaster/Toaster';
 import DrawerServices from '../../../utils/DrawerServices';
-import TouchIDService from '../../../utils/TouchIDService';
 
 export default class ChangePasswordV3 extends Component {
     constructor(props) {
@@ -109,18 +108,10 @@ export default class ChangePasswordV3 extends Component {
         }
     }
 
-    setEnabled = () => {
-        const { params = {} } = this.props.navigation.state,
-            { setupData } = typeof params == 'object' ? params : JSON.parse(params);
-
-        (setupData && typeof setupData == 'function') && setupData();
-    };
-
     changePasswordSuccess = () => {
         const { params = {} } = this.props.navigation.state,
             { IsFirstLogin, dataUser } = typeof params == 'object' ? params : JSON.parse(params);
 
-        TouchIDService.isRemoveTouchID(this.setEnabled.bind(this));
         IsFirstLogin
             ? dataUser
                 ? this.loginSuccess(dataUser)
@@ -181,22 +172,9 @@ export default class ChangePasswordV3 extends Component {
             isActiveSave
         } = this.state;
 
-        const { params = {} } = this.props.navigation.state,
-            { IsFirstLogin } = typeof params == 'object' ? params : JSON.parse(params);
-
         return (
             <SafeAreaView {...styleSafeAreaView}>
                 <ScrollView style={styles.container}>
-                    {IsFirstLogin && (
-                        <TouchableOpacity
-                            //disabled={!isActiveSave}
-                            style={styles.btnLogout}
-                            onPress={() => logout()}
-                        >
-                            <IconBack color={Colors.gray_7} size={Size.iconSizeHeader} />
-                        </TouchableOpacity>
-                    )}
-
                     <View style={styles.imgSty}>
                         <Image
                             source={require('../../../assets/images/profileinfo/lockPassword.png')}
@@ -344,7 +322,7 @@ export default class ChangePasswordV3 extends Component {
                         onPress={() => this.onSubmitNewPass()}
                     >
                         <Text style={[styleSheets.lable, { color: isActiveSave ? Colors.white : Colors.gray_6 }]}>
-                            {translate('HRM_System_User_ChangePass')}
+                            {translate('HRM_Common_Save')}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -410,17 +388,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: Colors.gray_3,
         paddingVertical: 12,
-        borderRadius: Size.borderRadiusBotton
-    },
-    btnLogout: {
-        position:'absolute',
-        top:0,
-        left: 0,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: Colors.gray_3,
-        padding: Size.defineHalfSpace,
         borderRadius: Size.borderRadiusBotton
     }
 });

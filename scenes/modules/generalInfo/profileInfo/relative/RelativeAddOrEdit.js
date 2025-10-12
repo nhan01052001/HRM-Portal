@@ -858,7 +858,7 @@ export default class RelativeAddOrEdit extends Component {
         HttpService.Post('[URI_HR]/Hre_GetData/IstUpperTextOfFieldTableByConfig', {
             tableName: 'Hre_Relatives'
         })
-            .then(() => {})
+            .then(() => { })
             .catch(err => {
                 DrawerServices.navigate('ErrorScreen', { ErrorDisplay: err });
             });
@@ -884,9 +884,9 @@ export default class RelativeAddOrEdit extends Component {
                         try {
                             //map field hidden by config
                             const _configField =
-                                    ConfigField && ConfigField.value['RelativeAddOrEdit']
-                                        ? ConfigField.value['RelativeAddOrEdit']['Hidden']
-                                        : [],
+                                ConfigField && ConfigField.value['RelativeAddOrEdit']
+                                    ? ConfigField.value['RelativeAddOrEdit']['Hidden']
+                                    : [],
                                 { E_ProfileID, E_FullName } = EnumName,
                                 _profile = {
                                     ID: this.profileInfo[E_ProfileID],
@@ -2052,7 +2052,7 @@ export default class RelativeAddOrEdit extends Component {
     //     })
     // }
 
-    getConfig = () => {};
+    getConfig = () => { };
 
     onFinishAddressInformation = data => {
         const { AddressInformation } = this.state;
@@ -2407,20 +2407,21 @@ export default class RelativeAddOrEdit extends Component {
         let params = this.getParamsFromData(this.state);
 
         if (this.compareData(params) === true) {
-            ToasterSevice.showSuccess('Hrm_Succeed', 4000);
+            ToasterSevice.showWarning('HRM_PortalApp_DataNoChange', 4000);
 
             if (isCreate) {
                 this.refreshView();
-            } else {
-                // navigation.goBack();
-                const { reload } = this.props.navigation.state.params;
-                if (reload && typeof reload === 'function') {
-                    reload();
-                }
-
-                RelativeConfirmedBusinessFunction.checkForLoadEditDelete[ScreenName.RelativeWaitConfirm] = true;
-                DrawerServices.navigate(ScreenName.RelativeWaitConfirm);
             }
+            // else {
+            //     // navigation.goBack();
+            //     const { reload } = this.props.navigation.state.params;
+            //     if (reload && typeof reload === 'function') {
+            //         reload();
+            //     }
+
+            //     RelativeConfirmedBusinessFunction.checkForLoadEditDelete[ScreenName.RelativeWaitConfirm] = true;
+            //     DrawerServices.navigate(ScreenName.RelativeWaitConfirm);
+            // }
 
             return;
         }
@@ -2456,7 +2457,7 @@ export default class RelativeAddOrEdit extends Component {
                         iconType: EnumIcon.E_WARNING,
                         message: translate('HRM_HR_ExistingOtherRelationship_Save'),
                         textRightButton: translate('Button_OK'),
-                        onCancel: () => {},
+                        onCancel: () => { },
                         onConfirm: () => {
                             this.isSaveContinue = true;
                             this.save();
@@ -3262,8 +3263,7 @@ export default class RelativeAddOrEdit extends Component {
                 typeName: 'E_PROVINCE',
                 titlePicker: 'HRM_HR_Profile_TAProvince',
                 api: {
-                    urlApi: `[URI_HR]/Cat_GetData/GetProvinceCascading${
-                        CountryID_NDK.value ? '?country=' + CountryID_NDK.value.ID : ''
+                    urlApi: `[URI_HR]/Cat_GetData/GetProvinceCascading${CountryID_NDK.value ? '?country=' + CountryID_NDK.value.ID : ''
                     }`,
                     type: 'E_GET'
                 },
@@ -3282,8 +3282,7 @@ export default class RelativeAddOrEdit extends Component {
                 typeName: 'E_DISTRICT',
                 titlePicker: 'HRM_HR_Profile_TADistrict',
                 api: {
-                    urlApi: `[URI_HR]/Cat_GetData/GetDistrictCascading${
-                        ProvinceID_NDK.value ? '?province=' + ProvinceID_NDK.value.ID : ''
+                    urlApi: `[URI_HR]/Cat_GetData/GetDistrictCascading${ProvinceID_NDK.value ? '?province=' + ProvinceID_NDK.value.ID : ''
                     }`,
                     type: 'E_GET'
                 },
@@ -3302,8 +3301,7 @@ export default class RelativeAddOrEdit extends Component {
                 typeName: 'E_VILLAGE',
                 titlePicker: 'HRM_HR_Profile_Village',
                 api: {
-                    urlApi: `[URI_HR]/Cat_GetData/GetVillageCascading${
-                        DistrictID_NDK.value ? '?districtid=' + DistrictID_NDK.value.ID : ''
+                    urlApi: `[URI_HR]/Cat_GetData/GetVillageCascading${DistrictID_NDK.value ? '?districtid=' + DistrictID_NDK.value.ID : ''
                     }`,
                     type: 'E_GET'
                 },
@@ -3463,7 +3461,7 @@ export default class RelativeAddOrEdit extends Component {
                                                                 }
                                                             });
                                                         })
-                                                        .catch(() => {});
+                                                        .catch(() => { });
                                                 }
                                             }}
                                         />
@@ -3992,7 +3990,7 @@ export default class RelativeAddOrEdit extends Component {
                                                                 }
                                                             });
                                                         })
-                                                        .catch(() => {});
+                                                        .catch(() => { });
                                                 }
                                             }}
                                         />
@@ -4041,7 +4039,7 @@ export default class RelativeAddOrEdit extends Component {
                                                                 }
                                                             });
                                                         })
-                                                        .catch(() => {});
+                                                        .catch(() => { });
                                                 }
                                             }}
                                         />
@@ -4369,7 +4367,7 @@ export default class RelativeAddOrEdit extends Component {
                                                                         ...this.state.CheckAddDependant.CodeTax,
                                                                         value:
                                                                             typeof text === 'string' &&
-                                                                            text.length === 0
+                                                                                text.length === 0
                                                                                 ? null
                                                                                 : text,
                                                                         refresh: !this.state.CheckAddDependant.CodeTax

@@ -215,8 +215,7 @@ const handleGetDataSubmitTakeLeveaDay = async ({ keyTask, payload }) => {
                         'Comment',
                         'RequestCancelStatus',
                         'itemStatusCancel',
-                        'ProfileName',
-                        'RelativeTypeName'
+                        'ProfileName'
                     ];
 
                 // Lấy đúng fields trong màn hình chi tiết.
@@ -593,7 +592,6 @@ const handleGetDataApproveTamScanLogRegister = async ({ keyTask, payload }) => {
                         'DateReject',
                         'DateCancel',
                         'Status',
-                        'Comment',
                         'itemStatus',
                         'StatusView',
                         // -- //
@@ -2052,9 +2050,8 @@ const handleGetDataSubmitWorkingOvertime = ({ keyTask, payload }) => {
             ],
             getDataList: (dataBody, payload) => {
                 console.log(dataBody, 'dataBody');
-                
                 return HttpService.Post(
-                    dataBody.api ?? '[URI_CENTER]/api/Att_OvertimePlan/New_PlanOvertimeByFilterHandle_App',
+                    '[URI_CENTER]/api/Att_OvertimePlan/New_PlanOvertimeByFilterHandle_App',
                     dataBody,
                     null,
                     payload.reload ? payload.reload : null
@@ -2424,7 +2421,7 @@ const handleGetDataSubmitShiftChange = ({ keyTask, payload }) => {
             ],
             getDataList: (dataBody, payload) => {
                 return HttpService.Post(
-                    '[URI_CENTER]/api/Att_Roster/GetRosterByFilter',
+                    '[URI_CENTER]/api/Att_Roster/GetRosterByFilter_App',
                     dataBody,
                     null,
                     payload.reload ? payload.reload : null
@@ -2432,36 +2429,29 @@ const handleGetDataSubmitShiftChange = ({ keyTask, payload }) => {
             },
             getParamsDefault: () => {
                 const _configList = ConfigList.value[ScreenName.AttSubmitShiftChange],
-                    filter = _configList[EnumName.E_Filter] ?? [],
+                    filter = _configList[EnumName.E_Filter],
                     configDetail = ConfigListDetail.value[ScreenName.AttSubmitShiftChangeViewDetail],
                     valueField = [
                         'ID',
                         'Status',
-                        'ProfileName',
-                        'ProfileName2',
-                        'StrChangeDate',
-                        'AlternateDate',
+                        'ApproveHours',
                         'RegisterHours',
-                        'ChangeShiftTypeView',
-                        'MonShiftName_Old',
-                        'TueShiftName_Old',
-                        'WedShiftName_Old',
-                        'ThuShiftName_Old',
-                        'FriShiftName_Old',
-                        'SatShiftName_Old',
-                        'SunShiftName_Old',
-                        'MonShiftName',
-                        'TueShiftName',
-                        'WedShiftName',
-                        'ThuShiftName',
-                        'FriShiftName',
-                        'SatShiftName',
-                        'SunShiftName',
+                        'ConfirmHours',
                         'WorkDateRoot',
-                        'CurrentApprover',
+                        'InTime',
                         'OutTime',
-                        'Comment',
-                        'StatusView'
+                        'Rate',
+                        'RequestCancelStatus',
+                        'itemStatusCancel',
+                        'StatusView',
+                        'WarningViolation',
+                        'ReasonOT',
+                        'DateCreate',
+                        'DateApprove',
+                        'ApprovalDate',
+                        'DateUpdate',
+                        'DateReject',
+                        'DateCancel'
                     ];
 
                 // Lấy đúng fields trong màn hình chi tiết.
@@ -2492,87 +2482,83 @@ const handleGetDataSubmitShiftChange = ({ keyTask, payload }) => {
     }
 };
 
-const handleGetDataApproveShiftChange = ({ keyTask, payload }) => {
-    try {
-        const api = {
-            taskNameScreen: [
-                ScreenName.AttAllTakeShiftChange,
-                ScreenName.AttCanceledShiftChange,
-                ScreenName.AttRejectShiftChange,
-                ScreenName.AttApprovedShiftChange,
-                ScreenName.AttApproveShiftChangeViewDetail,
-                ScreenName.AttApproveShiftChange
-            ],
-            getDataList: (dataBody, payload) => {
-                console.log(dataBody, 'dataBody');
+// const handleGetDataApproveShiftChange = ({ keyTask, payload }) => {
+//     try {
+//         const api = {
+//             taskNameScreen: [
+//                 ScreenName.AttCanceledWorkingOvertime,
+//                 ScreenName.AttRejectWorkingOvertime,
+//                 ScreenName.AttApprovedWorkingOvertime,
+//                 ScreenName.AttApprovedWorkingOvertimeViewDetail,
+//                 ScreenName.AttApproveWorkingOvertime
+//             ],
+//             getDataList: (dataBody, payload) => {
+//                 return HttpService.Post(
+//                     '[URI_CENTER]/api/Att_OvertimePlan/New_PlanGetOvertimeApprovedByFilterHandle_App',
+//                     dataBody,
+//                     null,
+//                     payload.reload ? payload.reload : null
+//                 );
+//             },
+//             getParamsDefault: () => {
+//                 const _configList = ConfigList.value[ScreenName.AttApproveWorkingOvertime],
+//                     filter = _configList[EnumName.E_Filter],
+//                     configDetail = ConfigListDetail.value[ScreenName.AttApproveWorkingOvertime],
+//                     valueField = [
+//                         'ID',
+//                         'ImagePath',
+//                         'SalaryClassName',
+//                         'OrgStructureName',
+//                         'PositionName',
+//                         'Status',
+//                         'ApproveHours',
+//                         'RegisterHours',
+//                         'ConfirmHours',
+//                         'WorkDateRoot',
+//                         'InTime',
+//                         'OutTime',
+//                         'Rate',
+//                         'RequestCancelStatus',
+//                         'itemStatusCancel',
+//                         'itemStatus',
+//                         'StatusView',
+//                         'WarningViolation',
+//                         'ReasonOT',
+//                         'DateCreate',
+//                         'DateApprove',
+//                         'ApprovalDate',
+//                         'DateUpdate',
+//                         'DateReject',
+//                         'DateCancel'
+//                     ];
 
-                return HttpService.Post(
-                    '[URI_CENTER]/api/Att_Roster/GetRosterApproveChangeShiftByFilter',
-                    dataBody,
-                    null,
-                    payload.reload ? payload.reload : null
-                );
-            },
-            getParamsDefault: () => {
-                const _configList = ConfigList.value[ScreenName.AttApproveShiftChange],
-                    filter = _configList[EnumName.E_Filter] ?? [],
-                    configDetail = ConfigListDetail.value[ScreenName.AttApproveShiftChange],
-                    valueField = [
-                        'ID',
-                        'ImagePath',
-                        'SalaryClassName',
-                        'OrgStructureName',
-                        'PositionName',
-                        'Status',
-                        'ApproveHours',
-                        'RegisterHours',
-                        'ConfirmHours',
-                        'WorkDateRoot',
-                        'InTime',
-                        'OutTime',
-                        'Rate',
-                        'RequestCancelStatus',
-                        'itemStatusCancel',
-                        'itemStatus',
-                        'StatusView',
-                        'WarningViolation',
-                        'ReasonOT',
-                        'DateCreate',
-                        'DateApprove',
-                        'ApprovalDate',
-                        'DateUpdate',
-                        'DateReject',
-                        'DateCancel'
-                    ];
+//                 // Lấy đúng fields trong màn hình chi tiết.
+//                 configDetail.forEach(item => {
+//                     if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
+//                         valueField.push(item.Name);
+//                     }
+//                 });
 
-                // Lấy đúng fields trong màn hình chi tiết.
-                if (configDetail)
-                    configDetail.forEach(item => {
-                        if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                            valueField.push(item.Name);
-                        }
-                    });
-
-                let _params = {
-                    IsPortalNew: true,
-                    // sort: orderBy,
-                    filter: filter,
-                    page: 1,
-                    pageSize: 20,
-                    take: 20,
-                    skip: 0,
-                    group: [],
-                    dataSourceRequestString: 'page=1&pageSize=20',
-                    ValueFields: valueField.join(',')
-                };
-                return _params;
-            }
-        };
-        handleDataListModuleCommon(api, keyTask, payload);
-    } catch (error) {
-        console.log(error);
-    }
-};
+//                 let _params = {
+//                     IsPortalNew: true,
+//                     // sort: orderBy,
+//                     filter: filter,
+//                     page: 1,
+//                     pageSize: 20,
+//                     take: 20,
+//                     skip: 0,
+//                     group: [],
+//                     dataSourceRequestString: 'page=1&pageSize=20',
+//                     ValueFields: valueField.join(',')
+//                 };
+//                 return _params;
+//             }
+//         };
+//         handleDataListModuleCommon(api, keyTask, payload);
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
 //#endregion
 
 //#region [module/attendance/attSubmitTakeDailyTask]
@@ -2744,8 +2730,7 @@ const handleGetDataProcessingCandidateApplications = ({ keyTask, payload }) => {
             taskNameScreen: [
                 ScreenName.HrePendingProcessingCandidateApplications,
                 ScreenName.HreProcesedProcessingCandidateApplications,
-                ScreenName.HreProcessingCandidateApplicationsViewDetail,
-                ScreenName.HreCandidateInformation
+                ScreenName.HreProcessingCandidateApplicationsViewDetail
             ],
             getDataList: (dataBody, payload) => {
                 return HttpService.Post(
@@ -2966,7 +2951,6 @@ const handleGetDataRecruitmentProposalProcessing = ({ keyTask, payload }) => {
         console.log(error);
     }
 };
-//#endregion
 
 //#region [module/attV3/AttLeaveDayReplacement]
 const handleGetDataWaitConfirmAttLeaveDayReplacement = ({ keyTask, payload }) => {
@@ -3088,7 +3072,6 @@ const handleGetDataConfirmedAttLeaveDayReplacement = ({ keyTask, payload }) => {
         console.log(error);
     }
 };
-//#endregion
 
 //#region [module/humanResourceV3/hreRecruitment/hreReceiveJob]
 const handleGetDataReceiveJob = ({ keyTask, payload }) => {
@@ -3178,392 +3161,6 @@ const handleGetDataProcessingPostingPlan = ({ keyTask, payload }) => {
                         'CompanyName',
                         'OrgStructureName',
                         'RecruitmentReasonView'
-                    ];
-
-                // Lấy đúng fields trong màn hình chi tiết.
-                configDetail.forEach(item => {
-                    if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                        valueField.push(item.Name);
-                    }
-                });
-
-                let _params = {
-                    IsPortalNew: true,
-                    // sort: orderBy,
-                    filter: filter,
-                    page: 1,
-                    pageSize: 20,
-                    take: 20,
-                    skip: 0,
-                    group: [],
-                    dataSourceRequestString: 'page=1&pageSize=20',
-                    ValueFields: valueField.join(',')
-                };
-                return _params;
-            }
-        };
-        handleDataListModuleCommon(api, keyTask, payload);
-    } catch (error) {
-        console.log(error);
-    }
-};
-//#endregion
-
-//#region [module/attendanceV3/hreRecruitment/hreApproveRecruitmentProposal]
-const handleGetDataJobPosting = ({ keyTask, payload }) => {
-    try {
-        const api = {
-            taskNameScreen: [
-                ScreenName.HreInProcessJobPosting,
-                ScreenName.HreStopJobPosting,
-                ScreenName.HreOutDateJobPosting,
-                ScreenName.HreJobPostingViewDetail
-            ],
-            getDataList: (dataBody, payload) => {
-                return HttpService.Post(
-                    '[URI_CENTER]/api/Rec_ComposePostingDetail/GetComposePostingDetailByFilterHandle',
-                    dataBody,
-                    null,
-                    payload.reload ? payload.reload : null
-                );
-            },
-            getParamsDefault: () => {
-                const _configList = ConfigList.value[ScreenName.HreInProcessJobPosting],
-                    filter = _configList[EnumName.E_Filter],
-                    configDetail = ConfigListDetail.value[ScreenName.HreJobPostingViewDetail],
-                    valueField = [
-                        'ID', 'CodeCandidate', 'CandidateName', 'StatusView', 'Phone', 'PositionName', 'ProbationDate', 'FileAttachment'
-                    ];
-
-                // Lấy đúng fields trong màn hình chi tiết.
-                if (configDetail)
-                    configDetail.forEach(item => {
-                        if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                            valueField.push(item.Name);
-                        }
-                    });
-
-                let _params = {
-                    IsPortalNew: true,
-                    // sort: orderBy,
-                    filter: filter,
-                    page: 1,
-                    pageSize: 20,
-                    take: 20,
-                    skip: 0,
-                    group: [],
-                    dataSourceRequestString: 'page=1&pageSize=20',
-                    ValueFields: valueField.join(',')
-                };
-                return _params;
-            }
-        };
-        handleDataListModuleCommon(api, keyTask, payload);
-    } catch (error) {
-        console.log(error);
-    }
-};
-//#endregion
-
-//#region [module/humanResourceV3/attDelegationApproval]
-const handleGetDataDelegationApproval = ({ keyTask, payload }) => {
-    try {
-        const api = {
-            taskNameScreen: [
-                ScreenName.AttSubmitDelegationApproval,
-                ScreenName.AttWaitConfirmSubmitDelegationApproval,
-                ScreenName.AttRejectSubmitDelegationApproval,
-                ScreenName.AttConfirmedSubmitDelegationApproval,
-                ScreenName.AttCanceledSubmitDelegationApproval,
-                ScreenName.AttSubmitDelegationApprovalViewDetail
-            ],
-            getDataList: (dataBody, payload) => {
-                return HttpService.Post(
-                    '[URI_HR]/Att_GetData/New_GetDelegateApproveList',
-                    {
-                        ...dataBody,
-                        UserID: dataVnrStorage.currentUser ? dataVnrStorage.currentUser.info.userid : null,
-                        UserSubmit: dataVnrStorage.currentUser ? dataVnrStorage.currentUser.info.userid : null
-                    },
-                    null,
-                    payload.reload ? payload.reload : null
-                );
-            },
-            getParamsDefault: () => {
-                const _configList = ConfigList.value[ScreenName.AttSubmitDelegationApproval],
-                    orderBy = _configList[EnumName.E_Order],
-                    filter = _configList[EnumName.E_Filter],
-                    configDetail = ConfigListDetail.value[ScreenName.AttSubmitDelegationApprovalViewDetail],
-                    valueField = [
-                        'ID', 'CodeCandidate', 'CandidateName', 'StatusView', 'Phone', 'PositionName', 'ProbationDate', 'FileAttachment'
-                    ];
-
-                // Lấy đúng fields trong màn hình chi tiết.
-                if (configDetail)
-                    configDetail.forEach(item => {
-                        if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                            valueField.push(item.Name);
-                        }
-                    });
-
-                let _params = {
-                    IsPortalNew: true,
-                    sort: orderBy,
-                    filter: filter,
-                    page: 1,
-                    pageSize: 20,
-                    take: 20,
-                    skip: 0,
-                    group: [],
-                    dataSourceRequestString: 'page=1&pageSize=20',
-                    ValueFields: valueField.join(',')
-                };
-                return _params;
-            }
-        };
-        handleDataListModuleCommon(api, keyTask, payload);
-    } catch (error) {
-        console.log(error);
-    }
-};
-//#endregion
-
-const handleGetDataConfirmDelegationApproval = ({ keyTask, payload }) => {
-    try {
-        const api = {
-            taskNameScreen: [
-                ScreenName.AttCanceledDelegationApproval,
-                ScreenName.AttRejectDelegationApproval,
-                ScreenName.AttConfirmedDelegationApproval,
-                ScreenName.AttConfirmDelegationApprovalViewDetail,
-                ScreenName.AttConfirmDelegationApproval
-            ],
-            getDataList: (dataBody, payload) => {
-                return HttpService.Post(
-                    '[URI_HR]/Sys_GetData/GetSysDelegateApproveConfirmationApproved',
-                    dataBody,
-                    null,
-                    payload.reload ? payload.reload : null
-                );
-            },
-            getParamsDefault: () => {
-                const _configList = ConfigList.value[ScreenName.AttApproveTakeDailyTask],
-                    filter = _configList[EnumName.E_Filter],
-                    configDetail = ConfigListDetail.value[ScreenName.AttApproveTakeDailyTask],
-                    valueField = [
-                        'ID',
-                        'ImagePath',
-                        'PositionName',
-                        'Status',
-                        'Note',
-                        'RequestCancelStatus',
-                        'itemStatusCancel',
-                        'itemStatus',
-                        'StatusView',
-                        'WarningViolation',
-                        'DateCreate',
-                        'DateApprove',
-                        'ApprovalDate',
-                        'DateUpdate',
-                        'DateReject',
-                        'DateCancel',
-                        'UserDelegateName',
-                        'DataTypeDelegateView',
-                        'DateFrom',
-                        'DateTo',
-                        'UserName'
-                    ];
-
-                // Lấy đúng fields trong màn hình chi tiết.
-                configDetail.forEach(item => {
-                    if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                        valueField.push(item.Name);
-                    }
-                });
-
-                let _params = {
-                    IsPortalNew: true,
-                    // sort: orderBy,
-                    filter: filter,
-                    page: 1,
-                    pageSize: 20,
-                    take: 20,
-                    skip: 0,
-                    group: [],
-                    dataSourceRequestString: 'page=1&pageSize=20',
-                    ValueFields: valueField.join(','),
-                    UserSubmit: dataVnrStorage.currentUser?.info?.ProfileID,
-                    UserID: dataVnrStorage.currentUser?.headers?.userid
-                };
-                return _params;
-            }
-        };
-        handleDataListModuleCommon(api, keyTask, payload);
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-//#region [module/AttendanceV3/LeaveFundManageDetail]
-const handleGetDataLeaveFundSeniorBonusViewDetail = ({ keyTask, payload }) => {
-    try {
-        const api = {
-            taskNameScreen: [
-                ScreenName.AttLeaveFundSeniorBonusViewDetail,
-                ScreenName.AttLeaveFundCompensatoryViewDetail,
-                ScreenName.AttLeaveFundManagement
-            ],
-            getDataList: (dataBody, payload) => {
-                return HttpService.Post(
-                    '[URI_CENTER]/api/Att_LeaveDay/GetSeniorBonusDetail',
-                    dataBody,
-                    null,
-                    payload.reload ? payload.reload : null
-                );
-            },
-            getParamsDefault: () => {
-                const _configList = ConfigList.value[ScreenName.AttLeaveFundSeniorBonusViewDetail],
-                    orderBy = _configList[EnumName.E_Order] ?? [],
-                    filter = _configList[EnumName.E_Filter] ?? [],
-                    configDetail = ConfigListDetail.value[ScreenName.AttLeaveFundSeniorBonusViewDetail] ?? [],
-                    valueField = [
-                        'ID', 'SeniorityYears', 'Remain', 'Used', 'AnlLeaveDays', 'DateReceived', 'ExpiryDate', 'SeniorityDate'
-                    ];
-
-                // Lấy đúng fields trong màn hình chi tiết.
-                if (configDetail)
-                    configDetail.forEach(item => {
-                        if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                            valueField.push(item.Name);
-                        }
-                    });
-
-                let _params = {
-                    IsPortalNew: true,
-                    sort: orderBy,
-                    filter: filter,
-                    page: 1,
-                    pageSize: 20,
-                    take: 20,
-                    skip: 0,
-                    group: [],
-                    dataSourceRequestString: 'page=1&pageSize=20',
-                    ValueFields: valueField.join(',')
-                };
-                return _params;
-            }
-        };
-        handleDataListModuleCommon(api, keyTask, payload);
-    } catch (error) {
-        console.log(error);
-    }
-};
-//#endregion
-
-const handleGetDataLeaveFundCompensatoryViewDetail = ({ keyTask, payload }) => {
-    try {
-        const api = {
-            taskNameScreen: [
-                ScreenName.AttLeaveFundSeniorBonusViewDetail,
-                ScreenName.AttLeaveFundCompensatoryViewDetail,
-                ScreenName.AttLeaveFundManagement
-            ],
-            getDataList: (dataBody, payload) => {
-                return HttpService.Post(
-                    '[URI_CENTER]/api/Att_LeaveDay/GetConpensationDetailGrid',
-                    dataBody,
-                    null,
-                    payload.reload ? payload.reload : null
-                );
-            },
-            getParamsDefault: () => {
-                const _configList = ConfigList.value[ScreenName.AttLeaveFundCompensatoryViewDetail],
-                    orderBy = _configList[EnumName.E_Order] ?? [],
-                    filter = _configList[EnumName.E_Filter] ?? [],
-                    configDetail = ConfigListDetail.value[ScreenName.AttLeaveFundCompensatoryViewDetail] ?? [],
-                    valueField = [
-                        'ID', 'WorkDateRoot', 'DateApprove', 'ApproveHours', 'CompLeaveHours', 'RemainCompLeaveHours', 'DateExpired'
-                    ];
-
-                // Lấy đúng fields trong màn hình chi tiết.
-                if (configDetail)
-                    configDetail.forEach(item => {
-                        if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                            valueField.push(item.Name);
-                        }
-                    });
-
-                let _params = {
-                    IsPortalNew: true,
-                    sort: orderBy,
-                    filter: filter,
-                    page: 1,
-                    pageSize: 20,
-                    take: 20,
-                    skip: 0,
-                    group: [],
-                    dataSourceRequestString: 'page=1&pageSize=20',
-                    ValueFields: valueField.join(',')
-                };
-                return _params;
-            }
-        };
-        handleDataListModuleCommon(api, keyTask, payload);
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-//#region [module/attV3/AttConfirmShiftChange]
-const handleGetDataConfirmAttConfirmShiftChange = ({ keyTask, payload }) => {
-    try {
-        const api = {
-            taskNameScreen: [
-                ScreenName.AttWaitConfirmShiftChange,
-                ScreenName.AttConfirmedShiftChange,
-                ScreenName.AttRejectedShiftChange,
-                ScreenName.AttConfirmShiftChangeViewDetail
-            ],
-            getDataList: (dataBody, payload) => {
-                return HttpService.Post(
-                    '[URI_CENTER]/api/Att_Roster/GetRosterConfirm',
-                    dataBody,
-                    null,
-                    payload.reload ? payload.reload : null
-                );
-            },
-            getParamsDefault: () => {
-                const _configList = ConfigList.value[ScreenName.AttSubmitShiftChange],
-                    filter = _configList[EnumName.E_Filter] ?? [],
-                    configDetail = ConfigListDetail.value[ScreenName.AttSubmitShiftChange],
-                    valueField = [
-                        'ID',
-                        'Status',
-                        'ProfileName',
-                        'ProfileName2',
-                        'StrChangeDate',
-                        'AlternateDate',
-                        'RegisterHours',
-                        'ChangeShiftTypeView',
-                        'MonShiftName_Old',
-                        'TueShiftName_Old',
-                        'WedShiftName_Old',
-                        'ThuShiftName_Old',
-                        'FriShiftName_Old',
-                        'SatShiftName_Old',
-                        'SunShiftName_Old',
-                        'MonShiftName',
-                        'TueShiftName',
-                        'WedShiftName',
-                        'ThuShiftName',
-                        'FriShiftName',
-                        'SatShiftName',
-                        'SunShiftName',
-                        'WorkDateRoot',
-                        'CurrentApprover',
-                        'OutTime',
-                        'Comment',
-                        'StatusView'
                     ];
 
                 // Lấy đúng fields trong màn hình chi tiết.
@@ -4223,10 +3820,9 @@ export default {
         try {
             const api = {
                 taskNameScreen: ScreenName.Permission,
-                getDataConfig: (payload) => {
+                getDataConfig: payload => {
                     let _userLogin = dataVnrStorage.currentUser.headers.userlogin,
-                        languageApp = dataVnrStorage.languageApp,
-                        _deviceID = dataVnrStorage.deviceID ? dataVnrStorage.deviceID : '';
+                        languageApp = dataVnrStorage.languageApp;
 
                     let lstRequest = [],
                         indexConfig = {};
@@ -4238,7 +3834,7 @@ export default {
 
                     if (payload && payload.isGetConfigAppByUser) {
                         indexConfig['E_CONFIG_APP_USER'] = lstRequest.length;
-                        lstRequest.push(HttpService.Get(`[URI_POR]/Portal/GetConfigAppByUser?userLogin=${_userLogin}&deviceID=` + _deviceID));
+                        lstRequest.push(HttpService.Get('[URI_POR]/Portal/GetConfigAppByUser?userLogin=' + _userLogin));
                     }
 
                     if (payload && payload.isGetLang) {
@@ -4347,7 +3943,7 @@ export default {
                             ConfigList.value = JSON.parse(configApp[0]);
                             ConfigListFilter.value = JSON.parse(configApp[1]);
                             ConfigListDetail.value = configListDetailRes;
-                            ConfigListDetail.configAlign = configListDetailRes.StyleLineViewDetail ? configListDetailRes.StyleLineViewDetail : 'E_ALIGN_LAYOUT';
+                            ConfigListDetail.configAlign = configListDetailRes.StyleLineViewDetail ? configListDetailRes.StyleLineViewDetail : 'E_ALIGN_LAYOUT'
                             ConfigField.value = JSON.parse(configApp[3]);
                             ConfigMappingSalary.value = JSON.parse(configApp[4]);
 
@@ -4745,7 +4341,7 @@ export default {
                     const dataBody = {
                         ProfileID: dataVnrStorage.currentUser.info.ProfileID,
                         timelog: moment().format('YYYY-MM-DD 00:00:00')
-                    };
+                    }
                     // return HttpService.Post(
                     //    '[URI_HR]/Att_GetData/GetWorkPlaceByProfileID',
                     //    dataBody,
@@ -6008,7 +5604,7 @@ export default {
                 ],
                 getDataList: (dataBody, payload) => {
                     return HttpService.Post(
-                        '[URI_HR]/Att_GetData/Get_ListRosterGroupByEmp',
+                        '[URI_HR]/Att_GetData/Get_ListRosterGroupByEmp_Portal',
                         dataBody,
                         null,
                         payload.reload ? payload.reload : null
@@ -6016,43 +5612,13 @@ export default {
                 },
                 getParamsDefault: () => {
                     const _configList = ConfigList.value[ScreenName.AttSubmitRosterGroupByEmp],
-                        orderBy = _configList[EnumName.E_Order],
-                        configDetail = ConfigListDetail.value[ScreenName.AttSubmitRosterGroupByEmp],
-                        valueField = [
-                            'ID',
-                            'ProfileName',
-                            'SalaryClassName',
-                            'OrgStructureName',
-                            'PositionName',
-                            'ApprovalDate',
-                            'DateUpdate',
-                            'JobTitleName',
-                            'RosterGroupTypeName',
-                            // -- //
-                            'DateStart',
-                            'DateEnd',
-                            'Note',
-                            'StatusView',
-                            'FirstApproverName',
-                            'MidApproverName',
-                            'NextApproverName',
-                            'LastApproverName'
-                        ];
-
-                    // Lấy đúng fields trong màn hình chi tiết.
-                    configDetail.forEach(item => {
-                        if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                            valueField.push(item.Name);
-                        }
-                    });
+                        orderBy = _configList[EnumName.E_Order];
 
                     let _params = {
                         IsPortal: true,
                         sort: orderBy,
                         page: 1,
-                        pageSize: 20,
-                        ValueFields: valueField.join(','),
-                        UserSubmit: dataVnrStorage.currentUser ? dataVnrStorage.currentUser.info.ProfileID : null
+                        pageSize: 20
                     };
                     return _params;
                 }
@@ -7692,7 +7258,8 @@ export default {
                         IsPortal: true,
                         sort: orderBy,
                         page: 1,
-                        pageSize: 20
+                        pageSize: 20,
+                        profileID: dataVnrStorage?.currentUser?.info?.ProfileID ?? null
                     };
                     return _params;
                 }
@@ -7712,7 +7279,6 @@ export default {
                 ],
 
                 getDataList: (dataBody, payload) => {
-                    console.log(dataBody, 'dataBody');
                     return HttpService.Post(
                         '[URI_HR]/Hre_GetData/GetHre_RelativesComebineAllGrid',
                         dataBody,
@@ -7728,7 +7294,8 @@ export default {
                         IsPortal: true,
                         sort: orderBy,
                         page: 1,
-                        pageSize: 20
+                        pageSize: 20,
+                        profileID: dataVnrStorage?.currentUser?.info?.ProfileID ?? null
                     };
                     return _params;
                 }
@@ -9835,114 +9402,6 @@ export default {
             console.log(error);
         }
     },
-    [EnumTask.KT_SalFeeCheck]: async ({ keyTask, payload }) => {
-        try {
-            const api = {
-                taskNameScreen: [
-                    ScreenName.SalFeeCheck,
-                    ScreenName.SalFeeCheckViewDetail,
-                    ScreenName.SalFeeCheckAddOrEdit
-                ],
-                getDataList: (dataBody, payload) => {
-                    return HttpService.Post(
-                        '[URI_HR]/Sal_GetData/GetSalPaymentCostListForFeeCheck/',
-                        dataBody,
-                        null,
-                        payload.reload ? payload.reload : null
-                    );
-                },
-                getParamsDefault: () => {
-                    const _configList = ConfigList.value[ScreenName.SalFeeCheck],
-                        orderBy = _configList[EnumName.E_Order];
-
-                    let _params = {
-                        IsPortal: true,
-                        sort: orderBy,
-                        page: 1,
-                        pageSize: 20
-                    };
-                    return _params;
-                }
-            };
-            handleDataListModuleCommon(api, keyTask, payload);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-
-    [EnumTask.KT_SalWaitApprovePaymentCostRegister]: async ({ keyTask, payload }) => {
-        try {
-            const api = {
-                taskNameScreen: [
-                    ScreenName.SalWaitApprovePaymentCostRegister,
-                    ScreenName.SalApprovePaymentCostRegister,
-                    ScreenName.SalApprovedPaymentCostRegister,
-                    ScreenName.SalApprovePaymentCostRegisterViewDetail
-                ],
-                getDataList: (dataBody, payload) => {
-                    return HttpService.Post(
-                        '[URI_HR]/Sal_GetData/GetSalPaymentcostRegisterWaitingApprovedPortal/',
-                        dataBody,
-                        null,
-                        payload.reload ? payload.reload : null
-                    );
-                },
-                getParamsDefault: () => {
-                    const _configList = ConfigList.value[ScreenName.SalWaitApprovePaymentCostRegister],
-                        orderBy = _configList[EnumName.E_Order];
-
-                    let _params = {
-                        IsPortal: true,
-                        sort: orderBy,
-                        page: 1,
-                        pageSize: 20,
-                        ValueFields: 'ID,CodeEmp,ProfileName,OrgStructureName,PositionName,JobTitleName,PaymentPeriodName,RequestPeriodName,TotalAmount,DataNote,StatusView,UserInfoFirstApproverName1,UserInfoNextApproverName2,UserInfoMidApproverName3,UserInfoLastApporoverName4,_1,HT03'
-                    };
-                    return _params;
-                }
-            };
-            handleDataListModuleCommon(api, keyTask, payload);
-        } catch (error) {
-            console.log(error);
-        }
-    },
-
-    [EnumTask.KT_SalApprovedPaymentCostRegister]: async ({ keyTask, payload }) => {
-        try {
-            const api = {
-                taskNameScreen: [
-                    ScreenName.SalWaitApprovePaymentCostRegister,
-                    ScreenName.SalApprovePaymentCostRegister,
-                    ScreenName.SalApprovedPaymentCostRegister,
-                    ScreenName.SalApprovePaymentCostRegisterViewDetail
-                ],
-                getDataList: (dataBody, payload) => {
-                    return HttpService.Post(
-                        '[URI_HR]/Sal_GetData/GetSalPaymentcostRegisterApprovedPortal/',
-                        dataBody,
-                        null,
-                        payload.reload ? payload.reload : null
-                    );
-                },
-                getParamsDefault: () => {
-                    const _configList = ConfigList.value[ScreenName.SalApprovedPaymentCostRegister],
-                        orderBy = _configList[EnumName.E_Order];
-
-                    let _params = {
-                        IsPortal: true,
-                        sort: orderBy,
-                        page: 1,
-                        pageSize: 20,
-                        ValueFields: 'ID,CodeEmp,ProfileName,OrgStructureName,PositionName,JobTitleName,PaymentPeriodName,RequestPeriodName,TotalAmount,DataNote,StatusView,UserInfoFirstApproverName1,UserInfoNextApproverName2,UserInfoMidApproverName3,UserInfoLastApporoverName4,_1,HT03'
-                    };
-                    return _params;
-                }
-            };
-            handleDataListModuleCommon(api, keyTask, payload);
-        } catch (error) {
-            console.log(error);
-        }
-    },
     //#endregion
 
     //#region [module/salary/Salary]
@@ -10197,13 +9656,13 @@ export default {
         try {
             const api = {
                 taskNameScreen: [ScreenName.HreEventCalendar],
-                getDataList: (dataBody, payload) => {
-                    return HttpService.Post(
-                        '[URI_CENTER]/api/Att_GetData/GetDataCalendarDashboard',
-                        dataBody,
-                        null,
-                        payload.reload ? payload.reload : null
-                    );
+                getDataList: () => {
+                    // return HttpService.Post(
+                    //     '[URI_CENTER]/api/Att_GetData/GetDataCalendarDashboard',
+                    //     dataBody,
+                    //     null,
+                    //     payload.reload ? payload.reload : null
+                    // );
                 },
                 getParamsDefault: () => {
                     let _params = {
@@ -11950,23 +11409,6 @@ export default {
         handleGetDataSubmitShiftChange({ keyTask, payload });
     },
 
-    [EnumTask.KT_AttApproveShiftChange]: async ({ keyTask, payload }) => {
-        handleGetDataApproveShiftChange({ keyTask, payload });
-    },
-    [EnumTask.KT_AttApprovedShiftChange]: async ({ keyTask, payload }) => {
-        handleGetDataApproveShiftChange({ keyTask, payload });
-    },
-    [EnumTask.KT_AttRejectShiftChange]: async ({ keyTask, payload }) => {
-        handleGetDataApproveShiftChange({ keyTask, payload });
-    },
-    [EnumTask.KT_AttCanceledShiftChange]: async ({ keyTask, payload }) => {
-        handleGetDataApproveShiftChange({ keyTask, payload });
-    },
-    [EnumTask.KT_AttAllTakeShiftChange]: async ({ keyTask, payload }) => {
-        handleGetDataApproveShiftChange({ keyTask, payload });
-    },
-    //#endregion
-
     //#region [module/HumanResourceV3/RecruitmentProposalProcessing]
     // màn hình Xử lý đề xuất bổ sung nhân sự
     [EnumTask.KT_HreWaitRecruitmentProposalProcessing]: async ({ keyTask, payload }) => {
@@ -12367,6 +11809,103 @@ export default {
     },
     //#endregion
 
+    //#region [module/humanResourceV3/hreInterview]
+    // Lịch tuyển dụng
+    [EnumTask.KT_HreInterviewCalendar]: async ({ keyTask, payload }) => {
+        try {
+            const api = {
+                taskNameScreen: [
+                    ScreenName.HreInterviewCalendar,
+                    ScreenName.HreInterviewCalendar, ScreenName.HreWaitingInterview,
+                    ScreenName.HreCandidateInterview, ScreenName.HreResultInterviewViewDetail
+                ],
+                getDataList: (dataBody, payload) => {
+                    return HttpService.Post(
+                        '[URI_CENTER]/api/Rec_InterviewSchedule/GetInterviewShedule',
+                        dataBody,
+                        null,
+                        payload.reload ? payload.reload : null
+                    );
+                },
+                getParamsDefault: () => {
+                    let _params = {
+                    };
+                    return _params;
+                }
+            };
+            handleDataListModuleCommon(api, keyTask, payload);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    [EnumTask.KT_HreWaitingInterview]: async ({ keyTask, payload }) => {
+        try {
+            const api = {
+                taskNameScreen: [
+                    ScreenName.HreInterviewCalendar,
+                    ScreenName.HreInterviewCalendar, ScreenName.HreWaitingInterview,
+                    ScreenName.HreCandidateInterview, ScreenName.HreResultInterviewViewDetail
+                ],
+                getDataList: (dataBody, payload) => {
+                    return HttpService.Post(
+                        '[URI_CENTER]/api/Rec_Interview/New_GetWaitInterviewByFilterHandle',
+                        dataBody,
+                        null,
+                        payload.reload ? payload.reload : null
+                    );
+                },
+                getParamsDefault: () => {
+                    let _params = {
+                        IsEvaluated: false
+                    };
+                    return _params;
+                }
+            };
+            handleDataListModuleCommon(api, keyTask, payload);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    [EnumTask.KT_HreCompletedInterview]: async ({ keyTask, payload }) => {
+        try {
+            const api = {
+                taskNameScreen: [
+                    ScreenName.HreInterviewCalendar,
+                    ScreenName.HreInterviewCalendar, ScreenName.HreWaitingInterview,
+                    ScreenName.HreCandidateInterview, ScreenName.HreResultInterviewViewDetail
+                ],
+                getDataList: (dataBody, payload) => {
+
+                    return HttpService.Post(
+                        '[URI_CENTER]/api/Rec_Interview/New_GetWaitInterviewByFilterHandle',
+                        dataBody,
+                        null,
+                        payload.reload ? payload.reload : null
+                    );
+                },
+                getParamsDefault: () => {
+                    let _params = {
+                        IsEvaluated: true
+                    };
+                    return _params;
+                }
+            };
+            handleDataListModuleCommon(api, keyTask, payload);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    //#endregion
+
+    //#region [module/humanResourceV3/hreRecruitment/hreApproveRecruitmentProposal]
+    [EnumTask.KT_HrePendingApproveRecruitmentProposal]: ({ keyTask, payload }) => {
+        handleGetDataApproveRecruitmentProposal({ keyTask, payload });
+    },
+    [EnumTask.KT_HreProcesedApproveRecruitmentProposal]: ({ keyTask, payload }) => {
+        handleGetDataApproveRecruitmentProposal({ keyTask, payload });
+    },
+    //#endregion
+
     //#region [module/humanResourceV3/hreRecruitment/hreReceiveJob]
     [EnumTask.KT_HreWaitingReceiveJob]: ({ keyTask, payload }) => {
         handleGetDataReceiveJob({ keyTask, payload });
@@ -12375,6 +11914,93 @@ export default {
         handleGetDataProcessingCandidateApplications({ keyTask, payload });
     },
     //#endregion
+
+    //#region [module/humanResourceV3/hreInterview]
+    // Lịch tuyển dụng
+    [EnumTask.KT_HreInterviewCalendar]: async ({ keyTask, payload }) => {
+        try {
+            const api = {
+                taskNameScreen: [
+                    ScreenName.HreInterviewCalendar,
+                    ScreenName.HreInterviewCalendar, ScreenName.HreWaitingInterview,
+                    ScreenName.HreCandidateInterview, ScreenName.HreResultInterviewViewDetail
+                ],
+                getDataList: (dataBody, payload) => {
+                    return HttpService.Post(
+                        '[URI_CENTER]/api/Rec_InterviewSchedule/GetInterviewShedule',
+                        dataBody,
+                        null,
+                        payload.reload ? payload.reload : null
+                    );
+                },
+                getParamsDefault: () => {
+                    let _params = {
+                    };
+                    return _params;
+                }
+            };
+            handleDataListModuleCommon(api, keyTask, payload);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    [EnumTask.KT_HreWaitingInterview]: async ({ keyTask, payload }) => {
+        try {
+            const api = {
+                taskNameScreen: [
+                    ScreenName.HreInterviewCalendar,
+                    ScreenName.HreInterviewCalendar, ScreenName.HreWaitingInterview,
+                    ScreenName.HreCandidateInterview, ScreenName.HreResultInterviewViewDetail
+                ],
+                getDataList: (dataBody, payload) => {
+                    return HttpService.Post(
+                        '[URI_CENTER]/api/Rec_Interview/New_GetWaitInterviewByFilterHandle',
+                        dataBody,
+                        null,
+                        payload.reload ? payload.reload : null
+                    );
+                },
+                getParamsDefault: () => {
+                    let _params = {
+                        IsEvaluated: false
+                    };
+                    return _params;
+                }
+            };
+            handleDataListModuleCommon(api, keyTask, payload);
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    [EnumTask.KT_HreCompletedInterview]: async ({ keyTask, payload }) => {
+        try {
+            const api = {
+                taskNameScreen: [
+                    ScreenName.HreInterviewCalendar,
+                    ScreenName.HreInterviewCalendar, ScreenName.HreWaitingInterview,
+                    ScreenName.HreCandidateInterview, ScreenName.HreResultInterviewViewDetail
+                ],
+                getDataList: (dataBody, payload) => {
+
+                    return HttpService.Post(
+                        '[URI_CENTER]/api/Rec_Interview/New_GetWaitInterviewByFilterHandle',
+                        dataBody,
+                        null,
+                        payload.reload ? payload.reload : null
+                    );
+                },
+                getParamsDefault: () => {
+                    let _params = {
+                        IsEvaluated: true
+                    };
+                    return _params;
+                }
+            };
+            handleDataListModuleCommon(api, keyTask, payload);
+        } catch (error) {
+            console.log(error);
+        }
+    },
 
     //#region [module/humanResourceV3/hreRecruitment/hreReceiveJob]
     [EnumTask.KT_HreWaitingReceiveJob]: ({ keyTask, payload }) => {
@@ -12394,76 +12020,23 @@ export default {
         handleGetDataProcessingPostingPlan({ keyTask, payload });
     },
 
-    //#region [module/humanResourceV3/hreRecruitment/hreJobPosting]
-    [EnumTask.KT_HreInProcessJobPosting]: ({ keyTask, payload }) => {
-        handleGetDataJobPosting({ keyTask, payload });
-    },
-    [EnumTask.KT_HreOutDateJobPosting]: ({ keyTask, payload }) => {
-        handleGetDataJobPosting({ keyTask, payload });
-    },
-    [EnumTask.KT_HreStopJobPosting]: ({ keyTask, payload }) => {
-        handleGetDataJobPosting({ keyTask, payload });
-    },
-    //#endregion
-
-    //#region [module/humanResourceV3/attDelegationApproval]
-    [EnumTask.KT_AttSubmitDelegationApproval]: ({ keyTask, payload }) => {
-        handleGetDataDelegationApproval({ keyTask, payload });
-    },
-    [EnumTask.KT_AttWaitConfirmSubmitDelegationApproval]: ({ keyTask, payload }) => {
-        handleGetDataDelegationApproval({ keyTask, payload });
-    },
-    [EnumTask.KT_AttRejectSubmitDelegationApproval]: ({ keyTask, payload }) => {
-        handleGetDataDelegationApproval({ keyTask, payload });
-    },
-    [EnumTask.KT_AttConfirmedSubmitDelegationApproval]: ({ keyTask, payload }) => {
-        handleGetDataDelegationApproval({ keyTask, payload });
-    },
-    [EnumTask.KT_AttCanceledSubmitDelegationApproval]: ({ keyTask, payload }) => {
-        handleGetDataDelegationApproval({ keyTask, payload });
-    },
-    //#endregion
-
-    // mành hình xác nhận ủy quyền duyệt
-    [EnumTask.KT_AttConfirmDelegationApproval]: async ({ keyTask, payload }) => {
+    [EnumTask.KT_AttNumberOfMeals]: async ({ keyTask, payload }) => {
         try {
             const api = {
                 taskNameScreen: [
-                    ScreenName.AttConfirmDelegationApproval,
-                    ScreenName.AttConfirmDelegationApprovalViewDetail,
-                    ScreenName.AttConfirmedDelegationApproval
+                    ScreenName.AttNumberOfMeals
                 ],
                 getDataList: (dataBody, payload) => {
                     return HttpService.Post(
-                        '[URI_HR]/Sys_GetData/GetSysDelegateApproveConfirmationWaitting',
-                        dataBody,
+                        `[URI_CENTER]/api/Can_MealBill/GetCanMealBillCalender?dateStartFilter=${dataBody?.dateStartFilter ?? null}&dateEndFilter=${dataBody?.dateEndFilter ?? null}`,
+                        {},
                         null,
                         payload.reload ? payload.reload : null
                     );
                 },
                 getParamsDefault: () => {
-                    const _configList = ConfigList.value[ScreenName.AttApproveTakeDailyTask],
-                        filter = _configList[EnumName.E_Filter],
-                        configDetail = ConfigListDetail.value[ScreenName.AttApproveTakeDailyTask],
-                        valueField = [
-                            'ID',
-                            'UserName',
-                            'DataTypeDelegateView',
-                            'DateFrom',
-                            'DateTo',
-                            'ProfileName',
-                            'Status',
-                            'Note',
-                            'StatusView',
-                            'UserDelegateName'
-                        ];
-
-                    // Lấy đúng fields trong màn hình chi tiết.
-                    configDetail.forEach(item => {
-                        if (item.Name && valueField.findIndex(e => e == item.Name) < 0) {
-                            valueField.push(item.Name);
-                        }
-                    });
+                    const _configList = ConfigList.value[ScreenName.AttNumberOfMeals],
+                        filter = _configList[EnumName.E_Filter];
 
                     let _params = {
                         IsPortalNew: true,
@@ -12474,8 +12047,7 @@ export default {
                         take: 20,
                         skip: 0,
                         group: [],
-                        dataSourceRequestString: 'page=1&pageSize=20',
-                        ValueFields: valueField.join(',')
+                        dataSourceRequestString: 'page=1&pageSize=20'
                     };
                     return _params;
                 }
@@ -12484,35 +12056,5 @@ export default {
         } catch (error) {
             console.log(error);
         }
-    },
-    [EnumTask.KT_AttConfirmedDelegationApproval]: async ({ keyTask, payload }) => {
-        handleGetDataConfirmDelegationApproval({ keyTask, payload });
-    },
-    [EnumTask.KT_AttRejectDelegationApproval]: async ({ keyTask, payload }) => {
-        handleGetDataConfirmDelegationApproval({ keyTask, payload });
-    },
-    [EnumTask.KT_AttCanceledDelegationApproval]: async ({ keyTask, payload }) => {
-        handleGetDataConfirmDelegationApproval({ keyTask, payload });
-    },
-    //#endregion
-
-    //#region [module/AttV3/AttLeaveFundManageViewDetail]
-    [EnumTask.KT_AttLeaveFundSeniorBonusViewDetail]: async ({ keyTask, payload }) => {
-        handleGetDataLeaveFundSeniorBonusViewDetail({ keyTask, payload });
-    },
-    [EnumTask.KT_AttLeaveFundCompensatoryViewDetail]: async ({ keyTask, payload }) => {
-        handleGetDataLeaveFundCompensatoryViewDetail({ keyTask, payload });
-    },
-    //#endregion
-
-    //#region [module/humanResourceV3/attConfirmShiftChange]
-    [EnumTask.KT_AttWaitConfirmShiftChange]: ({ keyTask, payload }) => {
-        handleGetDataConfirmAttConfirmShiftChange({ keyTask, payload });
-    },
-    [EnumTask.KT_AttConfirmedShiftChange]: ({ keyTask, payload }) => {
-        handleGetDataConfirmAttConfirmShiftChange({ keyTask, payload });
-    },
-    [EnumTask.KT_AttRejectedShiftChange]: ({ keyTask, payload }) => {
-        handleGetDataConfirmAttConfirmShiftChange({ keyTask, payload });
     }
 };

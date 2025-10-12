@@ -13,6 +13,16 @@ export default class InOutItem extends React.Component {
         this.state = {};
     }
 
+    handleLayout = (event) => {
+        const { onLayout } = this.props;
+        const { y } = event.nativeEvent.layout;
+
+        if (onLayout) {
+            onLayout(y); // Gửi yOffset lên component cha
+        }
+    };
+
+
     renderItem = (data) => {
         let viewIconInOut = null,
             viewTextInOut = null,
@@ -104,7 +114,6 @@ export default class InOutItem extends React.Component {
                     <Text style={[styleSheets.text, styles.lineItemRight_textTime]}>
                         {timeLogVal ? `${timeLogVal[0]}:${timeLogVal[1]}` : ''}
                     </Text>
-                    <VnrText i18nKey={'HRM_Sys_TimeRange'} style={[styleSheets.text, styles.lableText]} />
                 </View>
             </View>
         );
@@ -127,12 +136,12 @@ export default class InOutItem extends React.Component {
         }
 
         return (
-            <View style={styles.swipeable} key={index}>
+            <View style={styles.swipeable} onLayout={this.handleLayout} key={index}>
                 <View style={styles.leftBody}>
                     <Text style={[styleSheets.text, styles.viewTime_week, isToday && { color: Colors.primary }]}>
                         {dayOffWeek}
                     </Text>
-                    <Text style={[styleSheets.text, styles.viewTime_day, isToday && { color: Colors.primary }]}>
+                    <Text style={[styleSheets.lable, styles.viewTime_day, isToday && { color: Colors.primary }]}>
                         {day}
                     </Text>
                 </View>
@@ -148,8 +157,9 @@ const styles = StyleSheet.create({
     swipeable: {
         // flex: 1,
         flexDirection: 'row',
-        marginTop: Size.defineSpace,
-        marginHorizontal: Size.defineSpace
+        marginHorizontal: Size.defineSpace,
+        borderBottomWidth: 0.5,
+        borderBottomColor: Colors.gray_3
     },
     viewTime_week: {
         fontSize: Size.text + 1,
@@ -169,9 +179,6 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingHorizontal: Size.defineSpace,
         backgroundColor: Colors.white,
-        borderWidth: 0.5,
-        borderColor: Colors.gray_5,
-        borderRadius: 8,
         // justifyContent: 'center',
         // paddingBottom: 0,
         height: 'auto',
@@ -199,9 +206,7 @@ const styles = StyleSheet.create({
     },
     lineItemRight: {
         paddingLeft: Size.defineSpace,
-        borderLeftColor: Colors.gray_5,
-        borderLeftWidth: 0.5,
-        justifyContent: 'flex-end'
+        justifyContent: 'center'
     },
     lineItemRight_textTime: {
         fontSize: Size.text,

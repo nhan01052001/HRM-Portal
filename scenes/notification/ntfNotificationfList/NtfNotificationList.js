@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, FlatList, RefreshControl, StyleSheet, Keyboard } from 'react-native';
+import React, { Component } from 'react';
+import { View, FlatList, RefreshControl, TouchableWithoutFeedback, StyleSheet, Keyboard, Text } from 'react-native';
 import { Colors, Size, styleSheets } from '../../../constants/styleConfig';
 import VnrLoading from '../../../components/VnrLoading/VnrLoading';
 import VnrIndeterminate from '../../../components/VnrLoading/VnrIndeterminate';
@@ -9,10 +9,15 @@ import BottomAction from './BottomAction';
 import TopAction from './TopAction';
 import EmptyData from '../../../components/EmptyData/EmptyData';
 import DrawerServices from '../../../utils/DrawerServices';
-import { EnumName, EnumStatus } from '../../../assets/constant';
+import { EnumName, EnumStatus, ScreenName } from '../../../assets/constant';
 import { getDataLocal } from '../../../factories/LocalData';
 import NtfListNotificationItem from './NtfNotificationListItem';
+import moment from 'moment';
 import { dataVnrStorage } from '../../../assets/auth/authentication';
+import { translate } from '../../../i18n/translate';
+import { ScrollView } from 'react-native-gesture-handler';
+import store from '../../../store';
+import badgesNotification from '../../../redux/badgesNotification';
 
 const heightActionBottom = 45;
 const eTypeGroup = {
@@ -66,7 +71,13 @@ export default class NtfNotificationList extends React.Component {
     renderSeparator = () => {
         return (
             <View
-                style={styles.separator}
+                style={{
+                    height: 0.5,
+                    width: 'auto',
+                    backgroundColor: Colors.grey,
+                    marginHorizontal: styleSheets.p_10
+                    //marginVertical : 2
+                }}
             />
         );
     };
@@ -86,7 +97,7 @@ export default class NtfNotificationList extends React.Component {
         );
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps) {
         if (nextProps.isRefreshList != this.props.isRefreshList) {
             this.refresh(nextProps);
         }
@@ -96,51 +107,14 @@ export default class NtfNotificationList extends React.Component {
         }
     }
 
-    getAllIDNotify = () => {
-        const { dataSource } = this.state
-        if (Array.isArray(dataSource) && dataSource.length > 0 && dataSource !== EnumName.E_EMPTYDATA) {
-            const combinedIDs = dataSource.reduce((accumulator, current) => {
-                return accumulator.concat(current.lstID);
-            }, []);
-            return combinedIDs
-        }
-    }
-
-    updateAllStatusSeen = () => {
-        const { dataSource, dataGroup, refreshing } = this.state;
-
-        const updatedDataSource = dataSource.map(item => ({
-            ...item,
-            Status: 'E_SEEN'
-        }));
-
-        const updatedDataGroup = dataGroup.map(group =>
-            group.map(item => {
-                if (!item.Status) {
-                    return { ...item, Status: 'E_SEEN' };
-                }
-                return item;
-            })
-        );
-
-        this.setState({
-            dataSource: updatedDataSource,
-            dataGroup: updatedDataGroup,
-            refreshing: !refreshing
-        }, () => {
-            const { reloadScreenList } = this.props;
-            if (reloadScreenList && typeof reloadScreenList === 'function') {
-                reloadScreenList();
-            }
-        });
-    };
-
     remoteData = (param = {}) => {
-        const { isLazyLoading } = param,
-            { keyDataLocal, keyQuery } = this.props;
+        const { dataSource, page } = this.state,
+            { isLazyLoading } = param,
+            { api, dataLocal, keyDataLocal, keyQuery } = this.props;
         if (keyDataLocal) {
             getDataLocal(keyDataLocal)
                 .then(resData => {
+                    debugger;
                     const res = resData && resData[keyQuery] ? resData[keyQuery] : null;
                     if (res && res !== EnumName.E_EMPTYDATA) {
                         let data = res;
@@ -148,14 +122,16 @@ export default class NtfNotificationList extends React.Component {
                         let listDataGroupHandle = {};
                         let checkGroupCurrent = '';
                         let checkTotalGroupRecord = 0;
-                        // let countIsNotSeen = 0;
+                        let i = 0;
+                        let countIsNotSeen = 0;
 
-                        data.map((item) => {
-                            // if (item.Status !== 'E_SEEN') {
-                            //     countIsNotSeen += 1;
-                            // }
+                        data.map((item, index) => {
+                            if (item.Status !== 'E_SEEN') {
+                                countIsNotSeen += 1;
+                            }
 
                             if (item.type && item.type == 'E_GROUP') {
+                                i += 1;
                                 listDataGroupHandle[item.title] = [];
                                 checkGroupCurrent = item.title;
                                 checkTotalGroupRecord = item.totalRecord;
@@ -170,12 +146,10 @@ export default class NtfNotificationList extends React.Component {
                                     });
                             }
                         });
-
                         // console.log(data, 'data')
                         // cập nhật con số th4ng báo
-                        // không cần set lại
-                        // countIsNotSeen >= 0 &&
-                        //     store.dispatch(badgesNotification.actions.setNumberBadgesNotify(countIsNotSeen));
+                        countIsNotSeen >= 0 &&
+                            store.dispatch(badgesNotification.actions.setNumberBadgesNotify(countIsNotSeen));
 
                         this.setState({
                             dataGroup:
@@ -237,7 +211,7 @@ export default class NtfNotificationList extends React.Component {
         this.remoteData();
     }
 
-    refresh = () => {
+    refresh = nexProps => {
         this.setState({ isLoading: true, page: 1 });
     };
 
@@ -285,7 +259,11 @@ export default class NtfNotificationList extends React.Component {
     _renderFooterLoading = () => {
         return (
             <View
-                style={styles.footerLoading}
+                style={{
+                    flex: 1,
+                    paddingVertical: styleSheets.p_10,
+                    marginBottom: 30
+                }}
             >
                 <VnrLoading size="large" isVisible={this.state.isLoadingFooter} />
             </View>
@@ -423,6 +401,7 @@ export default class NtfNotificationList extends React.Component {
     };
 
     deleteItems = ({ typeGroup = null, item = null }) => {
+        debugger;
         const { dataGroup } = this.state,
             { rowActions } = this.props,
             firstActions = rowActions[0] ? rowActions[0] : null;
@@ -448,13 +427,15 @@ export default class NtfNotificationList extends React.Component {
                 }
             }
         } catch (error) {
-            //
+            console.log(error, 'error');
         }
 
         // console.log(rowActions, 'rowActions')
     };
 
     callBackUpdated = id => {
+        console.log(id, 'item');
+        debugger;
         const { dataSource, isReloadList } = this.state;
         const indexItem = dataSource.findIndex(e => e.ID === id);
         if (indexItem > -1) {
@@ -476,10 +457,14 @@ export default class NtfNotificationList extends React.Component {
                 isDisableSelectItem,
                 itemSelected,
                 totalRow,
+                messageEmptyData,
                 marginTopNumber,
+                isLoadingHeader,
+                dataIndexTitleGroup,
                 dataGroup
             } = this.state,
-            { api, detail, rowActions, selected, listConfigModule } = this.props;
+            { api, detail, renderConfig, rowActions, selected, listConfigModule } = this.props,
+            valueField = !Vnr_Function.CheckIsNullOrEmpty(this.props.valueField) ? this.props.valueField : 'ID';
 
         let dataBody = api ? (api.dataBody && this.isCheckAllServer ? api.dataBody : null) : null;
 
@@ -489,6 +474,8 @@ export default class NtfNotificationList extends React.Component {
                 pageSize: totalRow
             };
         }
+
+        console.log(dataSource, 'dataSource');
 
         let contentList = <View />;
         if (isLoading) {
@@ -548,7 +535,7 @@ export default class NtfNotificationList extends React.Component {
                             this._handleEndRefresh();
                         }
                     }}
-                    onEndReached={() => {
+                    onEndReached={aa => {
                         this.callOnEndReached = true;
                     }} // refresh khi scroll den cuoi
                     onEndReachedThreshold={0.5} // khoan cach tinh tu vi tri cuoi ds , se goi onEndReached
@@ -602,15 +589,21 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.white
     },
-    separator: {
-        height: 0.5,
-        width: 'auto',
-        backgroundColor: Colors.grey,
-        marginHorizontal: styleSheets.p_10
+    styTextNotify: {
+        fontSize: Size.text - 1,
+        marginBottom: 2
     },
-    footerLoading: {
+    styTextHighLight: {
         color: Colors.gray_10,
         fontWeight: '500',
         fontSize: Size.text - 1
+    },
+    styTextHighLightStatus: {
+        fontSize: Size.text
+    },
+    styViewWrap: {
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap'
     }
 });

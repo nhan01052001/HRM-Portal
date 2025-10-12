@@ -580,7 +580,7 @@ export default class AttSubmitPlanOvertimeAddOrEdit extends Component {
         const { ID, ProfileID, WorkDate } = record;
         let arrRequest = [
             HttpService.Post('[URI_HR]/Att_GetData/GetPlanOvertimeById', { id: ID }),
-            //HttpService.Get('[URI_HR]/Att_GetData/GetMultiDurationType'),
+            //HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiDurationType'),
             HttpService.Post('[URI_HR]/Att_GetData/GetOvertimeDurationTypeByDate', {
                 ProfileID: ProfileID,
                 WorkDate: moment(WorkDate).format('YYYY-MM-DD HH:mm:ss'),
@@ -592,9 +592,9 @@ export default class AttSubmitPlanOvertimeAddOrEdit extends Component {
                 userSubmit: ProfileID,
                 type: 'E_OVERTIMEPLAN'
             }),
-            HttpService.Post('[URI_HR]/Att_GetData/GetMultiMethodPayment', {}),
+            HttpService.Post('[URI_POR]/New_Att_Overtime/GetMultiMethodPayment', {}),
             HttpService.Get('[URI_HR]/Cat_GetData/GetMultiOvertimeTypeNotInPortal'),
-            HttpService.Get('[URI_HR]/api/Att_OvertimePlan/GetById?ID=' + ID)
+            HttpService.Get('[URI_POR]/New_Att_PlanOvertime/GetById?ID=' + ID)
         ];
 
         VnrLoadingSevices.show();
@@ -609,7 +609,7 @@ export default class AttSubmitPlanOvertimeAddOrEdit extends Component {
     };
 
     GetDurationType = () => {
-        HttpService.Get('[URI_HR]/Att_GetData/GetMultiDurationType').then(res => {
+        HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiDurationType').then(res => {
             if (res) {
                 const { DurationType, WorkDate } = this.state;
                 this.setState({
@@ -745,7 +745,7 @@ export default class AttSubmitPlanOvertimeAddOrEdit extends Component {
     };
 
     GetMethodPayment = () => {
-        HttpService.Post('[URI_HR]/Att_GetData/GetMultiMethodPayment', {}).then(data1 => {
+        HttpService.Post('[URI_POR]/New_Att_Overtime/GetMultiMethodPayment', {}).then(data1 => {
             if (data1) {
                 const { MethodPayment } = this.state;
                 this.setState(

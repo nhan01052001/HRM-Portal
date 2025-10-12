@@ -292,7 +292,6 @@ class AttRejectSubmitTakeDailyTask extends Component {
                             }}
                             screenName={attSubmitTakeDailyTask}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Register_Daily_Work'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

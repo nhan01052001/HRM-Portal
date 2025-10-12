@@ -144,13 +144,12 @@ export const AttApproveWorkingOvertimeBusiness = {
         [ScreenName.AttApprovedWorkingOvertime]: false,
         AttRejectWorkingOvertime: false,
         AttCanceledWorkingOvertime: false,
-        AttAllWorkingOvertime: false,
-        AttApproveWorkingOvertime: false
+        AttAllWorkingOvertime: false
     },
-    setThisForBusiness: (dataThis, isNotification, rowActionsFromScreen = _rowActions) => {
+    setThisForBusiness: (dataThis, isNotification) => {
         if (isNotification) _isOnScreenNotification = true;
         else _isOnScreenNotification = false;
-        _rowActions = rowActionsFromScreen ?? [];
+
         _this = dataThis;
     },
     checkRequireNote: async (field) => {
@@ -328,7 +327,7 @@ export const AttApproveWorkingOvertimeBusiness = {
         let actionCancel = _rowActions.find(item => item.Type === 'E_APPROVE'),
             isConfirm = actionCancel['Confirm'];
 
-        const isNote = await AttApproveWorkingOvertimeBusiness.checkRequireNote('IsRequiredApproveNote');
+        const isNote = await AttApproveWorkingOvertimeBusiness.checkRequireNote('IsRequiredApproveNote')
 
         if (isConfirm && !objValid?.isSkipConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -369,9 +368,6 @@ export const AttApproveWorkingOvertimeBusiness = {
                                             ScreenName.AttAllWorkingOvertime
                                         ] = true;
                                         AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
-                                            ScreenName.AttApproveWorkingOvertime
-                                        ] = true;
-                                        AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
                                             ScreenName.AttApprovedWorkingOvertime
                                         ] = true;
 
@@ -380,7 +376,7 @@ export const AttApproveWorkingOvertimeBusiness = {
 
                                         // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
                                         if (!_isOnScreenNotification)
-                                            DrawerServices.navigate('AttApprovedWorkingOvertime');
+                                            DrawerServices.navigate('AttApproveWorkingOvertime');
                                     } else if (res.Status === 'Locked') {
                                         ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {
@@ -417,9 +413,6 @@ export const AttApproveWorkingOvertimeBusiness = {
                                 ScreenName.AttAllWorkingOvertime
                             ] = true;
                             AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
-                                ScreenName.AttApproveWorkingOvertime
-                            ] = true;
-                            AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
                                 ScreenName.AttApprovedWorkingOvertime
                             ] = true;
 
@@ -427,7 +420,7 @@ export const AttApproveWorkingOvertimeBusiness = {
                             store.dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
 
                             // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
-                            if (!_isOnScreenNotification) DrawerServices.navigate('AttApprovedWorkingOvertime');
+                            if (!_isOnScreenNotification) DrawerServices.navigate('AttApproveWorkingOvertime');
                         } else if (res.Status === 'Locked') {
                             ToasterSevice.showWarning('Hrm_Locked', 5000);
                         } else {
@@ -527,7 +520,7 @@ export const AttApproveWorkingOvertimeBusiness = {
         let actionCancel = _rowActions.find(item => item.Type === 'E_REJECT'),
             isConfirm = actionCancel['Confirm'];
 
-        const isNote = await AttApproveWorkingOvertimeBusiness.checkRequireNote('IsRequiredRejectNote');
+        const isNote = await AttApproveWorkingOvertimeBusiness.checkRequireNote('IsRequiredRejectNote')
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
                 isValidInputText = isNote ? isNote : isConfirm['isValidInputText'],
@@ -567,9 +560,6 @@ export const AttApproveWorkingOvertimeBusiness = {
                                             ScreenName.AttAllWorkingOvertime
                                         ] = true;
                                         AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
-                                            ScreenName.AttApproveWorkingOvertime
-                                        ] = true;
-                                        AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
                                             ScreenName.AttApprovedWorkingOvertime
                                         ] = true;
 
@@ -577,7 +567,7 @@ export const AttApproveWorkingOvertimeBusiness = {
                                         store.dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
                                         // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
                                         if (!_isOnScreenNotification)
-                                            DrawerServices.navigate('AttRejectWorkingOvertime');
+                                            DrawerServices.navigate('AttApproveWorkingOvertime');
                                     } else if (res.Status === 'Locked') {
                                         ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {
@@ -614,16 +604,13 @@ export const AttApproveWorkingOvertimeBusiness = {
                                 ScreenName.AttAllWorkingOvertime
                             ] = true;
                             AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
-                                ScreenName.AttApproveWorkingOvertime
-                            ] = true;
-                            AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[
                                 ScreenName.AttApprovedWorkingOvertime
                             ] = true;
 
                             // Đếm lại con số ở Dashboard
                             store.dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
                             // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
-                            if (!_isOnScreenNotification) DrawerServices.navigate('AttRejectWorkingOvertime');
+                            if (!_isOnScreenNotification) DrawerServices.navigate('AttApproveWorkingOvertime');
                         } else if (res.Status === 'Locked') {
                             ToasterSevice.showWarning('Hrm_Locked', 5000);
                         } else {
@@ -710,7 +697,7 @@ export const AttApproveWorkingOvertimeBusiness = {
         let actionCancel = _rowActions.find(item => item.Type === 'E_CANCEL'),
             isConfirm = actionCancel['Confirm'];
 
-        const isNote = await AttApproveWorkingOvertimeBusiness.checkRequireNote('IsRequiredCancelNote');
+        const isNote = await AttApproveWorkingOvertimeBusiness.checkRequireNote('IsRequiredCancelNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],

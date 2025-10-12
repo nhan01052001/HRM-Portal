@@ -23,7 +23,6 @@ let configList = null,
     attApproveTakeLateEarlyAllowed = null,
     attApproveTakeLateEarlyAllowedViewDetail = null,
     attApproveTakeLateEarlyAllowedKeyTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttApproveTakeLateEarlyAllowed extends Component {
@@ -46,13 +45,6 @@ class AttApproveTakeLateEarlyAllowed extends Component {
 
         //biến lưu lại object filter
         this.paramsFilter = null;
-        this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
-            // reload danh sách khi có approve hoặc reject dữ liệu
-            AttApproveTakeLateEarlyAllowedBusiness.setThisForBusiness(this, false, dataRowActionAndSelected?.rowActions);
-            if (AttApproveTakeLateEarlyAllowedBusiness.checkForReLoadScreen[attApproveTakeLateEarlyAllowed]) {
-                this.reload();
-            }
-        });
     }
 
     checkDataFormNotify = () => {
@@ -151,7 +143,7 @@ class AttApproveTakeLateEarlyAllowed extends Component {
             groupField = _configList[enumName.E_Field_Group] ? _configList[enumName.E_Field_Group] : null,
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attApproveTakeLateEarlyAllowed);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attApproveTakeLateEarlyAllowed);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -284,7 +276,6 @@ class AttApproveTakeLateEarlyAllowed extends Component {
                             }}
                             screenName={attApproveTakeLateEarlyAllowed}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Late_Early'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
                         {/* </Animated.View> */}

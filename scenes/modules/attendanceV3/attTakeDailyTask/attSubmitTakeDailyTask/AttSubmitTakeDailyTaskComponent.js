@@ -333,7 +333,7 @@ class AttSubmitTakeDailyTaskComponent extends Component {
             orgStructureTransID = OrgStructureIDs.value[0][configOrgStructureTransID.valueField];
 
         return {
-            OrgStructureTransID: orgStructureTransID,
+            OrgStructureIDs: orgStructureTransID,
             JobTypeID: JobTypeID.value?.ID ? JobTypeID.value?.ID : null,
             ActualHours: ActualHours.value ? Number(ActualHours.value) : 0,
             Note: Note.value,

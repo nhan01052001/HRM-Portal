@@ -32,7 +32,7 @@ import Vnr_Function from '../../utils/Vnr_Function';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HttpService from '../../utils/HttpService';
 import { connect } from 'react-redux';
-import { dataVnrStorage, setdataDataQrStorage, setdataVnrStorage } from '../../assets/auth/authentication';
+import { dataVnrStorage, setdataVnrStorage } from '../../assets/auth/authentication';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { VnrLoadingSevices } from '../../components/VnrLoading/VnrLoadingPages';
 import languageReducer from '../../redux/i18n';
@@ -72,8 +72,7 @@ class QrScanner extends Component {
 
     setLanguage = async (language) => {
         dataVnrStorage.languageApp = language;
-        // Xét Qr vào Storage để đảm bảo đồng bộ với các phiên bản khác
-        await setdataDataQrStorage(dataVnrStorage);
+        await setdataVnrStorage(dataVnrStorage);
         this.props.setLanguage(language);
     };
 

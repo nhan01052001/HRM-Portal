@@ -164,20 +164,8 @@ class AttPaidLeave extends Component {
             const type = dataGeneral[keyType];
             if (keyType == key) {
                 type.isSelect = true;
-                if (keyType == typePaidLeave.E_COMPENSATORY_LEAVE.key) {
-                    _restDayByType = type.LeaveInMonth + type.TotalLeaveBef;
-                    _remainDayByType = type.Remain;
-                    _totalAvaiableDayByType = _restDayByType + type.Remain;
-
-                    typeNumberLeave = type?.TypeUnit
-                        ? type.TypeUnit === 'E_DAY'
-                            ? translate('HRM_PortalApp_Days')
-                            : type.TypeUnit === 'E_HOUR'
-                                ? translate('HRM_PortalApp_Hours')
-                                : translate(type.TypeUnit)
-                        : typeNumberLeave;
-                } else {
-                    _restDayByType = type.Avaiable - (type.Remain);
+                if (type.isSelect) {
+                    _restDayByType = type.Avaiable - type.Remain;
                     _remainDayByType = type.Remain;
                     _totalAvaiableDayByType = type.Avaiable;
                     _totalRemainAnlBegining = type.RemainAnlBegining;
@@ -232,7 +220,7 @@ class AttPaidLeave extends Component {
                             : {};
                         itemData.typeGroup = 'E_PREGNANT_LEAVE';
                         _restDayByType =
-                            itemData.Available - (itemData.Remain);
+                            itemData.Available - (itemData.Remain >= 0 ? itemData.Remain : -itemData.Remain);
                         _remainDayByType = itemData.Remain;
                         _totalAvaiableDayByType = itemData.Available;
 
@@ -322,7 +310,7 @@ class AttPaidLeave extends Component {
                         permission[typePaidLeave[group.AnnualType]['resouce']]['View']
                     ) {
                         if (group.AnnualType == typePaidLeave.E_ANNUAL_LEAVE.key) {
-                            _restDayByType = group.Avaiable - (group.Remain);
+                            _restDayByType = group.Avaiable - (group.Remain >= 0 ? group.Remain : -group.Remain);
                             _remainDayByType = group.Remain;
                             _totalAvaiableDayByType = group.Avaiable;
                             _totalRemainAnlBegining = group.RemainAnlBegining;
@@ -635,6 +623,7 @@ class AttPaidLeave extends Component {
             typeNumberLeave,
             keyType
         } = this.state;
+
         let viewContent = <View />,
             isShowTotalRemainAnlBegining =
                 keyType != typePaidLeave.E_ANNUAL_LEAVE.key ? { justifyContent: 'center' } : {};
@@ -721,7 +710,7 @@ class AttPaidLeave extends Component {
                             </Text>
                         </View>
 
-                        {keyType == typePaidLeave.E_ANNUAL_LEAVE.key && (
+                        {(keyType == typePaidLeave.E_ANNUAL_LEAVE.key && totalRemainAnlBegining !== 0 && !!totalRemainAnlBegining) && (
                             <View style={styles.styViewBox}>
                                 <VnrText
                                     style={[styleSheets.text, styles.styTitleDay]}
@@ -857,11 +846,7 @@ const styles = StyleSheet.create({
             maxWidth: Size.deviceWidth >= 1024 ? 100 : 60
         };
     },
-    styItemInfo: {
-        flex:1,
-        flexWrap:'wrap',
-        flexDirection :'row'
-    },
+    styItemInfo: {},
     styItemInfoRow: {
         paddingTop: 5
     },

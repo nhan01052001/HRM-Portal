@@ -146,9 +146,7 @@ export const getDataLocal = async (keyStore) => {
             return null;
         }
     } catch (e) {
-        console.log(e, 'getDataLocal');
-        // return null;
-        throw e;
+        return null;
     }
 };
 
@@ -172,9 +170,8 @@ export const removeMultiKey = async () => {
         }
         return { actionStatus: true };
     } catch (e) {
-        console.log(e, 'removeMultiKey')
-        // return { actionStatus: true };
-        throw e;
+        console.log(e, 'removeMultiKey');
+        return { actionStatus: true };
     }
 };
 // dùng cho xác thực bằng vân tay hay khuôn mặt

@@ -43,6 +43,8 @@ class VnrText extends Component {
                 ) {
                     return i18n.translations[language][i18nKey];
                 } else {
+                    if (i18nKey.includes('HRM' && '_') || i18nKey.includes('E' && '_') || i18nKey.includes('_'))
+                        Vnr_Function.sendMailFeedback(i18nKey);
                     return i18nKey;
                 }
             }

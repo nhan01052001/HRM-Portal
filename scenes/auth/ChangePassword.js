@@ -24,7 +24,6 @@ import DrawerServices from '../../utils/DrawerServices';
 import ConfirmGoogleCaptcha from '../../components/GoogleCaptchaV2/ConfirmGoogleCaptcha';
 import axios from 'axios';
 import { dataVnrStorage, setdataVnrStorageFromDataUser } from '../../assets/auth/authentication';
-import TouchIDService from '../../utils/TouchIDService';
 const sourceBackgroud = '../../assets/images/BackgroundLogin.png';
 export default class ChangePassword extends Component {
     constructor(porps) {
@@ -51,18 +50,10 @@ export default class ChangePassword extends Component {
         this.setState({ toggleMenu: false });
     };
 
-    setEnabled = () => {
-        const { params = {} } = this.props.navigation.state,
-            { setupData } = typeof params == 'object' ? params : JSON.parse(params);
-
-        (setupData && typeof setupData == 'function') && setupData();
-    };
-
     changePasswordSuccess = () => {
         const { params = {} } = this.props.navigation.state,
             { IsFirstLogin, dataUser } = typeof params == 'object' ? params : JSON.parse(params);
 
-        TouchIDService.isRemoveTouchID(this.setEnabled.bind(this));
         IsFirstLogin
             ? dataUser
                 ? this.loginSuccess(dataUser)
@@ -188,7 +179,7 @@ export default class ChangePassword extends Component {
 
         VnrLoadingSevices.show();
 
-        HttpService.Post('[URI_SYS]/Sys_GetData/ChangePasswordSys_User', data).then((res) => {
+        HttpService.Post('[URI_POR]/portal/ChangePassword', data).then(res => {
             console.log(typeof res, res);
             VnrLoadingSevices.hide();
 

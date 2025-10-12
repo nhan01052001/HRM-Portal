@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import {
     styleSheets,
     CustomStyleSheet,
@@ -19,9 +19,6 @@ import HttpService from '../../../../../utils/HttpService';
 import VnrSwitch from '../../../../../componentsV3/VnrSwitch/VnrSwitch';
 import VnrSuperFilterWithTextInput from '../../../../../componentsV3/VnrSuperFilterWithTextInput/VnrSuperFilterWithTextInput';
 import VnrText from '../../../../../components/VnrText/VnrText';
-import VnrTextInput from '../../../../../componentsV3/VnrTextInput/VnrTextInput';
-import VnrAttachFile from '../../../../../componentsV3/VnrAttachFile/VnrAttachFile';
-import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 
 const initSateDefault = {
     modalLimit: {
@@ -79,23 +76,6 @@ const initSateDefault = {
         visibleConfig: true,
         isValid: false
     },
-    Comment: {
-        lable: 'HRM_PortalApp_ReasonChangeShift',
-        visible: true,
-        visibleConfig: true,
-        disable: false,
-        value: '',
-        refresh: false,
-        isValid: true
-    },
-    FileAttach: {
-        lable: 'HRM_PortalApp_TakeLeave_FileAttachment',
-        visible: true,
-        visibleConfig: true,
-        disable: false,
-        refresh: false,
-        value: null
-    },
     WeekDayChangeShift: [],
     isRefeshChanged: false
 };
@@ -115,23 +95,14 @@ class AttSubmitShiftChangeComponent extends Component {
 
     componentDidMount() {
         // case type === E_CHANGE_SHIFT, call initState(), else don't need, because called initState() from AttSubmitShiftChangeAddOrEdit
-        if (this.props.type === EnumName.E_CHANGE_SHIFT) this.initState();
+        if (this.props.type === EnumName.E_CHANGE_SHIFT)
+            this.initState();
     }
 
     // Step 1: Khởi tạo dữ liệu
     initState = async () => {
         const { record, value, type, workDayRoot } = this.props,
-            {
-                Profiles,
-                isRefreshState,
-                Profile,
-                IsSubstitute,
-                ProfileID2,
-                ShiftChange,
-                ReplacementShift,
-                FileAttach,
-                Comment
-            } = this.state;
+            { Profiles, isRefreshState, Profile, IsSubstitute, ProfileID2, ShiftChange, ReplacementShift } = this.state;
         const profileInfo = dataVnrStorage
             ? dataVnrStorage.currentUser
                 ? dataVnrStorage.currentUser.info
@@ -150,11 +121,6 @@ class AttSubmitShiftChangeComponent extends Component {
                 Profiles: {
                     ...Profiles,
                     ..._profile
-                },
-                Comment: {
-                    ...Comment,
-                    value: record?.Comment ? record.Comment : null,
-                    refresh: !Comment.refresh
                 }
             };
             let tempType = type;
@@ -167,30 +133,27 @@ class AttSubmitShiftChangeComponent extends Component {
                             ...value[`Item${value.ID}`]
                         }
                         : null
-                };
+                }
             }
 
             if (type !== EnumName.E_CHANGE_SHIFT) {
                 if (IsSubstitute.value || record?.ProfileID2) {
-                    if (workDayRoot?.startDate !== workDayRoot?.endDate) tempType = EnumName.E_DIFFERENTDAY;
+                    if (workDayRoot?.startDate !== workDayRoot?.endDate)
+                        tempType = EnumName.E_DIFFERENTDAY;
                     else tempType = EnumName.E_SAMEDAY;
 
                     nextState = {
                         ...nextState,
                         ProfileID2: {
                             ...ProfileID2,
-                            value: record?.ProfileID2
-                                ? [
-                                    {
-                                        ID: record?.ProfileID2,
-                                        JoinProfileNameCode: `${record?.ProfileName2}-${record?.CodeEmp2}`,
-                                        isSelect: true
-                                    }
-                                ]
-                                : null,
+                            value: record?.ProfileID2 ? [{
+                                ID: record?.ProfileID2,
+                                JoinProfileNameCode: `${record?.ProfileName2}-${record?.CodeEmp2}`,
+                                isSelect: true
+                            }] : null,
                             refresh: !ProfileID2.refresh
                         }
-                    };
+                    }
                 }
                 nextState = {
                     ...nextState,
@@ -201,53 +164,23 @@ class AttSubmitShiftChangeComponent extends Component {
                     },
                     ShiftChange: {
                         ...ShiftChange,
-                        value: record?.ChangeShiftID
-                            ? {
-                                ChangeShiftID: record.ChangeShiftID,
-                                ChangeShiftName: record?.ChangeShiftName
-                            }
-                            : null,
+                        value: record?.ChangeShiftID ? {
+                            ChangeShiftID: record.ChangeShiftID,
+                            ChangeShiftName: record?.ChangeShiftName
+                        } : null,
                         refresh: !ShiftChange.refresh
                     },
 
                     ReplacementShift: {
                         ...ReplacementShift,
-                        value: record?.AlternateShiftID
-                            ? {
-                                AlternateShiftID: record.AlternateShiftID,
-                                AlternateShiftName: record?.AlternateShiftName
-                            }
-                            : null,
+                        value: record?.AlternateShiftID ? {
+                            AlternateShiftID: record.AlternateShiftID,
+                            AlternateShiftName: record?.AlternateShiftName
+                        } : null,
                         refresh: !ReplacementShift.refresh
                     }
-                };
+                }
             }
-
-            // Value Acttachment
-            if (record.FileAttach) {
-                let valFile = ManageFileSevice.setFileAttachApp(record.FileAttach);
-
-                nextState = {
-                    ...nextState,
-                    FileAttach: {
-                        ...FileAttach,
-                        disable: false,
-                        value: valFile && valFile.length > 0 ? valFile : null,
-                        refresh: !FileAttach.refresh
-                    }
-                };
-            } else {
-                nextState = {
-                    ...nextState,
-                    FileAttach: {
-                        ...FileAttach,
-                        disable: false,
-                        value: null,
-                        refresh: !FileAttach.refresh
-                    }
-                };
-            }
-
             this.setState({ ...nextState, Type: tempType, isRefreshState: !isRefreshState });
         } else {
             let nextState = {};
@@ -256,12 +189,13 @@ class AttSubmitShiftChangeComponent extends Component {
                 nextState = {
                     ...nextState,
                     [`Item${value.ID}`]: null
-                };
+                }
             }
 
             if (type !== EnumName.E_CHANGE_SHIFT) {
                 if (IsSubstitute.value) {
-                    if (workDayRoot?.startDate !== workDayRoot?.endDate) tempType = EnumName.E_DIFFERENTDAY;
+                    if (workDayRoot?.startDate !== workDayRoot?.endDate)
+                        tempType = EnumName.E_DIFFERENTDAY;
                     else tempType = EnumName.E_SAMEDAY;
 
                     nextState = {
@@ -270,7 +204,7 @@ class AttSubmitShiftChangeComponent extends Component {
                             ...ProfileID2,
                             refresh: !ProfileID2.refresh
                         }
-                    };
+                    }
                 }
                 nextState = {
                     ...nextState,
@@ -278,7 +212,7 @@ class AttSubmitShiftChangeComponent extends Component {
                         ...IsSubstitute,
                         refresh: !IsSubstitute.refresh
                     }
-                };
+                }
             }
 
             this.setState(
@@ -291,11 +225,9 @@ class AttSubmitShiftChangeComponent extends Component {
                     },
                     isRefreshState: !isRefreshState,
                     Type: tempType
-                },
-                () => {
+                }, () => {
                     const { Type } = this.state;
-                    Type !== EnumName.E_CHANGE_SHIFT &&
-                        this.handleGetShiftChange(this.props?.workDayRoot, Type, _profile.ID);
+                    (Type !== EnumName.E_CHANGE_SHIFT) && this.handleGetShiftChange(this.props?.workDayRoot, Type, _profile.ID);
                 }
             );
         }
@@ -314,10 +246,7 @@ class AttSubmitShiftChangeComponent extends Component {
             nextState.isError !== this.state.isError ||
             nextState.isRefeshChanged !== this.state.isRefeshChanged ||
             nextState.Type !== this.state.Type ||
-            nextState.IsSubstitute.value !== this.state.IsSubstitute.value ||
-            nextState.Comment.value !== this.state.Comment.value ||
-            nextState.FileAttach.value !== this.state.FileAttach.value ||
-            nextState.FileAttach.refresh !== this.state.FileAttach.value
+            nextState.IsSubstitute.value !== this.state.IsSubstitute.value
         ) {
             return true;
         } else {
@@ -325,7 +254,7 @@ class AttSubmitShiftChangeComponent extends Component {
         }
     }
 
-    showLoading = (isShow) => {
+    showLoading = isShow => {
         const { showLoading } = this.props;
         showLoading && showLoading(isShow);
     };
@@ -337,39 +266,15 @@ class AttSubmitShiftChangeComponent extends Component {
 
     getAllData = () => {
         const { value } = this.props,
-            { IsSubstitute, ShiftChange, ProfileID2, Type, ReplacementShift, Comment, FileAttach } = this.state;
-
-        let FinallyFileName = [];
-        if (FileAttach.value && Array.isArray(FileAttach.value) && FileAttach.value.length > 0) {
-            FileAttach.value.map((item) => {
-                FinallyFileName.push(item.fileName);
-            });
-        }
-
-        if (
-            ((!this.state[`Item${value.ID}`] || !this.state[`Item${value.ID}`].ShiftID) &&
-                Type === EnumName.E_CHANGE_SHIFT) ||
-            (this.state.IsSubstitute.value && this.state.ProfileID2.value?.length == 0) ||
-            (Comment.value && Comment.value.length > 500)
+            { IsSubstitute, ShiftChange, ProfileID2, Type, ReplacementShift } = this.state;
+        if ((!this.state[`Item${value.ID}`] ||
+            !this.state[`Item${value.ID}`].ShiftID) && (Type === EnumName.E_CHANGE_SHIFT)
         ) {
-            this.setState(
-                {
-                    isError: true
-                },
-                () => {
-                    if (Comment.value && Comment.value.length > 500) {
-                        let keyTrans = translate('HRM_Sytem_MaxLength500');
-                        let errorMax500 = keyTrans.replace(
-                            '[E_NAME]',
-                            Comment.lable ? `[${translate(Comment.lable)}]` : ''
-                        );
-                        this.props.ToasterSevice().showWarning(errorMax500);
-                        return null;
-                    }
-
-                    this.props.ToasterSevice().showWarning('HRM_PortalApp_InputValue_Please');
-                }
-            );
+            this.setState({
+                isError: true
+            }, () => {
+                this.props.ToasterSevice().showWarning('HRM_PortalApp_InputValue_Please');
+            });
             return null;
         }
 
@@ -379,18 +284,16 @@ class AttSubmitShiftChangeComponent extends Component {
 
         if (Type === EnumName.E_CHANGE_SHIFT)
             return {
-                ShiftID: this.state[`Item${value.ID}`].ShiftID,
-                DateShift: this.state[`Item${value.ID}`].DateShift,
-                DayOfWeek: this.state[`Item${value.ID}`].DayOfWeek,
-                Comment: Comment.value?.length > 0 ? Comment.value : null,
-                FileAttach: FinallyFileName.length > 0 ? FinallyFileName.join(',') : null
-            };
+                'ShiftID': this.state[`Item${value.ID}`].ShiftID,
+                'DateShift': this.state[`Item${value.ID}`].DateShift,
+                'DayOfWeek': this.state[`Item${value.ID}`].DayOfWeek
+            }
 
         let nextState = {};
         if (ReplacementShift.value?.AlternateShiftID) {
             nextState = {
                 AlternateShiftID: ReplacementShift.value?.AlternateShiftID
-            };
+            }
         }
 
         return {
@@ -405,10 +308,8 @@ class AttSubmitShiftChangeComponent extends Component {
             ThuShiftID: null,
             FriShiftID: null,
             SatShiftID: null,
-            SunShiftID: null,
-            Comment: Comment.value?.length > 0 ? Comment.value : null,
-            FileAttach: FinallyFileName.length > 0 ? FinallyFileName.join(',') : null
-        };
+            SunShiftID: null
+        }
     };
 
     unduData = () => {
@@ -426,10 +327,12 @@ class AttSubmitShiftChangeComponent extends Component {
                         paddingTop: Size.defineHalfSpace
                     }}
                 >
-                    <Text style={[styleSheets.lable, styles.styLableGp]}>{value?.Text}</Text>
+                    <Text style={[styleSheets.lable, styles.styLableGp]}>
+                        {value?.Text}
+                    </Text>
                 </View>
                 <VnrPickerQuickly
-                    fieldValid={true}
+                    fieldValid={isError}
                     isCheckEmpty={isError}
                     // refresh={DurationType.refresh}
                     value={this.state[`Item${value.ID}`] ? this.state[`Item${value.ID}`] : null}
@@ -441,36 +344,39 @@ class AttSubmitShiftChangeComponent extends Component {
                     disable={false}
                     lable={'HRM_PortalApp_AlternateShift'}
                     onFinish={(item) => {
-                        if (!item) return;
+                        if (!item)
+                            return;
                         this.setState({
                             [`Item${value.ID}`]: {
                                 ...item,
-                                ShiftID: item.ID,
-                                DateShift: value.rootdate,
-                                DayOfWeek: value.numberWeekday
+                                'ShiftID': item.ID,
+                                'DateShift': value.rootdate,
+                                'DayOfWeek': value.numberWeekday
                             },
                             isRefeshChanged: !this.state.isRefeshChanged,
                             isError: false
                         });
                     }}
                 />
-                <View style={stylesLocal.wrapCurrentShift}>
+                <View
+                    style={stylesLocal.wrapCurrentShift}
+                >
                     <Text style={[styleSheets.text, styles.styLableGp]}>
                         {translate('HRM_PortalApp_CurrentShift')}: {value?.value?.ShiftName}
                     </Text>
                 </View>
             </View>
-        );
-    };
+        )
+    }
 
     renderItemChangeSchedule = () => {
-        const { ReplacementShift, ShiftChange, IsSubstitute, ProfileID2, isError } = this.state,
+        const { ReplacementShift, ShiftChange, IsSubstitute, ProfileID2 } = this.state,
             { workDayRoot } = this.props;
         return (
             <View>
                 <View>
                     <VnrPickerQuickly
-                        fieldValid={false}
+                        fieldValid={true}
                         isCheckEmpty={false}
                         // refresh={DurationType.refresh}
                         value={ShiftChange.value}
@@ -487,7 +393,7 @@ class AttSubmitShiftChangeComponent extends Component {
                 </View>
                 <View>
                     <VnrPickerQuickly
-                        fieldValid={false}
+                        fieldValid={true}
                         isCheckEmpty={false}
                         // refresh={DurationType.refresh}
                         value={ReplacementShift.value}
@@ -507,7 +413,7 @@ class AttSubmitShiftChangeComponent extends Component {
                         lable={'HRM_PortalApp_AdditionalSubstitutes'}
                         subLable={translate('HRM_PortalApp_ChooseEmployeeNeedChange')}
                         value={IsSubstitute.value}
-                        onFinish={(value) => {
+                        onFinish={value => {
                             let type = null;
                             // check isSameDay
                             if (value && workDayRoot?.startDate && workDayRoot?.endDate) {
@@ -518,142 +424,135 @@ class AttSubmitShiftChangeComponent extends Component {
                                 }
                             }
 
-                            this.setState(
-                                {
-                                    IsSubstitute: {
-                                        ...IsSubstitute,
-                                        value: value,
-                                        refresh: !IsSubstitute.refresh
-                                    },
-                                    Type: type ? type : EnumName.E_CHANGE_SHIFT_COMPANSATION
+                            this.setState({
+                                IsSubstitute: {
+                                    ...IsSubstitute,
+                                    value: value,
+                                    refresh: !IsSubstitute.refresh
                                 },
-                                () => {
-                                    this.handleGetReplacementShift(
-                                        this.props?.workDayRoot,
-                                        type ? type : EnumName.E_CHANGE_SHIFT_COMPANSATION,
-                                        this.state.Profiles.ID,
-                                        this.state.ShiftChange.value
-                                    );
-                                }
-                            );
+                                Type: type ? type : EnumName.E_CHANGE_SHIFT_COMPANSATION
+                            }, () => {
+                                this.handleGetReplacementShift(this.props?.workDayRoot,
+                                    type ? type : EnumName.E_CHANGE_SHIFT_COMPANSATION,
+                                    this.state.Profiles.ID,
+                                    this.state.ShiftChange.value);
+                            });
                         }}
                     />
                 </View>
-                {IsSubstitute.value && (
-                    <VnrSuperFilterWithTextInput
-                        lable={ProfileID2.label}
-                        value={ProfileID2.value}
-                        fieldValid={true}
-                        isCheckEmpty={isError}
-                        onFinish={(listItem) => {
-                            if (Array.isArray(listItem) && listItem.length > 0) {
-                                this.setState(
-                                    {
-                                        ProfileID2: {
-                                            ...ProfileID2,
-                                            value: [{ ...listItem[0], isSelect: true }],
-                                            refresh: !ProfileID2.refresh
-                                        }
-                                    },
-                                    () => {
-                                        this.handleGetReplacementShift(
-                                            this.props?.workDayRoot,
-                                            this.state.Type,
-                                            this.state.Profiles.ID,
-                                            ShiftChange.value
-                                        );
-                                    }
-                                );
-                            } else {
+                {
+                    IsSubstitute.value && (
+                        <VnrSuperFilterWithTextInput
+                            lable={ProfileID2.label}
+                            value={ProfileID2.value}
+                            onFinish={(listItem) => {
                                 this.setState({
                                     ProfileID2: {
                                         ...ProfileID2,
-                                        value: [],
+                                        value: [{ ...listItem[0], isSelect: true }],
                                         refresh: !ProfileID2.refresh
                                     }
+                                }, () => {
+                                    this.handleGetReplacementShift(this.props?.workDayRoot,
+                                        this.state.Type,
+                                        this.state.Profiles.ID,
+                                        ShiftChange.value);
                                 });
+                            }}
+                            refresh={ProfileID2.refresh}
+                            api={{
+                                urlApi: '[URI_CENTER]/api/Att_GetData/GetProfileDetailForAttendance_App',
+                                type: 'E_POST',
+                                dataBody: {
+                                    page: 1,
+                                    pageSize: 100
+                                }
+                            }}
+                            filterParams={'ProfileName'}
+                            textField={'JoinProfileNameCode'}
+                            textFieldFilter={'FormatProfileCodeLogin'}
+                            valueField={'ID'}
+                            filter={true}
+                            autoFilter={true}
+                            filterServer={true}
+                            response={'string'}
+                            placeholder={'SELECT_ITEM'}
+                            isChooseOne={true}
+                            licensedDisplay={
+                                [
+                                    {
+                                        'Name': [
+                                            'JoinProfileNameCode'
+                                        ],
+                                        'Avatar': [
+                                            'ImagePath'
+                                        ],
+                                        'UnderName': [
+                                            'PositionName',
+                                            'HRM_PortalApp_ContractHistory_Position'
+                                        ]
+                                    }
+                                ]
                             }
-                        }}
-                        refresh={ProfileID2.refresh}
-                        api={{
-                            urlApi: '[URI_CENTER]/api/Att_GetData/GetProfileDetailForAttendance_App',
-                            type: 'E_POST',
-                            dataBody: {
-                                page: 1,
-                                pageSize: 100
-                            }
-                        }}
-                        filterParams={'ProfileName'}
-                        textField={'JoinProfileNameCode'}
-                        textFieldFilter={'FormatProfileCodeLogin'}
-                        valueField={'ID'}
-                        filter={true}
-                        autoFilter={true}
-                        filterServer={true}
-                        response={'string'}
-                        placeholder={'SELECT_ITEM'}
-                        // isChooseOne={true}
-                        licensedDisplay={[
-                            {
-                                Name: ['JoinProfileNameCode'],
-                                Avatar: ['ImagePath'],
-                                UnderName: ['PositionName', 'HRM_PortalApp_ContractHistory_Position']
-                            }
-                        ]}
-                    >
-                        <View style={stylesLocal.chil_controlVnrSuperTextInput}>
-                            <View style={stylesLocal.chil_controlVnrSuperTextInput_left}>
-                                <Text
-                                    numberOfLines={2}
-                                    style={[styleSheets.text, stylesVnrPickerV3.styLbNoValuePicker]}
-                                >
-                                    {translate(ProfileID2.label)}
-                                    {ProfileID2.isValid && (
-                                        <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
-                                    )}
-                                </Text>
-                            </View>
-                            <View style={stylesLocal.chil_controlVnrSuperTextInput_right}>
-                                {ProfileID2.value.length === 0 ? (
+                        >
+                            <View style={stylesLocal.chil_controlVnrSuperTextInput}>
+                                <View style={stylesLocal.chil_controlVnrSuperTextInput_left}>
                                     <Text
-                                        style={[styleSheets.lable, { fontSize: Size.text + 1, color: Colors.gray_6 }]}
+                                        numberOfLines={2}
+                                        style={[styleSheets.text,
+                                            stylesVnrPickerV3.styLbNoValuePicker]}
                                     >
-                                        {translate('SELECT_ITEM')}
+                                        {translate(ProfileID2.label)}
+                                        {ProfileID2.isValid && <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />}
                                     </Text>
-                                ) : (
-                                    <View style={stylesLocal.flex_Row_Ali_Center}>
-                                        {Vnr_Function.renderAvatarCricleByName(
-                                            ProfileID2.value[0]?.ImagePath,
-                                            ProfileID2.value[0]?.JoinProfileNameCode,
-                                            24
-                                        )}
+                                </View>
+                                <View style={stylesLocal.chil_controlVnrSuperTextInput_right}>
+                                    {ProfileID2.value.length === 0 ? (
                                         <Text
-                                            numberOfLines={2}
-                                            style={[styleSheets.lable, stylesLocal.textImplementer]}
+                                            style={[
+                                                styleSheets.lable,
+                                                { fontSize: Size.text + 1, color: Colors.gray_6 }
+                                            ]}
                                         >
-                                            {ProfileID2.value[0]?.JoinProfileNameCode}
+                                            {translate('SELECT_ITEM')}
                                         </Text>
-                                    </View>
-                                )}
+                                    ) : (
+                                        <View style={stylesLocal.flex_Row_Ali_Center}>
+                                            {Vnr_Function.renderAvatarCricleByName(
+                                                ProfileID2.value[0]?.ImagePath,
+                                                ProfileID2.value[0]?.JoinProfileNameCode,
+                                                24
+                                            )}
+                                            <Text
+                                                numberOfLines={2}
+                                                style={[styleSheets.lable, stylesLocal.textImplementer]}
+                                            >
+                                                {ProfileID2.value[0]?.JoinProfileNameCode}
+                                            </Text>
+                                        </View>
+                                    )}
+                                </View>
                             </View>
-                        </View>
-                    </VnrSuperFilterWithTextInput>
-                )}
+                        </VnrSuperFilterWithTextInput>
+                    )
+                }
             </View>
-        );
-    };
+        )
+    }
 
     handleGetShiftChange = (workDayRoot, type = this.state.Type, ProfileID = this.state.Profile.ID) => {
         try {
             if (!type || !workDayRoot?.startDate || !workDayRoot?.endDate || !ProfileID) {
-                this.props.ToasterSevice().showWarning(translate('HRM_Message_GetDataServices_Error'), 3000);
+                this.props
+                    .ToasterSevice()
+                    .showWarning(translate('HRM_Message_GetDataServices_Error'), 3000);
                 return;
             }
             let payload = {
-                DateStart: workDayRoot.startDate,
-                Type: type,
-                IsDateStart: true,
-                ProfileID: ProfileID
+                'DateStart': workDayRoot.startDate,
+                'Type': type,
+                'IsDateStart': true,
+                'ProfileID': ProfileID
             };
 
             this.showLoading(true);
@@ -662,7 +561,9 @@ class AttSubmitShiftChangeComponent extends Component {
                     this.showLoading(false);
                     if (res && res?.Status === EnumName.E_SUCCESS) {
                         if (res?.Data?.Message) {
-                            this.props.ToasterSevice().showWarning(res?.Data?.Message, 3000);
+                            this.props
+                                .ToasterSevice()
+                                .showWarning(res?.Data?.Message, 3000);
                             this.props?.onDisableButtonSave(true);
                             return;
                         }
@@ -679,30 +580,24 @@ class AttSubmitShiftChangeComponent extends Component {
             this.showLoading(false);
             DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
         }
-    };
+    }
 
-    handleGetReplacementShift = (
-        workDayRoot,
-        type = this.state.Type,
-        ProfileID = this.state.Profiles.ID,
-        currentShift,
-        isShiftChange = false
-    ) => {
+    handleGetReplacementShift = (workDayRoot, type = this.state.Type, ProfileID = this.state.Profiles.ID, currentShift, isShiftChange = false) => {
         try {
             const { ReplacementShift, ShiftChange, IsSubstitute, ProfileID2 } = this.state;
             let payload = {
-                DateStart: workDayRoot.startDate,
-                DateEnd: workDayRoot.endDate,
-                Type: type,
-                IsDateEnd: true
+                'DateStart': workDayRoot.startDate,
+                'DateEnd': workDayRoot.endDate,
+                'Type': type,
+                'IsDateEnd': true
             };
 
             // case: dateState not have shift when currentShift === null
             if (currentShift?.ChangeShiftID) {
                 payload = {
                     ...payload,
-                    ChangeShiftID: currentShift?.ChangeShiftID
-                };
+                    'ChangeShiftID': currentShift?.ChangeShiftID
+                }
             }
 
             // case: call form function handleGetShiftChange()
@@ -711,7 +606,7 @@ class AttSubmitShiftChangeComponent extends Component {
                     ...payload,
                     ProfileID: ProfileID,
                     AlternateShiftID: currentShift?.ChangeShiftID
-                };
+                }
             }
 
             // case: have tick choose Replacement Staff
@@ -721,7 +616,7 @@ class AttSubmitShiftChangeComponent extends Component {
                     ...payload,
                     ProfileID: ProfileID,
                     IsSubstitute: IsSubstitute.value
-                };
+                }
             }
 
             // case: choose Replacement Staff
@@ -729,7 +624,7 @@ class AttSubmitShiftChangeComponent extends Component {
                 payload = {
                     ...payload,
                     ProfileID2: ProfileID2.value[0]?.ID
-                };
+                }
             }
 
             this.showLoading(true);
@@ -749,27 +644,26 @@ class AttSubmitShiftChangeComponent extends Component {
                                     },
                                     refresh: !ReplacementShift.refresh
                                 }
-                            };
+                            }
                         }
 
-                        this.setState(
-                            {
-                                ...nextState,
-                                ShiftChange: {
-                                    ...ShiftChange,
-                                    value: currentShift,
-                                    refresh: !ShiftChange.refresh
-                                }
-                            },
-                            () => {
-                                if (res?.Data?.Message) {
-                                    this.props.ToasterSevice().showWarning(res?.Data?.Message, 3000);
-                                    this.props?.onDisableButtonSave(true);
-                                    return;
-                                }
-                                this.props?.onDisableButtonSave(false);
+                        this.setState({
+                            ...nextState,
+                            ShiftChange: {
+                                ...ShiftChange,
+                                value: currentShift,
+                                refresh: !ShiftChange.refresh
                             }
-                        );
+                        }, () => {
+                            if (res?.Data?.Message) {
+                                this.props
+                                    .ToasterSevice()
+                                    .showWarning(res?.Data?.Message, 3000);
+                                this.props?.onDisableButtonSave(true);
+                                return;
+                            }
+                            this.props?.onDisableButtonSave(false);
+                        });
                     }
                 })
                 .catch((error) => {
@@ -780,108 +674,26 @@ class AttSubmitShiftChangeComponent extends Component {
             this.showLoading(false);
             DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
         }
-    };
+    }
 
     render() {
-        const { value, index, length, fieldConfig, onScrollToInputIOS } = this.props,
-            { Type, Comment, FileAttach } = this.state;
-        console.log(FileAttach, 'FileAttach');
-
-        let limitFile = 1;
+        const { value } = this.props,
+            { Type } = this.state;
         return (
             <View
                 style={CustomStyleSheet.backgroundColor(Colors.white)}
-                onLayout={(event) => {
+                onLayout={event => {
                     const layout = event.nativeEvent.layout;
                     this.layoutHeightItem = layout.height;
                 }}
             >
-                {Type === EnumName.E_CHANGE_SHIFT
-                    ? value && !value?.isDisable && this.renderItemChangeShift(value)
-                    : this.renderItemChangeSchedule()}
-                {index === length.length - 1 && (
-                    <View style={CustomStyleSheet.backgroundColor(Colors.white)}>
-                        <View style={styles.flRowSpaceBetween}>
-                            <VnrText
-                                style={[styleSheets.lable, styles.styLableGp]}
-                                i18nKey={'HRM_PortalApp_Explanation'}
-                            />
-                        </View>
-
-                        {/* Lý do tăng ca */}
-                        {Comment.visible && fieldConfig?.Comment?.visibleConfig && (
-                            <VnrTextInput
-                                fieldValid={fieldConfig?.Comment?.isValid}
-                                // isCheckEmpty={
-                                //     fieldConfig?.Comment?.isValid && isError && Comment.value.length === 0 ? true : false
-                                // }
-                                placeHolder={'HRM_PortalApp_PleaseInput'}
-                                disable={Comment.disable}
-                                lable={Comment.lable}
-                                style={[
-                                    styleSheets.text,
-                                    stylesVnrPickerV3.viewInputMultiline,
-                                    CustomStyleSheet.paddingHorizontal(0)
-                                ]}
-                                multiline={true}
-                                value={Comment.value}
-                                onChangeText={(text) => {
-                                    this.setState({
-                                        Comment: {
-                                            ...Comment,
-                                            value: text,
-                                            refresh: !Comment.refresh
-                                        }
-                                    });
-                                }}
-                                onFocus={() => {
-                                    Platform.OS == 'ios' && onScrollToInputIOS(index + 1, this.layoutHeightItem);
-                                }}
-                                refresh={Comment.refresh}
-                            />
-                        )}
-
-                        {/* Tập tin đính kèm */}
-                        {FileAttach.visible && fieldConfig?.FileAttach?.visibleConfig && (
-                            <View style={{}}>
-                                <VnrAttachFile
-                                    fieldValid={fieldConfig?.FileAttach?.isValid}
-                                    // isCheckEmpty={
-                                    //     fieldConfig?.FileAttach?.isValid && isError && !FileAttach.value ? true : false
-                                    // }
-                                    lable={FileAttach.lable}
-                                    disable={FileAttach.disable}
-                                    refresh={FileAttach.refresh}
-                                    value={FileAttach.value}
-                                    multiFile={true}
-                                    uri={'[URI_CENTER]/api/Sys_Common/saveFileFromApp'}
-                                    onFinish={(file) => {
-                                        if (Array.isArray(file) && file.length > limitFile) {
-                                            let messMaxLimitFile = translate(
-                                                'HRM_PortalApp_Att_MaximumAttachmentFile'
-                                            ).replace('[E_NUMBER]', limitFile);
-                                            this.props.ToasterSevice().showWarning(messMaxLimitFile, 3000);
-                                            this.setState({
-                                                FileAttach: {
-                                                    ...FileAttach,
-                                                    refresh: !FileAttach.refresh
-                                                }
-                                            });
-                                        } else {
-                                            this.setState({
-                                                FileAttach: {
-                                                    ...FileAttach,
-                                                    value: file,
-                                                    refresh: !FileAttach.refresh
-                                                }
-                                            });
-                                        }
-                                    }}
-                                />
-                            </View>
-                        )}
-                    </View>
-                )}
+                {
+                    Type === EnumName.E_CHANGE_SHIFT ? (
+                        (value && !value?.isDisable) && this.renderItemChangeShift(value)
+                    ) : (
+                        this.renderItemChangeSchedule()
+                    )
+                }
             </View>
         );
     }

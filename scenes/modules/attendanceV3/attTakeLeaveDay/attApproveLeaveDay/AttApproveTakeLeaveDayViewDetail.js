@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, ScrollView, TouchableOpacity, Clipboard } from 'react-native';
-import { styleSheets, styleScreenDetail, styleSafeAreaView, Size, Colors, CustomStyleSheet } from '../../../../../constants/styleConfig';
+import { View, ScrollView } from 'react-native';
+import { styleSheets, styleScreenDetail, styleSafeAreaView } from '../../../../../constants/styleConfig';
 import { ConfigListDetail } from '../../../../../assets/configProject/ConfigListDetail';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { generateRowActionAndSelected, AttApproveTakeLeaveDayBusinessFunction } from './AttApproveTakeLeaveDayBusiness';
@@ -12,9 +12,6 @@ import { EnumName, ScreenName } from '../../../../../assets/constant';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import SafeAreaViewDetail from '../../../../../components/safeAreaView/SafeAreaViewDetail';
-import { IconCopy } from '../../../../../constants/Icons';
-import { VnrLoadingSevices } from '../../../../../components/VnrLoading/VnrLoadingPages';
-import { ToasterSevice } from '../../../../../components/Toaster/Toaster';
 
 const configDefault = [
     {
@@ -143,46 +140,7 @@ export default class AttApproveTakeLeaveDayViewDetail extends Component {
             dataRowActionAndSelected: generateRowActionAndSelected(ScreenName.AttApproveTakeLeaveDay),
             listActions: this.resultListActionHeader()
         };
-
-        props.navigation.setParams({
-            headerRight: (
-                <View style={CustomStyleSheet.marginRight(16)}>
-                    <TouchableOpacity
-                        onPress={this.copyLink}
-                    >
-                        <IconCopy size={Size.iconSize} color={Colors.black} />
-                    </TouchableOpacity>
-                </View>
-            )
-        });
     }
-
-    copyLink = async () => {
-        if (this.state?.dataItem?.ID) {
-            let link = `portal4hrm://main/AttApproveTakeLeaveDayViewDetail?encoding=true&dataId=${Vnr_Services.encryptCode(this.state?.dataItem?.ID, [0, 1, 2, 3])}`;
-
-            if (this.state?.dataItem?.ProcessApproval?.length > 0) {
-                this.state?.dataItem?.ProcessApproval?.map((item) => {
-                    if (item?.StatusProcess === 'process' && item?.UserApproveID) {
-                        link += `&current=${Vnr_Services.encryptCode(item?.UserApproveID, [0, 1, 2, 3])}`;
-                    }
-                });
-            }
-
-            Clipboard.setString(link);
-            // verify
-            VnrLoadingSevices.show();
-            const copied = await Clipboard.getString();
-            VnrLoadingSevices.hide();
-            if (copied === link) {
-                ToasterSevice.showSuccess('HRM_PortalApp_CopySuccess');
-            } else {
-                ToasterSevice.showError('HRM_PortalApp_CopyFailed!');
-            }
-        } else {
-            ToasterSevice.showWarning('HRM_PortalApp_DataLoading');
-        }
-    };
 
     resultListActionHeader = () => {
         const _params = this.props.navigation.state.params;
@@ -223,7 +181,7 @@ export default class AttApproveTakeLeaveDayViewDetail extends Component {
 
                 if (response && response.Status == EnumName.E_SUCCESS) {
                     let data = response.Data;
-                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(data.Status, data?.TypeApprove);
+                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(data.Status, dataItem?.TypeApprove);
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachment);
                     data.ImagePath = data?.AvatarUserRegister

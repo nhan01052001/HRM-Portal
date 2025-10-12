@@ -4,12 +4,14 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
+    Animated,
     TouchableWithoutFeedback,
     Dimensions
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Colors, CustomStyleSheet, Size, styleSheets, stylesScreenDetailV3 } from '../../../../../constants/styleConfig';
 import moment from 'moment';
+import format from 'number-format.js';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { translate } from '../../../../../i18n/translate';
 import {
@@ -18,10 +20,96 @@ import {
     IconDate,
     IconChat
 } from '../../../../../constants/Icons';
+import Color from 'color';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
-import VnrRenderListItem from '../../../../../componentsV3/VnrRenderList/VnrRenderListItem';
+import Vnr_Services from '../../../../../utils/Vnr_Services';
 
-export default class AttTamScanLogRegisterListItem extends VnrRenderListItem {
+export default class AttTamScanLogRegisterListItem extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            widthIconBack: new Animated.Value(Size.defineSpace),
+            heightIconNext: new Animated.Value(0),
+            springIconBack: new Animated.Value(1),
+            springIconNext: new Animated.Value(0)
+        };
+        this.formatStringType = this.formatStringType.bind(this);
+        this.setRightAction(props);
+        this.Swipe = null;
+    }
+
+    setRightAction = thisProps => {
+        const { dataItem } = thisProps;
+        this.sheetActions = [
+            {
+                title: translate('HRM_Common_Close'),
+                onPress: null
+            }
+        ];
+        if (!Vnr_Function.CheckIsNullOrEmpty(thisProps.rowActions)) {
+            this.rightListActions = thisProps.rowActions.filter(item => {
+                item.title = item?.title;
+                return (
+                    !Vnr_Function.CheckIsNullOrEmpty(dataItem.BusinessAllowAction) &&
+                    dataItem.BusinessAllowAction.indexOf(item.type) >= 0
+                );
+            });
+        }
+    };
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        if (nextProps.isPullToRefresh !== this.props.isPullToRefresh) {
+            this.setRightAction(nextProps);
+        }
+    }
+
+    shouldComponentUpdate(nextProps) {
+        if (
+            nextProps.isPullToRefresh !== this.props.isPullToRefresh ||
+            nextProps.isSelect !== this.props.isSelect ||
+            nextProps.isOpenAction !== this.props.isOpenAction ||
+            nextProps.isDisable !== this.props.isDisable
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    formatStringType = (data, col) => {
+        if (data[col.Name]) {
+            if (col.DataType && col.DataType.toLowerCase() == 'datetime') {
+                return moment(data[col.Name]).format(col.DataFormat);
+            }
+            if (col.DataType && col.DataType.toLowerCase() == 'double') {
+                return format(col.DataFormat, data[col.Name]);
+            } else {
+                return data[col.Name];
+            }
+        } else {
+            return '';
+        }
+    };
+
+    // openActionSheet = () => {
+    //   this.ActionSheet.show();
+    // };
+
+    // actionSheetOnCLick = index => {
+    //   const { dataItem } = this.props;
+    //   !Vnr_Function.CheckIsNullOrEmpty(this.sheetActions[index].onPress) &&
+    //     this.sheetActions[index].onPress(dataItem);
+    // };
+
+    rightActionsEmpty = () => {
+        return <View style={CustomStyleSheet.width(0)} />;
+    };
+
+    convertTextToColor = value => {
+        const [num1, num2, num3, opacity] = value.split(',');
+        return Color.rgb(parseFloat(num1), parseFloat(num2), parseFloat(num3), parseFloat(opacity));
+    };
+
     render() {
         const {
             dataItem,
@@ -146,13 +234,13 @@ export default class AttTamScanLogRegisterListItem extends VnrRenderListItem {
                                         {/* Top - left */}
                                         <View style={CustomStyleSheet.width('70%')}>
                                             <View style={[styles.styleFlex1_row_AlignCenter, CustomStyleSheet.marginBottom(4)]}>
-                                                <Text style={[styleSheets.lable, styles.styleTextViewTop]}>
-                                                    {dataItem?.DataRegister?.TimeLog}
+                                                <Text numberOfLines={1} style={[styleSheets.lable, styles.styleTextViewTop, CustomStyleSheet.maxWidth('65%')]}>
+                                                    {dataItem?.TimeLogOfWeek ? `${dataItem?.TimeLogOfWeek}, ` : ''}{dataItem?.DataRegister?.TimeLog}
                                                 </Text>
                                                 <View style={styles.wrapNumberLeaveDay}>
                                                     <Text style={[styleSheets.lable, styles.styleTextNum]}>
                                                         {`${dataItem?.DataRegister?.TypeView} ${dataItem?.DataTimeRegister?.TimeLog
-                                                            }`}
+                                                        }`}
                                                     </Text>
                                                 </View>
                                             </View>
@@ -185,7 +273,7 @@ export default class AttTamScanLogRegisterListItem extends VnrRenderListItem {
                                     </View>
 
                                     {/* cennter */}
-                                    {dataItem.Comment || dataItem?.DataNote ? (
+                                    {dataItem.Comment != null ? (
                                         <View style={styles.wrapContentCenter}>
                                             <View style={styles.styIconMess}>
                                                 <IconChat size={Size.text + 1} color={Colors.gray_8} />
@@ -195,7 +283,7 @@ export default class AttTamScanLogRegisterListItem extends VnrRenderListItem {
                                                     numberOfLines={2}
                                                     style={[styleSheets.text, styles.viewReason_text]}
                                                 >
-                                                    {dataItem?.Comment ?? dataItem?.DataNote ?? ''}
+                                                    {dataItem.Comment ? `${dataItem.Comment}` : ''}
                                                 </Text>
                                             </View>
                                         </View>
@@ -251,8 +339,8 @@ export default class AttTamScanLogRegisterListItem extends VnrRenderListItem {
 
                                             <IconDate size={Size.text - 1} color={Colors.gray_7} />
 
-                                            <Text style={[styleSheets.text, styles.dateTimeSubmit_Text]}>
-                                                {moment(dataItem.DateCreate).format('DD/MM/YYYY')}
+                                            <Text numberOfLines={1} style={[styleSheets.text, styles.dateTimeSubmit_Text]}>
+                                                {Vnr_Services.getDayOfWeek(dataItem.DateCreate) ? `${Vnr_Services.getDayOfWeek(dataItem.DateCreate)}, ` : ''}{moment(dataItem.DateCreate).format('DD/MM/YYYY')}
                                             </Text>
                                         </View>
                                     )}

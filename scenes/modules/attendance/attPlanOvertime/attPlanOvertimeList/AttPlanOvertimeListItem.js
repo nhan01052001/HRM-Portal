@@ -292,7 +292,7 @@ export default class AttPlanOvertimeListItem extends React.Component {
                 </Text>
               </View> */}
                         </View>
-                        {dataItem.WarningViolation !== null && (
+                        {dataItem.WarningViolation && (
                             <View style={styles.viewLimitTitle}>
                                 <IconInfo color={Colors.red} size={Size.text} />
                                 <Text numberOfLines={1} style={[styleSheets.lable, styles.viewReasoLimitTitle_text]}>

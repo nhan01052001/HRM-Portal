@@ -2,8 +2,6 @@ import { DrawerActions } from 'react-navigation-drawer';
 import { NavigationActions } from 'react-navigation';
 import { ConfigVersionBuild } from '../assets/configProject/ConfigVersionBuild';
 import { getDataVnrStorage } from '../assets/auth/authentication';
-import Vnr_Services from './Vnr_Services';
-import { translate } from '../i18n/translate';
 
 let _Drawercontainer = null,
     _historyRouter = [],
@@ -83,21 +81,6 @@ const navigateForVersion = (routeName, params) => {
     }
 };
 
-const navigateToTab = (tabNameOrParentName, routeName, params) => {
-    if (_Drawercontainer != null && tabNameOrParentName && routeName) {
-        const navigateAction = NavigationActions.navigate({
-            routeName: tabNameOrParentName,
-            params: params,
-            action: NavigationActions.navigate({
-                routeName: routeName,
-                params: params
-            })
-        });
-
-        _Drawercontainer.dispatch(navigateAction);
-    }
-};
-
 const openDrawer = () => {
     if (_Drawercontainer != null) {
         _Drawercontainer.dispatch(DrawerActions.openDrawer());
@@ -148,33 +131,6 @@ const OpenDeeplink = urlDeepLink => {
                         });
 
                         setNavigationTo('');
-                        if (params?.encoding === true || (typeof params?.encoding === 'string' && params?.encoding === 'true')) {
-                            //
-                            Object.keys(params).forEach((field) => {
-                                if (field !== 'encoding') {
-                                    params[field] = Vnr_Services.decryptCode(params[field]);
-                                }
-                            });
-                        }
-
-                        if (params?.current && typeof params?.current === 'string' && params?.current.length > 0) {
-                            if (params?.current !== currentUser?.info?.userid) {
-                                navigate('ErrorScreen', {
-                                    ErrorDisplay: {
-                                        response: {
-                                            status: 403,
-                                            message: translate('HRM_PortalApp_NoPermission')
-                                        }
-                                    },
-                                    isShowMess: true,
-                                    isHiddenFeedback: true,
-                                    isHiddenDownloadError: true,
-                                    isHiddenScanQrAgain: true
-                                });
-                                return;
-                            }
-                        }
-
                         navigate(screenName, {
                             ...params
                         });
@@ -206,11 +162,11 @@ const getParentScreen = (pushScreenName, screenNameDetail, router = _Drawerconta
         return null;
     let finalResult = arrayAllScreen.find((item) => allScreen[item] && allScreen[item]?.childRouters && allScreen[item]?.childRouters[screenNameDetail] !== undefined
         ? item
-        : allScreen[item]?.childRouters ? getParentScreen(pushScreenName, screenNameDetail, allScreen[item]?.childRouters) : null);
+        : allScreen[item]?.childRouters ? getParentScreen(pushScreenName, screenNameDetail, allScreen[item]?.childRouters) : null)
     if (finalResult)
         return finalResult;
     return null;
-};
+}
 
 export default {
     getDrawercontainer,
@@ -227,6 +183,5 @@ export default {
     setNavigateFromNotify,
     OpenDeeplink,
     getNavigationTo,
-    getParentScreen,
-    navigateToTab
+    getParentScreen
 };

@@ -35,6 +35,7 @@ import Vnr_Function from '../../../../../utils/Vnr_Function';
 import moment from 'moment';
 import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile';
 import ListButtonSave from '../../../../../components/ListButtonMenuRight/ListButtonSave';
+import { ConfigField } from '../../../../../assets/configProject/ConfigField';
 
 let enumName = null,
     profileInfo = null;
@@ -1285,7 +1286,29 @@ export default class AttSubmitRosterAddOrEdit extends Component {
             VnrLoadingSevices.hide();
             if (res) {
                 try {
-                    this.setState({ fieldValid: res }, () => {
+
+                    const _configField = ConfigField && ConfigField.value['AttSubmitRosterAddOrEdit']
+                        ? ConfigField.value['AttSubmitRosterAddOrEdit']['Hidden']
+                        : [];
+
+                    let nextState = { fieldValid: res };
+
+                    _configField.forEach(fieldConfig => {
+                        let _field = this.state[fieldConfig];
+                        if (_field && typeof _field === 'object') {
+                            _field = {
+                                ..._field,
+                                visibleConfig: false
+                            };
+
+                            nextState = {
+                                ...nextState,
+                                [fieldConfig]: { ..._field }
+                            };
+                        }
+                    });
+
+                    this.setState(nextState, () => {
                         enumName = EnumName;
                         profileInfo = dataVnrStorage
                             ? dataVnrStorage.currentUser

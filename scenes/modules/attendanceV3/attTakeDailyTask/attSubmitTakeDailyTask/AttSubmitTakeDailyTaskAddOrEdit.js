@@ -191,6 +191,7 @@ export default class AttSubmitTakeDailyTaskAddOrEdit extends Component {
         this.isProcessingAnalysic = false;
 
         //check processing cho nhấn lưu nhiều lần
+        this.isProcessing = false;
         this.isProcessingSave = false;
 
         this.paramsExtend = {
@@ -1005,7 +1006,7 @@ export default class AttSubmitTakeDailyTaskAddOrEdit extends Component {
                 {
                     ...this.listRefGetDataSave[`${item}`].getAllData(),
                     ID: record?.ID ? record.ID : null,
-                    WorkDate: moment(item).format('YYYY/MM/DD'),
+                    WorkDate: item,
                     ListProfileID: [Profile.ID],
                     LevelApproved: this.levelApprove,
                     IsEdit: this.isModify && params && record ? true : false,
@@ -1267,11 +1268,11 @@ export default class AttSubmitTakeDailyTaskAddOrEdit extends Component {
     };
 
     _renderHeaderLoading = () => {
-        if (this.state.isShowLoading) {
+        if (this.state.isShowLoading || this.isProcessing) {
             return (
-                <View style={styleComonAddOrEdit.styLoadingHeader}>
-                    <View style={styleComonAddOrEdit.styViewLoading} />
-                    <VnrIndeterminate isVisible={this.state.isShowLoading} />
+                <View style={[styleComonAddOrEdit.styLoadingHeader, Platform.OS === 'ios' && CustomStyleSheet.zIndex(99)]}>
+                    <View style={styles.styViewLoading} />
+                    <VnrIndeterminate isVisible={this.state.isShowLoading || this.isProcessing} />
                 </View>
             );
         } else return <View />;

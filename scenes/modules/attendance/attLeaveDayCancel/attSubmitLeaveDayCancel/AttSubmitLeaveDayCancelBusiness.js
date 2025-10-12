@@ -350,7 +350,7 @@ export const AttSubmitLeaveDayCancelBusinessFunction = {
 
         VnrLoadingSevices.show();
 
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedRequireCancel', {
+        HttpService.Post('[URI_POR]/New_Att_RequireCancel/RemoveSelected', {
             selectedIds,
             reason
         }).then(res => {

@@ -20,7 +20,7 @@ import DrawerServices from '../../../../../utils/DrawerServices';
 import { EnumName, EnumStatus, ScreenName } from '../../../../../assets/constant';
 import { getDataLocal } from '../../../../../factories/LocalData';
 import AttShiftChangeListItem from './AttShiftChangeListItem';
-import AttShiftChangeListItemApprove from './AttShiftChangeListItemApprove';
+import AttShiftChangeListItemApprove from './AttShiftChangeListItemApprove'
 import { ConfigListFilter } from '../../../../../assets/configProject/ConfigListFilter';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import ManageFileSevice from '../../../../../utils/ManageFileSevice';
@@ -118,16 +118,8 @@ export default class AttShiftChangeList extends React.Component {
             { keyDataLocal, keyQuery, detail, groupField, isRefreshList } = this.props;
         if (keyDataLocal) {
             getDataLocal(keyDataLocal)
-                .then(resData => {
-                    ;
-                    let res = resData && resData[keyQuery] ? resData[keyQuery] : null;
-                    if (Array.isArray(res?.Data?.Data)) {
-                        res = {
-                            ...res,
-                            Data: res?.Data?.Data
-                        };
-                    }
-
+                .then(resData => {;
+                    const res = resData && resData[keyQuery] ? resData[keyQuery] : null;
                     if (res && res !== EnumName.E_EMPTYDATA) {
                         let data = [],
                             dataNoGroup = [],
@@ -174,7 +166,6 @@ export default class AttShiftChangeList extends React.Component {
                                 item.lstFileAttach = ManageFileSevice.setFileAttachApp(item.FileAttachment);
                             });
                         }
-
 
                         if (page === 1) {
                             dataNoGroup = [...data];
@@ -576,7 +567,7 @@ export default class AttShiftChangeList extends React.Component {
         const paddingToBottom = 100;
         return (
             event.nativeEvent.layoutMeasurementlayoutMeasurement.height +
-            event.nativeEvent.layoutMeasurement.contentOffset.y >=
+                event.nativeEvent.layoutMeasurement.contentOffset.y >=
             event.nativeEvent.layoutMeasurement.contentSize.height - paddingToBottom
         );
     };
@@ -667,7 +658,7 @@ export default class AttShiftChangeList extends React.Component {
                                 style={[
                                     styles.checkTitleActive,
                                     isCheckAll &&
-                                    isCheckAll === true && stylesScreenDetailV3.checkAll
+                                        isCheckAll === true && stylesScreenDetailV3.checkAll
                                 ]}
                             >
                                 {isCheckAll && isCheckAll === true && (
@@ -689,7 +680,7 @@ export default class AttShiftChangeList extends React.Component {
     // indexInDataSource is variable when have isGroup === true
     renderDataOfGroup = (data, isGroup, indexInDataSource) => {
         const { dataSource, isPullToRefresh, isOpenAction, isDisableSelectItem } = this.state,
-            { detail, rowActions, renderConfig } = this.props;
+            { detail, rowActions } = this.props;
 
         return (
             <ScrollView>
@@ -701,7 +692,6 @@ export default class AttShiftChangeList extends React.Component {
                                     <View style={CustomStyleSheet.flex(1)}>
                                         {detail?.screenName === ScreenName.AttApproveShiftChange ? (
                                             <AttShiftChangeListItemApprove
-                                                renderConfig={renderConfig}
                                                 key={index}
                                                 currentDetail={detail}
                                                 onClick={() => {
@@ -727,7 +717,6 @@ export default class AttShiftChangeList extends React.Component {
                                             />
                                         ) : (
                                             <AttShiftChangeListItem
-                                                renderConfig={renderConfig}
                                                 key={index}
                                                 currentDetail={detail}
                                                 onClick={() => {
@@ -775,22 +764,13 @@ export default class AttShiftChangeList extends React.Component {
                 marginTopNumber,
                 isCheckAll
             } = this.state,
-            { api, detail, onCreate, scrollYAnimatedValue, renderConfig } = this.props,
+            { api, detail, rowActions, onCreate, scrollYAnimatedValue } = this.props,
             permissionBtnCreate =
                 PermissionForAppMobile &&
-                    PermissionForAppMobile.value['New_Att_Roster_New_Index_V2'] &&
-                    PermissionForAppMobile.value['New_Att_Roster_New_Index_V2']['Create']
+                PermissionForAppMobile.value['New_Att_Roster_New_Index_V2'] &&
+                PermissionForAppMobile.value['New_Att_Roster_New_Index_V2']['Create']
                     ? true
                     : false;
-        let { rowActions } = this.props;
-
-        if (!(PermissionForAppMobile &&
-            PermissionForAppMobile.value['HRM_PortalV3_Att_RegisterChangeShift_ChkChangeSchedule'] &&
-            PermissionForAppMobile.value['HRM_PortalV3_Att_RegisterChangeShift_ChkChangeSchedule']['View']) && Array.isArray(rowActions) && rowActions.length > 0) {
-
-            rowActions = rowActions.filter(item => item?.type !== 'E_MODIFY');
-        }
-
 
         let dataBody = api ? (api.dataBody && this.isCheckAllServer ? api.dataBody : null) : null;
         if (dataBody) {
@@ -800,11 +780,16 @@ export default class AttShiftChangeList extends React.Component {
             };
         }
 
+        const hiddenFiled = {
+            MethodPaymentView: Vnr_Function.checkIsHaveConfigListDetail(detail?.screenName, 'MethodPaymentView'),
+            DataNote: Vnr_Function.checkIsHaveConfigListDetail(detail?.screenName, 'ReasonOT')
+        };
+
         let contentList = <View />;
         if (isLoading) {
             let typeLoading =
                 detail.screenName == ScreenName.AttApproveShiftChange ||
-                    detail.screenName == ScreenName.AttApprovedTSLRegister
+                detail.screenName == ScreenName.AttApprovedTSLRegister
                     ? EnumStatus.E_APPROVE
                     : EnumStatus.E_SUBMIT;
 
@@ -869,8 +854,8 @@ export default class AttShiftChangeList extends React.Component {
                             </View>
                             {item?.isGroup ? (
                                 item?.dataGroupMaster &&
-                                    Array.isArray(item.dataGroupMaster) &&
-                                    item.dataGroupMaster.length > 0 ? (
+                                Array.isArray(item.dataGroupMaster) &&
+                                item.dataGroupMaster.length > 0 ? (
                                         this.renderDataOfGroup(item.dataGroupMaster, true, index)
                                     ) : (
                                         <EmptyData messageEmptyData={'EmptyData'} />
@@ -887,8 +872,8 @@ export default class AttShiftChangeList extends React.Component {
                                         <View style={CustomStyleSheet.flex(1)}>
                                             {detail.screenName !== ScreenName.AttSubmitShiftChange ? (
                                                 <AttShiftChangeListItemApprove
-                                                    renderConfig={renderConfig}
                                                     key={index}
+                                                    hiddenFiled={hiddenFiled}
                                                     currentDetail={detail}
                                                     onClick={() => {
                                                         this.addItemChecked(index, false, null);
@@ -913,8 +898,8 @@ export default class AttShiftChangeList extends React.Component {
                                                 />
                                             ) : (
                                                 <AttShiftChangeListItem
-                                                    renderConfig={renderConfig}
                                                     key={index}
+                                                    hiddenFiled={hiddenFiled}
                                                     currentDetail={detail}
                                                     onClick={() => {
                                                         this.addItemChecked(index, false, null);

@@ -45,8 +45,21 @@ class HreCandidateProfile extends Component {
         //biến lưu lại object filter
         this.paramsFilter = null;
 
+        // this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
+        //     // Trường hợp goBack từ detail thì phải gán lại this
+        //     if (HreCandidateProfileBusiness.checkForReLoadScreen[HreCandidateProfile]) {
+        //         this.reload();
+        //     } else {
+        //
+        //     }
+        // });
     }
 
+    componentWillUnmount() {
+        if (this.willFocusScreen) {
+            this.willFocusScreen.remove();
+        }
+    }
 
     reload = paramsFilter => {
         if (paramsFilter === 'E_KEEP_FILTER') {
@@ -70,29 +83,6 @@ class HreCandidateProfile extends Component {
 
         // set false khi đã reload.
         // HreCandidateProfileBusiness.checkForReLoadScreen[HreCandidateProfile] = false;
-        // E_BETWEEN > ExperienceFrom,ExperienceTo
-        // E_LESS > ExperienceTo
-        // E_BIGGER > ExperienceFrom
-        // E_EQUAL > ExperienceFrom,ExperienceTo
-        const { ExperienceTo, ExperienceToLess, ExperienceFrom, ExperienceFromBigger, ExperienceFromToEqua, ExperienceLevel } = _paramsDefault.dataBody;
-        if (ExperienceLevel != null && _paramsDefault.dataBody) {
-            if (ExperienceLevel == 'E_LESS') {
-                _paramsDefault.dataBody['ExperienceTo'] = ExperienceToLess;
-                _paramsDefault.dataBody['ExperienceFrom'] = '';
-            }
-            else if (ExperienceLevel == 'E_BIGGER') {
-                _paramsDefault.dataBody['ExperienceTo'] = '';
-                _paramsDefault.dataBody['ExperienceFrom'] = ExperienceFromBigger;
-            }
-            else if (ExperienceLevel == 'E_EQUAL') {
-                _paramsDefault.dataBody['ExperienceTo'] = ExperienceFromToEqua;
-                _paramsDefault.dataBody['ExperienceFrom'] = ExperienceFromToEqua;
-            }
-            else {
-                _paramsDefault.dataBody['ExperienceTo'] = ExperienceTo;
-                _paramsDefault.dataBody['ExperienceFrom'] = ExperienceFrom;
-            }
-        }
 
         // Gửi yêu cầu lọc dữ liệu
         this.setState(_paramsDefault, () => {

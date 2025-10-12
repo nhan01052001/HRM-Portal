@@ -1,13 +1,12 @@
 
 import React from 'react';
 import { View, TouchableOpacity, Modal, StyleSheet, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-navigation';
 import { Colors, Size, CustomStyleSheet, styleSheets } from '../../constants/styleConfig';
 import { IconCancel } from '../../constants/Icons';
 import VnrText from '../VnrText/VnrText';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import WebView from 'react-native-webview';
-import styleComonAddOrEdit from '../../constants/styleComonAddOrEdit';
 export default class ViewHTML extends React.Component {
     constructor(props) {
         super(props);
@@ -52,7 +51,7 @@ export default class ViewHTML extends React.Component {
                     visible={modalHTML.visible} //isShowModal
                     style={{ ...CustomStyleSheet.padding(0), ...CustomStyleSheet.margin(0) }}
                 >
-                    <SafeAreaView style={styleComonAddOrEdit.wrapInsideModal}>
+                    <SafeAreaView style={styles.wrapInsideModal}>
                         <View style={styles.flRowSpaceBetween}>
                             <VnrText
                                 style={[
@@ -91,6 +90,11 @@ export default class ViewHTML extends React.Component {
 }
 
 const styles = StyleSheet.create({
+    wrapInsideModal: {
+        flex: 1,
+        backgroundColor: Colors.gray_2,
+        borderRadius: 8
+    },
     flRowSpaceBetween: {
         flexDirection: 'row',
         justifyContent: 'space-between',

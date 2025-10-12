@@ -165,6 +165,9 @@ export default class AttWorkDayCalendarListItem extends React.Component {
 
                             <Text style={[styleSheets.text, styles.txtRegister]}>
                                 {item.DurationTypeView ? `${item.DurationTypeView} (${item.LeaveyHours}h)` : ''}
+                                {item.LeavedayTypeCode && item.LeavedayTypeName
+                                    ? `, ${item.LeavedayTypeCode} - ${item.LeavedayTypeName}`
+                                    : ''}
                             </Text>
                         </View>
                     </View>
@@ -295,7 +298,7 @@ export default class AttWorkDayCalendarListItem extends React.Component {
                             />
 
                             <Text style={[styleSheets.text, styles.txtRegister]}>
-                                {item.ActualHours ? `${item?.JobTypeView ?? ''} (${item.ActualHours}h)` : ''}
+                                {item.ActualHours ? `${item?.JobTypeView ?? ''} ${item.ActualHours}` : ''}
                             </Text>
                         </View>
                     </View>

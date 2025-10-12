@@ -162,9 +162,8 @@ export const AttSubmitTakeDailyTaskBusiness = {
         AttApprovedSubmitTakeDailyTask: false,
         AttRejectSubmitTakeDailyTask: false
     },
-    setThisForBusiness: (dataThis, rowActionsFromScreen = _rowActions) => {
+    setThisForBusiness: (dataThis) => {
         _this = dataThis;
-        _rowActions = rowActionsFromScreen;
     },
     //#region [action delete]
     businessDeleteRecords: (items, dataBody) => {
@@ -341,7 +340,7 @@ export const AttSubmitTakeDailyTaskBusiness = {
                 VnrLoadingSevices.hide();
                 if (res && res.Status == EnumName.E_SUCCESS) {
                     if (res.Data && res.Data.length > 0) {
-                        let numberRow = items.length == 1 ? '1/1' : `${res.Data.length}/${items.length}`,
+                        let numberRow = items.length == 1 ? '1' : `${res.Data.length}/${items.length}`,
                             keyTrans =
                                 items.length > 1
                                     ? translate('HRM_PortalApp_DailyTask_ConfirmCancel')

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
 import { translate } from '../../../../i18n/translate';
 import { ScreenName } from '../../../../assets/constant';
@@ -12,8 +12,6 @@ import AttRejectSubmitWorkingOvertime from './attSubmitWorkingOvertime/atRejectS
 import AttCanceledSubmitWorkingOvertime from './attSubmitWorkingOvertime/attCanceledSubmitWorkingOvertime/AttCanceledSubmitWorkingOvertime';
 import RenderTopTab from '../../../../navigation/tabar/RenderTopTab';
 import { PermissionForAppMobile } from '../../../../assets/configProject/PermissionForAppMobile';
-import { Colors } from '../../../../constants/styleConfig';
-import TopTabViewPlanAndResult from './TopTabViewPlanAndResult';
 
 const navigationOptionsCogfig = (navigation, Title_Key) => {
     return {
@@ -24,41 +22,35 @@ const navigationOptionsCogfig = (navigation, Title_Key) => {
 const data = [
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_All',
-        screenName: ScreenName.AttSubmitWorkingOvertime,
-        fieldCount: 'CountAll'
+        screenName: ScreenName.AttSubmitWorkingOvertime
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_SaveTemporary',
-        screenName: ScreenName.AttSaveTempSubmitWorkingOvertime,
-        fieldCount: 'Total_E_TEMP'
+        screenName: ScreenName.AttSaveTempSubmitWorkingOvertime
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_WaitingApproval',
-        screenName: ScreenName.AttApproveSubmitWorkingOvertime,
-        fieldCount: 'Total_E_PROGRESSING'
+        screenName: ScreenName.AttApproveSubmitWorkingOvertime
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Approved',
-        screenName: ScreenName.AttApprovedSubmitWorkingOvertime,
-        fieldCount: 'Total_E_PROCESSED'
+        screenName: ScreenName.AttApprovedSubmitWorkingOvertime
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Confirmed',
-        screenName: ScreenName.AttConfirmedSubmitWorkingOvertime,
-        fieldCount: 'CountConfirmed'
+        screenName: ScreenName.AttConfirmedSubmitWorkingOvertime
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Rejected',
-        screenName: ScreenName.AttRejectSubmitWorkingOvertime,
-        fieldCount: 'Total_E_REJECTED'
+        screenName: ScreenName.AttRejectSubmitWorkingOvertime
     },
     {
         title: 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Canceled',
-        screenName: ScreenName.AttCanceledSubmitWorkingOvertime,
-        fieldCount: 'Total_E_CANCELD'
+        screenName: ScreenName.AttCanceledSubmitWorkingOvertime
     }
 ];
 
+//#region [tạo tab màn hình Edit (công việc, người liên quan, đánh giá)]
 const TopTabAttSubmitWorkingOvertime = createMaterialTopTabNavigator(
     {
         AttSubmitWorkingOvertime: {
@@ -100,65 +92,48 @@ const TopTabAttSubmitWorkingOvertime = createMaterialTopTabNavigator(
     {
         lazy: true,
         swipeEnabled: false,
-        tabBarComponent: (navigationAll) => {
+        tabBarComponent: navigationAll => {
+
             let perTabApprove = true,
                 perTabWaitApproved = true,
                 perTabReject = true;
 
-            let perTabConfirmed = false,
-                perTabSaveTemp = false;
+            // if (PermissionForAppMobile && PermissionForAppMobile.value['Personal_RelativeConfirmed']
+            //     && PermissionForAppMobile.value['Personal_RelativeConfirmed']['View']) {
+            //     perTabApprove = true;
+            // }
 
-            if (
-                PermissionForAppMobile &&
-                PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2_TabConfirm'] &&
-                PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2_TabConfirm']['View']
-            ) {
+            // if (PermissionForAppMobile && PermissionForAppMobile.value['Personal_RelativeWaitConfirm']
+            //     && PermissionForAppMobile.value['Personal_RelativeWaitConfirm']['View']) {
+            //     perTabWaitApproved = true;
+            // }
+
+            // if (PermissionForAppMobile && PermissionForAppMobile.value['Personal_RelativeEdit']
+            //     && PermissionForAppMobile.value['Personal_RelativeEdit']['View']) {
+            //     perTabReject = true;
+            // }
+
+            let perTabConfirmed = false;
+
+            if (PermissionForAppMobile && PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2_TabConfirm']
+            && PermissionForAppMobile.value['New_Att_OvertimePlan_New_Index_V2_TabConfirm']['View']) {
                 perTabConfirmed = true;
-            }
-
-            if (
-                PermissionForAppMobile &&
-                PermissionForAppMobile.value['HRM_PortalV3_Att_OvertimePlan_BtnSaveTemp'] &&
-                PermissionForAppMobile.value['HRM_PortalV3_Att_OvertimePlan_BtnSaveTemp']['View']
-            ) {
-                perTabSaveTemp = true;
             }
 
             let filteredData = data;
 
             if (!perTabConfirmed) {
-                filteredData = filteredData.filter(
-                    (item) => item.title !== 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Confirmed'
-                );
-            }
-
-            if (perTabSaveTemp) {
-                filteredData = filteredData.filter(
-                    (item) => item.title !== 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_SaveTemporary'
-                );
+                filteredData = data.filter(item => item.title !== 'HRM_PortalApp_TopTab_AttSubmitWorkingOvertime_Confirmed');
             }
 
             if ((perTabApprove || perTabWaitApproved || perTabReject) && Array.isArray(data) && data.length > 0) {
-                return (
-                    <View style={styles.container}>
-                        <TopTabViewPlanAndResult />
-                        <RenderTopTab isShowCountData={true} data={filteredData} navigationAll={navigationAll} />
-                    </View>
-                );
+                return <RenderTopTab data={filteredData} navigationAll={navigationAll} />;
             } else {
                 return <View />;
             }
         }
     }
 );
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        width: '100%',
-        maxHeight: 90,
-        backgroundColor: Colors.white
-    }
-});
+//#endregion
 
 export default TopTabAttSubmitWorkingOvertime;

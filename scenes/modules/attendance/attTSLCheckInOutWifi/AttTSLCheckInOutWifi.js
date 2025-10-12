@@ -33,6 +33,7 @@ import {
     IconSetting
 } from '../../../../constants/Icons';
 import Time from './Time';
+import HttpFactory from '../../../../factories/HttpFactory';
 import HttpService from '../../../../utils/HttpService';
 import VnrLoading from '../../../../components/VnrLoading/VnrLoading';
 import Vnr_Function from '../../../../utils/Vnr_Function';
@@ -154,205 +155,221 @@ class AttTSLCheckInOutWifi extends Component {
         });
     };
 
-    requestData = async (typeData, distance = '') => {
-        try {
-            const {
-                    configConstraintWifi,
-                    configConstraintDistanceWithRadious,
-                    isAllowCheckInGPSLeavedayBusinessTrip,
-                    configLoadWorkPlace
-                } = this.state,
-                { isCheckingByCoordinates } = configConstraintDistanceWithRadious,
-                { isCheckingByMACAdress } = configConstraintWifi;
-
-            VnrLoadingSevices.show();
-            this.isProcessing = true;
-
-            // kiem tra bien bssid
-            let _bssid = null;
-            let isApprove = false;
-
-            if (this.macAddressCheckPass !== null) {
-                _bssid = this.macAddressCheckPass;
+    formatDateServer = () => {
+        const apiFormatDate = {
+            urlApi: '[URI_SYS]/Sys_GetData/GetFormatDate',
+            type: 'E_POST',
+            dataBody: {
+                value: moment(new Date()).format('DD/MM/YYYY')
             }
+        };
+        return HttpFactory.getDataPicker(apiFormatDate);
+    };
 
-            if (
-                (isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false) ||
-                (isCheckingByCoordinates && this.isConfirmCoodinateNotMatch === false)
-            ) {
-                // auto duyệt khi đúng wifi hoặc đúng tọa độ
-                isApprove = true;
-            }
-
-            const newTimeLog = await HttpService.Post('[URI_HR]/Sys_GetData/GetTimeOfServer');
-            const getUnitIdApp = await Vnr_Function.getUnitIdApp();
-
-            const dataBody = {
-                ProfileID: dataVnrStorage.currentUser.info.ProfileID,
-                UserSubmit: dataVnrStorage.currentUser.info.ProfileID,
-                UserUpdate: dataVnrStorage.currentUser.info.ProfileID,
-                Comment: this.state.Comment,
-                IsPortal: true,
-                Status: 'E_SUBMIT',
-                Type: typeData,
-                IsCheckGPS: true,
-                MACAddress: isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false ? _bssid : null,
-                IsScreenCheckInGPS: false, // chấm công giờ serverF
-                IsAllowApprove: isApprove,
-                TimeLogTime: moment(newTimeLog).format('HH:mm'),
-                TimeLog: moment(newTimeLog).format('YYYY-MM-DD HH:mm:ss'),
-                LocationAddress: `WIFI|${DeviceInfo.getUniqueId()}`,
-                Distance: distance,
-                Coordinate: '',
-                IsAllowCheckInGPSWhenLeavedayBusinessTrip: isAllowCheckInGPSLeavedayBusinessTrip,
-                PlaceID: configLoadWorkPlace.value ? configLoadWorkPlace.value.ID : null,
-                IPDeviceGPS: getUnitIdApp
-            };
-
-            let formData = new FormData();
-            // PMC bỏ lưu Hình để chấm công nhanh hơn.
-            formData.append('LocationImage', null);
-            formData.append('ImageCheckIn', null);
-            formData.append('AttTamScanModel', JSON.stringify(dataBody));
-
-            const configs = {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'multipart/form-data'
-                }
-            };
-            const callBackConfirmRequest = () => {
-                this.isConfirmSaveTamScanLog = false; // Đã confirm Save , case cảnh báo đi công tác không confirm cho lần kế tiếp
-                HttpService.Post('[URI_HR]/Att_GetData/New_SaveTamScanLog', formData, configs)
-                    .then((res) => {
-                        if (!Vnr_Function.CheckIsNullOrEmpty(res) && res == 'Success') {
-                            ToasterSevice.showSuccess('Hrm_Succeed');
-                            this.reload(true, dataBody);
-                        } else if (res && typeof res === 'string') {
-                            if (res === 'WarningCheckInGPSInLeavedayBusinessTravel') {
-                                AlertSevice.alert({
-                                    timeHideModal: 10000, // Sau 10s nếu không xác nhận thì sẽ tắt
-                                    iconType: EnumIcon.E_WARNING,
-                                    title: 'E_WARNING',
-                                    message: 'WarningCheckInGPSInLeavedayBusinessTravel',
-                                    textRightButton: 'HRM_Common_Continue',
-                                    textLeftButton: 'HRM_Common_Close',
-                                    onBackDrop: () => {
-                                        VnrLoadingSevices.hide();
-                                        this.reload();
-                                    },
-                                    onCancel: () => {
-                                        VnrLoadingSevices.hide();
-                                        this.reload();
-                                    },
-                                    onConfirm: () => {
-                                        this.setState(
-                                            {
-                                                isAllowCheckInGPSLeavedayBusinessTrip: true
-                                            },
-                                            () => {
-                                                this.requestData(typeData, distance);
-                                            }
-                                        );
-                                    }
-                                });
-                            } else if (res === 'OnlyAllowATTCheckInGPSForBizTrip') {
-                                this.reload();
-                                ToasterSevice.showWarning(res);
-                            } else if (res === 'Hrm_Locked') {
-                                ToasterSevice.showWarning('Hrm_Locked');
-                            } else if (res.includes('E_BLOCK|')) {
-                                ToasterSevice.showWarning(res.split('|')[1].trim());
-                            } else if (res.includes('E_WARNING|')) {
-                                // 0181527: Xử lý cảnh báo chấm công trên app nếu không thuộc thời gian cấu hình
-                                const message = res.split('|')[1].trim();
-                                AlertSevice.alert({
-                                    iconType: EnumIcon.E_WARNING,
-                                    title: 'E_WARNING',
-                                    message: message,
-                                    textRightButton: 'HRM_Common_Continue',
-                                    textLeftButton: 'HRM_Common_Close',
-                                    timeHideModal: 10000, // Sau 10s nếu không xác nhận thì sẽ tắt
-                                    onBackDrop: () => {
-                                        VnrLoadingSevices.hide();
-                                        this.reload();
-                                    },
-                                    onCancel: () => {
-                                        VnrLoadingSevices.hide();
-                                        this.reload();
-                                    },
-                                    onConfirm: () => {
-                                        this.setState(
-                                            {
-                                                IsRemoveAndContinue: true
-                                            },
-                                            () => {
-                                                this.requestData(typeData, distance);
-                                            }
-                                        );
-                                    }
-                                });
-                            } else {
-                                ToasterSevice.showWarning(res);
-                            }
-                        } else {
-                            ToasterSevice.showError('HRM_Common_SendRequest_Error', 6000);
-                        }
-                        //mở lại event
-                        this.isProcessing = false;
-                        this.isConfirmMACAdressNotMatch = false;
-                        this.isConfirmCoodinateNotMatch = false;
-                        VnrLoadingSevices.hide();
-                    })
-                    .catch((error) => {
-                        this.handleErrorRequest(error);
-                    });
-            };
-
-            let messAlertSave = '',
-                typeAppTransTitle = typeData === 'E_IN' ? 'HRM_Attendance_InTime' : 'HRM_Attendance_HoursTo',
-                typeAppTransMess = typeData === 'E_IN' ? translate('E_IN') : translate('E_OUT');
-
-            if (dataVnrStorage.languageApp == 'VN') {
-                messAlertSave = `Bạn có chắc xác nhận giờ ${typeAppTransMess.toLowerCase()} là ${
-                    dataBody.TimeLogTime
-                } không?`;
-            } else {
-                messAlertSave = `Are you sure the ${typeAppTransMess.toLowerCase()} time is confirmed at ${
-                    dataBody.TimeLogTime
-                }?`;
-            }
-            if (this.isConfirmSaveTamScanLog) {
+    checkSurveyWhenCheckingGPS = (ProfileID, TimeLog) => {
+        const dataBody = {
+            profileID: ProfileID,
+            timeLog: TimeLog
+        };
+        HttpService.Post('[URI_HR]/Att_GetData/APISurveyWhenCheckingGPS', dataBody).then((resLink) => {
+            if (resLink && resLink !== '') {
                 AlertSevice.alert({
                     iconType: EnumIcon.E_INFO,
-                    title: typeAppTransTitle,
-                    message: messAlertSave,
-                    textLeftButton: 'HRM_Common_No_AVN',
-                    textRightButton: 'HRM_Common_Yes_AVN',
-                    timeHideModal: 10000, // Sau 10s nếu không xác nhận thì sẽ tắt
-                    onBackDrop: () => {
-                        VnrLoadingSevices.hide();
-                        this.reload();
-                    },
-                    onCancel: () => {
-                        VnrLoadingSevices.hide();
-                        this.reload();
-                    },
-                    onConfirm: callBackConfirmRequest
+                    title: 'Hrm_Notification',
+                    message: 'HRM_Att_SurveyWhenCheckingGPS_Message',
+                    textRightButton: 'HRM_Common_Continue',
+                    textLeftButton: 'HRM_Common_Close',
+                    onConfirm: () => {
+                        Vnr_Function.openLink(resLink);
+                    }
                 });
-            } else {
-                callBackConfirmRequest();
             }
-        } catch (error) {
-            this.handleErrorRequest(error);
+        });
+    };
+
+    checkCoodinateInListCatShop = () => {
+        const { configConstraintDistanceWithRadious, latitude, longitude } = this.state,
+            { listCatShop } = configConstraintDistanceWithRadious ? configConstraintDistanceWithRadious : {},
+            geolocationInput = { latitude: latitude, longitude: longitude };
+        if (Array.isArray(listCatShop) && listCatShop.length > 0) {
+            let psssCheckPosition = false;
+            let itemShopPasss = null;
+
+            // eslint-disable-next-line no-unused-vars
+            for (let item of listCatShop) {
+                if (item.Coodinate && item.CoordinateDistance) {
+                    let geolocationCenter = {
+                        latitude: item.Coodinate.split(',')[0], //37.785834,
+                        longitude: item.Coodinate.split(',')[1] //-122.406417
+                    };
+                    let radious = item.CoordinateDistance;
+                    if (this.getDistanceWithingRadious(geolocationInput, geolocationCenter, radious)) {
+                        psssCheckPosition = true;
+                        itemShopPasss = item;
+                        break;
+                    }
+                }
+            }
+
+            if (!psssCheckPosition) {
+                return null;
+            } else {
+                return itemShopPasss;
+            }
         }
     };
 
-    handleErrorRequest = () => {
-        this.isProcessing = false;
-        this.isConfirmMACAdressNotMatch = false;
-        this.isConfirmCoodinateNotMatch = false;
-        VnrLoadingSevices.hide();
+    requestData = async (typeData, distance = '') => {
+        const {
+                configConstraintWifi,
+                configConstraintDistanceWithRadious,
+                isAllowCheckInGPSLeavedayBusinessTrip,
+                configLoadWorkPlace
+            } = this.state,
+            { isCheckingByCoordinates } = configConstraintDistanceWithRadious,
+            { isCheckingByMACAdress } = configConstraintWifi;
+
+        VnrLoadingSevices.show();
+
+        // kiem tra bien bssid
+        let _bssid = null;
+        let isApprove = false;
+
+        if (this.macAddressCheckPass !== null) {
+            _bssid = this.macAddressCheckPass;
+        }
+
+        if (
+            (isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false) ||
+            (isCheckingByCoordinates && this.isConfirmCoodinateNotMatch === false)
+        ) {
+            // auto duyệt khi đúng wifi hoặc đúng tọa độ
+            isApprove = true;
+        }
+
+        const newTimeLog = await HttpService.Post('[URI_HR]/Sys_GetData/GetTimeOfServer');
+        const getUnitIdApp = await Vnr_Function.getUnitIdApp();
+        const dataBody = {
+            ProfileID: dataVnrStorage.currentUser.info.ProfileID,
+            UserSubmit: dataVnrStorage.currentUser.info.ProfileID,
+            UserUpdate: dataVnrStorage.currentUser.info.ProfileID,
+            Comment: this.state.Comment,
+            IsPortal: true,
+            Status: 'E_SUBMIT',
+            Type: typeData,
+            IsCheckGPS: true,
+            MACAddress: isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false ? _bssid : null,
+            IsScreenCheckInGPS: false, // chấm công giờ serverF
+            IsAllowApprove: isApprove,
+            TimeLogTime: moment(newTimeLog).format('HH:mm'),
+            TimeLog: moment(newTimeLog).format('YYYY-MM-DD HH:mm:ss'),
+            LocationAddress: `WIFI|${DeviceInfo.getUniqueId()}`,
+            Distance: distance,
+            Coordinate: '',
+            IsAllowCheckInGPSWhenLeavedayBusinessTrip: isAllowCheckInGPSLeavedayBusinessTrip,
+            PlaceID: configLoadWorkPlace.value ? configLoadWorkPlace.value.ID : null,
+            IPDeviceGPS: getUnitIdApp
+        };
+
+        let formData = new FormData();
+        // PMC bỏ lưu Hình để chấm công nhanh hơn.
+        formData.append('LocationImage', null);
+        formData.append('ImageCheckIn', null);
+        formData.append('AttTamScanModel', JSON.stringify(dataBody));
+
+        const configs = {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data'
+            }
+        };
+
+        const callBackConfirmRequest = () => {
+            this.isConfirmSaveTamScanLog = false; // Đã confirm Save , case cảnh báo đi công tác không confirm cho lần kế tiếp
+            HttpService.Post('[URI_HR]/Att_GetData/New_SaveTamScanLog', formData, configs).then((res) => {
+                if (!Vnr_Function.CheckIsNullOrEmpty(res) && res == 'Success') {
+                    // task 143871
+                    if (typeData == EnumName.E_OUT)
+                        this.checkSurveyWhenCheckingGPS(dataBody.ProfileID, dataBody.TimeLog);
+
+                    ToasterSevice.showSuccess('Hrm_Succeed');
+                    this.reload(true, dataBody);
+                } else if (res && typeof res === 'string') {
+                    if (res === 'WarningCheckInGPSInLeavedayBusinessTravel') {
+                        //mở lại event
+                        this.isProcessing = false;
+
+                        AlertSevice.alert({
+                            iconType: EnumIcon.E_WARNING,
+                            title: 'E_WARNING',
+                            message: 'WarningCheckInGPSInLeavedayBusinessTravel',
+                            textRightButton: 'HRM_Common_Continue',
+                            textLeftButton: 'HRM_Common_Close',
+                            onConfirm: () => {
+                                this.setState(
+                                    {
+                                        isAllowCheckInGPSLeavedayBusinessTrip: true
+                                    },
+                                    () => {
+                                        this.requestData(typeData, distance);
+                                    }
+                                );
+                            }
+                        });
+                    } else if (res === 'OnlyAllowATTCheckInGPSForBizTrip') {
+                        this.reload();
+                        ToasterSevice.showWarning(res);
+                    } else if (res === 'Hrm_Locked') {
+                        ToasterSevice.showWarning('Hrm_Locked');
+                    } else {
+                        ToasterSevice.showWarning(res);
+                    }
+                } else {
+                    ToasterSevice.showWarning('HRM_Common_SendRequest_Error');
+                }
+                //mở lại event
+                this.isProcessing = false;
+                this.isConfirmMACAdressNotMatch = false;
+                this.isConfirmCoodinateNotMatch = false;
+                VnrLoadingSevices.hide();
+            });
+        };
+
+        let messAlertSave = '',
+            typeAppTransTitle = typeData === 'E_IN' ? 'HRM_Attendance_InTime' : 'HRM_Attendance_HoursTo',
+            typeAppTransMess = typeData === 'E_IN' ? translate('E_IN') : translate('E_OUT');
+
+        if (dataVnrStorage.languageApp == 'VN') {
+            messAlertSave = `Bạn có chắc xác nhận giờ ${typeAppTransMess.toLowerCase()} là ${
+                dataBody.TimeLogTime
+            } không?`;
+        } else {
+            messAlertSave = `Are you sure the ${typeAppTransMess.toLowerCase()} time is confirmed at ${
+                dataBody.TimeLogTime
+            }?`;
+        }
+
+        if (this.isConfirmSaveTamScanLog) {
+            AlertSevice.alert({
+                iconType: EnumIcon.E_INFO,
+                title: typeAppTransTitle,
+                message: messAlertSave,
+                textLeftButton: 'HRM_Common_No_AVN',
+                textRightButton: 'HRM_Common_Yes_AVN',
+                timeHideModal: 10000, // Sau 10s nếu không xác nhận thì sẽ tắt
+                onBackDrop: () => {
+                    VnrLoadingSevices.hide();
+                    this.reload();
+                },
+                onCancel: () => {
+                    VnrLoadingSevices.hide();
+                    this.reload();
+                },
+                onConfirm: callBackConfirmRequest
+            });
+        } else {
+            callBackConfirmRequest();
+        }
     };
 
     requestGetCoondinateInBeforce = () => {
@@ -365,7 +382,37 @@ class AttTSLCheckInOutWifi extends Component {
     };
 
     onConfirm = async (typeData) => {
-        this.requestData(typeData);
+        // chup anh map
+        const { latitude, longitude, configConstraintDistanceTwoPoint } = this.state;
+
+        // eslint-disable-next-line react/no-string-refs
+
+        // co cau hinh tinhs khoanr cach giua 2 lan check in
+        if (configConstraintDistanceTwoPoint && typeData === EnumName.E_IN) {
+            const dataOrigin = await this.requestGetCoondinateInBeforce();
+
+            // lay vi tri checkin gan nhat
+            const origin = dataOrigin ? `${dataOrigin.split('|')[0]},${dataOrigin.split('|')[1]}` : '';
+            // lay vi tri hien tai
+            const destination = `${latitude},${longitude}`;
+            // tinh khoan cach
+            const dataDistance = origin ? await this.getDistanceCoordinate(origin.split('|')[0], destination) : null;
+            if (
+                dataDistance &&
+                dataDistance.rows[0] &&
+                dataDistance.rows[0].elements &&
+                dataDistance.rows[0].elements[0] &&
+                dataDistance.rows[0].elements[0].distance
+            ) {
+                const distance = dataDistance.rows[0].elements[0].distance.text;
+                this.requestData(typeData, distance);
+            } else {
+                this.requestData(typeData);
+            }
+            VnrLoadingSevices.hide();
+        } else {
+            this.requestData(typeData);
+        }
     };
 
     goBack = () => {
@@ -432,7 +479,7 @@ class AttTSLCheckInOutWifi extends Component {
 
                             configConstraintWifi = {
                                 isCheckingByMACAdress: isCheckingByMACAdress,
-                                macID: `${resWorkPlace.MACAddress},00:13:10:85:fe:01`,
+                                macID: resWorkPlace.MACAddress,
                                 configCheckInWifi: resWorkPlace.ConfigCheckInWifi
                                     ? resWorkPlace.ConfigCheckInWifi
                                     : null
@@ -654,9 +701,6 @@ class AttTSLCheckInOutWifi extends Component {
                             // Accept Coordinate
                             this.saveIsAcceptCoordinate(true);
                             this.checkWifiAccpet(true);
-                        } else {
-                            this.saveIsAcceptCoordinate(false);
-                            this.setState({ address: 'PERMISSION_DENIED', isloading: false });
                         }
                     },
                     (error) => {
@@ -671,7 +715,6 @@ class AttTSLCheckInOutWifi extends Component {
                     { enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 }
                 );
             } else {
-                this.setState({ address: 'PERMISSION_DENIED', isloading: false });
                 this.alertContrainPermission();
                 this.saveIsAcceptCoordinate(false);
             }
@@ -686,9 +729,6 @@ class AttTSLCheckInOutWifi extends Component {
                         // Accept Coordinate
                         this.saveIsAcceptCoordinate(true);
                         this.checkWifiAccpet(true);
-                    } else {
-                        this.saveIsAcceptCoordinate(false);
-                        this.setState({ address: 'PERMISSION_DENIED', isloading: false });
                     }
                 },
                 (error) => {
@@ -782,28 +822,21 @@ class AttTSLCheckInOutWifi extends Component {
 
     checkWifiAccpet = (isAcceptCoordinate = false) => {
         const { configConstraintWifi, networkInfo } = this.state,
-            { macID } = configConstraintWifi ? configConstraintWifi : {};
+            { macID, isCheckingByMACAdress } = configConstraintWifi ? configConstraintWifi : {};
 
-        NetInfo.fetch('wifi')
-            .then((res) => {
+        if (isCheckingByMACAdress && macID) {
+            NetInfo.fetch('wifi').then((res) => {
                 const { bssid } = res.details;
                 let isCheckPassWifi = false;
-
                 if (
                     bssid != null &&
                     bssid.split(':').length == 6 &&
                     bssid != '02:00:00:00:00:00' &&
                     Object.keys(networkInfo).length > 0
                 ) {
-                    if (macID && macID != null && typeof macID == 'string') {
-                        const resultCompare = this.handleCompareBssid(macID, bssid);
-                        if (
-                            resultCompare &&
-                            resultCompare['actionStatus'] === true &&
-                            resultCompare['macAddressEqua']
-                        ) {
-                            isCheckPassWifi = true;
-                        }
+                    const resultCompare = this.handleCompareBssid(macID, bssid);
+                    if (resultCompare && resultCompare['actionStatus'] === true && resultCompare['macAddressEqua']) {
+                        isCheckPassWifi = true;
                     }
 
                     this.setState({
@@ -833,16 +866,12 @@ class AttTSLCheckInOutWifi extends Component {
                         this.checkPlatformCallRequestLocation(true);
                     }
                 }
-            })
-            .catch(() => {
-                this.setState({
-                    networkInfo: {
-                        bssid: null,
-                        isCheckPassWifi: false
-                    },
-                    isloading: false
-                });
             });
+        } else {
+            this.setState({
+                isloading: false
+            });
+        }
     };
 
     checkConstraintPhotoSaveInOut = (typeRequest) => {
@@ -860,9 +889,12 @@ class AttTSLCheckInOutWifi extends Component {
             return;
         }
 
+        // ToasterSevice.showInfo(`${_bssid} = ${macID}`, 10000)
+
         // checking với địaw chỉ mac;
         if (isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false) {
             // trường hợp có cấu hình kiểm tra địa chỉ mac nhưng false
+
             if (Object.keys(networkInfo).length == 0) {
                 ToasterSevice.showError('HRM_Alert_Please_Check_NetWork');
                 return;
@@ -923,7 +955,11 @@ class AttTSLCheckInOutWifi extends Component {
                     this.showModalCamera(typeRequest);
                 },
                 onConfirm: () => {
-                    this.onConfirm(typeRequest);
+                    if (configConstraintInOut === true && typeRequest === 'E_OUT') {
+                        this.moveToDetaiShift();
+                    } else {
+                        this.onConfirm(typeRequest);
+                    }
                 }
             });
             return;
@@ -934,6 +970,71 @@ class AttTSLCheckInOutWifi extends Component {
             this.onConfirm(typeRequest);
         } else {
             this.onConfirm(typeRequest);
+        }
+    };
+
+    moveToDetaiShift = () => {
+        const { navigation } = this.props,
+            {
+                Comment,
+                address,
+                imageCamera,
+                checkIn,
+                latitude,
+                longitude,
+                configConstraintWifi,
+                isAllowCheckInGPSLeavedayBusinessTrip
+            } = this.state,
+            { isCheckingByMACAdress } = configConstraintWifi ? configConstraintWifi : {};
+
+        let _bssid = null;
+        if (this.macAddressCheckPass !== null) {
+            _bssid = this.macAddressCheckPass;
+        }
+
+        const dataBodyOut = {
+            ProfileID: dataVnrStorage.currentUser.info.ProfileID,
+            UserSubmit: dataVnrStorage.currentUser.info.ProfileID,
+            UserUpdate: dataVnrStorage.currentUser.info.ProfileID,
+            Comment: Comment,
+            IsPortal: true,
+            Status: 'E_SUBMIT',
+            Type: 'E_OUT',
+            IsCheckGPS: true,
+            MACAddress: isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false ? _bssid : null,
+            IsScreenCheckInGPS: true, // chấm công giờ server,
+            IsAllowApprove: isCheckingByMACAdress && this.isConfirmMACAdressNotMatch === false, // auto duyệt khi đúng wifi
+            TimeLogTime: new Date(),
+            TimeLog: new Date(),
+            LocationAddress: address,
+            Coordinate: latitude && longitude ? `${latitude}|${longitude}` : '',
+            IsAllowCheckInGPSWhenLeavedayBusinessTrip: isAllowCheckInGPSLeavedayBusinessTrip
+        };
+
+        // eslint-disable-next-line react/no-string-refs
+        if (!Vnr_Function.CheckIsNullOrEmpty(this.viewShot)) {
+            VnrLoadingSevices.show();
+            this.isProcessing = true;
+            // eslint-disable-next-line react/no-string-refs
+            this.viewShot.capture().then((uri) => {
+                VnrLoadingSevices.hide();
+                const title = uri.split('/').pop().split('#')[0].split('?')[0];
+                const ext = title.substring(title.indexOf('.') + 1, title.length);
+                const file = {
+                    uri: uri,
+                    name: title,
+                    type: 'image/' + ext
+                };
+
+                this.isProcessing = false;
+                navigation.navigate('ShiftDetail', {
+                    dataBodyCheckOut: dataBodyOut,
+                    imgMap: file,
+                    imgCamera: imageCamera,
+                    dataCheckIn: checkIn,
+                    reloadGPS: this.reload
+                });
+            });
         }
     };
 
@@ -1064,9 +1165,8 @@ class AttTSLCheckInOutWifi extends Component {
                 configConstraintInOut,
                 configLoadWorkPlace,
                 isloading,
-                configConstraintWifi,
-                isRefeshTime,
-                networkInfo
+                networkInfo,
+                configConstraintWifi
             } = this.state,
             { macID } = configConstraintWifi ? configConstraintWifi : {};
 
@@ -1236,7 +1336,6 @@ class AttTSLCheckInOutWifi extends Component {
                                         <View style={styles.viewSessionTime}>
                                             <Time
                                                 ref={(refs) => (this.refTime = refs)}
-                                                isRefeshTime={isRefeshTime}
                                                 key={'E_TIMEWORK'}
                                                 format={'HH:mm'}
                                                 style={styles.componentTime}

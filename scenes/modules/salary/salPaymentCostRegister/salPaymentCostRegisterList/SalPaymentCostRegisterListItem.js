@@ -111,12 +111,6 @@ export default class SalPaymentCostRegisterListItem extends React.Component {
             bgStatusView = bgStatus ? bgStatus : null;
         }
 
-        if (dataItem?.BusinessAllowAction) {
-            dataItem.BusinessAllowAction = dataItem?.BusinessAllowAction + ',E_FEECHECK';
-        } else {
-            dataItem.BusinessAllowAction = 'E_FEECHECK';
-        }
-
         // dataItem.BusinessAllowAction = 'E_SENDMAIL,E_DELETE,E_CANCEL,E_MODIFY';
 
         return (
@@ -209,11 +203,12 @@ export default class SalPaymentCostRegisterListItem extends React.Component {
                                 <View style={styles.line_date_row}>
                                     <View style={styles.line_time_wrap}>
                                         <Text style={[styleSheets.lable, styles.line_value_Cost]} numberOfLines={1}>
-                                            {`${dataItem.TotalAmount == 0 ||
+                                            {`${
+                                                dataItem.TotalAmount == 0 ||
                                                 (dataItem.TotalAmount != null && dataItem.TotalAmount != '')
-                                                ? Vnr_Function.formatNumber(dataItem.TotalAmount)
-                                                : ''
-                                                } ${dataItem.Specification != null ? dataItem.Specification : ''}`}
+                                                    ? Vnr_Function.formatNumber(dataItem.TotalAmount)
+                                                    : ''
+                                            } ${dataItem.Specification != null ? dataItem.Specification : ''}`}
                                         </Text>
                                     </View>
                                 </View>
@@ -223,7 +218,8 @@ export default class SalPaymentCostRegisterListItem extends React.Component {
                         <View style={styles.viewReason}>
                             <Text numberOflines={1} style={[styleSheets.lable, styles.viewReason_text]}>
                                 {dataItem.TransferStatusView != null
-                                    ? `${translate('HRM_Sal_PaymentCostRegister_TransferStatus')}: ${dataItem.TransferStatusView
+                                    ? `${translate('HRM_Sal_PaymentCostRegister_TransferStatus')}: ${
+                                        dataItem.TransferStatusView
                                     }`
                                     : `${translate('HRM_Sal_PaymentCostRegister_TransferStatus')}:`}
                             </Text>

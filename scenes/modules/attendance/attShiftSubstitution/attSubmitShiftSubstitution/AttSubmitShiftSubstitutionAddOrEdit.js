@@ -349,7 +349,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                                     this.ProfileRemoveIDs = data.ErrorRespone.ProfileRemoveIDs;
                                     this.IsRemoveAndContinue = true;
                                     this.CacheID = data.ErrorRespone.CacheID;
-                                    this.save(navigation, isCreate, isSend);
+                                    this.onSave(navigation, isCreate, isSend);
                                 },
                                 //đóng
                                 onCancel: () => {},
@@ -415,7 +415,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                                 this.ProfileRemoveIDs = data.ErrorRespone.ProfileRemoveIDs;
                                 this.IsRemoveAndContinue = true;
                                 this.CacheID = data.ErrorRespone.CacheID;
-                                this.save(navigation, isCreate, isSend);
+                                this.onSave(navigation, isCreate, isSend);
                             },
                             //đóng
                             onCancel: () => {},
@@ -463,7 +463,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onCancel: () => {},
                         onConfirm: () => {
                             this.IsReceiveOvertimeBonusOrg = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (data.IsConfirmPreg == true && data.IsconfirmPregContinue == true) {
@@ -477,7 +477,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onConfirm: () => {
                             this.IsConfirmPreg = true;
                             this.IsconfirmPregContinue = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (data.IsConfirmPreg == true && data.IsconfirmPregContinue == false) {
@@ -490,7 +490,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onCancel: () => {},
                         onConfirm: () => {
                             this.IsConfirmPreg = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (data.ActionStatus == 'errorRegisterHoursPro') {
@@ -511,7 +511,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onCancel: () => {},
                         onConfirm: () => {
                             this.IsConfirmSaveContinue = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (data.ActionStatus.indexOf('errorRegisterHoursByYear') > -1) {
@@ -523,7 +523,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onCancel: () => {},
                         onConfirm: () => {
                             this.IsConfirmSaveContinue = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (data.ActionStatus.indexOf('errorRegisterHoursByDay') > -1) {
@@ -535,7 +535,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onCancel: () => {},
                         onConfirm: () => {
                             this.IsConfirmSaveContinue = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (data.ActionStatus.indexOf('errorRegisterHoursByWeek') > -1) {
@@ -547,7 +547,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onCancel: () => {},
                         onConfirm: () => {
                             this.IsConfirmSaveContinue = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (data.ActionStatus.indexOf('errorPregnancyPro') > -1) {
@@ -570,7 +570,7 @@ export default class AttSubmitShiftSubstitutionAddOrEdit extends Component {
                         onCancel: () => {},
                         onConfirm: () => {
                             this.IsconfirmPregContinue = true;
-                            this.save(navigation, isCreate, isSend);
+                            this.onSave(navigation, isCreate, isSend);
                         }
                     });
                 } else if (typeof data.ActionStatus == 'string') {

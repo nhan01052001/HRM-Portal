@@ -324,7 +324,7 @@ class HreRefuseReceiveJob extends Component {
                                 <HreReceiveJobList
                                     detail={{
                                         dataLocal: false,
-                                        screenDetail: ScreenName.HreCandidateHistoryApply, //hreRefuseReceiveJobViewDetail,
+                                        screenDetail: 'HreCandidateHistoryApply', //hreRefuseReceiveJobViewDetail,
                                         screenName: hreRefuseReceiveJob
                                     }}
                                     scrollYAnimatedValue={this.scrollYAnimatedValue}

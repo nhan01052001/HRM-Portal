@@ -144,13 +144,12 @@ export const generateRowActionAndSelected = screenName => {
 export const AttApproveTakeLateEarlyAllowedBusiness = {
     // Đối tượng checkForReLoadScreen để check có refresh AttApprovedTakeLateEarlyAllowed không
     checkForReLoadScreen: {
-        [ScreenName.AttApprovedTakeLateEarlyAllowed]: false,
-        [ScreenName.AttApproveTakeLateEarlyAllowed]: false
+        [ScreenName.AttApprovedTakeLateEarlyAllowed]: false
     },
-    setThisForBusiness: (dataThis, isNotification, rowActionsFromScreen = _rowActions) => {
+    setThisForBusiness: (dataThis, isNotification) => {
         if (isNotification) _isOnScreenNotification = true;
         else _isOnScreenNotification = false;
-        _rowActions = rowActionsFromScreen ?? [];
+
         _this = dataThis;
     },
     checkRequireNote: async (field) => {
@@ -208,7 +207,7 @@ export const AttApproveTakeLateEarlyAllowedBusiness = {
         let actionCancel = _rowActions.find(item => item.Type === 'E_APPROVE'),
             isConfirm = actionCancel['Confirm'];
 
-        let isNote = await AttApproveTakeLateEarlyAllowedBusiness.checkRequireNote('IsRequiredApproveNote');
+        let isNote = await AttApproveTakeLateEarlyAllowedBusiness.checkRequireNote('IsRequiredApproveNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -357,7 +356,7 @@ export const AttApproveTakeLateEarlyAllowedBusiness = {
     confirmReject: async (objValid) => {
         let actionCancel = _rowActions.find(item => item.Type === 'E_REJECT'),
             isConfirm = actionCancel['Confirm'];
-        let isNote = await AttApproveTakeLateEarlyAllowedBusiness.checkRequireNote('IsRequiredRejectNote');
+        let isNote = await AttApproveTakeLateEarlyAllowedBusiness.checkRequireNote('IsRequiredRejectNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -499,7 +498,7 @@ export const AttApproveTakeLateEarlyAllowedBusiness = {
     confirmCancel: async (objValid) => {
         let actionCancel = _rowActions.find(item => item.Type === 'E_CANCEL'),
             isConfirm = actionCancel['Confirm'];
-        let isNote = await AttApproveTakeLateEarlyAllowedBusiness.checkRequireNote('IsRequiredCancelNote');
+        let isNote = await AttApproveTakeLateEarlyAllowedBusiness.checkRequireNote('IsRequiredCancelNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],

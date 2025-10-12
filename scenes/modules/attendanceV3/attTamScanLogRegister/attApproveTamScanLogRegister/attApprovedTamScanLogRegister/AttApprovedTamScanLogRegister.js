@@ -24,7 +24,6 @@ let configList = null,
     attApproveTamScanLogRegister = null,
     attApproveTamScanLogRegisterViewDetail = null,
     keyListTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttApprovedTamScanLogRegister extends Component {
@@ -50,7 +49,7 @@ class AttApprovedTamScanLogRegister extends Component {
         this.paramsFilter = null;
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // reload danh sách khi có approve hoặc reject dữ liệu
-            AttApproveTamScanLogRegisterBusinessFunction.setThisForBusiness(this, false, dataRowActionAndSelected?.rowActions);
+            AttApproveTamScanLogRegisterBusinessFunction.setThisForBusiness(this);
             if (AttApproveTamScanLogRegisterBusinessFunction.checkForReLoadScreen[attApprovedTamScanLogRegister]) {
                 this.reload();
             }
@@ -145,7 +144,7 @@ class AttApprovedTamScanLogRegister extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attApprovedTamScanLogRegister);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attApprovedTamScanLogRegister);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -284,7 +283,6 @@ class AttApprovedTamScanLogRegister extends Component {
                             }}
                             screenName={attApproveTamScanLogRegister}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Tamscan_Log_Approve'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

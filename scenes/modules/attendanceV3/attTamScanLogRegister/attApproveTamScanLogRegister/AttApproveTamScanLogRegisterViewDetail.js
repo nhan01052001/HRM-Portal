@@ -183,10 +183,7 @@ export default class AttApproveTamScanLogRegisterViewDetail extends Component {
                 const getDetailConfig = await Vnr_Function.HandleConfigListDetailATT(_configListDetail, 'Detail_Approve_Tamscanlog');
                 if (response && response.Status == EnumName.E_SUCCESS) {
                     let data = response.Data;
-                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(
-                        data.Status,
-                        data?.TypeApprove ?? dataItem?.TypeApprove
-                    );
+                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(data.Status, dataItem?.TypeApprove);
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachment);
                     if (data.SingleWordDetail[0]?.FileAttachment) {

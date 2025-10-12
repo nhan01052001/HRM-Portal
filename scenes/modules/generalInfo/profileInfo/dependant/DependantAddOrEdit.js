@@ -63,15 +63,6 @@ const initSateDefault = {
         visibleConfig: true,
         visible: true
     },
-    //Mã số thuế NPT cũ
-    CodeTaxOld: {
-        label: 'HRM_PortalApp_TaxCodeDependantOld',
-        disable: false,
-        refresh: false,
-        value: null,
-        visibleConfig: true,
-        visible: true
-    },
     //Loại phụ thuộc
     RelationID: {
         label: 'HRM_HR_Dependant_RelationID',
@@ -818,7 +809,7 @@ export default class DependantAddOrEdit extends Component {
                     tableName: 'Hre_Dependant'
                 }),
                 HttpService.Get('[URI_HR]/Hre_GetDataV2/GetDefaultValueDependant')
-            ]).then((resAll) => {
+            ]).then(resAll => {
                 VnrLoadingSevices.hide();
                 if (resAll && Array.isArray(resAll) && resAll.length === 3) {
                     const [resConfigValid, resConfigUpperText, valueDefaultDependant] = resAll,
@@ -845,7 +836,7 @@ export default class DependantAddOrEdit extends Component {
                             { E_ProfileID, E_FullName } = EnumName,
                             _profile = { ID: this.profileInfo[E_ProfileID], ProfileName: this.profileInfo[E_FullName] };
 
-                        _configField.forEach((fieldConfig) => {
+                        _configField.forEach(fieldConfig => {
                             let _field = this.state[fieldConfig];
                             if (_field && typeof _field === 'object') {
                                 _field = {
@@ -888,7 +879,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(resConfigValid) && resConfigValid.length > 0) {
-                        resConfigValid.map((item) => {
+                        resConfigValid.map(item => {
                             if (item?.FieldName && !item?.Nullable)
                                 tempConfig = {
                                     ...tempConfig,
@@ -1060,7 +1051,7 @@ export default class DependantAddOrEdit extends Component {
         this.getConfigValid('Hre_DependantPortal');
     }
 
-    setRecordForModify = (response) => {
+    setRecordForModify = response => {
         let nextState = {};
 
         const {
@@ -1105,8 +1096,7 @@ export default class DependantAddOrEdit extends Component {
                 AddressInformation,
                 IsRelatives,
                 PAddress,
-                TAddress,
-                CodeTaxOld
+                TAddress
             } = this.state,
             { RelativesID } = IsRelatives,
             {
@@ -1168,7 +1158,7 @@ export default class DependantAddOrEdit extends Component {
         const { data } = BirthCertificate;
         let setValueBirthCertificate = [];
 
-        data.forEach((item) => {
+        data.forEach(item => {
             let fieldName = item.Value;
 
             if (response[fieldName]) {
@@ -1194,12 +1184,6 @@ export default class DependantAddOrEdit extends Component {
                 ...CodeTax,
                 value: response.CodeTax,
                 refresh: !CodeTax.refresh
-            },
-            //Mã số thuế NPT (cũ)
-            CodeTaxOld: {
-                ...CodeTaxOld,
-                value: response?.CodeTaxOld ?? null,
-                refresh: !CodeTaxOld.refresh
             },
             //Loại quan hệ
             RelationID: {
@@ -1406,9 +1390,9 @@ export default class DependantAddOrEdit extends Component {
                     ...DependantPassportIssuePlaceID,
                     value: response.DependantPassportIssuePlaceID
                         ? {
-                              ID: response.DependantPassportIssuePlaceID,
-                              PassportIssuePlaceName: response.DependantPassportIssuePlaceIDView
-                          }
+                            ID: response.DependantPassportIssuePlaceID,
+                            PassportIssuePlaceName: response.DependantPassportIssuePlaceIDView
+                        }
                         : null,
                     refresh: !DependantPassportIssuePlaceID.refresh
                 },
@@ -1443,9 +1427,9 @@ export default class DependantAddOrEdit extends Component {
                     ...PlaceOfIssuanceOfIdentityCardID,
                     value: response.DependantIDCardIssuePlaceID
                         ? {
-                              ID: response.DependantIDCardIssuePlaceID,
-                              IDCardIssuePlaceName: response.DependantIDCardIssuePlaceIDView
-                          }
+                            ID: response.DependantIDCardIssuePlaceID,
+                            IDCardIssuePlaceName: response.DependantIDCardIssuePlaceIDView
+                        }
                         : null,
                     refresh: !PlaceOfIssuanceOfIdentityCardID.refresh
                 },
@@ -1480,9 +1464,9 @@ export default class DependantAddOrEdit extends Component {
                     ...DependantIDPlaceOfIssueID,
                     value: response.DependantIDPlaceOfIssueID
                         ? {
-                              ID: response.DependantIDPlaceOfIssueID,
-                              ProvinceName: response.DependantIDPlaceOfIssueIDView
-                          }
+                            ID: response.DependantIDPlaceOfIssueID,
+                            ProvinceName: response.DependantIDPlaceOfIssueIDView
+                        }
                         : null,
                     refresh: !DependantIDPlaceOfIssueID.refresh
                 },
@@ -1633,7 +1617,7 @@ export default class DependantAddOrEdit extends Component {
                 arrPromisse.push(HttpService.Post(`[URI_HR]/Cat_GetData/GetVillageCascading?districtid=${districtID}`));
             }
 
-            HttpService.MultiRequest(arrPromisse).then((resAll) => {
+            HttpService.MultiRequest(arrPromisse).then(resAll => {
                 if (resAll) {
                     const [dataCountrys, dataProvinces, dataDistricts, dataWards] = resAll;
                     const {
@@ -1647,7 +1631,7 @@ export default class DependantAddOrEdit extends Component {
                     } = this.state;
                     let nextState = {};
                     if (Array.isArray(dataCountrys) && countryID) {
-                        const rs = dataCountrys.filter((item) => item?.ID === countryID);
+                        const rs = dataCountrys.filter(item => item?.ID === countryID);
                         if (rs.length > 0) {
                             nextState = {
                                 ...nextState,
@@ -1662,7 +1646,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataProvinces) && provinceID) {
-                        const rs = dataProvinces.filter((item) => item?.ID === provinceID);
+                        const rs = dataProvinces.filter(item => item?.ID === provinceID);
                         if (rs.length > 0) {
                             nextState = {
                                 ...nextState,
@@ -1677,7 +1661,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataDistricts) && districtID) {
-                        const rs = dataDistricts.filter((item) => item?.ID === districtID);
+                        const rs = dataDistricts.filter(item => item?.ID === districtID);
                         if (rs.length > 0) {
                             nextState = {
                                 ...nextState,
@@ -1692,7 +1676,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataWards) && wardID) {
-                        const rs = dataWards.filter((item) => item?.ID === wardID);
+                        const rs = dataWards.filter(item => item?.ID === wardID);
                         if (rs.length > 0) {
                             nextState = {
                                 ...nextState,
@@ -1716,7 +1700,8 @@ export default class DependantAddOrEdit extends Component {
 
     getConfig = () => {};
 
-    onFinishBirthCertificateGroup = (data) => {
+    onFinishBirthCertificateGroup = data => {
+
         const { BirthCertificate } = data,
             { BirthCertificateGroup } = this.state;
 
@@ -1728,26 +1713,12 @@ export default class DependantAddOrEdit extends Component {
         });
     };
 
-    onFinishOtherIdentificationGroup = (data) => {
+    onFinishOtherIdentificationGroup = data => {
+
         const { DepentantsPassport, Identification, IDNoInfo } = data,
-            { DepentantsPassportGroup, IdentificationGroup, IDNoInfoGroup, CodeTax } = this.state;
-        let nextState = {};
-        if (data?.Identification?.IdentificationNo?.value) {
-            nextState = {
-                CodeTax: {
-                    ...CodeTax,
-                    value:
-                        typeof data?.Identification?.IdentificationNo?.value === 'string' &&
-                        data?.Identification?.IdentificationNo?.value.length === 0
-                            ? null
-                            : data?.Identification?.IdentificationNo?.value,
-                    refresh: !CodeTax.refresh
-                }
-            };
-        }
+            { DepentantsPassportGroup, IdentificationGroup, IDNoInfoGroup } = this.state;
 
         this.setState({
-            ...nextState,
             DepentantsPassportGroup: { DepentantsPassportGroup, ...DepentantsPassport },
             IdentificationGroup: { IdentificationGroup, ...Identification },
             IDNoInfoGroup: { IDNoInfoGroup, ...IDNoInfo }
@@ -1755,6 +1726,7 @@ export default class DependantAddOrEdit extends Component {
     };
 
     save = (navigation, isCreate, isSend) => {
+
         const {
                 ID,
                 DependantName,
@@ -1799,8 +1771,7 @@ export default class DependantAddOrEdit extends Component {
                 IsLost,
                 IsNotDisplayedOnPortalApp,
                 PAddress,
-                TAddress,
-                CodeTaxOld
+                TAddress
             } = this.state,
             { MonthOfEffect, MonthOfExpiry, CompleteDate } = IsRegisterAtCompany,
             {
@@ -1860,7 +1831,7 @@ export default class DependantAddOrEdit extends Component {
             SchoolYear: SchoolYear.value ? SchoolYear.value : null,
             Career: Career.value,
             PhoneNumber: PhoneNumber.value,
-            FileAttach: FileAttach.value ? FileAttach.value.map((item) => item.fileName).join(',') : null,
+            FileAttach: FileAttach.value ? FileAttach.value.map(item => item.fileName).join(',') : null,
             Note: Note.value,
             IsRegisterAtCompany: IsRegisterAtCompany.value,
             MonthOfEffect: MonthOfEffect.value,
@@ -1937,8 +1908,7 @@ export default class DependantAddOrEdit extends Component {
             TVillageID: AddressInformation.TVillageID.value?.ID ? AddressInformation.TVillageID.value?.ID : null,
             TAddressNew: AddressInformation.TAddressNew.value ? AddressInformation.TAddressNew.value : null,
             PAddress: PAddress.value ? PAddress.value : null,
-            TAddress: TAddress.value ? TAddress.value : null,
-            CodeTaxOld: CodeTaxOld.value ?? null
+            TAddress: TAddress.value ? TAddress.value : null
         };
 
         // Send mail
@@ -1959,7 +1929,7 @@ export default class DependantAddOrEdit extends Component {
         }
 
         BirthCertificate.value &&
-            BirthCertificate.value.forEach((item) => {
+            BirthCertificate.value.forEach(item => {
                 params = {
                     ...params,
                     [item.Value]: true
@@ -1967,7 +1937,7 @@ export default class DependantAddOrEdit extends Component {
             });
 
         VnrLoadingSevices.show();
-        HttpService.Post('[URI_HR]/api/Hre_ApprovedDependant', params).then((data) => {
+        HttpService.Post('[URI_HR]/api/Hre_ApprovedDependant', params).then(data => {
             VnrLoadingSevices.hide();
 
             if (data && typeof data == 'object') {
@@ -2002,8 +1972,9 @@ export default class DependantAddOrEdit extends Component {
                             reload();
                         }
 
-                        DependantConfirmedBusinessFunction.checkForLoadEditDelete[ScreenName.DependantWaitConfirm] =
-                            true;
+                        DependantConfirmedBusinessFunction.checkForLoadEditDelete[
+                            ScreenName.DependantWaitConfirm
+                        ] = true;
                         DrawerServices.navigate(ScreenName.DependantWaitConfirm);
                     }
                 }
@@ -2011,15 +1982,16 @@ export default class DependantAddOrEdit extends Component {
         });
     };
 
-    onSaveAndCreate = (navigation) => {
+    onSaveAndCreate = navigation => {
         this.save(navigation, true, null);
     };
 
-    onSaveAndSend = (navigation) => {
+    onSaveAndSend = navigation => {
         this.save(navigation, null, true);
     };
 
-    onChangeMonthOfEffect = (value) => {
+    onChangeMonthOfEffect = value => {
+
         const { IsRegisterAtCompany } = this.state;
         this.setState({
             IsRegisterAtCompany: {
@@ -2033,7 +2005,8 @@ export default class DependantAddOrEdit extends Component {
         });
     };
 
-    onChangeMonthOfExpiry = (value) => {
+    onChangeMonthOfExpiry = value => {
+
         const { IsRegisterAtCompany } = this.state;
         this.setState({
             IsRegisterAtCompany: {
@@ -2047,7 +2020,8 @@ export default class DependantAddOrEdit extends Component {
         });
     };
 
-    onChangeCompleteDate = (value) => {
+    onChangeCompleteDate = value => {
+
         const { IsRegisterAtCompany } = this.state;
         this.setState({
             IsRegisterAtCompany: {
@@ -2067,7 +2041,7 @@ export default class DependantAddOrEdit extends Component {
         HttpService.Get(
             `[URI_HR]/Hre_GetData/GetMultiRelativesByProfileID?ProfileID=${Profile?.ID ? Profile?.ID : null}`
         )
-            .then((res) => {
+            .then(res => {
                 if (res && Array.isArray(res) && res.length > 0) {
                     this.setState({
                         IsRelatives: {
@@ -2077,7 +2051,7 @@ export default class DependantAddOrEdit extends Component {
                                 data: res,
                                 value:
                                     RelativesID.value && RelativesID.value.ID
-                                        ? res.find((item) => item.ID == RelativesID.value.ID)
+                                        ? res.find(item => item.ID == RelativesID.value.ID)
                                         : null,
                                 refresh: !IsRelatives.RelativesID.refresh
                             }
@@ -2085,12 +2059,12 @@ export default class DependantAddOrEdit extends Component {
                     });
                 }
             })
-            .catch((error) => {
+            .catch(error => {
                 DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
             });
     };
 
-    onChooseRelative = (value) => {
+    onChooseRelative = value => {
         if (value) {
             const {
                     DependantName,
@@ -2165,7 +2139,7 @@ export default class DependantAddOrEdit extends Component {
                 HttpService.Post('[URI_HR]/Hre_GetDataDI/GetRelativeByID', {
                     ID: value.ID
                 })
-                    .then((res) => {
+                    .then(res => {
                         if (res) {
                             let nextState = {
                                 IsRelatives: {
@@ -2183,7 +2157,7 @@ export default class DependantAddOrEdit extends Component {
                                 },
                                 CodeTax: {
                                     ...CodeTax,
-                                    value: res?.CodeTax ?? res?.IdentificationNo ?? null,
+                                    value: res.CodeTax ? res.CodeTax : null,
                                     refresh: !CodeTax.refresh
                                 },
                                 RelationID: {
@@ -2288,9 +2262,9 @@ export default class DependantAddOrEdit extends Component {
                                         ...DependantIDPlaceOfIssueID,
                                         value: res.RelativesIDPlaceOfIssueID
                                             ? {
-                                                  ID: res.RelativesIDPlaceOfIssueID,
-                                                  ProvinceName: res?.RelativesIDPlaceOfIssueIDView
-                                              }
+                                                ID: res.RelativesIDPlaceOfIssueID,
+                                                ProvinceName: res?.RelativesIDPlaceOfIssueIDView
+                                            }
                                             : null,
                                         refresh: !DependantIDPlaceOfIssueID.refresh
                                     },
@@ -2325,9 +2299,9 @@ export default class DependantAddOrEdit extends Component {
                                         ...PlaceOfIssuanceOfIdentityCardID,
                                         value: res.RelativesIDCardIssuePlaceID
                                             ? {
-                                                  ID: res.RelativesIDCardIssuePlaceID,
-                                                  IDCardIssuePlaceName: res?.RelativesIDCardIssuePlaceIDView
-                                              }
+                                                ID: res.RelativesIDCardIssuePlaceID,
+                                                IDCardIssuePlaceName: res?.RelativesIDCardIssuePlaceIDView
+                                            }
                                             : null,
                                         refresh: !PlaceOfIssuanceOfIdentityCardID.refresh
                                     },
@@ -2366,9 +2340,9 @@ export default class DependantAddOrEdit extends Component {
                                         ...DependantPassportIssuePlaceID,
                                         value: res.RelativesPassportIssuePlaceID
                                             ? {
-                                                  ID: res.RelativesPassportIssuePlaceID,
-                                                  PassportIssuePlaceName: res?.RelativesPassportIssuePlaceIDView
-                                              }
+                                                ID: res.RelativesPassportIssuePlaceID,
+                                                PassportIssuePlaceName: res?.RelativesPassportIssuePlaceIDView
+                                            }
                                             : null,
                                         refresh: !DependantPassportIssuePlaceID.refresh
                                     },
@@ -2461,7 +2435,7 @@ export default class DependantAddOrEdit extends Component {
 
                             if (isUpperCaseText?.DependantName && DependantName.value) {
                                 this.handleUpperCase('DependantName', DependantName.value)
-                                    .then((res) => {
+                                    .then(res => {
                                         if (res) {
                                             nextState = {
                                                 ...nextState,
@@ -2473,14 +2447,14 @@ export default class DependantAddOrEdit extends Component {
                                             };
                                         }
                                     })
-                                    .catch((error) => {
+                                    .catch(error => {
                                         DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
                                     });
                             }
 
                             if (isUpperCaseText?.Career && Career.value) {
                                 this.handleUpperCase('Career', Career.value)
-                                    .then((res) => {
+                                    .then(res => {
                                         if (res) {
                                             nextState = {
                                                 ...nextState,
@@ -2492,7 +2466,7 @@ export default class DependantAddOrEdit extends Component {
                                             };
                                         }
                                     })
-                                    .catch((error) => {
+                                    .catch(error => {
                                         DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
                                     });
                             }
@@ -2511,7 +2485,7 @@ export default class DependantAddOrEdit extends Component {
                             });
                         }
                     })
-                    .catch((error) => {
+                    .catch(error => {
                         DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
                     });
             } catch (error) {
@@ -2528,7 +2502,7 @@ export default class DependantAddOrEdit extends Component {
         });
     };
 
-    handleAddressInformation = (data) => {
+    handleAddressInformation = data => {
         const { AddressInformation } = this.state;
 
         this.setState({
@@ -2555,7 +2529,7 @@ export default class DependantAddOrEdit extends Component {
             );
     };
 
-    onChangeRelative = (item) => {
+    onChangeRelative = item => {
         const { RelationID, DateOfWedding } = this.state;
         let isShowDate = false;
         if ((item && item.Relative == 'E_HUSBAND') || item.Relative == 'E_WIFE') {
@@ -2576,7 +2550,7 @@ export default class DependantAddOrEdit extends Component {
         });
     };
 
-    onFinishCountry = (listValues) => {
+    onFinishCountry = listValues => {
         const { CountryID_NDK, ProvinceID_NDK, DistrictID_NDK, WardID_NDK } = this.state;
         let nextState = {};
         if (listValues) {
@@ -2605,7 +2579,7 @@ export default class DependantAddOrEdit extends Component {
         }
     };
 
-    onFinishProvince = (listValues) => {
+    onFinishProvince = listValues => {
         const { ProvinceID_NDK, DistrictID_NDK, WardID_NDK } = this.state;
 
         let nextState = {};
@@ -2633,7 +2607,7 @@ export default class DependantAddOrEdit extends Component {
         }
     };
 
-    onFinishDistrict = (listValues) => {
+    onFinishDistrict = listValues => {
         const { ProvinceID_NDK, DistrictID_NDK, WardID_NDK } = this.state;
 
         let nextState = {};
@@ -2656,7 +2630,7 @@ export default class DependantAddOrEdit extends Component {
         }
     };
 
-    onFinishVillage = (listValues) => {
+    onFinishVillage = listValues => {
         const { WardID_NDK, DistrictID_NDK } = this.state;
 
         let nextState = {};
@@ -2686,7 +2660,7 @@ export default class DependantAddOrEdit extends Component {
                 HttpService.Get(`[URI_HR]/Cat_GetData/GetVillageCascading?districtid=${districtIDT}`)
             ];
 
-            HttpService.MultiRequest(arrPromisse).then((resAll) => {
+            HttpService.MultiRequest(arrPromisse).then(resAll => {
                 if (resAll) {
                     const [
                         dataCountrys,
@@ -2710,7 +2684,7 @@ export default class DependantAddOrEdit extends Component {
                         } = AddressInformation;
                     let nextState = {};
                     if (Array.isArray(dataCountrys) && countryIDP) {
-                        const rs = dataCountrys.filter((item) => item?.ID === countryIDP);
+                        const rs = dataCountrys.filter(item => item?.ID === countryIDP);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -2743,7 +2717,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataProvinces) && provinceIDP) {
-                        const rs = dataProvinces.filter((item) => item?.ID === provinceIDP);
+                        const rs = dataProvinces.filter(item => item?.ID === provinceIDP);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -2776,7 +2750,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataDistricts) && districtIDP) {
-                        const rs = dataDistricts.filter((item) => item?.ID === districtIDP);
+                        const rs = dataDistricts.filter(item => item?.ID === districtIDP);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -2809,7 +2783,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataWards) && wardIDP) {
-                        const rs = dataWards.filter((item) => item?.ID === wardIDP);
+                        const rs = dataWards.filter(item => item?.ID === wardIDP);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -2842,7 +2816,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataCountrys) && countryIDT) {
-                        const rs = dataCountrys.filter((item) => item?.ID === countryIDT);
+                        const rs = dataCountrys.filter(item => item?.ID === countryIDT);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -2875,7 +2849,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataProvincesT) && provinceIDT) {
-                        const rs = dataProvincesT.filter((item) => item?.ID === provinceIDT);
+                        const rs = dataProvincesT.filter(item => item?.ID === provinceIDT);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -2908,7 +2882,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataDistrictsT) && districtIDT) {
-                        const rs = dataDistrictsT.filter((item) => item?.ID === districtIDT);
+                        const rs = dataDistrictsT.filter(item => item?.ID === districtIDT);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -2941,7 +2915,7 @@ export default class DependantAddOrEdit extends Component {
                     }
 
                     if (Array.isArray(dataWardsT) && wardIDT) {
-                        const rs = dataWardsT.filter((item) => item?.ID === wardIDT);
+                        const rs = dataWardsT.filter(item => item?.ID === wardIDT);
                         if (rs.length > 0) {
                             if (nextState?.AddressInformation) {
                                 nextState = {
@@ -3001,7 +2975,7 @@ export default class DependantAddOrEdit extends Component {
                 HttpService.Post('[URI_HR]/Hre_GetDataV2/GetTPAddressByProfileID', {
                     ProfileID: Profile?.ID
                 })
-                    .then((res) => {
+                    .then(res => {
                         VnrLoadingSevices.hide();
                         if (res) {
                             this.setState({
@@ -3077,7 +3051,7 @@ export default class DependantAddOrEdit extends Component {
                             });
                         }
                     })
-                    .catch((error) => {
+                    .catch(error => {
                         VnrLoadingSevices.hide();
                         DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
                     });
@@ -3141,14 +3115,19 @@ export default class DependantAddOrEdit extends Component {
                 IsNotDisplayedOnPortalApp,
                 fieldHiden,
                 PAddress,
-                TAddress,
-                CodeTaxOld
+                TAddress
             } = this.state,
             { MonthOfEffect, MonthOfExpiry, CompleteDate } = IsRegisterAtCompany,
             { RelativesID } = IsRelatives;
 
-        const { textLableInfo, contentViewControl, viewLable, viewControl, styBtnCheckBox, styBtnCheckBoxText } =
-                stylesListPickerControl,
+        const {
+                textLableInfo,
+                contentViewControl,
+                viewLable,
+                viewControl,
+                styBtnCheckBox,
+                styBtnCheckBoxText
+            } = stylesListPickerControl,
             { textLableGroup, styleViewTitleGroupRow } = styleViewTitleForGroup;
 
         let tranPassport =
@@ -3367,7 +3346,7 @@ export default class DependantAddOrEdit extends Component {
                                             filterLocal={true}
                                             filterParams="RelativeName"
                                             disable={RelativesID.disable}
-                                            onFinish={(item) => this.onChooseRelative(item?.ID ? item : null)}
+                                            onFinish={item => this.onChooseRelative(item?.ID ? item : null)}
                                         />
                                     </View>
                                 </View>
@@ -3393,7 +3372,7 @@ export default class DependantAddOrEdit extends Component {
                                             disable={DependantName.disable}
                                             refresh={DependantName.refresh}
                                             value={DependantName.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     DependantName: {
                                                         ...DependantName,
@@ -3404,7 +3383,7 @@ export default class DependantAddOrEdit extends Component {
                                             onBlur={() => {
                                                 if (isUpperCaseText?.DependantName) {
                                                     this.handleUpperCase('DependantName', DependantName.value)
-                                                        .then((res) => {
+                                                        .then(res => {
                                                             this.setState({
                                                                 DependantName: {
                                                                     ...DependantName,
@@ -3412,7 +3391,7 @@ export default class DependantAddOrEdit extends Component {
                                                                 }
                                                             });
                                                         })
-                                                        .catch((error) => {
+                                                        .catch(error => {
                                                             DrawerServices.navigate('ErrorScreen', {
                                                                 ErrorDisplay: error
                                                             });
@@ -3445,49 +3424,13 @@ export default class DependantAddOrEdit extends Component {
                                             disable={CodeTax.disable}
                                             refresh={CodeTax.refresh}
                                             value={CodeTax.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     CodeTax: {
                                                         ...CodeTax,
                                                         value:
                                                             typeof text === 'string' && text.length === 0 ? null : text,
                                                         refresh: !CodeTax.refresh
-                                                    }
-                                                })
-                                            }
-                                        />
-                                    </View>
-                                </View>
-                            )}
-
-                            {/* Mã số thuế NPT (cũ) - CodeTaxOld */}
-                            {CodeTaxOld.visibleConfig && CodeTaxOld.visible && (
-                                <View style={contentViewControl}>
-                                    <View style={viewLable}>
-                                        <VnrText style={[styleSheets.text, textLableInfo]} i18nKey={CodeTaxOld.label} />
-
-                                        {/* valid ProfileID */}
-                                        {fieldValid.CodeTaxOld && (
-                                            <VnrText style={styleValid} i18nKey={'HRM_Valid_Char'} />
-                                        )}
-                                    </View>
-
-                                    <View style={viewControl}>
-                                        <VnrTextInput
-                                            keyboardType={'numeric'}
-                                            charType={'int'}
-                                            // nhan.nguyen: 0177970: 177074 Modify số ký tự tối đa cho phép nhập trên APP
-                                            // maxLength={10}
-                                            disable={CodeTaxOld.disable}
-                                            refresh={CodeTaxOld.refresh}
-                                            value={CodeTaxOld.value}
-                                            onChangeText={(text) =>
-                                                this.setState({
-                                                    CodeTaxOld: {
-                                                        ...CodeTaxOld,
-                                                        value:
-                                                            typeof text === 'string' && text.length === 0 ? null : text,
-                                                        refresh: !CodeTaxOld.refresh
                                                     }
                                                 })
                                             }
@@ -3522,7 +3465,7 @@ export default class DependantAddOrEdit extends Component {
                                             filterServer={true}
                                             filterParams="text"
                                             disable={RelationID.disable}
-                                            onFinish={(item) => this.onChangeRelative(item)}
+                                            onFinish={item => this.onChangeRelative(item)}
                                         />
                                     </View>
                                 </View>
@@ -3548,7 +3491,7 @@ export default class DependantAddOrEdit extends Component {
                                             value={DateOfWedding.value}
                                             refresh={DateOfWedding.refresh}
                                             type={'date'}
-                                            onFinish={(value) =>
+                                            onFinish={value =>
                                                 this.setState({
                                                     DateOfWedding: {
                                                         ...DateOfWedding,
@@ -3582,7 +3525,7 @@ export default class DependantAddOrEdit extends Component {
                                             value={DateOfBirth.value}
                                             refresh={DateOfBirth.refresh}
                                             type={'date'}
-                                            onFinish={(value) =>
+                                            onFinish={value =>
                                                 this.setState({
                                                     DateOfBirth: {
                                                         ...DateOfBirth,
@@ -3636,7 +3579,7 @@ export default class DependantAddOrEdit extends Component {
                                                     value={YearOfLose.value}
                                                     refresh={YearOfLose.refresh}
                                                     type={'date'}
-                                                    onFinish={(value) =>
+                                                    onFinish={value =>
                                                         this.setState({
                                                             YearOfLose: {
                                                                 ...YearOfLose,
@@ -3699,7 +3642,7 @@ export default class DependantAddOrEdit extends Component {
                                             filter={false}
                                             value={Gender.value}
                                             disable={Gender.disable}
-                                            onFinish={(item) =>
+                                            onFinish={item =>
                                                 this.setState({
                                                     Gender: {
                                                         ...Gender,
@@ -3730,7 +3673,7 @@ export default class DependantAddOrEdit extends Component {
                                             disable={PAddress.disable}
                                             refresh={PAddress.refresh}
                                             value={PAddress.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     PAddress: {
                                                         ...PAddress,
@@ -3760,7 +3703,7 @@ export default class DependantAddOrEdit extends Component {
                                             disable={TAddress.disable}
                                             refresh={TAddress.refresh}
                                             value={TAddress.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     TAddress: {
                                                         ...TAddress,
@@ -3793,7 +3736,7 @@ export default class DependantAddOrEdit extends Component {
                                             disable={DependentsAddress.disable}
                                             refresh={DependentsAddress.refresh}
                                             value={DependentsAddress.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     DependentsAddress: {
                                                         ...DependentsAddress,
@@ -3835,7 +3778,7 @@ export default class DependantAddOrEdit extends Component {
                                             filterServer={true}
                                             filterParams="text"
                                             disable={NationalityID.disable}
-                                            onFinish={(item) => {
+                                            onFinish={item => {
                                                 this.setState({
                                                     NationalityID: {
                                                         ...NationalityID,
@@ -3878,7 +3821,7 @@ export default class DependantAddOrEdit extends Component {
                                             filterServer={false}
                                             filterParams="ReqDocumentName"
                                             disable={ReqDocumnetIDs.disable}
-                                            onFinish={(item) => {
+                                            onFinish={item => {
                                                 this.setState({
                                                     ReqDocumnetIDs: {
                                                         ...ReqDocumnetIDs,
@@ -3909,7 +3852,7 @@ export default class DependantAddOrEdit extends Component {
                                             value={SchoolYear.value}
                                             refresh={SchoolYear.refresh}
                                             type={'date'}
-                                            onFinish={(value) =>
+                                            onFinish={value =>
                                                 this.setState({
                                                     SchoolYear: {
                                                         ...SchoolYear,
@@ -3945,7 +3888,7 @@ export default class DependantAddOrEdit extends Component {
                                             disable={PhoneNumber.disable}
                                             refresh={PhoneNumber.refresh}
                                             value={PhoneNumber.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     PhoneNumber: {
                                                         ...PhoneNumber,
@@ -3972,7 +3915,7 @@ export default class DependantAddOrEdit extends Component {
                                             disable={Career.disable}
                                             refresh={Career.refresh}
                                             value={Career.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     Career: {
                                                         ...Career,
@@ -3983,7 +3926,7 @@ export default class DependantAddOrEdit extends Component {
                                             onBlur={() => {
                                                 if (isUpperCaseText?.Career) {
                                                     this.handleUpperCase('Career', Career.value)
-                                                        .then((res) => {
+                                                        .then(res => {
                                                             this.setState({
                                                                 Career: {
                                                                     ...Career,
@@ -3991,7 +3934,7 @@ export default class DependantAddOrEdit extends Component {
                                                                 }
                                                             });
                                                         })
-                                                        .catch((error) => {
+                                                        .catch(error => {
                                                             DrawerServices.navigate('ErrorScreen', {
                                                                 ErrorDisplay: error
                                                             });
@@ -4026,7 +3969,7 @@ export default class DependantAddOrEdit extends Component {
                                             valueField="Value"
                                             filter={true}
                                             filterServer={false}
-                                            onFinish={(items) =>
+                                            onFinish={items =>
                                                 this.setState({
                                                     BirthCertificate: {
                                                         ...BirthCertificate,
@@ -4056,7 +3999,7 @@ export default class DependantAddOrEdit extends Component {
                                             value={FileAttach.value}
                                             multiFile={true}
                                             uri={'[URI_POR]/New_Home/saveFileFromApp'}
-                                            onFinish={(file) => {
+                                            onFinish={file => {
                                                 this.setState({
                                                     FileAttach: {
                                                         ...FileAttach,
@@ -4083,7 +4026,7 @@ export default class DependantAddOrEdit extends Component {
                                             disable={Note.disable}
                                             refresh={Note.refresh}
                                             value={Note.value}
-                                            onChangeText={(text) =>
+                                            onChangeText={text =>
                                                 this.setState({
                                                     Note: {
                                                         ...Note,
@@ -4151,7 +4094,7 @@ export default class DependantAddOrEdit extends Component {
                                                 refresh={RegisterDate.refresh}
                                                 type={'date'}
                                                 response={'string'}
-                                                onFinish={(value) => {
+                                                onFinish={value => {
                                                     this.setState({
                                                         RegisterDate: {
                                                             ...RegisterDate,
@@ -4185,7 +4128,7 @@ export default class DependantAddOrEdit extends Component {
                                                 refresh={MonthOfEffect.refresh}
                                                 type={'date'}
                                                 response={'string'}
-                                                onFinish={(value) => this.onChangeMonthOfEffect(value)}
+                                                onFinish={value => this.onChangeMonthOfEffect(value)}
                                             />
                                         </View>
                                     </View>
@@ -4211,7 +4154,7 @@ export default class DependantAddOrEdit extends Component {
                                                 refresh={MonthOfExpiry.refresh}
                                                 type={'date'}
                                                 response={'string'}
-                                                onFinish={(value) => this.onChangeMonthOfExpiry(value)}
+                                                onFinish={value => this.onChangeMonthOfExpiry(value)}
                                             />
                                         </View>
                                     </View>
@@ -4237,7 +4180,7 @@ export default class DependantAddOrEdit extends Component {
                                                 refresh={CompleteDate.refresh}
                                                 type={'date'}
                                                 response={'string'}
-                                                onFinish={(value) => this.onChangeCompleteDate(value)}
+                                                onFinish={value => this.onChangeCompleteDate(value)}
                                             />
                                         </View>
                                     </View>
@@ -4262,7 +4205,7 @@ export default class DependantAddOrEdit extends Component {
                                                 key="E_COUNTRY"
                                                 disable={CountryID_NDK.disable}
                                                 listPicker={objAddress}
-                                                onFinish={(item) => this.onFinishCountry(item)}
+                                                onFinish={item => this.onFinishCountry(item)}
                                             />
                                         </View>
                                     </View>
@@ -4291,7 +4234,7 @@ export default class DependantAddOrEdit extends Component {
                                                     district: objAddress.district,
                                                     village: objAddress.village
                                                 }}
-                                                onFinish={(item) => this.onFinishProvince(item)}
+                                                onFinish={item => this.onFinishProvince(item)}
                                             />
                                         </View>
                                     </View>
@@ -4319,7 +4262,7 @@ export default class DependantAddOrEdit extends Component {
                                                     district: objAddress.district,
                                                     village: objAddress.village
                                                 }}
-                                                onFinish={(item) => this.onFinishDistrict(item)}
+                                                onFinish={item => this.onFinishDistrict(item)}
                                             />
                                         </View>
                                     </View>
@@ -4344,7 +4287,7 @@ export default class DependantAddOrEdit extends Component {
                                                 key="E_VILLAGE"
                                                 disable={WardID_NDK.disable}
                                                 listPicker={{ village: objAddress.village }}
-                                                onFinish={(item) => this.onFinishVillage(item)}
+                                                onFinish={item => this.onFinishVillage(item)}
                                             />
                                         </View>
                                     </View>
@@ -4369,7 +4312,7 @@ export default class DependantAddOrEdit extends Component {
                                                 disable={Address_NDK.disable}
                                                 refresh={Address_NDK.refresh}
                                                 value={Address_NDK.value}
-                                                onChangeText={(text) =>
+                                                onChangeText={text =>
                                                     this.setState({
                                                         Address_NDK: {
                                                             ...Address_NDK,

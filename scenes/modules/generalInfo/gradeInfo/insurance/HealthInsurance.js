@@ -58,7 +58,7 @@ class HealthInsurance extends Component {
 
     remoteData = () => {
         const { keyQuery } = this.state;
-        getDataLocal(EnumTask.KT_GeneralInfomation).then((resData) => {
+        getDataLocal(EnumTask.KT_GeneralInfomation).then(resData => {
             const res = resData && resData[keyQuery] ? resData[keyQuery] : null;
 
             if (res && res !== EnumName.E_EMPTYDATA) {
@@ -138,8 +138,7 @@ class HealthInsurance extends Component {
         } else if (
             dataInsurance &&
             Object.keys(dataInsurance).length > 0 &&
-            _configList &&
-            _configList['HealthInsurance']
+            (_configList && _configList['HealthInsurance'])
         ) {
             contentList = (
                 <View style={CustomStyleSheet.flex(1)}>
@@ -147,9 +146,7 @@ class HealthInsurance extends Component {
                         <FlatList
                             showsVerticalScrollIndicator={false}
                             data={_configList['HealthInsurance']}
-                            renderItem={({ item }) =>
-                                Vnr_Function.formatStringTypeV2(dataInsurance, item, _configList['HealthInsurance'])
-                            }
+                            renderItem={({ item }) => Vnr_Function.formatStringTypeV3(dataInsurance, item, _configList['HealthInsurance'])}
                             keyExtractor={(item, index) => index}
                             refreshControl={
                                 <RefreshControl
@@ -169,7 +166,7 @@ class HealthInsurance extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
     return {
         //generalProfileInfo: state.generalProfileInfo.data,
         reloadScreenName: state.lazyLoadingReducer.reloadScreenName,
@@ -182,4 +179,7 @@ const mapDispatchToProps = () => {
     return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HealthInsurance);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(HealthInsurance);

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/split-platform-components */
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Image, PermissionsAndroid } from 'react-native';
-import { Colors, CustomStyleSheet, Size, styleSheets, styleValid, stylesScreenDetailV3, stylesVnrPickerV3 } from '../../constants/styleConfig';
+import { Colors, Size, styleSheets, styleValid, stylesScreenDetailV3, stylesVnrPickerV3 } from '../../constants/styleConfig';
 import VnrText from '../../components/VnrText/VnrText';
 import { VnrLoadingSevices } from '../../components/VnrLoading/VnrLoadingPages';
 import { ToasterSevice } from '../../components/Toaster/Toaster';
@@ -10,7 +10,6 @@ import {
     IconAttach,
     IconDelete,
     IconDownload,
-    IconUpload2,
     IconWarn
 } from '../../constants/Icons';
 import ManageFileSevice from '../../utils/ManageFileSevice';
@@ -312,14 +311,14 @@ export default class VnrAttachFile extends React.Component {
             PermissionsAndroid.PERMISSIONS = {
                 ...PermissionsAndroid.PERMISSIONS,
                 READ_MEDIA_IMAGES: 'android.permission.READ_MEDIA_IMAGES'
-            };
+            }
         }
 
         if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_VIDEO) {
             PermissionsAndroid.PERMISSIONS = {
                 ...PermissionsAndroid.PERMISSIONS,
                 READ_MEDIA_VIDEO: 'android.permission.READ_MEDIA_VIDEO'
-            };
+            }
         }
 
         let options = {
@@ -353,7 +352,7 @@ export default class VnrAttachFile extends React.Component {
                 file.name = nameFile;
 
                 if (file.uri) {
-                    lsImgAndVideo.push(file);
+                    lsImgAndVideo.push(file)
                 }
 
             });
@@ -472,7 +471,7 @@ export default class VnrAttachFile extends React.Component {
     render() {
         const { stylePlaceholder } = stylesVnrPickerV3; //stylesVnrPicker.VnrPicker;
         const { listItemUpload } = this.state,
-            { fieldValid, isCheckEmpty, lable, children, style, styleUserUpload, isHideIconLeft } = this.props;
+            { fieldValid, isCheckEmpty, lable, children, style, styleUserUpload } = this.props;
 
         let disable = false;
         let viewListItemUserUpload = <View />;
@@ -571,14 +570,10 @@ export default class VnrAttachFile extends React.Component {
                                             styles.maxWidth60Ali_Center
                                         ]}
                                     >
-                                        {
-                                            !isHideIconLeft && (
-                                                <IconAttach size={Size.iconSize} color={Colors.black} />
-                                            )
-                                        }
+                                        <IconAttach size={Size.iconSize} color={Colors.black} />
                                         <VnrText
                                             numberOfLines={2}
-                                            style={[styleSheets.text, stylesVnrPickerV3.styLbNotHaveValuePicker, isHideIconLeft && CustomStyleSheet.marginLeft(0)]}
+                                            style={[styleSheets.text, stylesVnrPickerV3.styLbNotHaveValuePicker]}
                                             i18nKey={lable}
                                         />
                                         {fieldValid && <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />}
@@ -588,22 +583,14 @@ export default class VnrAttachFile extends React.Component {
                                 <View
                                     style={[
                                         stylesVnrPickerV3.styVlPicker,
-                                        styles.maxWidth40Jutify_End_Ali_Center,
-                                        stylesVnrPickerV3.wrapRightLabel
+                                        styles.maxWidth40Jutify_End_Ali_Center
                                     ]}
                                 >
                                     <VnrText
-                                        numberOfLines={1}
-                                        style={[
-                                            styleSheets.text,
-                                            stylePlaceholder,
-                                            styles.textAlignCenter,
-                                            CustomStyleSheet.color(Colors.black),
-                                            CustomStyleSheet.marginRight(6)
-                                        ]}
+                                        numberOfLines={2}
+                                        style={[styleSheets.text, stylePlaceholder, styles.textAlignCenter]}
                                         i18nKey={'HRM_PortalApp_Please_Attachment'}
                                     />
-                                    <IconUpload2 size={16} color={Colors.black} />
                                 </View>
                             </View>
                         )}

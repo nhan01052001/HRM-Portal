@@ -281,7 +281,6 @@ class AttCanceledTakeLeaveDay extends Component {
                             }}
                             screenName={attApproveTakeLeaveDay}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Leave_Day_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

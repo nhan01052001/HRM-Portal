@@ -181,17 +181,33 @@ export const AttSubmitShiftChangeBusinessFunction = {
             });
 
             if (selectedID.length == 0) {
-                ToasterSevice.showWarning('HRM_Common_DataInStatus_CannotDelete', 4000);
+                ToasterSevice.showWarning('HRM_PortalApp_Status_AllowDelete', 4000);
                 return;
-            } else {
-                AttSubmitShiftChangeBusinessFunction.confirmDelete({
-                    strResultID: selectedID,
-                    message: translate('HRM_PortalApp_Message_DeleteConfirm').replace(
-                        '[E_NUMBER]',
-                        `${selectedID.length}/${items.length}`
-                    )
-                });
             }
+
+            VnrLoadingSevices.show();
+            HttpService.Post('[URI_CENTER]/api/Att_OvertimePlan/CheckStatusOverTimePlanForDelete', {
+                ListRecordID: selectedID,
+                UserLogin: dataVnrStorage.currentUser.headers.userlogin,
+                UserProcessID: dataVnrStorage.currentUser.headers.userid,
+                Host: _uriPor
+            }).then(res => {
+                VnrLoadingSevices.hide();
+                if (res && res.Status == EnumName.E_SUCCESS) {
+                    if (res.Data && res.Data.length > 0) {
+                        let numberRow = res.Data.length == 1 ? '1' : `${res.Data.length}/${items.length}`,
+                            keyTrans = translate('HRM_PortalApp_Message_DeleteConfirm');
+                        AttSubmitShiftChangeBusinessFunction.confirmDelete({
+                            strResultID: res.Data,
+                            message: keyTrans.replace('[E_NUMBER]', numberRow)
+                        });
+                    } else {
+                        ToasterSevice.showError('HRM_Common_SendRequest_Error', 4000);
+                    }
+                } else {
+                    ToasterSevice.showError('HRM_Common_SendRequest_Error', 4000);
+                }
+            });
         }
     },
 
@@ -228,7 +244,7 @@ export const AttSubmitShiftChangeBusinessFunction = {
 
     setDelete: objValid => {
         VnrLoadingSevices.show();
-        HttpService.Post('[URI_CENTER]/api/Att_Roster/DeleteRoster', {
+        HttpService.Post('[URI_CENTER]/api/Att_OvertimePlan/DeleteOvertimePlan', {
             ListRecordID: objValid.strResultID,
             UserLogin: dataVnrStorage.currentUser.headers.userlogin,
             UserProcessID: dataVnrStorage.currentUser.headers.userid,
@@ -240,9 +256,6 @@ export const AttSubmitShiftChangeBusinessFunction = {
                     ToasterSevice.showSuccess(res.Message, 4000);
                     AttSubmitShiftChangeBusinessFunction.checkForReLoadScreen[
                         ScreenName.AttSubmitShiftChange
-                    ] = true;
-                    AttSubmitShiftChangeBusinessFunction.checkForReLoadScreen[
-                        ScreenName.AttSaveTempSubmitShiftChange
                     ] = true;
                     _this.reload('E_KEEP_FILTER', true);
                 } else if (res && res.Message && typeof res.Message == 'string') {
@@ -286,7 +299,7 @@ export const AttSubmitShiftChangeBusinessFunction = {
             _uriPor = apiConfig ? apiConfig.uriPor : null;
 
         VnrLoadingSevices.show();
-        HttpService.Post('[URI_CENTER]/api/Att_Roster/ProcessingSendMailRoster', {
+        HttpService.Post('[URI_CENTER]/api/Att_OvertimePlan/ProcessingSendMailOvertimePlan', {
             ListRecordID: objValid.strResultID,
             UserLogin: dataVnrStorage.currentUser.headers.userlogin,
             UserProcessID: dataVnrStorage.currentUser.headers.userid,
@@ -332,7 +345,7 @@ export const AttSubmitShiftChangeBusinessFunction = {
             }
 
             VnrLoadingSevices.show();
-            HttpService.Post('[URI_CENTER]/api/Att_Roster/ValidateCancelRoster', {
+            HttpService.Post('[URI_CENTER]/api/Att_OvertimePlan/ValidateCancelOvertimePlan', {
                 ListRecordID: selectedID,
                 UserLogin: dataVnrStorage.currentUser.headers.userlogin,
                 UserProcessID: dataVnrStorage.currentUser.headers.userid,
@@ -341,7 +354,7 @@ export const AttSubmitShiftChangeBusinessFunction = {
                 VnrLoadingSevices.hide();
                 if (res && res.Status == EnumName.E_SUCCESS) {
                     if (res.Data && res.Data.length > 0) {
-                        let numberRow = items.length == 1 ? '1' : `${res.Data.length}/${items.length}`,
+                        let numberRow = res.Data.length == 1 ? '1' : `${res.Data.length}/${items.length}`,
                             keyTrans = translate('HRM_PortalApp_Message_CancelConfirm');
 
                         AttSubmitShiftChangeBusinessFunction.confirmCancel({
@@ -368,13 +381,7 @@ export const AttSubmitShiftChangeBusinessFunction = {
             let isInputText = isConfirm['isInputText'],
                 isValidInputText = isConfirm['isValidInputText'],
                 message = objValid.message && typeof objValid.message === 'string' ? objValid.message : null,
-                placeholder = translate('HRM_Common_CommentCancel'),
-                limit = 500,
-                textLimit = translate('HRM_Sytem_Reason_DynamicMaxLength').replace(
-                    '[E_DYNAMIC1]',
-                    `[${translate('HRM_Medical_ImmunizationRecord_CommentCancel')}]`
-                );
-            textLimit = textLimit.replace('[E_DYNAMIC2]', 500);
+                placeholder = translate('HRM_Common_CommentCancel');
 
             AlertSevice.alert({
                 iconType: EnumIcon.E_CANCEL,
@@ -382,8 +389,6 @@ export const AttSubmitShiftChangeBusinessFunction = {
                 isValidInputText: isValidInputText,
                 isInputText: isInputText,
                 message: message,
-                limit: limit,
-                textLimit: textLimit,
                 onCancel: () => {},
                 onConfirm: reason => {
                     if (isValidInputText && (!reason || reason === '')) {
@@ -401,8 +406,8 @@ export const AttSubmitShiftChangeBusinessFunction = {
 
     setCancel: objValid => {
         VnrLoadingSevices.show();
-        HttpService.Post('[URI_CENTER]/api/Att_Roster/ChangeStatusCancelRoster', {
-            Comment: objValid.Comment,
+        HttpService.Post('[URI_CENTER]/api/Att_OvertimePlan/ChangeStatusCancelOvertimePlanNew', {
+            //Comment: objValid.Comment,
             ListRecordID: objValid.strResultID,
             UserLogin: dataVnrStorage.currentUser.headers.userlogin,
             UserProcessID: dataVnrStorage.currentUser.headers.userid,

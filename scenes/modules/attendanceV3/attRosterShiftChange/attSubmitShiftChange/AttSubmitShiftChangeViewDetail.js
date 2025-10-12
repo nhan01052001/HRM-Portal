@@ -1,14 +1,6 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet } from 'react-native';
-import {
-    styleSheets,
-    styleScreenDetail,
-    styleSafeAreaView,
-    stylesScreenDetailV3,
-    CustomStyleSheet,
-    Size,
-    Colors
-} from '../../../../../constants/styleConfig';
+import { View, ScrollView } from 'react-native';
+import { styleSheets, styleScreenDetail, styleSafeAreaView, Colors } from '../../../../../constants/styleConfig';
 import { ConfigListDetail } from '../../../../../assets/configProject/ConfigListDetail';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { generateRowActionAndSelected, AttSubmitShiftChangeBusinessFunction } from './AttSubmitShiftChangeBusiness';
@@ -22,13 +14,17 @@ import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import AttSubmitShiftChangeAddOrEdit from './AttSubmitShiftChangeAddOrEdit';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import SafeAreaViewDetail from '../../../../../components/safeAreaView/SafeAreaViewDetail';
-import VnrText from '../../../../../components/VnrText/VnrText';
-import { IconSwapright } from '../../../../../constants/Icons';
 
 const configDefault = [
     {
+        TypeView: 'E_STATUS',
+        Name: 'StatusView',
+        DisplayKey: 'HRM_Attendance_Overtime_OvertimeList_Status',
+        DataType: 'string'
+    },
+    {
         TypeView: 'E_GROUP_PROFILE',
-        DisplayKey: 'HRM_PortalApp_Employee',
+        DisplayKey: 'HRM_PortalApp_Subscribers',
         DataType: 'string'
     },
     {
@@ -45,14 +41,20 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_COMPANY',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_COMPANY',
+        Name: 'PositionName',
+        DisplayKey: 'HRM_HR_Profile_PositionName',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_BRANCH',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_BRANCH',
+        Name: 'JobTitleName',
+        DisplayKey: 'HRM_HR_Profile_JobTitleName',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON_PROFILE',
+        Name: 'OrgStructureName',
+        DisplayKey: 'HRM_Eva_Performance_OrgStructureName',
         DataType: 'string'
     },
     {
@@ -69,12 +71,6 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_DEPARTMENT',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_DEPARTMENT',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
         Name: 'E_TEAM',
         DisplayKey: 'Group',
         DataType: 'string'
@@ -86,216 +82,124 @@ const configDefault = [
         DataType: 'string'
     },
     {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'JobTitleName',
-        DisplayKey: 'HRM_HR_Profile_JobTitleName',
+        TypeView: 'E_GROUP',
+        DisplayKey: 'HRM_PortalApp_OvertimePlanInformation',
         DataType: 'string'
     },
     {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'PositionName',
-        DisplayKey: 'HRM_HR_Profile_PositionName',
+        TypeView: 'E_COMMON',
+        Name: 'WorkDateRoot',
+        DisplayKey: 'DateOvertime',
+        DataType: 'DateToFrom',
+        DataFormat: 'DD/MM/YYYY'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'DurationTypeView',
+        DisplayKey: 'HRM_PortalApp_TypeRegister',
         DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'RegisterHours',
+        DisplayKey: 'HRM_PortalApp_HourRegister',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'TimeFrom',
+        NameSecond: 'TimeTo',
+        DisplayKey: 'HRM_PortalApp_TimeOvertime',
+        DataType: 'DateToFrom',
+        DataFormat: 'HH:mm'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'OvertimeReasonName',
+        DisplayKey: 'HRM_PortalApp_ReasonOvertime',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'ReasonOT',
+        DisplayKey: 'HRM_PortalApp_Explanation',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'AccumulateHour',
+        DisplayKey: 'HRM_PortalApp_AccumulatedOvertime',
+        DataType: 'string',
+        DataFormat: 'E_MULTITEXTHORIZONTAL',
+        Unit: 'HRM_PortalApp_Hour_Lowercase'
     },
     {
         TypeView: 'E_GROUP',
-        DisplayKey: 'HRM_PortalApp_ChangeShiftInformation',
+        DisplayKey: 'HRM_PortalApp_AnotherInformation',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'StatusView',
-        DisplayKey: 'HRM_Attendance_Overtime_OvertimeList_Status',
-        DataType: 'string'
+        Name: 'IsUnitAssistant',
+        DisplayKey: 'HRM_PortalApp_Change_TLĐV',
+        DataType: 'bool'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'TypeView',
-        DisplayKey: 'Type',
-        DataType: 'string'
+        Name: 'IsSignUpToEat',
+        DisplayKey: 'HRM_PortalApp_RegisterEat',
+        DataType: 'bool'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'ChangeShiftTypeView',
-        DisplayKey: 'HRM_PortalApp_TakeLeave_DurationType',
-        DataType: 'string'
+        Name: 'IsRequestForBenefit',
+        DisplayKey: 'E_ARCHIVESPAYMENTREQUEST',
+        DataType: 'bool'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'StrDate',
-        DisplayKey: 'HRM_PortalApp_ShiftChangeDate',
-        DataType: 'string'
+        Name: 'IsRequestEntryExitGate',
+        DisplayKey: 'HRM_PortalApp_Request_InOut',
+        DataType: 'bool'
     },
     {
-        TypeView: 'E_MULTI',
-        Name: 'ShiftName',
-        DisplayKey: 'HRM_PortalApp_TopTab_AttSubmitShiftChange_ShiftChangeShiftNow',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'Comment',
-        DisplayKey: 'Reason',
+        TypeView: 'E_GROUP_FILEATTACH',
+        DisplayKey: 'HRM_PortalApp_Attachments',
         DataType: 'string'
     },
     {
         TypeView: 'E_FILEATTACH',
-        Name: 'FileAttach',
-        DisplayKey: '',
+        Name: 'lstFileAttach',
+        DisplayKey: 'HRM_Payroll_Sal_TaxInformationRegister_FileAttach',
         DataType: 'FileAttach'
     },
     {
         TypeView: 'E_GROUP_APPROVE',
-        DisplayKey: 'HRM_PortalApp_Approval_Process',
-        DataType: 'string'
-    }
-];
-const configScheDefault = [
-    {
-        TypeView: 'E_GROUP_PROFILE',
-        DisplayKey: 'HRM_PortalApp_Employee',
+        DisplayKey: 'HRM_HRE_Concurrent_ApproveHistory',
         DataType: 'string'
     },
     {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'CodeEmp',
-        DisplayKey: 'HRM_HR_Profile_CodeEmp',
+        TypeView: 'E_USERAPPROVE1',
+        Name: 'UserApproveName',
+        DisplayKey: 'PerformanceApprovalStatus__E_APPROVED1',
         DataType: 'string'
     },
     {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'ProfileName',
-        DisplayKey: 'HRM_HR_Profile_ProfileName',
+        TypeView: 'E_USERAPPROVE3',
+        Name: 'UserApproveName3',
+        DisplayKey: 'PerformanceApprovalStatus__E_APPROVED2',
         DataType: 'string'
     },
     {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_COMPANY',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_COMPANY',
+        TypeView: 'E_USERAPPROVE4',
+        Name: 'UserApproveName4',
+        DisplayKey: 'PerformanceApprovalStatus__E_APPROVED3',
         DataType: 'string'
     },
     {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_BRANCH',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_BRANCH',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_UNIT',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_UNIT',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_DIVISION',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_DIVISION',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_DEPARTMENT',
-        DisplayKey: 'HRM_Hre_SignatureRegister_E_DEPARTMENT',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_TEAM',
-        DisplayKey: 'Group',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'E_SECTION',
-        DisplayKey: 'HRM_HR_ReportProfileWaitingStopWorking_TeamName',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'JobTitleName',
-        DisplayKey: 'HRM_HR_Profile_JobTitleName',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'PositionName',
-        DisplayKey: 'HRM_HR_Profile_PositionName',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_GROUP',
-        DisplayKey: 'HRM_PortalApp_ChangeShiftInformation',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'StatusView',
-        DisplayKey: 'HRM_Attendance_Overtime_OvertimeList_Status',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'TypeView',
-        DisplayKey: 'Type',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'ChangeShiftTypeView',
-        DisplayKey: 'HRM_PortalApp_TakeLeave_DurationType',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'StrChangeDate',
-        DisplayKey: 'HRM_PortalApp_ShiftChangeDate',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'StrAlternateDate',
-        DisplayKey: 'HRM_PortalApp_TheReplacementDay',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'Shift_Old',
-        DisplayKey: 'HRM_PortalApp_ShiftChange',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_MULTI',
-        Name: 'ShiftName',
-        DisplayKey: 'HRM_PortalApp_AlternateShift',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'ProfileName',
-        DisplayKey: 'HRM_PortalApp_ShiftChangeEmployee',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'ProfileName2',
-        DisplayKey: 'HRM_PortalApp_ReplacementStaff',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'Comment',
-        DisplayKey: 'Reason',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_FILEATTACH',
-        Name: 'FileAttach',
-        DisplayKey: '',
-        DataType: 'FileAttach'
-    },
-    {
-        TypeView: 'E_GROUP_APPROVE',
-        DisplayKey: 'HRM_PortalApp_Approval_Process',
+        TypeView: 'E_USERAPPROVE2',
+        Name: 'UserApproveName2',
+        DisplayKey: 'JobVacancyStatus__E_APPROVED4',
         DataType: 'string'
     }
 ];
@@ -313,7 +217,7 @@ export default class AttSubmitShiftChangeViewDetail extends Component {
         this.AttSubmitShiftChangeAddOrEdit = null;
     }
 
-    onEdit = (item) => {
+    onEdit = item => {
         if (item) {
             if (this.AttSubmitShiftChangeAddOrEdit && this.AttSubmitShiftChangeAddOrEdit.onShow) {
                 this.AttSubmitShiftChangeAddOrEdit.onShow({
@@ -332,7 +236,7 @@ export default class AttSubmitShiftChangeViewDetail extends Component {
         return [];
     };
 
-    rowActionsHeaderRight = (dataItem) => {
+    rowActionsHeaderRight = dataItem => {
         let _listActions = [];
         const { rowActions } = this.state.dataRowActionAndSelected;
 
@@ -340,7 +244,7 @@ export default class AttSubmitShiftChangeViewDetail extends Component {
             !Vnr_Function.CheckIsNullOrEmpty(rowActions) &&
             !Vnr_Function.CheckIsNullOrEmpty(dataItem.BusinessAllowAction)
         ) {
-            _listActions = rowActions.filter((item) => {
+            _listActions = rowActions.filter(item => {
                 return dataItem.BusinessAllowAction.indexOf(item.type) >= 0;
             });
         }
@@ -353,50 +257,74 @@ export default class AttSubmitShiftChangeViewDetail extends Component {
                 { screenName, dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params),
                 _configListDetail = ConfigListDetail.value[screenName]
                     ? ConfigListDetail.value[screenName]
-                    : configDefault,
-                _configListScheduleDetail = ConfigListDetail.value['AttSubmitShiftChangeSchedule']
-                    ? ConfigListDetail.value['AttSubmitShiftChangeSchedule']
-                    : configScheDefault;
+                    : configDefault;
 
             let id = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
             if (id) {
-                const response = await HttpService.Get(`[URI_CENTER]/api/Att_Roster/GetDetailRosterByID?ID=${id}`);
+                const response = await HttpService.Get(
+                    `[URI_CENTER]/api/Att_OvertimePlan/GetOvertimePlanByID?ID=${id}`
+                );
                 if (response && response.Status == EnumName.E_SUCCESS) {
-                    let data = { ...response.Data, ...response.Data?.DetailChangeShift[0] };
+                    let data = response.Data;
                     data.BusinessAllowAction = Vnr_Services.handleStatus(
                         data.Status,
                         dataItem?.SendEmailStatus ? dataItem?.SendEmailStatus : false
                     );
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
-                    data.FileAttach = ManageFileSevice.setFileAttachApp(data.FileAttach);
+                    data.lstFileAttach = ManageFileSevice.setFileAttachApp(data.FileAttachment);
                     data.ImagePath = data?.AvatarUserRegister
                         ? data.AvatarUserRegister
                         : dataItem?.ProfileInfo?.ImagePath;
+                    data.AccumulateHour = dataItem?.AccumulateHour
+                        ? [
+                            {
+                                value: dataItem?.AccumulateHour?.UdHourByDate,
+                                color:
+                                      dataItem?.AccumulateHour?.UdLimitColorDate || dataItem?.UdLimitColorDay
+                                          ? Colors.red
+                                          : null
+                            },
+                            {
+                                value: dataItem?.AccumulateHour?.UdHourByMonth,
+                                color:
+                                      dataItem?.AccumulateHour?.UdLimitColorMonth || dataItem?.UdLimitColorMonth
+                                          ? Colors.red
+                                          : null
+                            },
+                            {
+                                value: dataItem?.AccumulateHour?.UdHourByYear,
+                                color:
+                                      dataItem?.AccumulateHour?.UdLimitColorYear || dataItem?.UdLimitColorYear
+                                          ? Colors.red
+                                          : null
+                            }
+                        ]
+                        : null;
+
+                    // handle synchronized field for app
+                    if (!data?.UserProcessApproveID && data?.UserProcessID) {
+                        data.UserProcessApproveID = data?.UserProcessID;
+                    }
+
+                    if (!data?.UserProcessApproveID2 && data?.UserProcessID2) {
+                        data.UserProcessApproveID2 = data?.UserProcessID2;
+                    }
+
+                    if (!data?.UserProcessApproveID3 && data?.UserProcessID3) {
+                        data.UserProcessApproveID3 = data?.UserProcessID3;
+                    }
+
+                    if (!data?.UserProcessApproveID4 && data?.UserProcessID4) {
+                        data.UserProcessApproveID4 = data?.UserProcessID4;
+                    }
 
                     const _listActions = await this.rowActionsHeaderRight(data);
-                    this.setState({
-                        configListDetail:
-                            data.Type === 'E_DIFFERENTDAY' ||
-                            data.Type === 'E_CHANGE_SHIFT_COMPANSATION' ||
-                            data.Type === 'E_SAMEDAY'
-                                ? _configListScheduleDetail
-                                : _configListDetail,
-                        dataItem: data,
-                        listActions: _listActions
-                    });
+                    this.setState({ configListDetail: _configListDetail, dataItem: data, listActions: _listActions });
                 } else {
                     this.setState({ dataItem: 'EmptyData' });
                 }
             } else if (!Vnr_Function.CheckIsNullOrEmpty(dataItem)) {
-                this.setState({
-                    configListDetail:
-                        dataItem.Type === 'E_DIFFERENTDAY' ||
-                        dataItem.Type === 'E_CHANGE_SHIFT_COMPANSATION' ||
-                        dataItem.Type === 'E_SAMEDAY'
-                            ? _configListScheduleDetail
-                            : _configListDetail,
-                    dataItem
-                });
+                this.setState({ configListDetail: _configListDetail, dataItem });
             } else {
                 this.setState({ dataItem: 'EmptyData' });
             }
@@ -432,111 +360,10 @@ export default class AttSubmitShiftChangeViewDetail extends Component {
         if (dataItem && configListDetail) {
             contentViewDetail = (
                 <View style={styleSheets.container}>
-                    <AttSubmitShiftChangeAddOrEdit ref={(refs) => (this.AttSubmitShiftChangeAddOrEdit = refs)} />
+                    <AttSubmitShiftChangeAddOrEdit ref={refs => (this.AttSubmitShiftChangeAddOrEdit = refs)} />
                     <ScrollView style={contentScroll} showsVerticalScrollIndicator={false}>
                         <View style={containerItemDetail}>
-                            {configListDetail.map((e) => {
-                                if (e.TypeView === 'E_MULTI') {
-                                    return (
-                                        <View
-                                            style={[
-                                                stylesScreenDetailV3.styItemContent,
-                                                e.isWrapLine && CustomStyleSheet.flexDirection('column')
-                                            ]}
-                                        >
-                                            <View
-                                                style={[
-                                                    stylesScreenDetailV3.viewLable,
-                                                    CustomStyleSheet.justifyContent('flex-start'),
-                                                    stylesScreenDetailV3.viewLableJustify
-                                                ]}
-                                            >
-                                                <VnrText
-                                                    style={[
-                                                        styleSheets.text,
-                                                        { ...styleSheets.text, ...{ textAlign: 'left' } }
-                                                    ]}
-                                                    i18nKey={e.DisplayKey}
-                                                />
-                                            </View>
-                                            <View
-                                                style={[
-                                                    stylesScreenDetailV3.styViewValue,
-                                                    stylesScreenDetailV3.styViewValueJustify
-                                                ]}
-                                            >
-                                                {Array.isArray(dataItem?.DetailChangeShift) &&
-                                                dataItem?.DetailChangeShift.length > 0 &&
-                                                Array.isArray(dataItem?.DetailChangeShift[0]?.ListChangeShift) &&
-                                                dataItem?.DetailChangeShift[0]?.ListChangeShift.length > 0 ? (
-                                                    dataItem?.DetailChangeShift[0]?.ListChangeShift.map(
-                                                        (item, index) => {
-                                                            return (
-                                                                <Text
-                                                                    key={index}
-                                                                    style={{
-                                                                        ...styleSheets.lable,
-                                                                        ...stylesScreenDetailV3.styTextValueInfo,
-                                                                        ...CustomStyleSheet.textAlign('right')
-                                                                    }}
-                                                                >
-                                                                    <Text
-                                                                        style={[item?.Shift_Old && styles.lineThrough]}
-                                                                    >
-                                                                        {item?.Shift_Old ?? '-'}
-                                                                    </Text>{' '}
-                                                                    {
-                                                                        <IconSwapright
-                                                                            size={Size.iconSize - 6}
-                                                                            color={Colors.black}
-                                                                        />
-                                                                    }{' '}
-                                                                    {item?.Shift ?? '-'}{' '}
-                                                                </Text>
-                                                            );
-                                                        }
-                                                    )
-                                                    ) : dataItem?.DetailChangeShift[0].Shift ||
-                                                  dataItem?.DetailChangeShift[0].Shift_Old ? (
-                                                            <Text
-                                                                style={{
-                                                                    ...styleSheets.lable,
-                                                                    ...stylesScreenDetailV3.styTextValueInfo,
-                                                                    ...CustomStyleSheet.textAlign('right')
-                                                                }}
-                                                            >
-                                                                <Text
-                                                                    style={[
-                                                                dataItem?.DetailChangeShift[0].Shift_Old &&
-                                                                    styles.lineThrough
-                                                                    ]}
-                                                                >
-                                                                    {dataItem?.DetailChangeShift[0]?.Shift_Old ?? ''}
-                                                                </Text>{' '}
-                                                                {dataItem?.DetailChangeShift[0]?.Shift_Old && (
-                                                                    <IconSwapright
-                                                                        size={Size.iconSize - 6}
-                                                                        color={Colors.black}
-                                                                    />
-                                                                )}{' '}
-                                                                {dataItem?.DetailChangeShift[0]?.Shift ?? '-'}{' '}
-                                                            </Text>
-                                                        ) : (
-                                                            <Text
-                                                                style={{
-                                                                    ...styleSheets.lable,
-                                                                    ...stylesScreenDetailV3.styTextValueInfo,
-                                                                    ...CustomStyleSheet.textAlign('right')
-                                                                }}
-                                                            >
-                                                        -
-                                                            </Text>
-                                                        )}
-                                            </View>
-                                        </View>
-                                    );
-                                }
-
+                            {configListDetail.map(e => {
                                 if (e.TypeView != 'E_COMMON_PROFILE')
                                     return Vnr_Function.formatStringTypeV3(dataItem, e, configListDetail);
                             })}
@@ -560,10 +387,3 @@ export default class AttSubmitShiftChangeViewDetail extends Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    lineThrough: {
-        textDecorationLine: 'line-through',
-        textDecorationStyle: 'solid'
-    }
-});

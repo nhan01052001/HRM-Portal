@@ -580,10 +580,8 @@ export default class VnrRenderList extends React.Component {
             ) {
                 dataSource[index].dataGroupMaster.forEach(element => {
                     element.isSelect = itemChecked.isCheckAll;
-                    if (element?.isSelect) {
-                        let rsInItemChecked = itemSelected.find((item) => item?.ID === element?.ID)
-                        if (!rsInItemChecked)
-                            tempItemSelected = tempItemSelected.concat(element);
+                    if (element?.isSelect === true) {
+                        tempItemSelected = tempItemSelected.concat(element);
                     } else {
                         nextState = {
                             isCheckAll: false
@@ -609,6 +607,7 @@ export default class VnrRenderList extends React.Component {
             ToasterSevice.showError('Có lỗi trong quá trình xử lý dữ liệu!');
         }
     };
+
     isCheckedAll = (isGroup, dataSource, itemSelected) => {
         const { dataNoGroup } = this.state;
 

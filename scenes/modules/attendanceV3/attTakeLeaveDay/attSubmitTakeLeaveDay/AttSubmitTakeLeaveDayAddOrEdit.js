@@ -9,17 +9,16 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
-    Keyboard,
-    StyleSheet
+    Keyboard
 } from 'react-native';
 import moment from 'moment';
-import { IconCloseCircle, IconInfo } from '../../../../../constants/Icons';
+import { IconCloseCircle, IconDate } from '../../../../../constants/Icons';
 import { Colors, CustomStyleSheet, Size, styleSheets } from '../../../../../constants/styleConfig';
 import VnrText from '../../../../../components/VnrText/VnrText';
 import { translate } from '../../../../../i18n/translate';
 import VnrDateFromTo from '../../../../../componentsV3/VnrDateFromTo/VnrDateFromTo';
 import AttTakeLeaveDayComponent from './AttTamTakeLeaveDayComponent';
-// import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
+import VnrLoadApproval from '../../../../../componentsV3/VnrLoadApproval/VnrLoadApproval';
 import HttpService from '../../../../../utils/HttpService';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
 import { EnumIcon, EnumName, ScreenName } from '../../../../../assets/constant';
@@ -34,7 +33,6 @@ import DrawerServices from '../../../../../utils/DrawerServices';
 import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile';
 import ListButtonRegister from '../../../../../componentsV3/ListButtonRegister/ListButtonRegister';
 import { VnrLoadingSevices } from '../../../../../components/VnrLoading/VnrLoadingPages';
-import VnrApprovalProcess from '../../../../../componentsV3/VnrApprovalProcess/VnrApprovalProcess';
 
 const initSateDefault = {
     ID: null,
@@ -84,10 +82,6 @@ const initSateDefault = {
             visibleConfig: true,
             isValid: false
         },
-        FileAttach: {
-            visibleConfig: true,
-            isValid: false
-        },
         AddEmployee: {
             visibleConfig: true,
             isValid: false
@@ -95,10 +89,6 @@ const initSateDefault = {
         Substitute: {
             visibleConfig: true,
             isValid: false
-        },
-        RelativeTypeID: {
-            visibleConfig: true,
-            isValid: true
         },
         UserApprove: {
             visibleConfig: true,
@@ -113,10 +103,6 @@ const initSateDefault = {
             isValid: false
         },
         UserApprove2: {
-            visibleConfig: true,
-            isValid: false
-        },
-        IsPermissionLeave: {
             visibleConfig: true,
             isValid: false
         }
@@ -180,16 +166,22 @@ const initSateDefault = {
     isShowRemain: {
         value: null,
         visible: false,
-        visibleConfig: true,
-        isPrioritize: false
+        visibleConfig: true
     },
     isCheckEmpty: false,
     isVisibleKeyboard: false,
     listRemainingLeaveFunds: [],
     isShowRemainLeavefunds: false,
-    isConfigRemainLeavefunds: false,
-    totalRemain: 0,
-    dataApprovalProcess: []
+    isConfigRemainLeavefunds: false
+};
+
+const API_APPROVE = {
+    urlApi: '[URI_CENTER]/api/Att_GetData/GetMultiUserApproved',
+    type: 'E_POST',
+    dataBody: {
+        text: '',
+        Type: 'E_LEAVE_DAY'
+    }
 };
 
 class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
@@ -208,7 +200,6 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         this.refVnrDateFromTo = null;
         this.listRefGetDataSave = {};
         this.refFlatList = null;
-        this.refApproval = null;
 
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
             this.setState({ isVisibleKeyboard: true });
@@ -260,64 +251,87 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ? dataVnrStorage.currentUser.info
                 : null
             : null;
-
+        VnrLoadingSevices.show();
         const { E_ProfileID, E_FullName } = EnumName,
             _profile = { ID: profileInfo[E_ProfileID], ProfileName: profileInfo[E_FullName] };
-        VnrLoadingSevices.show();
-        HttpService.Get(`[URI_CENTER]/api/Sys_common/GetValidateJson?listFormId=${tblName}`)
-            .then((resConfig) => {
-                VnrLoadingSevices.hide();
-                let nextState = { Profile: _profile };
+        HttpService.MultiRequest([
+            HttpService.Get(`[URI_CENTER]/api/Sys_common/GetValidateJson?listFormId=${tblName}`),
+            HttpService.Get(`[URI_CENTER]/api/Att_LeaveDay/GetLeaveDayFundsRemaining?profileID=${_profile.ID}`)
+        ])
+            .then(resAll => {
+                if (Array.isArray(resAll) && resAll.length === 2) {
+                    const [resConfig, resGetRemaining] = resAll;
+                    let nextState = { Profile: _profile };
 
-                if (resConfig) {
-                    const data =
-                        resConfig.Status == EnumName.E_SUCCESS && resConfig.Data && resConfig.Data[tblName]
-                            ? resConfig.Data[tblName]
-                            : null;
-                    if (data && Object.keys(data).length > 0) {
-                        const listControl = Object.keys(fieldConfig);
-                        listControl.forEach((key) => {
-                            if (data[key] && data[key]['hasInApp']) {
-                                const { validation } = data[key];
-                                fieldConfig = {
-                                    ...fieldConfig,
-                                    [key]: {
-                                        visibleConfig: data[key] && data[key]['hidden'] == true ? false : true,
-                                        isValid: validation && validation.nullable == false ? true : false
-                                    }
-                                };
-                            }
-                        });
+                    if (resConfig) {
+                        const data =
+                            resConfig.Status == EnumName.E_SUCCESS && resConfig.Data && resConfig.Data[tblName]
+                                ? resConfig.Data[tblName]
+                                : null;
+                        if (data && Object.keys(data).length > 0) {
+                            const listControl = Object.keys(fieldConfig);
+                            listControl.forEach(key => {
+                                if (data[key] && data[key]['hasInApp']) {
+                                    const { validation } = data[key];
+                                    fieldConfig = {
+                                        ...fieldConfig,
+                                        [key]: {
+                                            visibleConfig: data[key] && data[key]['hidden'] == true ? false : true,
+                                            isValid: validation && validation.nullable == false ? true : false
+                                        }
+                                    };
+                                }
+                            });
+                        }
+                        nextState = {
+                            ...nextState,
+                            fieldConfig: fieldConfig
+                        };
                     }
-                    nextState = {
-                        ...nextState,
-                        fieldConfig: fieldConfig
-                    };
-                }
 
-                this.setState({ ...nextState }, () => {
-                    const { params } = this.state;
-
-                    let { record } = params;
-
-                    if (!record) {
-                        // [CREATE] Step 3: Tạo mới
-                        this.isModify = false;
-                        this.initData();
+                    if (
+                        resGetRemaining?.Status === 'SUCCESS' &&
+                        Array.isArray(resGetRemaining?.Data) &&
+                        resGetRemaining?.Data.length > 0
+                    ) {
+                        nextState = {
+                            ...nextState,
+                            listRemainingLeaveFunds: [...resGetRemaining?.Data],
+                            isConfigRemainLeavefunds: true
+                        };
                     } else {
-                        // [EDIT] Step 3: Chỉnh sửa
-                        this.isModify = true;
-                        this.getRecordAndConfigByID(record, this.handleSetState);
+                        nextState = {
+                            ...nextState,
+                            listRemainingLeaveFunds: [],
+                            isConfigRemainLeavefunds: false
+                        };
                     }
-                });
+
+                    this.setState({ ...nextState }, () => {
+                        const { params } = this.state;
+
+                        let { record } = params;
+
+                        if (!record) {
+                            // [CREATE] Step 3: Tạo mới
+                            this.isModify = false;
+                            this.initData();
+                        } else {
+                            // [EDIT] Step 3: Chỉnh sửa
+                            this.isModify = true;
+                            this.getRecordAndConfigByID(record, this.handleSetState);
+                        }
+                        // VnrLoadingSevices.hide();
+                    });
+                }
             })
-            .catch((error) => {
+            .catch(error => {
                 VnrLoadingSevices.hide();
                 DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
             });
     };
 
-    initData = () => {
+    initData = async () => {
         // nhan.nguyen: Task: 0171440
         // const profileInfo = dataVnrStorage
         //     ? dataVnrStorage.currentUser
@@ -365,103 +379,152 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         // });
 
         //[CREATE] Step 4: Lấy cấp duyệt .
-
+        await this.getHighSupervisor();
         const { params, DateFromTo, SimilarRegistration } = this.state;
         if (params.listItem && params.listItem.length > 0) {
             // Trường hợp tạo mới từ ngày công
-            let listday = params.listItem.map((item) => moment(item.WorkDate).format('YYYY-MM-DD'));
-            this.setState(
-                {
-                    DateFromTo: {
-                        ...DateFromTo,
-                        value: listday ? listday : [],
-                        refresh: !DateFromTo.refresh
-                    },
-                    SimilarRegistration: {
-                        value: false,
-                        refresh: !SimilarRegistration.refresh
-                    },
-                    isShowModal: true
+            let listday = params.listItem.map(item => moment(item.WorkDate).format('YYYY-MM-DD'));
+            this.setState({
+                DateFromTo: {
+                    ...DateFromTo,
+                    value: listday ? listday : [],
+                    refresh: !DateFromTo.refresh
                 },
-                () => {
-                    this.getRemainLeave();
-                    this.getApprovalProcess();
-                }
-            );
+                SimilarRegistration: {
+                    value: false,
+                    refresh: !SimilarRegistration.refresh
+                },
+                isShowModal: true,
+                isShowLoading: false
+            }, () => {
+                VnrLoadingSevices.hide();
+            });
         } else if (this.refVnrDateFromTo && this.refVnrDateFromTo.showModal) {
             this.refVnrDateFromTo.showModal();
+            VnrLoadingSevices.hide();
         }
     };
 
-    getHighSupervisor = (totalLeaveDay, LeaveDayTypeID, DateStart, DateEnd) => {
-        const { Profile } = this.state;
-        if (totalLeaveDay != null) {
-            this.showLoading(true);
-            HttpService.Post('[URI_CENTER]/api/Att_GetData/GetHighSupervisor', {
-                ProfileID: Profile.ID,
-                userSubmit: Profile.ID,
-                TotalLeaveDay: totalLeaveDay ? totalLeaveDay : null,
-                type: 'E_LEAVE_DAY',
-                LeaveDayTypeID: LeaveDayTypeID ? LeaveDayTypeID.ID : null,
-                DateStart: DateStart ? DateStart : null,
-                DateEnd: DateEnd ? DateEnd : null
-            }).then((resData) => {
-                this.showLoading(false);
+    getHighSupervisor = (totalLeaveDay = 0, LeaveDayTypeID, DateStart, DateEnd) => {
 
-                if (resData.Status == EnumName.E_SUCCESS) {
-                    const result = resData.Data;
-                    const { UserApprove, UserApprove2, UserApprove3, UserApprove4 } = this.state;
-                    let nextState = {
-                        UserApprove: { ...UserApprove },
-                        UserApprove2: { ...UserApprove2 },
-                        UserApprove3: { ...UserApprove3 },
-                        UserApprove4: { ...UserApprove4 }
-                    };
+        return new Promise((resolve) => {
+            const { Profile } = this.state;
+            if (totalLeaveDay != null && totalLeaveDay != undefined) {
+                this.showLoading(true);
+                HttpService.Post('[URI_CENTER]/api/Att_GetData/GetHighSupervisor', {
+                    ProfileID: Profile.ID,
+                    userSubmit: Profile.ID,
+                    TotalLeaveDay: totalLeaveDay,
+                    type: 'E_LEAVE_DAY',
+                    LeaveDayTypeID: LeaveDayTypeID ? LeaveDayTypeID.ID : null,
+                    DateStart: DateStart ? DateStart : null,
+                    DateEnd: DateEnd ? DateEnd : null
+                }).then(resData => {
+                    if (resData.Status == EnumName.E_SUCCESS) {
+                        const result = resData.Data;
+                        const { UserApprove, UserApprove2, UserApprove3, UserApprove4 } = this.state;
+                        let nextState = {
+                            UserApprove: { ...UserApprove },
+                            UserApprove2: { ...UserApprove2 },
+                            UserApprove3: { ...UserApprove3 },
+                            UserApprove4: { ...UserApprove4 }
+                        };
 
-                    //truong hop chạy theo approve grade
-                    if (result.LevelApprove > 0) {
-                        if (result.IsChangeApprove != true) {
-                            nextState = {
-                                UserApprove: { ...nextState.UserApprove, disable: true },
-                                UserApprove2: { ...nextState.UserApprove2, disable: true },
-                                UserApprove3: { ...nextState.UserApprove3, disable: true },
-                                UserApprove4: { ...nextState.UserApprove4, disable: true }
-                            };
-                        } else {
-                            nextState = {
-                                UserApprove: { ...nextState.UserApprove, disable: false },
-                                UserApprove2: { ...nextState.UserApprove2, disable: false },
-                                UserApprove3: { ...nextState.UserApprove3, disable: false },
-                                UserApprove4: { ...nextState.UserApprove4, disable: false }
-                            };
-                        }
-
-                        this.levelApprove = result.LevelApprove;
-
-                        if (result.LevelApprove == 2 || result.LevelApprove == 1) {
-                            if (result.IsOnlyOneLevelApprove) {
-                                this.levelApprove = 1;
-                                if (result.SupervisorID != null) {
-                                    nextState = {
-                                        UserApprove: {
-                                            ...nextState.UserApprove,
-                                            value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
-                                        },
-                                        UserApprove2: {
-                                            ...nextState.UserApprove2,
-                                            value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
-                                        },
-                                        UserApprove3: {
-                                            ...nextState.UserApprove3,
-                                            value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
-                                        },
-                                        UserApprove4: {
-                                            ...nextState.UserApprove4,
-                                            value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
-                                        }
-                                    };
-                                }
+                        //truong hop chạy theo approve grade
+                        if (result.LevelApprove > 0) {
+                            if (result.IsChangeApprove != true) {
+                                nextState = {
+                                    UserApprove: { ...nextState.UserApprove, disable: true },
+                                    UserApprove2: { ...nextState.UserApprove2, disable: true },
+                                    UserApprove3: { ...nextState.UserApprove3, disable: true },
+                                    UserApprove4: { ...nextState.UserApprove4, disable: true }
+                                };
                             } else {
+                                nextState = {
+                                    UserApprove: { ...nextState.UserApprove, disable: false },
+                                    UserApprove2: { ...nextState.UserApprove2, disable: false },
+                                    UserApprove3: { ...nextState.UserApprove3, disable: false },
+                                    UserApprove4: { ...nextState.UserApprove4, disable: false }
+                                };
+                            }
+
+                            this.levelApprove = result.LevelApprove;
+
+                            if (result.LevelApprove == 2 || result.LevelApprove == 1) {
+                                if (result.IsOnlyOneLevelApprove) {
+                                    this.levelApprove = 1;
+                                    if (result.SupervisorID != null) {
+                                        nextState = {
+                                            UserApprove: {
+                                                ...nextState.UserApprove,
+                                                value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
+                                            },
+                                            UserApprove2: {
+                                                ...nextState.UserApprove2,
+                                                value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
+                                            },
+                                            UserApprove3: {
+                                                ...nextState.UserApprove3,
+                                                value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
+                                            },
+                                            UserApprove4: {
+                                                ...nextState.UserApprove4,
+                                                value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
+                                            }
+                                        };
+                                    }
+                                } else {
+                                    if (result.SupervisorID != null) {
+                                        nextState = {
+                                            ...nextState,
+                                            UserApprove: {
+                                                ...nextState.UserApprove,
+                                                value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
+                                            }
+                                        };
+                                    }
+
+                                    if (result.MidSupervisorID != null) {
+                                        nextState = {
+                                            ...nextState,
+                                            UserApprove2: {
+                                                ...nextState.UserApprove2,
+                                                value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                            },
+                                            UserApprove3: {
+                                                ...nextState.UserApprove3,
+                                                value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                            },
+                                            UserApprove4: {
+                                                ...nextState.UserApprove4,
+                                                value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                            }
+                                        };
+                                    }
+                                }
+
+                                nextState = {
+                                    ...nextState,
+                                    UserApprove: {
+                                        ...nextState.UserApprove,
+                                        levelApproval: 1
+                                    },
+                                    UserApprove3: {
+                                        ...nextState.UserApprove3,
+                                        visible: false,
+                                        levelApproval: 0
+                                    },
+                                    UserApprove4: {
+                                        ...nextState.UserApprove4,
+                                        visible: false,
+                                        levelApproval: 0
+                                    },
+                                    UserApprove2: {
+                                        ...nextState.UserApprove2,
+                                        levelApproval: 2
+                                    }
+                                };
+                            } else if (result.LevelApprove == 3) {
                                 if (result.SupervisorID != null) {
                                     nextState = {
                                         ...nextState,
@@ -475,340 +538,130 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 if (result.MidSupervisorID != null) {
                                     nextState = {
                                         ...nextState,
+                                        UserApprove3: {
+                                            ...nextState.UserApprove3,
+                                            value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                        }
+                                    };
+                                }
+
+                                if (result.NextMidSupervisorID != null) {
+                                    nextState = {
+                                        ...nextState,
                                         UserApprove2: {
                                             ...nextState.UserApprove2,
                                             value: {
-                                                UserInfoName: result.SupervisorNextName,
-                                                ID: result.MidSupervisorID
-                                            }
-                                        },
-                                        UserApprove3: {
-                                            ...nextState.UserApprove3,
-                                            value: {
-                                                UserInfoName: result.SupervisorNextName,
-                                                ID: result.MidSupervisorID
+                                                UserInfoName: result.NextMidSupervisorName,
+                                                ID: result.NextMidSupervisorID
                                             }
                                         },
                                         UserApprove4: {
                                             ...nextState.UserApprove4,
                                             value: {
-                                                UserInfoName: result.SupervisorNextName,
-                                                ID: result.MidSupervisorID
+                                                UserInfoName: result.NextMidSupervisorName,
+                                                ID: result.NextMidSupervisorID
                                             }
                                         }
                                     };
                                 }
-                            }
 
-                            nextState = {
-                                ...nextState,
-                                UserApprove: {
-                                    ...nextState.UserApprove,
-                                    levelApproval: 1
-                                },
-                                UserApprove3: {
-                                    ...nextState.UserApprove3,
-                                    visible: false,
-                                    levelApproval: 0
-                                },
-                                UserApprove4: {
-                                    ...nextState.UserApprove4,
-                                    visible: false,
-                                    levelApproval: 0
-                                },
-                                UserApprove2: {
-                                    ...nextState.UserApprove2,
-                                    levelApproval: 2
-                                }
-                            };
-                        } else if (result.LevelApprove == 3) {
-                            if (result.SupervisorID != null) {
                                 nextState = {
                                     ...nextState,
                                     UserApprove: {
                                         ...nextState.UserApprove,
-                                        value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
-                                    }
-                                };
-                            }
-
-                            if (result.MidSupervisorID != null) {
-                                nextState = {
-                                    ...nextState,
+                                        levelApproval: 1
+                                    },
                                     UserApprove3: {
                                         ...nextState.UserApprove3,
-                                        value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
-                                    }
-                                };
-                            }
-
-                            if (result.NextMidSupervisorID != null) {
-                                nextState = {
-                                    ...nextState,
+                                        visible: true,
+                                        levelApproval: 2
+                                    },
+                                    UserApprove4: {
+                                        ...nextState.UserApprove4,
+                                        visible: false,
+                                        levelApproval: 3
+                                    },
                                     UserApprove2: {
                                         ...nextState.UserApprove2,
-                                        value: {
-                                            UserInfoName: result.NextMidSupervisorName,
-                                            ID: result.NextMidSupervisorID
+                                        levelApproval: 4
+                                    }
+                                };
+                            } else if (result.LevelApprove == 4) {
+                                if (result.SupervisorID != null) {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove: {
+                                            ...nextState.UserApprove,
+                                            value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
                                         }
-                                    },
-                                    UserApprove4: {
-                                        ...nextState.UserApprove4,
-                                        value: {
-                                            UserInfoName: result.NextMidSupervisorName,
-                                            ID: result.NextMidSupervisorID
+                                    };
+                                }
+
+                                if (result.MidSupervisorID != null) {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove3: {
+                                            ...nextState.UserApprove3,
+                                            value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
                                         }
-                                    }
-                                };
-                            }
-
-                            nextState = {
-                                ...nextState,
-                                UserApprove: {
-                                    ...nextState.UserApprove,
-                                    levelApproval: 1
-                                },
-                                UserApprove3: {
-                                    ...nextState.UserApprove3,
-                                    visible: true,
-                                    levelApproval: 2
-                                },
-                                UserApprove4: {
-                                    ...nextState.UserApprove4,
-                                    visible: false,
-                                    levelApproval: 3
-                                },
-                                UserApprove2: {
-                                    ...nextState.UserApprove2,
-                                    levelApproval: 4
+                                    };
                                 }
-                            };
-                        } else if (result.LevelApprove == 4) {
-                            if (result.SupervisorID != null) {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove: {
-                                        ...nextState.UserApprove,
-                                        value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
-                                    }
-                                };
-                            }
 
-                            if (result.MidSupervisorID != null) {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove3: {
-                                        ...nextState.UserApprove3,
-                                        value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
-                                    }
-                                };
-                            }
-
-                            if (result.NextMidSupervisorID != null) {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove4: {
-                                        ...nextState.UserApprove4,
-                                        value: {
-                                            UserInfoName: result.NextMidSupervisorName,
-                                            ID: result.NextMidSupervisorID
+                                if (result.NextMidSupervisorID != null) {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove4: {
+                                            ...nextState.UserApprove4,
+                                            value: {
+                                                UserInfoName: result.NextMidSupervisorName,
+                                                ID: result.NextMidSupervisorID
+                                            }
                                         }
-                                    }
-                                };
-                            }
-
-                            if (result.HighSupervisorID) {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove2: {
-                                        ...nextState.UserApprove2,
-                                        value: { UserInfoName: result.HighSupervisorName, ID: result.HighSupervisorID }
-                                    }
-                                };
-                            }
-
-                            nextState = {
-                                ...nextState,
-                                UserApprove: {
-                                    ...nextState.UserApprove,
-                                    levelApproval: 1
-                                },
-                                UserApprove3: {
-                                    ...nextState.UserApprove3,
-                                    visible: true,
-                                    levelApproval: 2
-                                },
-                                UserApprove4: {
-                                    ...nextState.UserApprove4,
-                                    visible: true,
-                                    levelApproval: 3
-                                },
-                                UserApprove2: {
-                                    ...nextState.UserApprove2,
-                                    levelApproval: 4
+                                    };
                                 }
-                            };
 
-                            // nextState = {
-                            //     ...nextState,
-                            //     isShowApprove3: true,
-                            //     isShowApprove4: true
-                            // }
-                        }
-
-                        if (result.IsChangeApprove != true) {
-                            nextState = {
-                                ...nextState,
-                                UserApprove: {
-                                    ...nextState.UserApprove,
-                                    disable: true
-                                },
-                                UserApprove2: {
-                                    ...nextState.UserApprove2,
-                                    disable: true
-                                },
-                                UserApprove3: {
-                                    ...nextState.UserApprove3,
-                                    disable: true
-                                },
-                                UserApprove4: {
-                                    ...nextState.UserApprove4,
-                                    disable: true
+                                if (result.HighSupervisorID) {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove2: {
+                                            ...nextState.UserApprove2,
+                                            value: { UserInfoName: result.HighSupervisorName, ID: result.HighSupervisorID }
+                                        }
+                                    };
                                 }
-                            };
-                        } else {
-                            nextState = {
-                                ...nextState,
-                                UserApprove: {
-                                    ...nextState.UserApprove,
-                                    disable: false
-                                },
-                                UserApprove2: {
-                                    ...nextState.UserApprove2,
-                                    disable: false
-                                },
-                                UserApprove3: {
-                                    ...nextState.UserApprove3,
-                                    disable: false
-                                },
-                                UserApprove4: {
-                                    ...nextState.UserApprove4,
-                                    disable: false
-                                }
-                            };
-                        }
-                    }
 
-                    //TH chạy không theo approve grade
-                    else if (result.LevelApprove == 0) {
-                        if (result.IsConCurrent) {
-                            let dataFirstApprove = [],
-                                dataMidApprove = [],
-                                dataLastApprove = [];
-
-                            for (let i = 0; i < result.ListSupervior.length; i++) {
-                                dataFirstApprove.push({
-                                    UserInfoName: result.ListSupervior[i].SupervisorName,
-                                    ID: result.ListSupervior[i].SupervisorID
-                                });
-                            }
-
-                            for (let i = 0; i < result.ListHightSupervior.length; i++) {
-                                dataMidApprove.push({
-                                    UserInfoName: result.ListHightSupervior[i].HighSupervisorName,
-                                    ID: result.ListHightSupervior[i].HighSupervisorID
-                                });
-                                dataLastApprove.push({
-                                    UserInfoName: result.ListHightSupervior[i].HighSupervisorName,
-                                    ID: result.ListHightSupervior[i].HighSupervisorID
-                                });
-                            }
-
-                            nextState = {
-                                ...nextState,
-                                UserApprove: {
-                                    ...nextState.UserApprove,
-                                    value: null
-                                },
-                                UserApprove2: {
-                                    ...nextState.UserApprove2,
-                                    value: null
-                                },
-                                UserApprove3: {
-                                    ...nextState.UserApprove3,
-                                    value: null
-                                }
-                            };
-                        } else {
-                            if (result.SupervisorID != null) {
                                 nextState = {
                                     ...nextState,
                                     UserApprove: {
                                         ...nextState.UserApprove,
-                                        value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
-                                    }
-                                };
-                            } else {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove: {
-                                        ...nextState.UserApprove,
-                                        value: null
-                                    }
-                                };
-                            }
-                            if (result.HighSupervisorID != null) {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove2: {
-                                        ...nextState.UserApprove2,
-                                        value: { UserInfoName: result.HighSupervisorName, ID: result.HighSupervisorID }
-                                    }
-                                };
-                            } else {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove2: {
-                                        ...nextState.UserApprove2,
-                                        value: null
-                                    }
-                                };
-                            }
-                            if (result.MidSupervisorID != null) {
-                                nextState = {
-                                    ...nextState,
-                                    UserApprove2: {
-                                        ...nextState.UserApprove2,
-                                        value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                        levelApproval: 1
                                     },
                                     UserApprove3: {
                                         ...nextState.UserApprove3,
-                                        value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                        visible: true,
+                                        levelApproval: 2
                                     },
                                     UserApprove4: {
                                         ...nextState.UserApprove4,
-                                        value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
-                                    }
-                                };
-                            } else {
-                                nextState = {
-                                    ...nextState,
+                                        visible: true,
+                                        levelApproval: 3
+                                    },
                                     UserApprove2: {
                                         ...nextState.UserApprove2,
-                                        value: null
-                                    },
-                                    UserApprove3: {
-                                        ...nextState.UserApprove3,
-                                        value: null
-                                    },
-                                    UserApprove4: {
-                                        ...nextState.UserApprove4,
-                                        value: null
+                                        levelApproval: 4
                                     }
                                 };
+
+                                // nextState = {
+                                //     ...nextState,
+                                //     isShowApprove3: true,
+                                //     isShowApprove4: true
+                                // }
                             }
+
                             if (result.IsChangeApprove != true) {
                                 nextState = {
+                                    ...nextState,
                                     UserApprove: {
                                         ...nextState.UserApprove,
                                         disable: true
@@ -828,6 +681,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 };
                             } else {
                                 nextState = {
+                                    ...nextState,
                                     UserApprove: {
                                         ...nextState.UserApprove,
                                         disable: false
@@ -847,36 +701,188 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 };
                             }
                         }
-                    }
 
-                    nextState = {
-                        ...nextState,
-                        UserApprove: {
-                            ...nextState.UserApprove,
-                            refresh: !UserApprove.refresh
-                        },
-                        UserApprove2: {
-                            ...nextState.UserApprove2,
-                            refresh: !UserApprove2.refresh
-                        },
-                        UserApprove3: {
-                            ...nextState.UserApprove3,
-                            refresh: !UserApprove3.refresh
-                        },
-                        UserApprove4: {
-                            ...nextState.UserApprove4,
-                            refresh: !UserApprove4.refresh
+                        //TH chạy không theo approve grade
+                        else if (result.LevelApprove == 0) {
+                            if (result.IsConCurrent) {
+                                let dataFirstApprove = [],
+                                    dataMidApprove = [],
+                                    dataLastApprove = [];
+
+                                for (let i = 0; i < result.ListSupervior.length; i++) {
+                                    dataFirstApprove.push({
+                                        UserInfoName: result.ListSupervior[i].SupervisorName,
+                                        ID: result.ListSupervior[i].SupervisorID
+                                    });
+                                }
+
+                                for (let i = 0; i < result.ListHightSupervior.length; i++) {
+                                    dataMidApprove.push({
+                                        UserInfoName: result.ListHightSupervior[i].HighSupervisorName,
+                                        ID: result.ListHightSupervior[i].HighSupervisorID
+                                    });
+                                    dataLastApprove.push({
+                                        UserInfoName: result.ListHightSupervior[i].HighSupervisorName,
+                                        ID: result.ListHightSupervior[i].HighSupervisorID
+                                    });
+                                }
+
+                                nextState = {
+                                    ...nextState,
+                                    UserApprove: {
+                                        ...nextState.UserApprove,
+                                        value: null
+                                    },
+                                    UserApprove2: {
+                                        ...nextState.UserApprove2,
+                                        value: null
+                                    },
+                                    UserApprove3: {
+                                        ...nextState.UserApprove3,
+                                        value: null
+                                    }
+                                };
+                            } else {
+                                if (result.SupervisorID != null) {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove: {
+                                            ...nextState.UserApprove,
+                                            value: { UserInfoName: result.SupervisorName, ID: result.SupervisorID }
+                                        }
+                                    };
+                                } else {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove: {
+                                            ...nextState.UserApprove,
+                                            value: null
+                                        }
+                                    };
+                                }
+                                if (result.HighSupervisorID != null) {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove2: {
+                                            ...nextState.UserApprove2,
+                                            value: { UserInfoName: result.HighSupervisorName, ID: result.HighSupervisorID }
+                                        }
+                                    };
+                                } else {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove2: {
+                                            ...nextState.UserApprove2,
+                                            value: null
+                                        }
+                                    };
+                                }
+                                if (result.MidSupervisorID != null) {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove2: {
+                                            ...nextState.UserApprove2,
+                                            value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                        },
+                                        UserApprove3: {
+                                            ...nextState.UserApprove3,
+                                            value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                        },
+                                        UserApprove4: {
+                                            ...nextState.UserApprove4,
+                                            value: { UserInfoName: result.SupervisorNextName, ID: result.MidSupervisorID }
+                                        }
+                                    };
+                                } else {
+                                    nextState = {
+                                        ...nextState,
+                                        UserApprove2: {
+                                            ...nextState.UserApprove2,
+                                            value: null
+                                        },
+                                        UserApprove3: {
+                                            ...nextState.UserApprove3,
+                                            value: null
+                                        },
+                                        UserApprove4: {
+                                            ...nextState.UserApprove4,
+                                            value: null
+                                        }
+                                    };
+                                }
+                                if (result.IsChangeApprove != true) {
+                                    nextState = {
+                                        UserApprove: {
+                                            ...nextState.UserApprove,
+                                            disable: true
+                                        },
+                                        UserApprove2: {
+                                            ...nextState.UserApprove2,
+                                            disable: true
+                                        },
+                                        UserApprove3: {
+                                            ...nextState.UserApprove3,
+                                            disable: true
+                                        },
+                                        UserApprove4: {
+                                            ...nextState.UserApprove4,
+                                            disable: true
+                                        }
+                                    };
+                                } else {
+                                    nextState = {
+                                        UserApprove: {
+                                            ...nextState.UserApprove,
+                                            disable: false
+                                        },
+                                        UserApprove2: {
+                                            ...nextState.UserApprove2,
+                                            disable: false
+                                        },
+                                        UserApprove3: {
+                                            ...nextState.UserApprove3,
+                                            disable: false
+                                        },
+                                        UserApprove4: {
+                                            ...nextState.UserApprove4,
+                                            disable: false
+                                        }
+                                    };
+                                }
+                            }
                         }
-                    };
 
-                    this.setState(nextState, () => {});
-                }
-            });
-        }
+                        nextState = {
+                            ...nextState,
+                            UserApprove: {
+                                ...nextState.UserApprove,
+                                refresh: !UserApprove.refresh
+                            },
+                            UserApprove2: {
+                                ...nextState.UserApprove2,
+                                refresh: !UserApprove2.refresh
+                            },
+                            UserApprove3: {
+                                ...nextState.UserApprove3,
+                                refresh: !UserApprove3.refresh
+                            },
+                            UserApprove4: {
+                                ...nextState.UserApprove4,
+                                refresh: !UserApprove4.refresh
+                            }
+                        };
+
+                        this.setState(nextState, () => {
+                            resolve(true);
+                        });
+                    }
+                });
+            }
+        });
     };
 
     // Step 1: Gọi hàm onShow để tạo mới hoặc chỉnh sửa hoặc onShowFromWorkDay để tạo mới
-    onShow = (params) => {
+    onShow = params => {
         this.setState(
             {
                 ...{ ...initSateDefault },
@@ -889,29 +895,37 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         );
     };
 
-    showLoading = (isShow) => {
-        this.setState({
-            isShowLoading: isShow
-        });
+    showLoading = isShow => {
+        if (!isShow)
+            setTimeout(() => {
+                this.setState({
+                    isShowLoading: isShow
+                });
+            }, 200);
+        else
+            this.setState({
+                isShowLoading: isShow
+            });
     };
 
     _renderHeaderLoading = () => {
-        if (this.state.isShowLoading) {
+        if (this.state.isShowLoading || this.isProcessing) {
             return (
-                <View style={styles.styLoadingHeader}>
+                <View style={[styleComonAddOrEdit.styLoadingHeader, Platform.OS === 'ios' && CustomStyleSheet.zIndex(99)]}>
                     <View style={styles.styViewLoading} />
-                    <VnrIndeterminate isVisible={this.state.isShowLoading} />
+                    <VnrIndeterminate isVisible={this.state.isShowLoading || this.isProcessing} />
                 </View>
             );
         } else return <View />;
     };
 
     getRecordAndConfigByID = (record, _handleSetState) => {
+
         // trường hợp có get config thì vào hàm này get
         _handleSetState(record);
     };
 
-    handleSetState = (response) => {
+    handleSetState = response => {
         const { DateFromTo, UserApprove, UserApprove3, UserApprove4, UserApprove2, SimilarRegistration } = this.state;
 
         this.levelApprove = response.LevelApproved ? response.LevelApproved : 4;
@@ -940,10 +954,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove,
                 value: response.UserApproveID
                     ? {
-                          UserInfoName: response.UserApproveName,
-                          ID: response.UserApproveID,
-                          AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
-                      }
+                        UserInfoName: response.UserApproveName,
+                        ID: response.UserApproveID,
+                        AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove.refresh
@@ -952,10 +966,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove3,
                 value: response.UserApproveID3
                     ? {
-                          UserInfoName: response.UserApproveName3,
-                          ID: response.UserApproveID3,
-                          AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
-                      }
+                        UserInfoName: response.UserApproveName3,
+                        ID: response.UserApproveID3,
+                        AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove3.refresh
@@ -964,10 +978,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove4,
                 value: response.UserApproveID4
                     ? {
-                          UserInfoName: response.UserApproveName4,
-                          ID: response.UserApproveID4,
-                          AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
-                      }
+                        UserInfoName: response.UserApproveName4,
+                        ID: response.UserApproveID4,
+                        AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove4.refresh
@@ -976,10 +990,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove2,
                 value: response.UserApproveID
                     ? {
-                          UserInfoName: response.UserApproveName2,
-                          ID: response.UserApproveID2,
-                          AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
-                      }
+                        UserInfoName: response.UserApproveName2,
+                        ID: response.UserApproveID2,
+                        AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
+                    }
                     : null,
                 disable: true,
                 refresh: !UserApprove2.refresh
@@ -1052,7 +1066,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         }
 
         this.setState(nextState, () => {
-            this.getRemainLeave();
+            VnrLoadingSevices.hide();
         });
     };
 
@@ -1061,8 +1075,8 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnReset',
             message: 'HRM_PortalApp_OnReset_Message',
-            onCancel: () => {},
-            onConfirm: () => {
+            onCancel: () => { },
+            onConfirm: async () => {
                 const { DateFromTo, SimilarRegistration } = this.state;
                 if (DateFromTo.value && DateFromTo.value.length > 0) {
                     const { params } = this.state;
@@ -1071,7 +1085,12 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 
                     if (!record) {
                         // nếu bấm refresh lấy lại cấp duyệt
-                        this.getApprovalProcess();
+                        const statusLoading = await this.getHighSupervisor();
+                        if (statusLoading) {
+                            this.setState({
+                                isShowLoading: false
+                            })
+                        }
                     } else {
                         // Nếu bấm refresh khi Chỉnh sửa
                         this.isModify = true;
@@ -1085,7 +1104,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                             if (this.listRefGetDataSave[key]) this.listRefGetDataSave[key].unduData();
                         } else {
                             // Đăng ký từng ngày, 1 ngày
-                            DateFromTo.value.map((item) => {
+                            DateFromTo.value.map(item => {
                                 if (this.listRefGetDataSave[item]) this.listRefGetDataSave[item].unduData();
                             });
                         }
@@ -1099,9 +1118,9 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     };
     //#endregion
 
-    delete = (item) => {
+    delete = item => {
         const { DateFromTo } = this.state;
-        let rs = DateFromTo.value.filter((e) => {
+        let rs = DateFromTo.value.filter(e => {
             return moment(e).isSame(moment(item)) === false;
         });
         this.setState({
@@ -1126,12 +1145,12 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         });
     };
 
-    onDeleteItemDay = (index) => {
+    onDeleteItemDay = index => {
         this.AlertSevice.alert({
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnDeleteItemDay',
             textRightButton: 'Confirm',
-            onCancel: () => {},
+            onCancel: () => { },
             onConfirm: () => {
                 const { DateFromTo } = this.state;
                 if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 1) {
@@ -1157,61 +1176,46 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         const { DateFromTo, SimilarRegistration } = this.state;
         if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value) {
-                this.setState(
-                    {
-                        DateFromTo: {
-                            ...DateFromTo,
-                            value: date,
-                            refresh: !DateFromTo.refresh
-                        }
-                    },
-                    () => this.getApprovalProcess()
-                );
-            } else {
-                if (DateFromTo.value[index]) DateFromTo.value[index] = moment(new Date(date)).format('YYYY-MM-DD');
-
-                this.setState(
-                    {
-                        DateFromTo: {
-                            ...DateFromTo,
-                            value: DateFromTo.value,
-                            refresh: !DateFromTo.refresh
-                        }
-                    },
-                    () => this.getApprovalProcess()
-                );
-            }
-        } else if (date.endDate && date.startDate) {
-            this.setState(
-                {
+                this.setState({
                     DateFromTo: {
                         ...DateFromTo,
                         value: date,
                         refresh: !DateFromTo.refresh
                     }
-                },
-                () => this.getApprovalProcess()
-            );
+                });
+            } else {
+                if (DateFromTo.value[index]) DateFromTo.value[index] = moment(new Date(date)).format('YYYY-MM-DD');
+
+                this.setState({
+                    DateFromTo: {
+                        ...DateFromTo,
+                        value: DateFromTo.value,
+                        refresh: !DateFromTo.refresh
+                    }
+                });
+            }
+        } else if (date.endDate && date.startDate) {
+            this.setState({
+                DateFromTo: {
+                    ...DateFromTo,
+                    value: date,
+                    refresh: !DateFromTo.refresh
+                }
+            });
         }
     };
 
-    onChangeDateFromTo = (range) => {
+    onChangeDateFromTo = range => {
         const { DateFromTo } = this.state;
         this.listRefGetDataSave = {};
-        this.setState(
-            {
-                DateFromTo: {
-                    ...DateFromTo,
-                    value: range,
-                    refresh: !DateFromTo.refresh
-                },
-                isShowModal: true
+        this.setState({
+            DateFromTo: {
+                ...DateFromTo,
+                value: range,
+                refresh: !DateFromTo.refresh
             },
-            () => {
-                this.getRemainLeave();
-                this.getApprovalProcess();
-            }
-        );
+            isShowModal: true
+        });
     };
 
     renderApprove = () => {
@@ -1239,25 +1243,32 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     };
 
     onSaveAndSend = () => {
+        if (this.state.isShowLoading) return;
         this.onSave(true);
     };
 
     onSaveTemp = () => {
+        if (this.state.isShowLoading) return;
         this.onSave(false, true);
     };
 
     onSave = (isSend, isconfirm) => {
-        if (this.isProcessing) return;
-        let lstLeaveDayItem = [];
-        const { DateFromTo, Profile, modalErrorDetail, params, SimilarRegistration } = this.state,
+        let lstLeaveDayItem = [],
+            totalLeaveDay = 0;
+        const {
+                DateFromTo,
+                Profile,
+                UserApprove,
+                UserApprove2,
+                UserApprove3,
+                UserApprove4,
+                modalErrorDetail,
+                params,
+                SimilarRegistration
+            } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
             { record } = params;
-        let dataApprovalProcess = [];
-
-        if (typeof this.refApproval?.getData === 'function') {
-            dataApprovalProcess = this.refApproval?.getData();
-        }
 
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value && DateFromTo.value.length > 1) {
@@ -1268,13 +1279,12 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     if (data) {
                         const { lstLeaveDaysHours } = data;
 
-                        DateFromTo.value.map((item) => {
+                        DateFromTo.value.map(item => {
                             // Gán lại LeavesDay và LeavesHours vì dữ liệu trả ra đã bị cộng dồn lại.
                             const dataLeaveDaysHours = lstLeaveDaysHours ? lstLeaveDaysHours[item] : null;
 
                             lstLeaveDayItem.push({
                                 ...data,
-                                DataApprove: dataApprovalProcess,
                                 LeaveDays:
                                     dataLeaveDaysHours && dataLeaveDaysHours.LeaveDays
                                         ? dataLeaveDaysHours.LeaveDays
@@ -1293,11 +1303,11 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 }
             } else {
                 // Đăng ký từng ngày, 1 ngày
-                DateFromTo.value.map((item) => {
+                DateFromTo.value.map(item => {
                     if (this.listRefGetDataSave[item]) {
                         let data = this.listRefGetDataSave[item].getAllData();
                         if (data) {
-                            lstLeaveDayItem.push({ ...data, DataApprove: dataApprovalProcess });
+                            lstLeaveDayItem.push(data);
                         }
                     }
                 });
@@ -1308,7 +1318,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             if (this.listRefGetDataSave[key]) {
                 let data = this.listRefGetDataSave[key].getAllData();
                 if (data) {
-                    lstLeaveDayItem.push({ ...data, DataApprove: dataApprovalProcess });
+                    lstLeaveDayItem.push(data);
                 }
             }
         }
@@ -1337,10 +1347,21 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 
         let payload = {};
         if (lstLeaveDayItem.length > 0) {
+            totalLeaveDay = lstLeaveDayItem.reduce((acc, item) => acc + item?.LeaveDays ?? 0, 0);
+            if (totalLeaveDay > 0)
+                payload = {
+                    ...payload,
+                    TotalLeaveDay: totalLeaveDay
+                }
             payload = {
                 ...payload,
                 ID: record && record.ID ? record.ID : null,
                 ProfileIDs: Profile.ID,
+                // Lý do gán lại cấp duyệt thứ tự 1.2.3.4 là do server tự gán lại theo thứ tự 1.3.4.2
+                UserApproveID: UserApprove && UserApprove.value ? UserApprove.value.ID : null,
+                UserApproveID2: UserApprove3 && UserApprove3.value ? UserApprove3.value.ID : null,
+                UserApproveID3: UserApprove4 && UserApprove4.value ? UserApprove4.value.ID : null,
+                UserApproveID4: UserApprove2 && UserApprove2.value ? UserApprove2.value.ID : null,
 
                 UserSubmit: Profile.ID,
                 Host: uriPor,
@@ -1359,16 +1380,19 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     IsAddNewAndSendMail: true
                 };
                 AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttSubmitTakeLeaveDay] = true;
-                AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttSaveTempSubmitTakeLeaveDay] =
-                    true;
-                AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttApproveSubmitTakeLeaveDay] =
-                    true;
+                AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[
+                    ScreenName.AttSaveTempSubmitTakeLeaveDay
+                ] = true;
+                AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[
+                    ScreenName.AttApproveSubmitTakeLeaveDay
+                ] = true;
             }
+
             const callSave = () => {
                 this.isProcessing = true;
                 this.showLoading(true);
+                HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/CreateOrUpdateLeaveday', payload).then(res => {
 
-                HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/CreateOrUpdateLeaveday', payload).then((res) => {
                     this.isProcessing = false;
                     this.showLoading(false);
                     if (res && typeof res === EnumName.E_object) {
@@ -1401,7 +1425,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                                 this.onSave(isSend);
                                             },
                                             //đóng
-                                            onCancel: () => {},
+                                            onCancel: () => { },
                                             //chi tiết lỗi
                                             textRightButton: translate('Button_Detail'),
                                             onConfirm: () => {
@@ -1428,7 +1452,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             ),
                                             textRightButton: translate('Button_Detail'),
                                             //đóng popup
-                                            onCancel: () => {},
+                                            onCancel: () => { },
                                             //chi tiết lỗi
                                             onConfirm: () => {
                                                 this.setState(
@@ -1462,7 +1486,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             this.onSave(isSend);
                                         },
                                         //đóng
-                                        onCancel: () => {},
+                                        onCancel: () => { },
                                         //chi tiết lỗi
                                         textRightButton: translate('Button_Detail'),
                                         onConfirm: () => {
@@ -1500,11 +1524,12 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     iconType: EnumIcon.E_CONFIRM,
                     title: 'HRM_PortalApp_OnSave_Temp',
                     message: 'HRM_PortalApp_OnSave_Temp_Message',
-                    onCancel: () => {},
+                    onCancel: () => { },
                     onConfirm: () => {
                         callSave();
-                        AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttSubmitTakeLeaveDay] =
-                            true;
+                        AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[
+                            ScreenName.AttSubmitTakeLeaveDay
+                        ] = true;
                         AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[
                             ScreenName.AttSaveTempSubmitTakeLeaveDay
                         ] = true;
@@ -1527,7 +1552,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         }, {}); // empty object is the initial value for result object
     };
 
-    mappingDataGroup = (dataGroup) => {
+    mappingDataGroup = dataGroup => {
         let dataSource = [];
         let key = '';
         for (key in dataGroup) {
@@ -1631,76 +1656,6 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         }
     };
 
-    getRemainLeave = () => {
-        const { Profile } = this.state;
-        HttpService.Get(`[URI_CENTER]/api/Att_LeaveDay/GetLeaveDayFundsRemaining?profileID=${Profile.ID}`).then(
-            (resGetRemaining) => {
-                let nextState = {};
-                if (
-                    resGetRemaining?.Status === 'SUCCESS' &&
-                    Array.isArray(resGetRemaining?.Data) &&
-                    resGetRemaining?.Data.length > 0
-                ) {
-                    // Cộng tất cả LeaveDaysRegister
-                    const totalLeaveDays = resGetRemaining?.Data.reduce((sum, item) => {
-                        const text = item?.FundsRemainingDetail?.LeaveDaysRegister || '0';
-                        const num = parseFloat(text); // parse "1.00 Ngày" → 1.00
-                        return sum + (isNaN(num) ? 0 : num);
-                    }, 0);
-                    nextState = {
-                        ...nextState,
-                        totalRemain: totalLeaveDays,
-                        listRemainingLeaveFunds: [...resGetRemaining?.Data],
-                        isConfigRemainLeavefunds: true,
-                        isLoadingGetRemain: false
-                    };
-                } else {
-                    nextState = {
-                        ...nextState,
-                        totalRemain: 0,
-                        listRemainingLeaveFunds: [],
-                        isConfigRemainLeavefunds: false,
-                        isLoadingGetRemain: false
-                    };
-                }
-
-                this.setState({ ...nextState });
-            }
-        );
-    };
-
-    renderRemain = () => {
-        const { listRemainingLeaveFunds, totalRemain } = this.state;
-        if (listRemainingLeaveFunds?.length > 0) {
-            return (
-                <View style={customStyle.remainingLeaveContainer}>
-                    <View style={customStyle.remainingLeaveHeader}>
-                        <IconInfo size={Size.iconSize} color={Colors.blue} />
-                        <Text style={customStyle.remainingLeaveTitle}>{translate('HRM_Total_Leave_Balance')}</Text>
-                    </View>
-
-                    <View style={CustomStyleSheet.marginLeft(12)}>
-                        {listRemainingLeaveFunds.map((item, index) => (
-                            <View key={index} style={customStyle.row}>
-                                <View style={customStyle.dot} />
-                                <Text style={customStyle.text}>
-                                    {item?.TypeName ?? ''}: {item?.FundsRemainingDetail?.TotalRemain ?? '0.00'}
-                                </Text>
-                            </View>
-                        ))}
-                    </View>
-
-                    <View>
-                        <Text style={[CustomStyleSheet.fontSize(14), CustomStyleSheet.fontWeight('700')]}>
-                            {translate('HRM_PortalApp_LeaveDay_TotalLeaveDaysTaken')}: {totalRemain}{' '}
-                            {translate('HRM_PortalApp_TSLRegister_day')}
-                        </Text>
-                    </View>
-                </View>
-            );
-        } else return <View />;
-    };
-
     getErrorMessageRespone() {
         const { modalErrorDetail, Profile } = this.state,
             { cacheID } = modalErrorDetail;
@@ -1710,7 +1665,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             cacheID: cacheID,
             IsPortal: true,
             ProfileID: Profile.ID
-        }).then((res) => {
+        }).then(res => {
             this.showLoading(false);
             if (res && res.Data && res.Status == EnumName.E_SUCCESS) {
                 const data = res.Data.Data;
@@ -1737,7 +1692,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     //#endregion
 
     // Thay đổi đăng ký tương tự
-    onChangeSimilarRegistration = (value) => {
+    onChangeSimilarRegistration = value => {
         const { SimilarRegistration } = this.state;
 
         this.setState({
@@ -1749,14 +1704,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         });
     };
 
-    componentDidMount() {
-        PermissionForAppMobile.value = {
-            ...PermissionForAppMobile.value,
-            Sys_ProcessApprove_ChangeProcess: {
-                View: true
-            }
-        };
-    }
+    componentDidMount() { }
 
     onScrollToInputIOS = (index, height) => {
         try {
@@ -1775,20 +1723,20 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     };
 
     renderItems = () => {
-        const { DateFromTo, SimilarRegistration, fieldConfig, params, isCheckEmpty, dataApprovalProcess } = this.state;
+        const { DateFromTo, SimilarRegistration, fieldConfig, params, isCheckEmpty } = this.state;
         if (Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value && DateFromTo.value.length > 1) {
                 // Đăng ký nhiều ngày cùng lúc
                 const key = JSON.stringify(DateFromTo.value);
                 return (
                     <FlatList
-                        ref={(refs) => (this.refFlatList = refs)}
+                        ref={refs => (this.refFlatList = refs)}
                         style={styles.styFlatListContainer}
                         data={[key]}
                         renderItem={({ item, index }) => (
                             <AttTakeLeaveDayComponent
                                 key={item}
-                                ref={(refCom) => {
+                                ref={refCom => {
                                     this.listRefGetDataSave[`${item}`] = refCom;
                                 }}
                                 levelApprove={this.levelApprove}
@@ -1807,37 +1755,25 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 updateShowRemain={this.updateShowRemain}
                                 onScrollToInputIOS={this.onScrollToInputIOS}
                                 getHighSupervisor={this.getHighSupervisor}
-                                showRemain={this.state.isShowRemain}
+                                isLoading={this.state.isShowLoading}
                             />
                         )}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={() => {
-                            return (
-                                <VnrApprovalProcess
-                                    ref={(ref) => (this.refApproval = ref)}
-                                    ToasterSevice={() => this.ToasterSeviceCallBack()}
-                                    isEdit={
-                                        PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']
-                                    }
-                                    data={dataApprovalProcess}
-                                />
-                            );
-                        }}
-                        ListHeaderComponent={this.renderRemain}
+                        ListFooterComponent={this.renderApprove}
                     />
                 );
             } else {
                 // Đăng ký từng ngày, 1 ngày
                 return (
                     <FlatList
-                        ref={(refs) => (this.refFlatList = refs)}
+                        ref={refs => (this.refFlatList = refs)}
                         style={styles.styFlatListContainer}
                         data={DateFromTo.value}
                         renderItem={({ item, index }) => (
                             <AttTakeLeaveDayComponent
                                 key={item}
-                                ref={(refCom) => {
+                                ref={refCom => {
                                     this.listRefGetDataSave[`${item}`] = refCom;
                                 }}
                                 levelApprove={this.levelApprove}
@@ -1857,24 +1793,12 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                     Array.isArray(DateFromTo.value) && DateFromTo.value.length == 1 ? false : true
                                 }
                                 getHighSupervisor={this.getHighSupervisor}
-                                showRemain={this.state.isShowRemain}
+                                isLoading={this.state.isShowLoading}
                             />
                         )}
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
-                        ListFooterComponent={() => {
-                            return (
-                                <VnrApprovalProcess
-                                    ref={(ref) => (this.refApproval = ref)}
-                                    ToasterSevice={() => this.ToasterSeviceCallBack()}
-                                    isEdit={
-                                        PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']
-                                    }
-                                    data={dataApprovalProcess}
-                                />
-                            );
-                        }}
-                        ListHeaderComponent={this.renderRemain}
+                        ListFooterComponent={this.renderApprove}
                     />
                 );
             }
@@ -1883,13 +1807,13 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             const key = `${DateFromTo.value.startDate}-${DateFromTo.value.endDate}`;
             return (
                 <FlatList
-                    ref={(refs) => (this.refFlatList = refs)}
+                    ref={refs => (this.refFlatList = refs)}
                     style={styles.styFlatListContainer}
                     data={[key]}
                     renderItem={({ item, index }) => (
                         <AttTakeLeaveDayComponent
                             key={item}
-                            ref={(refCom) => {
+                            ref={refCom => {
                                 this.listRefGetDataSave[`${item}`] = refCom;
                             }}
                             levelApprove={this.levelApprove}
@@ -1908,40 +1832,28 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                             ToasterSevice={() => this.ToasterSeviceCallBack()}
                             onScrollToInputIOS={this.onScrollToInputIOS}
                             getHighSupervisor={this.getHighSupervisor}
-                            showRemain={this.state.isShowRemain}
+                            isLoading={this.state.isShowLoading}
                         />
                     )}
                     keyExtractor={(item, index) => index}
                     ItemSeparatorComponent={() => <View style={styles.separate} />}
-                    ListFooterComponent={() => {
-                        return (
-                            <VnrApprovalProcess
-                                ref={(ref) => (this.refApproval = ref)}
-                                ToasterSevice={() => this.ToasterSeviceCallBack()}
-                                isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']}
-                                data={dataApprovalProcess}
-                            />
-                        );
-                    }}
-                    ListHeaderComponent={this.renderRemain}
+                    ListFooterComponent={this.renderApprove}
                 />
             );
         }
     };
 
-    updateShowRemain = (value) => {
-        const { remain, LeaveDayNoFundDetail } = value;
+    updateShowRemain = value => {
         this.setState({
             isShowRemain: {
-                visible: (!!remain && remain !== 0) || value?.IsLeaveDayNoFund ? true : false,
-                value: value?.IsLeaveDayNoFund ? LeaveDayNoFundDetail : remain,
-                isPrioritize: value?.IsLeaveDayNoFund
+                visible: value != null && value !== '' && value !== 0 ? true : false,
+                value: value
             }
         });
     };
 
     //change duyệt đầu
-    onChangeUserApprove = (item) => {
+    onChangeUserApprove = item => {
         const { UserApprove, UserApprove2, UserApprove3, UserApprove4 } = this.state;
 
         let nextState = {
@@ -2015,7 +1927,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     };
 
     //change duyệt cuối
-    onChangeUserApprove2 = (item) => {
+    onChangeUserApprove2 = item => {
         const { UserApprove, UserApprove2, UserApprove3, UserApprove4 } = this.state;
 
         let nextState = {
@@ -2134,45 +2046,24 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         this.setState(nextState);
     };
 
-    getApprovalProcess = () => {
-        const { Profile, DateFromTo } = this.state;
-        if (!Profile.ID || !DateFromTo.value) return;
-
-        this.showLoading(true);
-        const payload = {
-            ProfileID: Profile.ID,
-            WorkDate: Array.isArray(DateFromTo.value)
-                ? moment(DateFromTo.value[0]).format('YYYY/MM/DD')
-                : moment(DateFromTo.value).format('YYYY/MM/DD'),
-            BusinessType: 'E_LEAVEDAY'
-        };
-
-        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload)
-            .then((res) => {
-                this.showLoading(false);
-                if (res?.Status === EnumName.E_SUCCESS) {
-                    this.setState({
-                        dataApprovalProcess: res.Data
-                    });
-                } else {
-                    this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
-                }
-            })
-            .catch(() => {
-                this.showLoading(false);
-                this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
-            });
-    };
-
     render() {
         const {
             DateFromTo,
             isShowModal,
+            isShowModalApprove,
+            UserApprove,
+            UserApprove3,
+            UserApprove4,
+            UserApprove2,
             SimilarRegistration,
+            isShowRemain,
             /// lỗi chi tiết
             modalErrorDetail,
             // ---------- //
-            isVisibleKeyboard
+            isVisibleKeyboard,
+            listRemainingLeaveFunds,
+            isShowRemainLeavefunds,
+            isConfigRemainLeavefunds
         } = this.state;
 
         if (Object.keys(this.state).length == 0) return <View />;
@@ -2203,14 +2094,14 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         return (
             <View style={styles.container}>
                 <VnrDateFromTo
-                    ref={(ref) => (this.refVnrDateFromTo = ref)}
+                    ref={ref => (this.refVnrDateFromTo = ref)}
                     // key={DateFromTo.id}
                     refresh={DateFromTo.refresh}
                     value={DateFromTo.value === null ? {} : DateFromTo.value}
                     displayOptions={true}
                     onlyChooseEveryDay={false}
                     disable={DateFromTo.disable}
-                    onFinish={(range) => this.onChangeDateFromTo(range)}
+                    onFinish={range => this.onChangeDateFromTo(range)}
                 />
 
                 {DateFromTo.value !== null ? (
@@ -2220,8 +2111,8 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         visible={isShowModal} //isShowModal
                     >
                         <SafeAreaView style={styles.wrapInsideModal}>
-                            <ToasterInModal ref={(refs) => (this.ToasterSevice = refs)} />
-                            <AlertInModal ref={(refs) => (this.AlertSevice = refs)} />
+                            <ToasterInModal ref={refs => (this.ToasterSevice = refs)} />
+                            <AlertInModal ref={refs => (this.AlertSevice = refs)} />
 
                             <View style={styles.flRowSpaceBetween}>
                                 <VnrText
@@ -2249,17 +2140,17 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 DateFromTo.value &&
                                 Array.isArray(DateFromTo.value) &&
                                 DateFromTo.value.length > 1 && (
-                                    <View>
-                                        <VnrSwitch
-                                            lable={'HRM_PortalApp_TakeLeave_Similar'}
-                                            subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
-                                            value={SimilarRegistration.value}
-                                            onFinish={(value) => {
-                                                this.onChangeSimilarRegistration(value);
-                                            }}
-                                        />
-                                    </View>
-                                )}
+                                <View>
+                                    <VnrSwitch
+                                        lable={'HRM_PortalApp_TakeLeave_Similar'}
+                                        subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
+                                        value={SimilarRegistration.value}
+                                        onFinish={value => {
+                                            this.onChangeSimilarRegistration(value);
+                                        }}
+                                    />
+                                </View>
+                            )}
 
                             <KeyboardAvoidingView
                                 scrollEnabled={true}
@@ -2272,9 +2163,251 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                             {/* button */}
                             {!isVisibleKeyboard && (
                                 <View style={styles.alignItems}>
+                                    {isConfigRemainLeavefunds ||
+                                        (isShowRemain.visible && isShowRemain.value != null) ? (
+                                            <View style={styles.wrapViewRemaining}>
+                                                {isConfigRemainLeavefunds ? (
+                                                    isShowRemainLeavefunds ? (
+                                                        <View style={styles.contentRemaining}>
+                                                            <IconDate size={Size.text + 4} color={Colors.white} />
+                                                            <ScrollView
+                                                                style={CustomStyleSheet.flex(1)}
+                                                                horizontal={true}
+                                                                showsHorizontalScrollIndicator={false}
+                                                            >
+                                                                {listRemainingLeaveFunds.map((item, index) => {
+                                                                    return (
+                                                                        <View
+                                                                            style={CustomStyleSheet.marginHorizontal(3)}
+                                                                            key={item?.Type}
+                                                                        >
+                                                                            <Text
+                                                                                style={[
+                                                                                    styleSheets.text,
+                                                                                    {
+                                                                                        color: Colors.white,
+                                                                                        fontSize: Size.text
+                                                                                    }
+                                                                                ]}
+                                                                            >
+                                                                                {`${translate(item?.TypeName)}: ${item?.Remain
+                                                                                }/${item?.Available}`}{' '}
+                                                                                {listRemainingLeaveFunds.length - 1 !==
+                                                                                index && ' | '}
+                                                                            </Text>
+                                                                        </View>
+                                                                    );
+                                                                })}
+                                                            </ScrollView>
+                                                        </View>
+                                                    ) : (
+                                                        <View style={styles.contentRemaining}>
+                                                            <IconDate size={Size.text + 4} color={Colors.white} />
+                                                            <ScrollView
+                                                                style={CustomStyleSheet.flex(1)}
+                                                                horizontal={true}
+                                                                showsHorizontalScrollIndicator={false}
+                                                            >
+                                                                <View>
+                                                                    <Text
+                                                                        style={[
+                                                                            styleSheets.text,
+                                                                            {
+                                                                                color: Colors.white,
+                                                                                fontSize: Size.text
+                                                                            }
+                                                                        ]}
+                                                                    >
+                                                                        {translate(
+                                                                            'HRM_PortalApp_TakeLeave_DoYouWantToSee'
+                                                                        )}
+                                                                    </Text>
+                                                                </View>
+                                                                <TouchableOpacity
+                                                                    onPress={() => {
+                                                                        this.setState({
+                                                                            isShowRemainLeavefunds: true
+                                                                        });
+                                                                    }}
+                                                                    style={{
+                                                                        ...CustomStyleSheet.borderBottomColor(Colors.blue),
+                                                                        ...CustomStyleSheet.borderBottomWidth(1)
+                                                                    }}
+                                                                >
+                                                                    <Text
+                                                                        style={[
+                                                                            styleSheets.text,
+                                                                            {
+                                                                                color: Colors.blue,
+                                                                                fontSize: Size.text
+                                                                            }
+                                                                        ]}
+                                                                    >
+                                                                        {translate(
+                                                                            'HRM_PortalApp_TakeLeave_PermissionFund'
+                                                                        )}
+                                                                    </Text>
+                                                                </TouchableOpacity>
+                                                                <View>
+                                                                    <Text
+                                                                        style={[
+                                                                            styleSheets.text,
+                                                                            {
+                                                                                color: Colors.white,
+                                                                                fontSize: Size.text
+                                                                            }
+                                                                        ]}
+                                                                    >
+                                                                        {translate('HRM_PortalApp_TakeLeave_Remaining')}
+                                                                    </Text>
+                                                                </View>
+                                                            </ScrollView>
+                                                        </View>
+                                                    )
+                                                ) : (
+                                                    isShowRemain.visible &&
+                                                isShowRemain.value != null && (
+                                                        <View style={styles.contentRemaining}>
+                                                            <IconDate size={Size.text + 4} color={Colors.white} />
+                                                            <Text style={[styleSheets.text, styles.styViewRemainText]}>
+                                                                {`${translate('HRM_PortalApp_TakeLeave_Remain')} ${isShowRemain.value
+                                                                }`}
+                                                            </Text>
+                                                        </View>
+                                                    )
+                                                )}
+                                            </View>
+                                        ) : null}
                                     <ListButtonRegister listActions={listActions} />
                                 </View>
                             )}
+
+                            {/* modal cấp duyệt */}
+                            {isShowModalApprove ? ( //styles.wrapModalApprovaLevel
+                                <View style={styles.wrapModalApproval}>
+                                    <TouchableOpacity
+                                        style={[styles.bgOpacity]}
+                                        onPress={() => {
+                                            this.setState({
+                                                isShowModalApprove: false
+                                            });
+                                        }}
+                                    />
+                                    <View style={styles.modalApprover}>
+                                        <SafeAreaView style={styles.wrapContentModalApproval}>
+                                            <View style={styles.wrapTitileHeaderModalApprovaLevel}>
+                                                <VnrText
+                                                    style={[styleSheets.text, styles.styRegister, styles.fS16fW600]}
+                                                    i18nKey={'HRM_PortalApp_Approval_Process'}
+                                                />
+                                                <VnrText
+                                                    style={[styleSheets.text, styles.styApproveProcessTitle]}
+                                                    i18nKey={`${this.levelApprove} ${translate(
+                                                        'HRM_PortalApp_Approval_Level'
+                                                    )}`}
+                                                />
+                                            </View>
+                                            <View style={styles.wrapLevelApproval}>
+                                                <View style={styles.h90}>
+                                                    <VnrLoadApproval
+                                                        api={API_APPROVE}
+                                                        refresh={UserApprove.refresh}
+                                                        textField="UserInfoName"
+                                                        valueField="ID"
+                                                        nameApprovalLevel={UserApprove.label}
+                                                        levelApproval={UserApprove.levelApproval}
+                                                        filter={true}
+                                                        filterServer={true}
+                                                        filterParams={'Text'}
+                                                        autoFilter={true}
+                                                        status={UserApprove.status}
+                                                        value={UserApprove.value}
+                                                        disable={UserApprove.disable}
+                                                        onFinish={item => this.onChangeUserApprove(item)}
+                                                    />
+                                                </View>
+
+                                                {UserApprove3.visible && UserApprove3.visibleConfig && (
+                                                    <View style={styles.h90}>
+                                                        <VnrLoadApproval
+                                                            api={API_APPROVE}
+                                                            refresh={UserApprove3.refresh}
+                                                            textField="UserInfoName"
+                                                            nameApprovalLevel={UserApprove3.label}
+                                                            levelApproval={UserApprove3.levelApproval}
+                                                            valueField="ID"
+                                                            filter={true}
+                                                            filterServer={true}
+                                                            filterParams={'Text'}
+                                                            autoFilter={true}
+                                                            status={UserApprove3.status}
+                                                            value={UserApprove3.value}
+                                                            disable={UserApprove3.disable}
+                                                            onFinish={item => {
+                                                                this.setState({
+                                                                    UserApprove3: {
+                                                                        ...UserApprove3,
+                                                                        value: item,
+                                                                        refresh: !UserApprove3.refresh
+                                                                    }
+                                                                });
+                                                            }}
+                                                        />
+                                                    </View>
+                                                )}
+
+                                                {UserApprove4.visible && UserApprove4.visibleConfig && (
+                                                    <View style={styles.h90}>
+                                                        <VnrLoadApproval
+                                                            api={API_APPROVE}
+                                                            refresh={UserApprove4.refresh}
+                                                            textField="UserInfoName"
+                                                            nameApprovalLevel={UserApprove4.label}
+                                                            levelApproval={UserApprove4.levelApproval}
+                                                            valueField="ID"
+                                                            filter={true}
+                                                            filterServer={true}
+                                                            filterParams={'Text'}
+                                                            autoFilter={true}
+                                                            status={UserApprove4.status}
+                                                            value={UserApprove4.value}
+                                                            disable={UserApprove4.disable}
+                                                            onFinish={item => {
+                                                                this.setState({
+                                                                    UserApprove4: {
+                                                                        ...UserApprove4,
+                                                                        value: item,
+                                                                        refresh: !UserApprove4.refresh
+                                                                    }
+                                                                });
+                                                            }}
+                                                        />
+                                                    </View>
+                                                )}
+
+                                                <View style={styles.h90}>
+                                                    <VnrLoadApproval
+                                                        api={API_APPROVE}
+                                                        refresh={UserApprove2.refresh}
+                                                        textField="UserInfoName"
+                                                        nameApprovalLevel={UserApprove2.label}
+                                                        levelApproval={UserApprove2.levelApproval}
+                                                        valueField="ID"
+                                                        filter={true}
+                                                        filterServer={true}
+                                                        filterParams={'Text'}
+                                                        autoFilter={true}
+                                                        status={UserApprove2.status}
+                                                        value={UserApprove2.value}
+                                                        disable={UserApprove2.disable}
+                                                        onFinish={item => this.onChangeUserApprove2(item)}
+                                                    />
+                                                </View>
+                                            </View>
+                                        </SafeAreaView>
+                                    </View>
+                                </View>
+                            ) : null}
                         </SafeAreaView>
 
                         {modalErrorDetail.isModalVisible && (
@@ -2310,44 +2443,5 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 }
 
 const styles = styleComonAddOrEdit;
-const customStyle = StyleSheet.create({
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 6
-    },
-    dot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: Colors.black, // màu dot
-        marginRight: 8
-    },
-    text: {
-        fontSize: 14,
-        color: Colors.black
-    },
-    remainingLeaveContainer: {
-        flex: 1,
-        backgroundColor: Colors.blue_transparent_8,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderTopColor: Colors.gray_5,
-        borderTopWidth: 0.5,
-        borderBottomColor: Colors.gray_5,
-        borderBottomWidth: 0.5
-    },
-    remainingLeaveHeader: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center'
-    },
-    remainingLeaveTitle: {
-        marginLeft: 6,
-        fontSize: 16,
-        fontWeight: '600',
-        color: Colors.blue
-    }
-});
 
 export default AttSubmitTakeLeaveDayAddOrEdit;

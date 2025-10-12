@@ -376,7 +376,7 @@ class TopTabProfileBasicInfoUpdate extends Component {
 
                 if (res && res.Value1) {
                     // ProbationTime mặc định disable task 0172569
-                    res.Value1 = res.Value1 + ',ProbationTime,SeniorityByFormula,DateJoinCorporation';
+                    res.Value1 = res.Value1 + ',ProbationTime,SeniorityByFormula';
                     nextState = {
                         ...nextState,
                         dataNotChange: res.Value1,
@@ -588,13 +588,12 @@ class TopTabProfileBasicInfoUpdate extends Component {
                             </View>
                             <View style={styles.viewAvatar}>
                                 <TouchableOpacity
+                                    style={styles.avatar}
                                     onPress={() =>
                                         !isChange && this.resActionSheet ? this.resActionSheet.show() : null
                                     }
                                 >
-                                    {
-                                        Vnr_Function.renderAvatarCricleByName(_imagePath, profile?.ProfileName ?? 'A', 50)
-                                    }
+                                    <Image source={{ uri: _imagePath }} style={styles.imgAvatar} />
                                 </TouchableOpacity>
                                 <View style={styles.avatarEdit}>
                                     {!isChange && (
@@ -823,201 +822,84 @@ class TopTabProfileBasicInfoUpdate extends Component {
         }
     };
 
-    showPickerImage = async () => {
-        try {
-            let hasPermission = false;
-
-            if (Platform.OS === 'android') {
-                // Thêm permissions nếu chưa có
-                if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_IMAGES) {
-                    PermissionsAndroid.PERMISSIONS = {
-                        ...PermissionsAndroid.PERMISSIONS,
-                        READ_MEDIA_IMAGES: 'android.permission.READ_MEDIA_IMAGES'
-                    };
-                }
-                if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_VIDEO) {
-                    PermissionsAndroid.PERMISSIONS = {
-                        ...PermissionsAndroid.PERMISSIONS,
-                        READ_MEDIA_VIDEO: 'android.permission.READ_MEDIA_VIDEO'
-                    };
-                }
-
-                // Kiểm tra Android version
-                const androidVersion = Platform.Version;
-
-                if (androidVersion >= 33) {
-                    // Android 13+ sử dụng READ_MEDIA_IMAGES
-                    const result = await PermissionsAndroid.request(
-                        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-                        {
-                            title: translate('HRM_Permission_Photo_Title'),
-                            message: translate('HRM_Permission_Photo_Message'),
-                            buttonNeutral: translate('HRM_Permission_Ask_Later'),
-                            buttonNegative: translate('HRM_Common_Cancel'),
-                            buttonPositive: translate('HRM_Common_OK')
-                        }
-                    );
-                    hasPermission = result === PermissionsAndroid.RESULTS.GRANTED;
-                } else {
-                    // Android < 13 sử dụng READ_EXTERNAL_STORAGE
-                    const result = await PermissionsAndroid.request(
-                        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                        {
-                            title: translate('HRM_Permission_Photo_Title'),
-                            message: translate('HRM_Permission_Photo_Message'),
-                            buttonNeutral: translate('HRM_Permission_Ask_Later'),
-                            buttonNegative: translate('HRM_Common_Cancel'),
-                            buttonPositive: translate('HRM_Common_OK')
-                        }
-                    );
-                    hasPermission = result === PermissionsAndroid.RESULTS.GRANTED;
-                }
-            } else {
-                // iOS
-                const result = await check(PERMISSIONS.IOS.PHOTO_LIBRARY);
-
-                if (result === RESULTS.DENIED) {
-                    const requestResult = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
-                    hasPermission = requestResult === RESULTS.GRANTED;
-                } else if (result === RESULTS.GRANTED) {
-                    hasPermission = true;
-                } else if (result === RESULTS.UNAVAILABLE) {
-                    // Tính năng không khả dụng (ví dụ: trên simulator)
-                    // Cho phép tiếp tục để ImagePicker tự xử lý
-                    hasPermission = true;
-                } else if (result === RESULTS.BLOCKED) {
-                    // Quyền đã bị chặn, hướng dẫn người dùng vào Settings
-                    AlertSevice.alert({
-                        iconType: EnumIcon.E_WARNING,
-                        message: translate('HRM_Permission_Photo_Blocked'),
-                        onConfirm: () => {
-                            // Mở Settings
-                            Vnr_Function.openSettings();
-                        }
-                    });
-                    return;
-                }
-            }
-
-            if (hasPermission) {
-                let options = {
-                    mediaType: 'any',
-                    multiple: false,
-                    width: 400,
-                    height: 400,
-                    cropping: true,
-                    includeBase64: true
-                };
-
-                ImagePicker.openPicker({
-                    ...options
-                }).then((image) => {
-                    if (image) {
-                        this.updateAvatar({
-                            data: image.data,
-                            type: image.mime
-                        });
-                    }
-                }).catch(() => {
-                    // Người dùng hủy chọn ảnh, không cần xử lý
-                });
-            } else {
-                ToasterSevice.showWarning('HRM_Permission_Photo_Denied', 3000);
-            }
-        } catch (error) {
-            ToasterSevice.showError('ErrorInProcessing');
+    showPickerImage = () => {
+        if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_IMAGES) {
+            PermissionsAndroid.PERMISSIONS = {
+                ...PermissionsAndroid.PERMISSIONS,
+                READ_MEDIA_IMAGES: 'android.permission.READ_MEDIA_IMAGES'
+            };
         }
+        if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_VIDEO) {
+            PermissionsAndroid.PERMISSIONS = {
+                ...PermissionsAndroid.PERMISSIONS,
+                READ_MEDIA_VIDEO: 'android.permission.READ_MEDIA_VIDEO'
+            };
+        }
+        let options = {
+            mediaType: 'any',
+            multiple: false,
+            width: 400,
+            height: 400,
+            cropping: true,
+            includeBase64: true
+        };
+        ImagePicker.openPicker({
+            ...options
+        }).then(async (image) => {
+            if (image) {
+                this.updateAvatar({
+                    data: image.data,
+                    type: image.mime
+                });
+            }
+        });
     };
 
     showPickerCamera = async () => {
-        try {
-            let hasPermission = false;
-
-            if (Platform.OS === 'android') {
-                // Thêm permissions nếu chưa có
-                if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_IMAGES) {
-                    PermissionsAndroid.PERMISSIONS = {
-                        ...PermissionsAndroid.PERMISSIONS,
-                        READ_MEDIA_IMAGES: 'android.permission.READ_MEDIA_IMAGES'
-                    };
-                }
-
-                if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_VIDEO) {
-                    PermissionsAndroid.PERMISSIONS = {
-                        ...PermissionsAndroid.PERMISSIONS,
-                        READ_MEDIA_VIDEO: 'android.permission.READ_MEDIA_VIDEO'
-                    };
-                }
-
-                if (!PermissionsAndroid.PERMISSIONS?.CAMERA) {
-                    PermissionsAndroid.PERMISSIONS = {
-                        ...PermissionsAndroid.PERMISSIONS,
-                        CAMERA: 'android.permission.CAMERA'
-                    };
-                }
-
-                // Yêu cầu quyền camera
-                const cameraResult = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.CAMERA,
-                    {
-                        title: translate('HRM_Permission_Camera_Title'),
-                        message: translate('HRM_Permission_Camera_Message'),
-                        buttonNeutral: translate('HRM_Permission_Ask_Later'),
-                        buttonNegative: translate('HRM_Common_Cancel'),
-                        buttonPositive: translate('HRM_Common_OK')
-                    }
-                );
-                hasPermission = cameraResult === PermissionsAndroid.RESULTS.GRANTED;
-            } else {
-                // iOS
-                const response = await check(PERMISSIONS.IOS.CAMERA);
-
-                if (response === RESULTS.DENIED) {
-                    const requestResult = await request(PERMISSIONS.IOS.CAMERA);
-                    hasPermission = requestResult === RESULTS.GRANTED;
-                } else if (response === RESULTS.GRANTED) {
-                    hasPermission = true;
-                } else if (response === RESULTS.UNAVAILABLE) {
-                    // Tính năng không khả dụng (ví dụ: trên simulator)
-                    // Cho phép tiếp tục để ImagePicker tự xử lý
-                    hasPermission = true;
-                } else if (response === RESULTS.BLOCKED) {
-                    // Quyền đã bị chặn, hướng dẫn người dùng vào Settings
-                    AlertSevice.alert({
-                        iconType: EnumIcon.E_WARNING,
-                        message: translate('HRM_Permission_Camera_Blocked'),
-                        onConfirm: () => {
-                            // Mở Settings
-                            Vnr_Function.openSettings();
-                        }
-                    });
-                    return;
-                }
+        if (Platform.OS === 'android') {
+            if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_IMAGES) {
+                PermissionsAndroid.PERMISSIONS = {
+                    ...PermissionsAndroid.PERMISSIONS,
+                    READ_MEDIA_IMAGES: 'android.permission.READ_MEDIA_IMAGES'
+                };
             }
 
-            if (hasPermission) {
-                ImagePicker.openCamera({
-                    cropping: true,
-                    includeBase64: true,
-                    width: 400,
-                    height: 400
-                }).then((image) => {
-                    if (!image) {
-                        return;
-                    }
-                    this.updateAvatar({
-                        data: image.data,
-                        type: image.mime
-                    });
-                }).catch(() => {
-                    // Người dùng hủy chụp ảnh, không cần xử lý
-                });
-            } else {
-                ToasterSevice.showWarning('HRM_Permission_Camera_Denied', 3000);
+            if (!PermissionsAndroid.PERMISSIONS?.READ_MEDIA_VIDEO) {
+                PermissionsAndroid.PERMISSIONS = {
+                    ...PermissionsAndroid.PERMISSIONS,
+                    READ_MEDIA_VIDEO: 'android.permission.READ_MEDIA_VIDEO'
+                };
             }
-        } catch (error) {
-            ToasterSevice.showError('ErrorInProcessing');
+            if (!PermissionsAndroid.PERMISSIONS?.CAMERA) {
+                PermissionsAndroid.PERMISSIONS = {
+                    ...PermissionsAndroid.PERMISSIONS,
+                    CAMERA: 'android.permission.CAMERA'
+                };
+            }
+        } else {
+            const response = await check(
+                Platform.select({
+                    ios: PERMISSIONS.IOS.CAMERA
+                })
+            );
+            if (response !== RESULTS.GRANTED && response !== RESULTS.UNAVAILABLE) {
+                request(PERMISSIONS.IOS.CAMERA).then(() => { });
+            }
         }
+        ImagePicker.openCamera({
+            cropping: true,
+            includeBase64: true,
+            width: 400,
+            height: 400
+        }).then((image) => {
+            if (!image) {
+                return;
+            }
+            this.updateAvatar({
+                data: image.data,
+                type: image.mime
+            });
+        });
     };
 
     updateAvatar = (dataFile) => {
@@ -1059,477 +941,9 @@ class TopTabProfileBasicInfoUpdate extends Component {
         let contentList = <View />;
         let listConfigBasic;
 
-        // if (ConfigList.value['GeneralInfoHreProfileBasicInfo']) {
-        //     listConfigBasic = ConfigList.value['GeneralInfoHreProfileBasicInfo'];
-        // }
-        listConfigBasic = [
-            {
-                'Name': 'ImagePath',
-                'DisplayKey': 'HRM_HR_Profile_ImagePath'
-            },
-            {
-                'Name': 'E_Group',
-                'DisplayKey': 'HR_ProfileInformation'
-            },
-            {
-                'Name': 'ProfileName',
-                'DisplayKey': 'HRM_HR_Profile_ProfileName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'ProfileName'
-                }
-            },
-            {
-                'Name': 'CodeEmp',
-                'DisplayKey': 'HRM_HR_Profile_CodeEmp',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'CodeEmp'
-                }
-            },
-            {
-                'Name': 'DateHire',
-                'DisplayKey': 'HRM_HR_Profile_DateHire',
-                'DataType': 'DateTime',
-                'DataFormat': 'DD/MM/YYYY',
-                'Control': {
-                    'Name': 'VnrDate',
-                    'format': 'DD/MM/YYYY',
-                    'fieldName': 'DateHire',
-                    'type': 'date'
-                }
-            },
-            {
-                'Name': 'DateSenior',
-                'DisplayKey': 'HRM_HR_Profile_DateSenior',
-                'DataType': 'DateTime',
-                'DataFormat': 'DD/MM/YYYY',
-                'Control': {
-                    'Name': 'VnrDate',
-                    'format': 'DD/MM/YYYY',
-                    'fieldName': 'DateSenior',
-                    'type': 'date'
-                }
-            },
-            {
-                'Name': 'ProbationTime',
-                'DisplayKey': 'HRM_HR_Profile_ProbationTime',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'ProbationTime'
-                }
-            },
-            {
-                'Name': 'DateEndProbation',
-                'DisplayKey': 'HRM_HR_Profile_DateEndProbation',
-                'DataType': 'DateTime',
-                'DataFormat': 'DD/MM/YYYY',
-                'Control': {
-                    'Name': 'VnrDate',
-                    'format': 'DD/MM/YYYY',
-                    'fieldName': 'DateEndProbation',
-                    'type': 'date'
-                }
-            },
-            {
-                'Name': 'codeTax',
-                'DisplayKey': 'Mã số thuế',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'codeTax'
-                }
-            },
-            {
-                'Name': 'DateOfIssuedTaxCode',
-                'DisplayKey': 'HRM_HR_Profile_DateOfIssuedTaxCode',
-                'DataType': 'DateTime',
-                'DataFormat': 'DD/MM/YYYY',
-                'Control': {
-                    'Name': 'VnrDate',
-                    'format': 'DD/MM/YYYY',
-                    'fieldName': 'DateOfIssuedTaxCode',
-                    'type': 'date'
-                }
-            },
-            {
-                'Name': 'FileAttach',
-                'DisplayKey': 'File đính kèm thuế',
-                'FieldNameAttach': 'lstCodeTaxFileAttach'
-            },
-            {
-                'Name': 'Fingercode',
-                'DisplayKey': 'HRM_Hre_Profile_Fingercode',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'Fingercode'
-                }
-            },
-            {
-                'Name': 'IDCardCodeAtt',
-                'DisplayKey': 'HRM_Hre_Profile_IDCardCodeAtt',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'IDCardCodeAtt'
-                }
-            },
-            {
-                'Name': 'CodeAttendance',
-                'DisplayKey': 'HRM_HR_Profile_CodeAttendance',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'CodeAttendance'
-                }
-            },
-            {
-                'Name': 'DateApplyAttendanceCode',
-                'DisplayKey': 'HRM_Recruitment_UnusualAllowance_DateOccur',
-                'DataType': 'DateTime',
-                'DataFormat': 'DD/MM/YYYY',
-                'Control': {
-                    'Name': 'VnrDate',
-                    'format': 'DD/MM/YYYY',
-                    'fieldName': 'DateApplyAttendanceCode',
-                    'type': 'date'
-                }
-            },
-            {
-                'Name': 'EmploymentTypeView',
-                'DisplayKey': 'HRM_HR_Profile_EmploymentType',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetListEmploymentType',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'Text',
-                    'valueField': 'Value',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'EmploymentType',
-                    'objValue': {
-                        'key': 'EmploymentTypeView',
-                        'value': 'EmploymentType'
-                    }
-                }
-            },
-            {
-                'Name': 'SupervisorName',
-                'DisplayKey': 'HRM_HR_Profile_SupervisiorID',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Hre_GetData/GetProfileOrd',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'ProfileName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'SupervisorID',
-                    'objValue': {
-                        'key': 'SupervisorName',
-                        'value': 'SupervisorID'
-                    }
-                }
-            },
-            {
-                'Name': 'MidSupervisorName',
-                'DisplayKey': 'HRM_HR_Profile_MidSupervisorID',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Hre_GetData/GetProfileOrd',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'ProfileName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'MidSupervisorID',
-                    'objValue': {
-                        'key': 'MidSupervisorName',
-                        'value': 'MidSupervisorID'
-                    }
-                }
-            },
-            {
-                'Name': 'HighSupervisorName',
-                'DisplayKey': 'HRM_HR_Profile_HighSupervisiorID',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Hre_GetData/GetProfileOrd',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'ProfileName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'HighSupervisorID',
-                    'objValue': {
-                        'key': 'HighSupervisorName',
-                        'value': 'HighSupervisorID'
-                    }
-                }
-            },
-            {
-                'Name': 'E_Group',
-                'DisplayKey': 'HRM_HRM_WorkingPosition'
-            },
-            {
-                'Name': 'OrgStructureName',
-                'DisplayKey': 'HRM_HR_Profile_OrgStructureName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'OrgStructureName'
-                }
-            },
-            {
-                'Name': 'JobTitleName',
-                'DisplayKey': 'HRM_HR_Profile_JobTitleName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetJobTitleOrd',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'JobTitleName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'JobTitleID',
-                    'objValue': {
-                        'key': 'JobTitleName',
-                        'value': 'JobTitleID'
-                    }
-                }
-            },
-            {
-                'Name': 'PositionName',
-                'DisplayKey': 'HRM_HR_Profile_PositionName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetPositionOrd',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'PositionName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'PositionID',
-                    'objValue': {
-                        'key': 'PositionName',
-                        'value': 'PositionID'
-                    }
-                }
-            },
-            {
-                'Name': 'EmployeeTypeName',
-                'DisplayKey': 'HRM_HR_Profile_EmployeeTypeName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetEmployeeTypeOrd',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'EmployeeTypeName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'EmpTypeID',
-                    'objValue': {
-                        'key': 'EmployeeTypeName',
-                        'value': 'EmpTypeID'
-                    }
-                }
-            },
-            {
-                'Name': 'EmployeeGroupName',
-                'DisplayKey': 'HRM_HR_Profile_EmployeeGroup',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetMultiEmployeeGroup',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'NameEntityName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'EmployeeGroupID',
-                    'objValue': {
-                        'key': 'EmployeeGroupName',
-                        'value': 'EmployeeGroupID'
-                    }
-                }
-            },
-            {
-                'Name': 'PayrollGroupName',
-                'DisplayKey': 'HRM_Attendance_PayrollID',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetMultiPayrollGroup',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'PayrollGroupName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'PayrollGroupID',
-                    'objValue': {
-                        'key': 'PayrollGroupName',
-                        'value': 'PayrollGroupID'
-                    }
-                }
-            },
-            {
-                'Name': 'AbilityTitleVNI',
-                'DisplayKey': 'HRM_Hre_ProfileTemp_AbilityTitle',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetMultiAbilityTile',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'AbilityTitleVNI',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'AbilityTileID',
-                    'objValue': {
-                        'key': 'AbilityTitleVNI',
-                        'value': 'AbilityTileID'
-                    }
-                }
-            },
-            {
-                'Name': 'AreaPostJobWorkName',
-                'DisplayKey': 'HRM_Cat_AreaPostJobWorkListCode',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetMultiAreaPostJob',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'NameEntityName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'AreaPostJobWorkID',
-                    'objValue': {
-                        'key': 'AreaPostJobWorkName',
-                        'value': 'AreaPostJobWorkID'
-                    }
-                }
-            },
-            {
-                'Name': 'WorkPlaceName',
-                'DisplayKey': 'HRM_Rec_JobVacancy_WorkPlaceName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetMultiWorkPlace',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'WorkPlaceName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'WorkPlaceID',
-                    'objValue': {
-                        'key': 'WorkPlaceName',
-                        'value': 'WorkPlaceID'
-                    }
-                }
-            },
-            {
-                'Name': 'CompanyName',
-                'DisplayKey': 'HRM_Category_Warehouse_CompanyName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetMultiCompany',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'CompanyName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'CompanyID',
-                    'objValue': {
-                        'key': 'CompanyName',
-                        'value': 'CompanyID'
-                    }
-                }
-            },
-            {
-                'Name': 'ShopName',
-                'DisplayKey': 'HRM_Sal_RevenueForShop_ShopID',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'ShopName'
-                }
-            },
-            {
-                'Name': 'ShopAddress',
-                'DisplayKey': 'HRM_Hre_Shop_ShopAddress',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrText',
-                    'fieldName': 'ShopAddress'
-                }
-            },
-            {
-                'Name': 'CostCentreName',
-                'DisplayKey': 'HRM_Hre_Reward_Index_CostCentreName',
-                'DataType': 'string',
-                'Control': {
-                    'Name': 'VnrPicker',
-                    'api': {
-                        'urlApi': '[URI_HR]/Cat_GetData/GetMultiCostCentre',
-                        'type': 'E_GET'
-                    },
-                    'textField': 'CostCentreName',
-                    'valueField': 'ID',
-                    'filter': true,
-                    'filterServer': false,
-                    'fieldName': 'CostCentreID',
-                    'objValue': {
-                        'key': 'CostCentreName',
-                        'value': 'CostCentreID'
-                    }
-                }
-            },
-            {
-                'Name': 'FileAttach',
-                'DisplayKey': 'HRM_Rec_JobVacancy_FileAttachment',
-                'FieldNameAttach': 'lstFileAttachBasic'
-            }
-        ];
+        if (ConfigList.value['GeneralInfoHreProfileBasicInfo']) {
+            listConfigBasic = ConfigList.value['GeneralInfoHreProfileBasicInfo'];
+        }
 
         if (isLoading) {
             contentList = <VnrLoading size="large" isVisible={isLoading} />;
@@ -1677,6 +1091,17 @@ const styles = StyleSheet.create({
         width: 35
         // borderRadius: 50 / 2,
         // position: 'absolute',
+    },
+    avatar: {
+        height: 35,
+        width: 35,
+        backgroundColor: Colors.grey,
+        borderRadius: 35 / 2
+    },
+    imgAvatar: {
+        height: 35,
+        width: 35,
+        borderRadius: 35 / 2
     },
     wrapButtonHandler: {
         width: '100%',

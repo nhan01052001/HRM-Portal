@@ -23,7 +23,6 @@ let configList = null,
     enumName = null,
     attSubmitTakeBusinessTrip = null,
     attSubmitTakeBusinessTripViewDetail = null,
-    dataRowActionAndSelected= null,
     attSubmitTakeBusinessTripKeyTask = null,
     pageSizeList = 20;
 
@@ -53,7 +52,7 @@ class AttSubmitTakeBusinessTrip extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitTakeBusinessTripBusinessFunction.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttSubmitTakeBusinessTripBusinessFunction.setThisForBusiness(this);
             if (AttSubmitTakeBusinessTripBusinessFunction.checkForReLoadScreen[attSubmitTakeBusinessTrip]) {
                 this.reload();
             }
@@ -201,7 +200,7 @@ class AttSubmitTakeBusinessTrip extends Component {
             dataFromParams = this.checkDataFormNotify();
 
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeBusinessTrip);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeBusinessTrip);
         let _params = {
             // IsPortal: true,
             // sort: orderBy,
@@ -334,7 +333,6 @@ class AttSubmitTakeBusinessTrip extends Component {
                             }}
                             screenName={attSubmitTakeBusinessTrip}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_List_Attendance_Business'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

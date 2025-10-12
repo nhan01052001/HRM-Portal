@@ -7,7 +7,7 @@ const { height, width } = Dimensions.get('window');
 // width = 320;
 
 export const CustomStyleSheet = {
-    textAlign: (value) => {
+    textAlign: value => {
         return {
             textAlign: value
         };
@@ -186,12 +186,6 @@ export const CustomStyleSheet = {
         };
     },
 
-    borderTopColor: (value = Colors.primary) => {
-        return {
-            borderTopColor: value
-        };
-    },
-
     borderColor: (value = Colors.primary) => {
         return {
             borderColor: value
@@ -259,10 +253,10 @@ export const CustomStyleSheet = {
         };
     },
 
-    flexWrap: (value) => {
+    flexWrap: (value = 'wrap') => {
         return {
             flexWrap: value
-        };
+        }
     }
 };
 
@@ -390,7 +384,6 @@ export const Colors = {
     red: '#F5222D', // overtime
 
     blue: '#0971DC',
-    blue_transparent: '#ecf4fd',
     blue_1: '#CEE5FD',
     blue_3: '#9DCBFB',
     blue_5: '#6CB1F9',
@@ -1102,11 +1095,6 @@ export const stylesScreenDetailV3 = StyleSheet.create({
     },
     styMarginLeftCmt: { marginLeft: 44 + Size.defineSpace - 9 },
     styDateUpdate: { fontSize: Size.textSmall, fontWeight: '400', color: Colors.gray_7 },
-    styViewRenderApprove: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
     wrapInforApprover: {
         flex: 1,
         paddingLeft: 0,
@@ -1320,18 +1308,8 @@ export const stylesScreenDetailV3 = StyleSheet.create({
 
     checkAll: {
         backgroundColor: Colors.primary,
-        borderRadius: 4,
+        borderRadius: 100,
         borderWidth: 0
-    },
-    // Many data
-    styLineManydata: {
-        height: 10,
-        width: Size.deviceheight,
-        backgroundColor: Colors.gray_3,
-        borderColor: Colors.gray_5,
-        borderTopWidth: 0.5,
-        borderBottomWidth: 0.5,
-        marginLeft: -Size.defineSpace
     }
 });
 
@@ -2683,15 +2661,6 @@ export const stylesVnrPickerV3 = StyleSheet.create({
     onlyFlRowSpaceBetween: {
         flexDirection: 'row',
         justifyContent: 'space-between'
-    },
-
-    wrapRightLabel: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: Colors.gray_3,
-        paddingVertical: 6,
-        paddingHorizontal: 8,
-        borderRadius: 8
     }
 });
 
@@ -3779,7 +3748,7 @@ export const styleListItemV3 = StyleSheet.create({
         paddingHorizontal: 6,
         alignItems: 'center',
         paddingVertical: 2,
-        borderRadius: 2
+        borderRadius: Size.borderRadiusCircle
         // padding: 4
     },
     viewLimitTitle: {
@@ -3805,7 +3774,7 @@ export const styleListItemV3 = StyleSheet.create({
     styRadiusCheck: {
         width: Size.iconSize - 3,
         height: Size.iconSize - 3,
-        borderRadius: 4,
+        borderRadius: (Size.iconSize - 3) / 2,
         borderWidth: 1,
         borderColor: Colors.gray_8,
         justifyContent: 'center',

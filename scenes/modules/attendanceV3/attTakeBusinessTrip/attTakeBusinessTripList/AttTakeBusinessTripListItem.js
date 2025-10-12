@@ -1,41 +1,130 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, TouchableWithoutFeedback, Platform } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import {
-    Colors,
-    CustomStyleSheet,
-    Size,
-    styleSheets,
-    stylesScreenDetailV3
-} from '../../../../../constants/styleConfig';
+import { Colors, CustomStyleSheet, Size, styleSheets, stylesScreenDetailV3 } from '../../../../../constants/styleConfig';
 import moment from 'moment';
+import format from 'number-format.js';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { translate } from '../../../../../i18n/translate';
-import { IconCheck, IconInfo, IconChat, IconDate, IconSwapright } from '../../../../../constants/Icons';
+import {
+    IconCheck,
+    IconInfo,
+    IconSwapright,
+    IconChat,
+    IconDate
+} from '../../../../../constants/Icons';
+import Color from 'color';
 // import RightActions from '../../../../../components/ListButtonMenuRight/RightActions';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
-import VnrRenderListItem from '../../../../../componentsV3/VnrRenderList/VnrRenderListItem';
-export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
+export default class AttTakeBusinessTripListItem extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            widthIconBack: new Animated.Value(Size.defineSpace),
+            heightIconNext: new Animated.Value(0),
+            springIconBack: new Animated.Value(1),
+            springIconNext: new Animated.Value(0)
+        };
+        this.formatStringType = this.formatStringType.bind(this);
+        this.setRightAction(props);
+        this.Swipe = null;
+    }
+    setRightAction = thisProps => {
+        const { dataItem } = thisProps;
+        this.sheetActions = [
+            {
+                title: translate('HRM_Common_Close'),
+                onPress: null
+            }
+        ];
+        if (!Vnr_Function.CheckIsNullOrEmpty(thisProps.rowActions)) {
+            this.rightListActions = thisProps.rowActions.filter(item => {
+                return (
+                    !Vnr_Function.CheckIsNullOrEmpty(dataItem.BusinessAllowAction) &&
+                    dataItem.BusinessAllowAction.indexOf(item.type) >= 0
+                );
+            });
+        }
+    };
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        if (nextProps.isPullToRefresh !== this.props.isPullToRefresh) {
+            this.setRightAction(nextProps);
+        }
+    }
+
+    shouldComponentUpdate(nextProps) {
+        if (
+            nextProps.isPullToRefresh !== this.props.isPullToRefresh ||
+            nextProps.isSelect !== this.props.isSelect ||
+            nextProps.isOpenAction !== this.props.isOpenAction ||
+            nextProps.isDisable !== this.props.isDisable
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    formatStringType = (data, col) => {
+        if (data[col.Name]) {
+            if (col.DataType && col.DataType.toLowerCase() == 'datetime') {
+                return moment(data[col.Name]).format(col.DataFormat);
+            }
+            if (col.DataType && col.DataType.toLowerCase() == 'double') {
+                return format(col.DataFormat, data[col.Name]);
+            } else {
+                return data[col.Name];
+            }
+        } else {
+            return '';
+        }
+    };
+
+    openActionSheet = () => {
+        this.ActionSheet.show();
+    };
+
+    actionSheetOnCLick = index => {
+        const { dataItem } = this.props;
+        !Vnr_Function.CheckIsNullOrEmpty(this.sheetActions[index].onPress) &&
+            this.sheetActions[index].onPress(dataItem);
+    };
+
+    rightActionsEmpty = () => {
+        return <View style={CustomStyleSheet.width(0)} />;
+    };
+
+    convertTextToColor = value => {
+        const [num1, num2, num3, opacity] = value.split(',');
+        return Color.rgb(parseFloat(num1), parseFloat(num2), parseFloat(num3), parseFloat(opacity));
+    };
+
     formatPlace = (dataItem) => {
         if (dataItem?.PlaceFrom && dataItem?.PlaceTo) {
             return (
-                <Text style={[styleSheets.lable, styles.styleTextType]} numberOfLines={2}>
-                    {dataItem?.PlaceFrom} <IconSwapright size={Size.iconSize - 8} color={Colors.black} />{' '}
-                    {dataItem?.PlaceTo}
+                <Text style={[styleSheets.lable, styles.styleTextType]}
+                    numberOfLines={2}>
+                    {dataItem?.PlaceFrom} <IconSwapright size={Size.iconSize - 8} color={Colors.black} /> {dataItem?.PlaceTo}
                 </Text>
             );
         } else if (dataItem?.PlaceOutToName) {
-            return (
-                <Text style={[styleSheets.lable, styles.styleTextType]} numberOfLines={2}>
-                    {dataItem?.PlaceOutToName}
-                </Text>
-            );
+            return <Text style={[styleSheets.lable, styles.styleTextType]}
+                numberOfLines={2}>{dataItem?.PlaceOutToName}</Text>;
         }
         return null;
-    };
+    }
+
     render() {
-        const { dataItem, index, listItemOpenSwipeOut, rowActions, isOpenAction, isDisable, handerOpenSwipeOut } =
-            this.props;
+        const {
+            dataItem,
+            index,
+            listItemOpenSwipeOut,
+            rowActions,
+            isOpenAction,
+            isDisable,
+            handerOpenSwipeOut
+        } = this.props;
 
         let textFieldDate = '',
             textFieldPlace = '',
@@ -73,6 +162,7 @@ export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
             textFieldDate = TimeCouse;
         }
 
+
         // xử lý color
         if (dataItem.itemStatus) {
             const { colorStatus, bgStatus } = dataItem.itemStatus;
@@ -85,21 +175,22 @@ export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
 
         let permissionRightAction =
             rowActions != null &&
-            Array.isArray(rowActions) &&
-            rowActions.length > 0 &&
-            !isOpenAction &&
-            this.rightListActions &&
-            Array.isArray(this.rightListActions) &&
-            this.rightListActions.length > 0
+                Array.isArray(rowActions) &&
+                rowActions.length > 0 &&
+                !isOpenAction &&
+                this.rightListActions &&
+                Array.isArray(this.rightListActions) &&
+                this.rightListActions.length > 0
                 ? true
                 : false;
 
+
         return (
             <Swipeable
-                ref={(ref) => {
+                ref={ref => {
                     this.Swipe = ref;
                     if (
-                        listItemOpenSwipeOut.findIndex((value) => {
+                        listItemOpenSwipeOut.findIndex(value => {
                             return value['ID'] == index;
                         }) < 0
                     ) {
@@ -120,7 +211,12 @@ export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
                 <View style={[styles.swipeableLayout]}>
                     <View style={styles.left_isCheckbox}>
                         {rowActions === null || (Array.isArray(rowActions) && rowActions.length === 0) ? null : (
-                            <View style={[styles.styRadiusCheck, this.props.isSelect && stylesScreenDetailV3.checkAll]}>
+                            <View
+                                style={[
+                                    styles.styRadiusCheck,
+                                    this.props.isSelect && stylesScreenDetailV3.checkAll
+                                ]}
+                            >
                                 {this.props.isSelect && <IconCheck size={Size.iconSize - 10} color={Colors.white} />}
                             </View>
                         )}
@@ -156,31 +252,23 @@ export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
                                     <View style={styles.styViewTop}>
                                         {/* Top - left */}
                                         <View style={[CustomStyleSheet.width('70%'), styles.styViewHidden]}>
-                                            <View
-                                                style={[
-                                                    styles.styleFlex1_row_AlignCenter,
-                                                    CustomStyleSheet.marginBottom(4)
-                                                ]}
-                                            >
+                                            <View style={[styles.styleFlex1_row_AlignCenter, CustomStyleSheet.marginBottom(4)]}>
                                                 <Text style={[styleSheets.lable, styles.styleTextViewTop]}>
                                                     {textFieldDate}
                                                 </Text>
-                                                {dataItem?.DataRegister?.BusinessTravelName ? (
-                                                    <View style={styles.wrapNumberLeaveDay}>
-                                                        <Text
-                                                            numberOfLines={1}
-                                                            style={[styleSheets.lable, styles.styleTextNum]}
-                                                        >
-                                                            {dataItem?.DataRegister?.BusinessTravelName
-                                                                ? dataItem?.DataRegister?.BusinessTravelName
-                                                                : ''}
-                                                        </Text>
-                                                    </View>
-                                                ) : null}
+                                                <View style={styles.wrapNumberLeaveDay}>
+                                                    <Text numberOfLines={1} style={[styleSheets.lable, styles.styleTextNum]}>
+                                                        {dataItem?.DataRegister?.BusinessTravelName
+                                                            ? dataItem?.DataRegister?.BusinessTravelName
+                                                            : ''}
+                                                    </Text>
+                                                </View>
                                             </View>
 
                                             <View style={CustomStyleSheet.flex(1)}>
-                                                <View style={styles.styleFlex1_row_AlignCenter}>{textFieldPlace}</View>
+                                                <View style={styles.styleFlex1_row_AlignCenter}>
+                                                    {textFieldPlace}
+                                                </View>
                                             </View>
                                         </View>
 
@@ -190,9 +278,7 @@ export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
                                                 style={[
                                                     styles.lineSatus,
                                                     {
-                                                        backgroundColor: bgStatusView
-                                                            ? this.convertTextToColor(bgStatusView)
-                                                            : Colors.white
+                                                        backgroundColor: bgStatusView ? this.convertTextToColor(bgStatusView) : Colors.white
                                                     }
                                                 ]}
                                             >
@@ -213,7 +299,7 @@ export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
                                     </View>
 
                                     {/* cennter */}
-                                    {dataItem.Note !== null && (
+                                    {dataItem.Note && (
                                         <View style={styles.wrapContentCenter}>
                                             <View style={styles.styIconMess}>
                                                 <IconChat size={Size.text + 1} color={Colors.gray_8} />
@@ -230,17 +316,12 @@ export default class AttTakeBusinessTripListItem extends VnrRenderListItem {
                                     )}
                                 </View>
                                 <View style={[styles.viewStatusBottom]}>
-                                    <View
-                                        style={[
-                                            styles.leftContent,
-                                            isDisable ? styleSheets.opacity05 : styleSheets.opacity1
-                                        ]}
-                                    >
+                                    <View style={[styles.leftContent, isDisable ? styleSheets.opacity05 : styleSheets.opacity1]}>
                                         {isHaveAvatar
                                             ? Vnr_Function.renderAvatarCricleByName(
                                                 DataStatus.ImagePath,
-                                                  DataStatus?.UserProcessName,
-                                                  20
+                                                DataStatus?.UserProcessName,
+                                                20
                                             )
                                             : null}
                                     </View>
@@ -403,6 +484,11 @@ const styles = StyleSheet.create({
     },
     styleTextNum: {
         fontSize: Size.text - 1
+    },
+    styleTextType: {
+        fontWeight: Platform.OS == 'android' ? '600' : '500',
+        color: Colors.gray_10,
+        fontSize: Size.text - 2
     },
     viewContentTopRight: {
         // width: '30%',

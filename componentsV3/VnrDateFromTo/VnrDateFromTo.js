@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import { ToasterSevice } from '../../components/Toaster/Toaster';
-import { IconDate, IconSwapright, IconWarn } from '../../constants/Icons';
+import { IconDate, IconSwapright } from '../../constants/Icons';
 import {
     Colors,
     CustomStyleSheet,
@@ -64,11 +64,11 @@ class VnrDateFromTo extends Component {
 
     // reset value
     closeModal = () => {
-        this.setState({ isShowModal: false, range: this.props.value ?? {}, valueEndDateTemp: null });
+        this.setState({ isShowModal: false, range: {}, valueEndDateTemp: null });
     };
 
-    showModal = (isEditEndDate) => {
-        const { value, isChangeShiftorChangeSchedule, onlyChooseOneDay, onlyChooseEveryDay, displayOptions, isHiddenChooseEveryDay, isHiddenChooseAboutDays } = this.props;
+    showModal = () => {
+        const { value, isChangeShiftorChangeSchedule, onlyChooseOneDay, onlyChooseEveryDay, displayOptions } = this.props;
         const { range } = this.state;
         let nextState = {};
 
@@ -84,19 +84,11 @@ class VnrDateFromTo extends Component {
             };
         }
 
-        if ((!isHiddenChooseEveryDay && isHiddenChooseAboutDays) || (isHiddenChooseEveryDay && !isHiddenChooseAboutDays)) {
-            nextState = {
-                ...nextState,
-                isOptionChooseEveryDay: !isHiddenChooseEveryDay,
-                isOptionChooseAboutDays: !isHiddenChooseAboutDays
-            };
-        }
-
         // case use controls change shift, default is 'Shift change day'
         if (Object.entries(value).length > 0 && isChangeShiftorChangeSchedule) {
             nextState = {
                 ...nextState,
-                isDateChangeShift: !isEditEndDate
+                isDateChangeShift: true
             };
         }
 
@@ -218,7 +210,7 @@ class VnrDateFromTo extends Component {
         });
     };
 
-    componentDidMount() { }
+    componentDidMount() {}
 
     marked = () => {
         const { range, isOptionChooseEveryDay } = this.state;
@@ -370,7 +362,7 @@ class VnrDateFromTo extends Component {
                         isEditEndDate: false
                     });
                 }
-            } else if (moment(range.startDate).isBefore(day.dateString, 'day') || moment(range.startDate).isSame(day.dateString, 'day')) {
+            } else if (moment(range.startDate).isBefore(day.dateString, 'day')) {
                 this.setState({
                     range: {
                         ...range,
@@ -413,7 +405,7 @@ class VnrDateFromTo extends Component {
         }
     }
 
-    handleChangeDate = () => { };
+    handleChangeDate = () => {};
 
     onRefreshControl = (nextProps) => {
         // let _state = this.state;
@@ -436,7 +428,6 @@ class VnrDateFromTo extends Component {
             this.state.isEditStartDate !== nextState.isEditStartDate ||
             this.state.isEditEndDate !== nextState.isEditEndDate ||
             this.props.valueDisplay !== nextProps.valueDisplay ||
-            this.props.isCheckEmpty !== nextProps.isCheckEmpty ||
             this.state.isDateChangeShift !== nextState.isDateChangeShift
         ) {
             return true;
@@ -510,6 +501,7 @@ class VnrDateFromTo extends Component {
             fieldValid,
             placeHolder,
             stylePicker,
+            stylePlaceholder,
             styContentPicker,
             isOptionFilterQuicly,
             valueDisplay,
@@ -519,10 +511,7 @@ class VnrDateFromTo extends Component {
             layoutFilter,
             isHiddenIcon,
             isChangeShiftorChangeSchedule,
-            fieldName,
-            textButtonFinish,
-            isHiddenChooseEveryDay,
-            isHiddenChooseAboutDays
+            fieldName
         } = this.props;
         const {
             isOptionChooseAboutDays,
@@ -536,9 +525,9 @@ class VnrDateFromTo extends Component {
         } = this.state;
         let statusBtn =
             valueEndDateTemp ||
-                (onlyChooseOneDay && onlyChooseOneDay === true) ||
-                (onlyChooseEveryDay && onlyChooseEveryDay === true) ||
-                (displayOptions && displayOptions == true && isOptionChooseEveryDay === true)
+            (onlyChooseOneDay && onlyChooseOneDay === true) ||
+            (onlyChooseEveryDay && onlyChooseEveryDay === true) ||
+            (displayOptions && displayOptions == true && isOptionChooseEveryDay === true)
                 ? range.length === 0 || Object.keys(range).length === 0
                     ? false
                     : true
@@ -548,8 +537,8 @@ class VnrDateFromTo extends Component {
 
         let statusMarkingType =
             (onlyChooseOneDay && onlyChooseOneDay === true) ||
-                (onlyChooseEveryDay && onlyChooseEveryDay === true) ||
-                (displayOptions && displayOptions == true && isOptionChooseEveryDay === true)
+            (onlyChooseEveryDay && onlyChooseEveryDay === true) ||
+            (displayOptions && displayOptions == true && isOptionChooseEveryDay === true)
                 ? true
                 : false;
 
@@ -565,7 +554,7 @@ class VnrDateFromTo extends Component {
             fieldValid === true &&
             isCheckEmpty &&
             isCheckEmpty === true &&
-            (value === null || value === undefined || Object.keys(value).length === 0)
+            (value === null || value === undefined)
         ) {
             isShowErr = true;
         } else {
@@ -648,7 +637,7 @@ class VnrDateFromTo extends Component {
                         stylePicker,
                         isShowErr && {
                             ...CustomStyleSheet.borderBottomColor(Colors.red),
-                            ...CustomStyleSheet.borderBottomWidth(0.5)
+                            ...CustomStyleSheet.borderBottomWidth(1.5)
                         },
                         disable && styles.bntPickerDisable,
                         isOptionFilterQuicly === true && CustomStyleSheet.paddingHorizontal(0)
@@ -692,12 +681,11 @@ class VnrDateFromTo extends Component {
                             <View
                                 style={[
                                     styles.styLeftPicker,
-                                    isControll && isControll === true && styles.onlyFlRowSpaceBetween,
-                                    CustomStyleSheet.alignItems('center')
+                                    isControll && isControll === true && styles.onlyFlRowSpaceBetween
                                 ]}
                             >
                                 {lable && (
-                                    <View style={[styles.styVlPicker, CustomStyleSheet.flex(value.startDate && value.endDate ? 0.35 : 0.6), CustomStyleSheet.marginRight(22)]}>
+                                    <View style={[styles.styVlPicker, CustomStyleSheet.flex(0.35)]}>
                                         {isControll && !isHiddenIcon && (
                                             <IconDate
                                                 size={Size.iconSize}
@@ -705,7 +693,7 @@ class VnrDateFromTo extends Component {
                                             />
                                         )}
 
-                                        <Text
+                                        <VnrText
                                             numberOfLines={2}
                                             style={[
                                                 styleSheets.text,
@@ -716,68 +704,63 @@ class VnrDateFromTo extends Component {
                                                 },
                                                 isHiddenIcon && CustomStyleSheet.marginLeft(0)
                                             ]}
-                                        >
-                                            {translate(layoutFilter ? placeHolder : lable)}
-                                            {fieldValid && <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />}
-                                        </Text>
+                                            i18nKey={layoutFilter ? placeHolder : lable}
+                                        />
+                                        {fieldValid && <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />}
                                     </View>
                                 )}
 
-                                <View style={[
-                                    styles.styVlPicker,
-                                    styles.enableLable,
-                                    CustomStyleSheet.flex(value.startDate && value.endDate ? 0.6 : 0.4),
-                                    !lable && [styles.disableLable, CustomStyleSheet.flex(1)]
-                                ]}>
-                                    <View
-                                        style={[stylesVnrPickerV3.wrapRightLabel, !this.props?.isNewUIValue && CustomStyleSheet.backgroundColor('transparent')]}
-                                    >
-                                        {value.startDate && value.endDate ? (
-                                            <View style={styles.styVlPickerFromTo}>
-                                                <Text style={[styleSheets.text, styles.styLableValue]} numberOfLines={1}>
-                                                    {`${moment(value.startDate).format('DD/MM/YYYY')}`}{' '}
-                                                    <IconSwapright size={Size.text} color={Colors.gray_10} />{' '}
-                                                    <Text
-                                                        style={[
-                                                            styleSheets.text,
-                                                            styles.styLableValue,
-                                                            styles.styLbRightValue
-                                                        ]}
-                                                        numberOfLines={1}
-                                                    >
-                                                        {`${moment(value.endDate).format('DD/MM/YYYY')}`}
-                                                    </Text>
+                                <View style={[styles.styVlPicker, styles.enableLable, !lable && [styles.disableLable, CustomStyleSheet.flex(1)]]}>
+                                    {value.startDate && value.endDate ? (
+                                        <View style={styles.styVlPickerFromTo}>
+                                            <Text style={[styleSheets.text, styles.styLableValue]} numberOfLines={1}>
+                                                {`${moment(value.startDate).format('DD/MM/YYYY')}`}{' '}
+                                                <IconSwapright size={Size.text} color={Colors.gray_10} />{' '}
+                                                <Text
+                                                    style={[
+                                                        styleSheets.text,
+                                                        styles.styLableValue,
+                                                        styles.styLbRightValue
+                                                    ]}
+                                                    numberOfLines={1}
+                                                >
+                                                    {`${moment(value.endDate).format('DD/MM/YYYY')}`}
                                                 </Text>
-                                            </View>
-                                        ) : value && Array.isArray(value) && value.length > 0 ? (
-                                            value.length === 1 ? (
-                                                <Text style={[styleSheets.text, styles.styLableValue]}>
-                                                    {moment(value[0]).format('DD/MM/YYYY')}
-                                                </Text>
-                                            ) : textChangeShiftorChangeSchedule ? (
-                                                textChangeShiftorChangeSchedule
-                                            ) : (
-                                                <Text style={[styleSheets.text, styles.styLableValue]}>
-                                                    {value.length} {translate('E_DAY_LOWERCASE')}
-                                                </Text>
-                                            )
+                                            </Text>
+                                            {/* <IconSwapright size={Size.text} color={Colors.gray_10} />
+                                               <Text style={[styleSheets.text, styles.styLableValue, styles.styLbRightValue]} numberOfLines={1}>
+                                                   {`${moment(value.endDate).format('DD/MM/YYYY')}`}
+                                               </Text> */}
+                                        </View>
+                                    ) : value && Array.isArray(value) && value.length > 0 ? (
+                                        value.length === 1 ? (
+                                            <Text style={[styleSheets.text, styles.styLableValue]}>
+                                                {moment(value[0]).format('DD/MM/YYYY')}
+                                            </Text>
+                                        ) : textChangeShiftorChangeSchedule ? (
+                                            textChangeShiftorChangeSchedule
                                         ) : (
-                                            <VnrText
-                                                style={[styleSheets.text, stylesVnrPickerV3.stylePlaceholder, CustomStyleSheet.marginRight(2)]}
-                                                i18nKey={
-                                                    placeHolder && !layoutFilter ? placeHolder : 'HRM_PortalApp_Selectdate'
-                                                }
-                                            />
-                                        )}
-                                    </View>
+                                            <Text style={[styleSheets.text, styles.styLableValue]}>
+                                                {value.length} {translate('E_DAY_LOWERCASE')}
+                                            </Text>
+                                        )
+                                    ) : (
+                                        <VnrText
+                                            style={[styleSheets.text, stylePlaceholder]}
+                                            i18nKey={
+                                                placeHolder && !layoutFilter ? placeHolder : 'HRM_PortalApp_Selectdate'
+                                            }
+                                        />
+                                    )}
                                 </View>
                             </View>
 
                             {isOptionFilterQuicly === true ? null : isControll && isControll === true ? (
                                 isShowErr && (
-                                    <View style={CustomStyleSheet.marginLeft(6)}>
-                                        <IconWarn color={Colors.red} size={Size.iconSize - 2} />
-                                    </View>
+                                    <Image
+                                        source={require('../../assets/images/filterV3/IconErrorMauDo.png')}
+                                        style={CustomStyleSheet.marginLeft(6)}
+                                    />
                                 )
                             ) : (
                                 <View style={styles.styRightPicker}>
@@ -825,8 +808,6 @@ class VnrDateFromTo extends Component {
                                             isChangeDate={isOptionChooseEveryDay}
                                             handleChangeShift={this.handleChooseAboutDays}
                                             handleChangeDate={this.handleChooseEveryDay}
-                                            isHiddenChooseEveryDay={isHiddenChooseEveryDay}
-                                            isHiddenChooseAboutDays={isHiddenChooseAboutDays}
                                         />
                                     ) : (
                                         <View style={[styles.flexD_align_center, CustomStyleSheet.marginRight(10)]}>
@@ -937,7 +918,7 @@ class VnrDateFromTo extends Component {
                                         handleDateChangeShift={(res) => {
                                             this.setState({
                                                 isDateChangeShift: res
-                                            });
+                                            })
                                         }} />
                                 </Animated.View>
                             )
@@ -956,7 +937,7 @@ class VnrDateFromTo extends Component {
                                                     isEditStartDate: isEditStartDate,
                                                     isEditEndDate: isEditEndDate,
                                                     isDateChangeShift: isEditStartDate
-                                                });
+                                                })
                                             }}
                                         />
                                     </Animated.View>
@@ -966,6 +947,20 @@ class VnrDateFromTo extends Component {
 
                         {/* button */}
                         <View style={styles.wrapButtonHandler}>
+                            <View style={CustomStyleSheet.flex(1)}>
+                                <TouchableOpacity
+                                    accessibilityLabel={'VnrDateFromTo-Refresh'}
+                                    style={styles.btnRefresh}
+                                    onPress={() => this.handleRefresh()}
+                                >
+                                    <Image
+                                        style={{ width: Size.iconSize, height: Size.iconSize }}
+                                        resizeMode="cover"
+                                        source={require('../../assets/images/vnrDateFromTo/reset-sm.png')}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
                             <View style={{ ...CustomStyleSheet.flex(8.5), ...CustomStyleSheet.marginRight(10) }}>
                                 <TouchableOpacity
                                     accessibilityLabel={'VnrDateFromTo-Continue'}
@@ -987,35 +982,23 @@ class VnrDateFromTo extends Component {
                                             },
                                             statusBtn === true ? { color: Colors.white } : { color: Colors.grayD1 }
                                         ]}
-                                        i18nKey={textButtonFinish ? textButtonFinish : statusBtn === true ? 'HRM_Common_Continue' : 'HRM_HR_Task_Date'}
+                                        i18nKey={statusBtn === true ? 'HRM_Common_Continue' : 'HRM_HR_Task_Date'}
                                     />
                                     <Text style={[styleSheets.text, styles.txtDay]}>
                                         {(onlyChooseEveryDay && onlyChooseEveryDay === true) ||
-                                            (onlyChooseEveryDay && onlyChooseEveryDay === true) ||
-                                            (displayOptions && displayOptions == true && isOptionChooseEveryDay === true)
+                                        (onlyChooseEveryDay && onlyChooseEveryDay === true) ||
+                                        (displayOptions && displayOptions == true && isOptionChooseEveryDay === true)
                                             ? range.length === 0 || range.length === undefined
                                                 ? ''
                                                 : `(${range.length} ${translate('E_DAY_LOWERCASE')})`
                                             : range.startDate && range.endDate
-                                                ? `(${moment(range.endDate).diff(moment(range.startDate), 'days') + 1
+                                                ? `(${
+                                                    moment(range.endDate).diff(moment(range.startDate), 'days') + 1
                                                 } ${translate('E_DAY_LOWERCASE')})`
                                                 : range.startDate && !range.endDate && valueEndDateTemp
                                                     ? `(1 ${translate('E_DAY_LOWERCASE')})`
                                                     : ''}
                                     </Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={CustomStyleSheet.flex(1)}>
-                                <TouchableOpacity
-                                    accessibilityLabel={'VnrDateFromTo-Refresh'}
-                                    style={styles.btnRefresh}
-                                    onPress={() => this.handleRefresh()}
-                                >
-                                    <Image
-                                        style={{ width: Size.iconSize, height: Size.iconSize }}
-                                        resizeMode="cover"
-                                        source={require('../../assets/images/vnrDateFromTo/reset-sm.png')}
-                                    />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -1112,7 +1095,7 @@ const styles = StyleSheet.create({
     btnOptionChoseDays: {
         paddingHorizontal: 8,
         paddingVertical: 6,
-        borderRadius: 2
+        borderRadius: Size.borderRadiusBotton
     },
 
     flexD_align_center: {
@@ -1125,7 +1108,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colors.primary,
-        borderRadius: 2,
+
+        borderRadius: Size.borderRadiusBotton,
         paddingVertical: 10
     },
 
@@ -1138,7 +1122,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
-    enableLable: { justifyContent: 'flex-end' },
+    enableLable: { flex: 0.6, justifyContent: 'flex-end' },
     disableLable: { justifyContent: 'flex-start', paddingTop: 4 },
     txtDay: {
         color: Colors.white,

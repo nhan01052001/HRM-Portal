@@ -270,7 +270,6 @@ class AttCanceledTamScanLogRegister extends Component {
                             }}
                             screenName={attApproveTamScanLogRegister}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Tamscan_Log_Approve'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

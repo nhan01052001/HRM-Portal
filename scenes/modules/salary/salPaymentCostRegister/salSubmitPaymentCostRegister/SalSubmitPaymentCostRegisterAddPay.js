@@ -29,7 +29,6 @@ import ListButtonSave from '../../../../../components/ListButtonMenuRight/ListBu
 import format from 'number-format.js';
 
 const initSateDefault = {
-    ID: null,
     PaymentCostsGroupID: {
         label: 'HRM_Category_PaymentAmount_PaymentCostsGroupID',
         api: {
@@ -155,7 +154,7 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
         props.navigation.setParams({
             title:
                 props.navigation.state.params && props.navigation.state.params.record
-                    ? 'HRM_Sal_PaymentCostRegister_Edit_Title'
+                    ? 'HRM_Sal_PaymentCostRegister_Edit_itle'
                     : 'HRM_Common_SearchAddPayCost',
             goback: this.goBack.bind(this)
         });
@@ -183,7 +182,6 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
         this.setVariable();
 
         initSateDefault.FromDate.refresh = !this.state.FromDate.refresh;
-        initSateDefault.ToDate.refresh = !this.state.ToDate.refresh;
         initSateDefault.UnitView.value = translate('HRM_UNIT');
         initSateDefault.UnitView.refresh = !this.state.UnitView.refresh;
 
@@ -220,7 +218,6 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
                     });
 
                     this.setState({ ...nextState }, () => {
-
                         // let { record } = this.props.navigation.state.params;
                         let { record } = !isRefresh ? this.props.navigation.state.params : {};
 
@@ -277,36 +274,32 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
     handleSetState = (record, res) => {
         const {
                 Profile,
+                RelativeID,
+                RelativeTypeName,
+                UnusualEDTypeID,
+                DateHire,
+                DateOccur,
+                MonthStart,
                 Amount,
+                CurrencyID,
                 Notes,
-                Attachment,
-                PaymentCostsGroupID,
-                PaymentAmountID,
-                FromDate,
-                ToDate,
-                Quantity,
-                TotalAmount,
-                NoteOfSecretary,
-                ComputationBasis
+                Attachment
             } = this.state,
             item = res[0],
-            dataPaymentCostsGroupID = res[1],
-            dataPaymentAmountID = res[2],
-            dataSalaryClassPaymentCostRegister = res[3];
+            dataRalative = res[1],
+            dataCurrencyID = res[2];
 
+        let nextState = {},
+            _dataRalative = [],
+            _dataCurrencyID = [];
 
-        let valuePaymentCostsGroupID = null,
-            valuePaymentAmountID = null;
-
-        if (Array.isArray(dataPaymentCostsGroupID) && dataPaymentCostsGroupID.length > 0) {
-            valuePaymentCostsGroupID = dataPaymentCostsGroupID.find((item) => item?.ID === record?.PaymentCostsGroupID);
+        if (dataRalative) {
+            _dataRalative = [...dataRalative];
         }
 
-        if (Array.isArray(dataPaymentAmountID) && dataPaymentAmountID.length > 0) {
-            valuePaymentAmountID = dataPaymentAmountID.find((item) => item?.ID === record?.PaymentAmountID);
+        if (dataCurrencyID) {
+            _dataCurrencyID = [...dataCurrencyID];
         }
-
-        let nextState = {};
 
         nextState = {
             ID: record.ID,
@@ -315,64 +308,59 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
                 ID: item.ProfileID,
                 ProfileName: item.ProfileName
             },
+            RelativeID: {
+                ...RelativeID,
+                data: _dataRalative,
+                value: item.RelativeID ? { ID: item.RelativeID, RelativeName: item.RelativeName } : null,
+                refresh: !RelativeID.refresh
+            },
+            RelativeTypeName: {
+                ...RelativeTypeName,
+                value: item.RelativeTypeName,
+                refresh: !RelativeTypeName.refresh
+            },
+            UnusualEDTypeID: {
+                ...UnusualEDTypeID,
+                value: item.UnusualEDTypeID
+                    ? { ID: item.UnusualEDTypeID, UnusualAllowanceCfgName: item.UnusualAllowanceCfgName }
+                    : null,
+                refresh: !UnusualEDTypeID.refresh
+            },
+            DateHire: {
+                ...DateHire,
+                value: item.DateHire ? moment(item.DateHire).format('YYYY-MM-DD HH:mm:ss') : null,
+                refresh: !DateHire.refresh
+            },
+            DateOccur: {
+                ...DateOccur,
+                value: item.DateOccur ? moment(item.DateOccur).format('YYYY-MM-DD HH:mm:ss') : null,
+                refresh: !DateOccur.refresh
+            },
+            MonthStart: {
+                ...MonthStart,
+                value: item.MonthStart ? moment(item.MonthStart).format('YYYY-MM-DD HH:mm:ss') : null,
+                refresh: !MonthStart.refresh
+            },
             Amount: {
                 ...Amount,
-                value: dataSalaryClassPaymentCostRegister.Amount ? dataSalaryClassPaymentCostRegister.Amount.toString() : null,
+                value: item.Amount ? item.Amount.toString() : null,
                 refresh: !Amount.refresh
+            },
+            CurrencyID: {
+                ...CurrencyID,
+                data: _dataCurrencyID,
+                value: item.CurrencyID ? { ID: item.CurrencyID, CurrencyName: item.CurrencyName } : null,
+                refresh: !CurrencyID.refresh
             },
             Notes: {
                 ...Notes,
-                value: record.Notes,
+                value: item.Notes,
                 refresh: !Notes.refresh
             },
             Attachment: {
                 ...Attachment,
                 value: item.lstFileAttach,
                 refresh: !Attachment.refresh
-            },
-            PaymentCostsGroupID: {
-                ...PaymentCostsGroupID,
-                data: [...dataPaymentCostsGroupID],
-                value: valuePaymentCostsGroupID,
-                refresh: !PaymentCostsGroupID.refresh
-            },
-
-            PaymentAmountID: {
-                ...PaymentAmountID,
-                data: [...dataPaymentAmountID],
-                value: valuePaymentAmountID,
-                refresh: !PaymentAmountID.refresh
-            },
-            FromDate: {
-                ...FromDate,
-                value: record?.FromDate ?? null,
-                refresh: !FromDate.refresh
-            },
-            ToDate: {
-                ...ToDate,
-                value: record?.ToDate ?? null,
-                refresh: !ToDate.refresh
-            },
-            Quantity: {
-                ...Quantity,
-                value: record?.Quantity ? `${record?.Quantity}` : null,
-                refresh: !Quantity.refresh
-            },
-            OrderNumber: record?.OrderNumber ?? null,
-            TotalAmount: {
-                ...TotalAmount,
-                value: record?.TotalAmount ? `${record?.TotalAmount}` : null,
-                refresh: !TotalAmount.refresh
-            },
-            NoteOfSecretary: {
-                ...NoteOfSecretary,
-                value: record?.NoteOfSecretary ?? null,
-                refresh: !NoteOfSecretary.refresh
-            },
-            ComputationBasis: {
-                ...ComputationBasis,
-                value: record.Specification,
-                refresh: !ComputationBasis.refresh
             }
         };
 
@@ -381,18 +369,10 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
 
     getRecordAndConfigByID = (record, _handleSetState) => {
         const { ID } = record;
-
-        const dataBody = {
-            dateTo: moment(record?.ToDate).format(),
-            ProfileID: record?.ProfileID,
-            PaymentAmountID: record?.PaymentAmountID
-        };
-
         let arrRequest = [
             HttpService.Get('[URI_HR]/api/Sal_UnusualAllowance/GetById?ID=' + ID),
-            HttpService.Get('[URI_HR]/Cat_GetData/GetMultiPaymentCostGroupMulti'),
-            HttpService.Get('[URI_HR]/Cat_GetData/GetMultiListPaymentAmount_Portal'),
-            HttpService.Post('[URI_HR]/Sal_GetData/GetSalaryClassPaymentCostRegister', dataBody)
+            HttpService.Post('[URI_HR]/Sal_GetData/GetRalativeByProfileId', { profileid: record.ProfileID }),
+            HttpService.Get('[URI_HR]/Cat_GetData/GetMultiCurrency')
         ];
 
         VnrLoadingSevices.show();
@@ -613,7 +593,7 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
     };
 
     save = (navigation, isCreate) => {
-        const { record, MasterData, fullDataCost } = this.props.navigation.state.params,
+        const { MasterData } = this.props.navigation.state.params,
             {
                 PaymentCostsGroupID,
                 PaymentAmountID,
@@ -627,38 +607,13 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
                 NoteOfSecretary,
                 Attachment,
                 OrderNumber,
-                SpecificationCustom,
-                ID
+                SpecificationCustom
             } = this.state;
 
-        let lstPaymentCost = [
-            {
-                ProfileID: MasterData.ProfileID,
-                PaymentCostsGroupID: PaymentCostsGroupID.value ? PaymentCostsGroupID.value.ID : null,
-                PaymentAmountID: PaymentAmountID.value ? PaymentAmountID.value.ID : null,
-                ComputationBasis: ComputationBasis.value,
-                FromDate: FromDate.value ? moment(FromDate.value).format('YYYY-MM-DD 00:00:00') : null,
-                ToDate: ToDate.value ? moment(ToDate.value).format('YYYY-MM-DD 00:00:00') : null,
-                Quantity: Quantity.value,
-                UnitView: UnitView.value,
-                TotalAmount: TotalAmount.value,
-                Notes: Notes.value,
-                NoteOfSecretary: NoteOfSecretary.value,
-                OrderNumber: OrderNumber,
-                SpecificationCustom: SpecificationCustom,
-                Attachment: Attachment.value ? Attachment.value.map((item) => item.fileName).join(',') : null
-            }
-        ];
-
-        if (Array.isArray(fullDataCost) && fullDataCost.length > 0 && ID) {
-            fullDataCost.forEach((value) => {
-                value.FromDate = FromDate.value ? moment(FromDate.value).format('YYYY-MM-DD 00:00:00') : null;
-                value.ToDate = ToDate.value ? moment(ToDate.value).format('YYYY-MM-DD 00:00:00') : null;
-            });
-            let indexID = fullDataCost.findIndex((item) => item?.ID === ID);
-            if (indexID > -1) {
-                lstPaymentCost = [{
-                    ...fullDataCost[indexID],
+        let param = {
+            ...MasterData,
+            lstPaymentCost: [
+                {
                     ProfileID: MasterData.ProfileID,
                     PaymentCostsGroupID: PaymentCostsGroupID.value ? PaymentCostsGroupID.value.ID : null,
                     PaymentAmountID: PaymentAmountID.value ? PaymentAmountID.value.ID : null,
@@ -673,21 +628,10 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
                     OrderNumber: OrderNumber,
                     SpecificationCustom: SpecificationCustom,
                     Attachment: Attachment.value ? Attachment.value.map((item) => item.fileName).join(',') : null
-                }];
-            }
-        }
-
-        let param = {
-            ...MasterData,
-            lstPaymentCost
+                }
+            ]
         };
 
-        if (record && MasterData?.ID) {
-            param = {
-                ...param,
-                ID: MasterData?.ID
-            };
-        }
         VnrLoadingSevices.show();
         HttpService.Post('[URI_HR]/Sal_GetData/ValidatePaymentCost', param).then((data) => {
             VnrLoadingSevices.hide();
@@ -709,7 +653,7 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
                         title: translate('AlertsView'),
                         iconType: EnumIcon.E_WARNING,
                         message: translate('HRM_PaymentCostRe_Please_Select_FromDateToDate_RequestPeriodNew'),
-                        onCancel: () => { },
+                        onCancel: () => {},
                         onConfirm: () => {
                             param = {
                                 ...param,
@@ -992,8 +936,8 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
                                                     () => this.onSubmitQuantity()
                                                 );
                                             }}
-                                        // onBlur={this.onSubmitQuantity}
-                                        // onSubmitEditing={this.onSubmitQuantity}
+                                            // onBlur={this.onSubmitQuantity}
+                                            // onSubmitEditing={this.onSubmitQuantity}
                                         />
                                     </View>
 
@@ -1041,7 +985,7 @@ export default class SalSubmitPaymentCostRegisterAddPay extends Component {
                                         keyboardType={'numeric'}
                                         charType={'money'}
                                         returnKeyType={'done'}
-                                        onChangeText={() => { }}
+                                        onChangeText={() => {}}
                                     />
                                 </View>
                             </View>

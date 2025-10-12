@@ -1,13 +1,6 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet } from 'react-native';
-import {
-    styleSheets,
-    styleScreenDetail,
-    styleSafeAreaView,
-    Colors,
-    Size,
-    CustomStyleSheet
-} from '../../../../../constants/styleConfig';
+import { View, ScrollView } from 'react-native';
+import { styleSheets, styleScreenDetail, styleSafeAreaView, Colors } from '../../../../../constants/styleConfig';
 import { ConfigListDetail } from '../../../../../assets/configProject/ConfigListDetail';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import {
@@ -24,7 +17,6 @@ import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import AttSubmitWorkingOvertimeAddOrEdit from './AttSubmitWorkingOvertimeAddOrEdit';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import SafeAreaViewDetail from '../../../../../components/safeAreaView/SafeAreaViewDetail';
-import VnrText from '../../../../../components/VnrText/VnrText';
 
 const configDefault = [
     {
@@ -40,32 +32,14 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON_PROFILE',
-        Name: 'CodeEmp',
-        DisplayKey: 'HRM_HR_Profile_CodeEmp',
+        Name: 'E_COMPANY',
+        DisplayKey: 'E_COMPANY',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON_PROFILE',
-        Name: 'ProfileName',
-        DisplayKey: 'HRM_HR_Profile_ProfileName',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'PositionName',
-        DisplayKey: 'HRM_HR_Profile_PositionName',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'JobTitleName',
-        DisplayKey: 'HRM_HR_Profile_JobTitleName',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON_PROFILE',
-        Name: 'OrgStructureName',
-        DisplayKey: 'HRM_Eva_Performance_OrgStructureName',
+        Name: 'E_BRANCH',
+        DisplayKey: 'E_BRANCH',
         DataType: 'string'
     },
     {
@@ -82,6 +56,12 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON_PROFILE',
+        Name: 'E_DEPARTMENT',
+        DisplayKey: 'HRM_HR_Profile_OrgStructureName',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON_PROFILE',
         Name: 'E_TEAM',
         DisplayKey: 'Group',
         DataType: 'string'
@@ -89,80 +69,36 @@ const configDefault = [
     {
         TypeView: 'E_COMMON_PROFILE',
         Name: 'E_SECTION',
-        DisplayKey: 'HRM_HR_ReportProfileWaitingStopWorking_TeamName',
+        DisplayKey: 'E_SECTION',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON_PROFILE',
+        Name: 'JobTitleName',
+        DisplayKey: 'HRM_HR_Profile_JobTitleName',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON_PROFILE',
+        Name: 'PositionName',
+        DisplayKey: 'HRM_HR_Profile_PositionName',
         DataType: 'string'
     },
     {
         TypeView: 'E_GROUP',
-        DisplayKey: 'Thông tin chung',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'CodeView',
-        DisplayKey: 'Mã phiếu',
+        DisplayKey: 'HRM_PortalApp_OvertimePlanInformation',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
         Name: 'MethodPaymentView',
-        DisplayKey: 'Phương pháp thanh toán',
+        DisplayKey: 'MethodPaymentView',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'OvertimeReasonName',
-        DisplayKey: 'HRM_PortalApp_ReasonOvertime',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_GROUP_FILEATTACH',
-        DisplayKey: 'HRM_PortalApp_Attachments',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_FILEATTACH',
-        Name: 'lstFileAttach',
-        DisplayKey: 'HRM_Payroll_Sal_TaxInformationRegister_FileAttach',
-        DataType: 'FileAttach'
-    },
-    {
-        TypeView: 'E_GROUP',
-        DisplayKey: 'DS thông tin người duyệt',
-        Name: 'ProcessApproval',
-        isGroupList: true
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'UserInfoName',
-        DisplayKey: 'Tên người duyệt',
-        DataType: 'string',
-        isList: true
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'PositionName',
-        DisplayKey: 'Chức vụ',
-        DataType: 'string',
-        isList: true
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'Content',
-        DisplayKey: 'Nội dung',
-        DataType: 'string',
-        isList: true
-    },
-    {
-        TypeView: 'E_GROUP',
-        DisplayKey: 'Danh sách tăng ca',
-        DataType: 'string',
-        isCollapse: true
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'WorkDateRoot',
-        DisplayKey: 'DateOvertime',
+        Name: 'WorkDate',
+        DisplayKey: 'HRM_PortalApp_DayRegister',
         DataType: 'DateToFrom',
         DataFormat: 'DD/MM/YYYY'
     },
@@ -174,7 +110,7 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'RegisterHours',
+        Name: 'StrRegisterHours',
         DisplayKey: 'HRM_PortalApp_HourRegister',
         DataType: 'string'
     },
@@ -188,9 +124,27 @@ const configDefault = [
     },
     {
         TypeView: 'E_COMMON',
+        Name: 'ShiftNameCode',
+        DisplayKey: 'HRM_Attendance_ShiftName',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'OvertimeReason',
+        DisplayKey: 'HRM_PortalApp_ReasonOvertime',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
         Name: 'ReasonOT',
         DisplayKey: 'HRM_PortalApp_Explanation',
         DataType: 'string'
+    },
+    {
+        TypeView: 'E_FILEATTACH',
+        Name: 'FileAttachment',
+        DisplayKey: 'HRM_Payroll_Sal_TaxInformationRegister_FileAttach',
+        DataType: 'FileAttach'
     },
     {
         TypeView: 'E_GROUP',
@@ -222,32 +176,32 @@ const configDefault = [
         DataType: 'bool'
     },
     {
+        TypeView: 'E_COMMON',
+        Name: 'BusinessUnitTypeView',
+        DisplayKey: 'HRM_Portal_Att_TimesheetEvaluation_BusinessUnitTypeName',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'BusinessUnitView',
+        DisplayKey: 'HRM_Payroll_Sal_SeveranceAllowance_ShopID',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'SendToView',
+        DisplayKey: 'HRM_Category_HeadcountOrg_MailToHeadcount_code',
+        DataType: 'string'
+    },
+    {
+        TypeView: 'E_COMMON',
+        Name: 'OvertimeArea',
+        DisplayKey: 'HRM_OTWorkingArea',
+        DataType: 'string'
+    },
+    {
         TypeView: 'E_GROUP_APPROVE',
         DisplayKey: 'HRM_HRE_Concurrent_ApproveHistory',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_USERAPPROVE1',
-        Name: 'UserApproveName',
-        DisplayKey: 'PerformanceApprovalStatus__E_APPROVED1',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_USERAPPROVE3',
-        Name: 'UserApproveName3',
-        DisplayKey: 'PerformanceApprovalStatus__E_APPROVED2',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_USERAPPROVE4',
-        Name: 'UserApproveName4',
-        DisplayKey: 'PerformanceApprovalStatus__E_APPROVED3',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_USERAPPROVE2',
-        Name: 'UserApproveName2',
-        DisplayKey: 'JobVacancyStatus__E_APPROVED4',
         DataType: 'string'
     }
 ];
@@ -313,16 +267,6 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                     `[URI_CENTER]/api/Att_OvertimePlan/GetOvertimePlanByID?ID=${id}`
                 );
 
-                // HttpService.Post('[URI_CENTER]/api/Att_OvertimeForm/New_OvertimeFormResultRegister', {
-                //     tabEnum: 'E_WAITCONFIRM',
-                //     CutOffDurationID: '992E8FEF-3B39-4E4A-B241-9FCE1E44A9CC',
-                //     Text: '',
-                //     OrgStructureIDs: '',
-                //     ProfileIDs: '404061d7-2ea2-401c-9182-403fa52f77de'
-                // }).then((res) => {
-                //     console.log(res, 'res');
-                // });
-
                 const getDetailConfig = await Vnr_Function.HandleConfigListDetailATT(
                     _configListDetail,
                     'Detail_List_Overtime'
@@ -332,8 +276,7 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                     let data = { ...response.Data, ...response.Data.SingleWordDetail[0] };
                     data.BusinessAllowAction = Vnr_Services.handleStatus(
                         data.Status,
-                        dataItem?.SendEmailStatus ? dataItem?.SendEmailStatus : false,
-                        dataItem?.TypeApprove
+                        dataItem?.SendEmailStatus ? dataItem?.SendEmailStatus : false
                     );
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachment);
@@ -345,34 +288,31 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                             {
                                 value: dataItem?.AccumulateHour?.UdHourByDate,
                                 color:
-                                      dataItem?.AccumulateHour?.UdLimitColorDate || dataItem?.UdLimitColorDay
-                                          ? Colors.red
-                                          : null
+                                    dataItem?.AccumulateHour?.UdLimitColorDate || dataItem?.UdLimitColorDay
+                                        ? Colors.red
+                                        : null
                             },
                             {
                                 value: dataItem?.AccumulateHour?.UdHourByMonth,
                                 color:
-                                      dataItem?.AccumulateHour?.UdLimitColorMonth || dataItem?.UdLimitColorMonth
-                                          ? Colors.red
-                                          : null
+                                    dataItem?.AccumulateHour?.UdLimitColorMonth || dataItem?.UdLimitColorMonth
+                                        ? Colors.red
+                                        : null
                             },
                             {
                                 value: dataItem?.AccumulateHour?.UdHourByYear,
                                 color:
-                                      dataItem?.AccumulateHour?.UdLimitColorYear || dataItem?.UdLimitColorYear
-                                          ? Colors.red
-                                          : null
+                                    dataItem?.AccumulateHour?.UdLimitColorYear || dataItem?.UdLimitColorYear
+                                        ? Colors.red
+                                        : null
                             }
                         ]
                         : null;
 
                     //0181592: [TB_W30][LTG] APP. Thêm điều kiện lọc để nhận biết Tự sinh tăng ca và tự đăng ký ở màn hình Tăng ca
-                    data.ShiftOverTimeplanView =
-                        Array.isArray(data?.OtherInformation) &&
-                        data?.OtherInformation.length > 0 &&
-                        data?.OtherInformation[0]?.ShiftOverTimeplanView
-                            ? data?.OtherInformation[0]?.ShiftOverTimeplanView
-                            : null;
+                    data.ShiftOverTimeplanView = (Array.isArray(data?.OtherInformation)
+                        && data?.OtherInformation.length > 0
+                        && data?.OtherInformation[0]?.ShiftOverTimeplanView) ? data?.OtherInformation[0]?.ShiftOverTimeplanView : null;
 
                     // handle synchronized field for app
                     // if (!data?.UserProcessApproveID && data?.UserProcessID) {
@@ -427,11 +367,6 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
     render() {
         const { dataItem, configListDetail, listActions } = this.state,
             { containerItemDetail, contentScroll, bottomActions } = styleScreenDetail;
-        const fieldNameRenderList = configListDetail?.filter(
-            (item) => item.TypeView === 'E_GROUP' && item.isGroupList
-        )?.[0]?.Name;
-        const configOfRenderList = configListDetail?.filter((item) => item.TypeView === 'E_COMMON' && item.isList);
-
         let contentViewDetail = <VnrLoading size={'large'} />;
         if (dataItem && configListDetail) {
             contentViewDetail = (
@@ -440,76 +375,10 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
                         ref={(refs) => (this.AttSubmitWorkingOvertimeAddOrEdit = refs)}
                     />
                     <ScrollView style={contentScroll} showsVerticalScrollIndicator={false}>
-                        <View style={[containerItemDetail, CustomStyleSheet.paddingHorizontal(0)]}>
+                        <View style={containerItemDetail}>
                             {configListDetail.map((e) => {
-                                if (e.TypeView != 'E_COMMON_PROFILE' && !e.isList && !e.isGroupList)
-                                    return (
-                                        <View style={CustomStyleSheet.paddingHorizontal(styleSheets.p_10)}>
-                                            {Vnr_Function.formatStringTypeV3(dataItem, e, configListDetail)}
-                                        </View>
-                                    );
-                                else if (
-                                    (e.TypeView === 'E_GROUP' || e.TypeView === 'E_COMMON') &&
-                                    e.isGroupList &&
-                                    fieldNameRenderList &&
-                                    dataItem?.[fieldNameRenderList]?.length > 0 &&
-                                    configOfRenderList?.length > 0
-                                ) {
-                                    return (
-                                        <View>
-                                            <View style={styles.groupHeaderContainer}>
-                                                <VnrText
-                                                    style={[styleSheets.lable, styles.groupHeaderText]}
-                                                    i18nKey={e.DisplayKey}
-                                                    value={e.DisplayKey}
-                                                />
-                                            </View>
-                                            {dataItem?.[fieldNameRenderList].map((item, index) => {
-                                                return (
-                                                    <View
-                                                        key={index}
-                                                        style={[
-                                                            CustomStyleSheet.paddingHorizontal(styleSheets.p_10),
-                                                            CustomStyleSheet.marginVertical(6)
-                                                        ]}
-                                                    >
-                                                        <View style={styles.itemContainer}>
-                                                            {configOfRenderList.map((config) => {
-                                                                return (
-                                                                    <View
-                                                                        key={config.Label}
-                                                                        style={[
-                                                                            styles.configItemRow,
-                                                                            config.isWrapLine && styles.configItemColumn
-                                                                        ]}
-                                                                    >
-                                                                        <View style={styles.labelContainer}>
-                                                                            <VnrText
-                                                                                style={[styleSheets.lable]}
-                                                                                i18nKey={config.DisplayKey}
-                                                                                // numberOfLines={1}
-                                                                            />
-                                                                        </View>
-                                                                        <View
-                                                                            style={[
-                                                                                styles.valueContainer,
-                                                                                config.isWrapLine && styles.valueContainerWrapLine
-                                                                            ]}
-                                                                        >
-                                                                            <Text style={[styleSheets.text, styles.valueText]}>
-                                                                                {dataItem[config.Name] ?? '-'}
-                                                                            </Text>
-                                                                        </View>
-                                                                    </View>
-                                                                );
-                                                            })}
-                                                        </View>
-                                                    </View>
-                                                );
-                                            })}
-                                        </View>
-                                    );
-                                }
+                                if (e.TypeView != 'E_COMMON_PROFILE')
+                                    return Vnr_Function.formatStringTypeV3(dataItem, e, configListDetail);
                             })}
                         </View>
                     </ScrollView>
@@ -531,56 +400,3 @@ export default class AttSubmitWorkingOvertimeViewDetail extends Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    groupHeaderContainer: {
-        flexShrink: 1,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        minWidth: 160 - Size.defineSpace * 2,
-        backgroundColor: Colors.gray_3,
-        paddingHorizontal: styleSheets.p_10,
-        paddingVertical: 8
-    },
-    groupHeaderText: {
-        color: Colors.black,
-        fontSize: Size.text + 2,
-        fontWeight: '600'
-    },
-    itemContainer: {
-        padding: 8,
-        borderWidth: 1,
-        borderColor: Colors.gray_5,
-        borderRadius: 8
-    },
-    configItemRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        paddingVertical: 12
-    },
-    configItemColumn: {
-        flexDirection: 'column'
-    },
-    labelContainer: {
-        flexShrink: 1,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        minWidth: 160 - Size.defineSpace * 2
-    },
-    valueContainer: {
-        flexShrink: 1,
-        justifyContent: 'center',
-        alignItems: 'flex-end',
-        paddingLeft: Size.defineHalfSpace,
-        minWidth: 160 - Size.defineSpace * 2
-    },
-    valueContainerWrapLine: {
-        paddingLeft: 0,
-        paddingTop: Size.defineSpace
-    },
-    valueText: {
-        color: Colors.gray_7,
-        textAlign: 'right'
-    }
-});

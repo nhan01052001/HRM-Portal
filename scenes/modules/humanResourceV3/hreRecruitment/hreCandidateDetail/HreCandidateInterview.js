@@ -14,7 +14,6 @@ import { EnumName, ScreenName } from '../../../../../assets/constant';
 import HreResultInterviewAddOrEdit from '../hreInterview/hreInterview/hreWaitingInterview/HreResultInterviewAddOrEdit';
 import DrawerServices from '../../../../../utils/DrawerServices';
 import { dataVnrStorage } from '../../../../../assets/auth/authentication';
-import Vnr_Services from '../../../../../utils/Vnr_Services';
 
 export default class HreCandidateInterview extends Component {
     constructor(props) {
@@ -32,9 +31,15 @@ export default class HreCandidateInterview extends Component {
             headerLeft: (
                 <TouchableOpacity
                     onPress={() => {
-                        const _params = this.props.navigation.state.params,
-                            { beforeScreen } = typeof _params == 'object' ? _params : JSON.parse(_params);
-                        if (beforeScreen != null) DrawerServices.navigate(beforeScreen);
+                        const beforeScreen = DrawerServices.getBeforeScreen();
+                        if (
+                            beforeScreen == ScreenName.HreWaitingInterview ||
+                            beforeScreen == ScreenName.HreCompletedInterview
+                        )
+                            DrawerServices.navigate('TopTabHreInterview');
+                        else if (beforeScreen == ScreenName.HreInterviewCalendar) {
+                            DrawerServices.navigate(ScreenName.HreInterviewCalendar);
+                        }
                         else DrawerServices.goBack();
                     }}
                 >
@@ -93,7 +98,7 @@ export default class HreCandidateInterview extends Component {
                 id = dataItem?.CandidateID;
             }
 
-            if (id && Vnr_Services.checkPermissions('New_PortalV3_Rec_CandidateProfileDetail_InterviewTab', 'View')) {
+            if (id) {
                 const response = await HttpService.Get(
                     `[URI_CENTER]/api/Rec_Interview/GetInfoInterviewDetail?CandidateID=${id}&IsGeneral=false`
                 );
@@ -107,9 +112,8 @@ export default class HreCandidateInterview extends Component {
                         data.rounds[data.rounds.length - 1] &&
                         data.rounds[data.rounds.length - 1]['ListInterviewResultDetail'] != null
                     ) {
-                        const _ListInterviewResultDetail =
-                            data.rounds[data.rounds.length - 1]['ListInterviewResultDetail'];
-                        const lastItem = _ListInterviewResultDetail.find((item) => item.InterviewerID == profileID);
+                        const _ListInterviewResultDetail = data.rounds[data.rounds.length - 1]['ListInterviewResultDetail'];
+                        const lastItem = _ListInterviewResultDetail.find(item => item.InterviewerID == profileID);
                         if (lastItem && lastItem.IsInputResult == true && lastItem.ResultInterview == undefined) {
                             data = {
                                 ...data,
@@ -137,37 +141,19 @@ export default class HreCandidateInterview extends Component {
         this.getDataItem();
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const _params = nextProps.navigation.state.params,
-            { dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params);
-
-        if (dataItem != null) {
-            this.getDataItem();
-        }
-    }
-
     reload = () => {
         const { reloadScreenList } = this.props.navigation.state.params;
-        !Vnr_Function.CheckIsNullOrEmpty(reloadScreenList) && reloadScreenList('E_KEEP_FILTER');
 
+        !Vnr_Function.CheckIsNullOrEmpty(reloadScreenList) && reloadScreenList('E_KEEP_FILTER');
         this.setState({ dataItem: null }, () => {
             this.getDataItem(true);
         });
     };
 
-    renderInterViewResult = (el, index) => {
-        if (index == 0) {
+    renderInterViewResult = (el, index, item) => {
+        if (index == 0 && item.ListInterviewer.length > 1) {
             return (
-                <TouchableOpacity key={index} style={styles.styUsResult}
-                    disabled={el.ResultInterview == null}
-                    onPress={() => {
-                        if (el.ResultInterview != null)
-                            DrawerServices.navigate(ScreenName.HreResultInterviewViewDetail, {
-                                dataItem: el,
-                                reloadScreenList: this.reload
-                            });
-                    }}
-                >
+                <View key={index} style={styles.styUsResult}>
                     <View style={styles.styAvtaUser}>
                         <Text style={[styleSheets.text, styles.styOverallInterview]} numberOfLines={1}>
                             {translate('HRM_PortalApp_OverallInterview')}
@@ -181,7 +167,7 @@ export default class HreCandidateInterview extends Component {
                             </Text>
                         </View>
                     )}
-                </TouchableOpacity>
+                </View>
             );
         } else if (index != 0) {
             return (
@@ -193,15 +179,14 @@ export default class HreCandidateInterview extends Component {
                         if (el.ResultInterview != null)
                             DrawerServices.navigate(ScreenName.HreResultInterviewViewDetail, {
                                 dataItem: el,
-                                reloadScreenList: this.reload,
-                                beforeScreen: 'HreCandidateInterview'
+                                reloadScreenList: this.reload
                             });
                     }}
                 >
                     <View style={styles.styAvtaUser}>
-                        {Vnr_Function.renderAvatarCricleByName(el?.ImagePath, el?.ProfileNameOnly, Size.iconSize - 3)}
+                        {Vnr_Function.renderAvatarCricleByName(el?.ImagePath, el?.InterviewerName, Size.iconSize - 3)}
                         <Text style={[styleSheets.text, styles.styUsText]} numberOfLines={1}>
-                            {el.ProfileNameOnly || ''}
+                            {el.InterviewerName || ''}
                         </Text>
                     </View>
 
@@ -279,11 +264,11 @@ export default class HreCandidateInterview extends Component {
                                             <View key={id} style={styles.styUsViewer}>
                                                 {Vnr_Function.renderAvatarCricleByName(
                                                     el?.ImagePath,
-                                                    el?.ProfileNameOnly,
+                                                    el?.ProfileName,
                                                     Size.iconSize - 3
                                                 )}
                                                 <Text style={[styleSheets.text, styles.styUsText]}>
-                                                    {el.ProfileNameOnly || ''}
+                                                    {el.ProfileName || ''}
                                                 </Text>
                                             </View>
                                         ))}
@@ -291,13 +276,15 @@ export default class HreCandidateInterview extends Component {
                             </View>
 
                             <View style={styles.styRound}>
-                                <Text style={[styleSheets.lable]}>{translate('HRM_PortalApp_InterviewResult')}</Text>
+                                <Text style={[styleSheets.lable]}>
+                                    {translate('HRM_PortalApp_InterviewResult')}
+                                </Text>
 
                                 <View style={styles.styListResult}>
                                     {item.ListInterviewResultDetail &&
                                         item.ListInterviewResultDetail.length > 0 &&
                                         item.ListInterviewResultDetail.map((el, id) =>
-                                            this.renderInterViewResult(el, id)
+                                            this.renderInterViewResult(el, id, item)
                                         )}
                                 </View>
                             </View>

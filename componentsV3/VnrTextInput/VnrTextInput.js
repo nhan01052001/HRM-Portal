@@ -1,14 +1,7 @@
 /* eslint-disable no-console */
 import React, { Component } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import {
-    Colors,
-    CustomStyleSheet,
-    Size,
-    styleSheets,
-    stylesVnrPickerV3,
-    styleValid
-} from '../../constants/styleConfig';
+import { Colors, CustomStyleSheet, Size, styleSheets, stylesVnrPickerV3, styleValid } from '../../constants/styleConfig';
 import { IconCancel, IconWarn } from '../../constants/Icons';
 import Vnr_Function from '../../utils/Vnr_Function';
 import format from 'number-format.js';
@@ -26,15 +19,13 @@ export default class VnrTextInput extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return (
-            nextProps?.value !== this.props?.value ||
+        return nextProps?.value !== this.props?.value ||
             nextProps?.refresh !== this.props?.refresh ||
             nextState?.isShowClearText !== this.state.isShowClearText ||
             nextProps?.isCheckEmpty !== this.props?.isCheckEmpty
-        );
     }
 
-    changeDisable = (bool) => {
+    changeDisable = bool => {
         const stateProps = { ...this.state.stateProps };
         if (!Vnr_Function.CheckIsNullOrEmpty(stateProps.disable) && typeof stateProps.disable === 'boolean') {
             stateProps.disable = bool;
@@ -47,11 +38,11 @@ export default class VnrTextInput extends Component {
             this.onRefreshControl(nextProps);
         }
     }
-    onRefreshControl = (nextProps) => {
+    onRefreshControl = nextProps => {
         this.setState({ stateProps: nextProps });
     };
 
-    onChangeText = (text) => {
+    onChangeText = text => {
         const { onChangeText, charType } = this.state.stateProps,
             numRegexTypeInt = /^[0-9]+$/g,
             numRegexTypeDouble = /^(-)?(((\d+(\.\d*)?)|(\.\d*)))?$/,
@@ -121,20 +112,6 @@ export default class VnrTextInput extends Component {
         }
     };
 
-    onBlur = () => {
-        const { onChangeText, value } = this.state.stateProps,
-            numRegexTextEmpty = /^\s+$/;
-
-        if (value) {
-            // Block input empty, space or \n
-            if (numRegexTextEmpty.test(value) == true) {
-                onChangeText('');
-            }
-        }
-
-        this.props.onBlur && this.props.onBlur();
-    };
-
     render() {
         const stateProps = this.state.stateProps;
         const { lable, maxNumber } = this.props;
@@ -149,15 +126,13 @@ export default class VnrTextInput extends Component {
                 (stateProps.value === null ||
                     stateProps.value === undefined ||
                     stateProps.value === '' ||
-                    (stateProps.value && stateProps.value.length > 1000))) ||
-            (this.props.fieldValid &&
+                    (stateProps.value && stateProps.value.length > 1000)))
+            || (this.props.fieldValid &&
                 this.props.isCheckEmpty &&
                 !isNaN(Number(maxNumber)) &&
-                !isNaN(Number(stateProps.value)) &&
-                stateProps.value >= maxNumber + 1)
+                !isNaN(Number(stateProps.value))
+                && stateProps.value >= maxNumber + 1)
         ) {
-            isShowErr = true;
-        } else if (this.state.isFalseCheckText) {
             isShowErr = true;
         } else {
             isShowErr = false;
@@ -199,7 +174,7 @@ export default class VnrTextInput extends Component {
                         )}
 
                         <TextInput
-                            ref={(ref) => (this.refInput = ref)}
+                            ref={ref => (this.refInput = ref)}
                             accessibilityLabel={`VnrTextInput-${stateProps.textField ? stateProps.textField : stateProps.lable}`}
                             editable={!disable}
                             placeholder={translate(stateProps.placeHolder)}
@@ -212,37 +187,20 @@ export default class VnrTextInput extends Component {
                                     height: this.props.height == undefined ? Size.heightInput : this.props.height
                                 }
                             ]}
-                            onBlur={this.onBlur}
-                            onChangeText={(text) => this.onChangeText(text)}
+                            onChangeText={text => this.onChangeText(text)}
                         />
                     </View>
                 ) : (
                     <View style={CustomStyleSheet.flex(1)}>
                         {stateProps.lable && (
-                            <View style={[
-                                stylesVnrPickerV3.styLbPicker,
-                                CustomStyleSheet.justifyContent('space-between'),
-                                CustomStyleSheet.alignItems('center'),
-                                stateProps?.styleLabel ?? {}
-                            ]}>
-                                <View style={[stylesVnrPickerV3.styLbPicker]}>
-                                    <VnrText
-                                        style={[styleSheets.text, styles.styLbNotHaveValuePicker]}
-                                        i18nKey={stateProps.lable}
-                                    />
-                                    {stateProps.fieldValid && (
-                                        <VnrText style={[styleSheets.text, styleValid]} i18nKey={'HRM_Valid_Char'} />
-                                    )}
-                                </View>
-                                {
-                                    !!this.props?.maxLength && (
-                                        <View>
-                                            <Text
-                                                style={[styleSheets.text, styles.styLbNotHaveValuePicker]}
-                                            >{this.props?.value?.length ?? 0}/{this.props?.maxLength}</Text>
-                                        </View>
-                                    )
-                                }
+                            <View style={stylesVnrPickerV3.styLbPicker}>
+                                <VnrText
+                                    style={[styleSheets.text, styles.styLbNotHaveValuePicker]}
+                                    i18nKey={stateProps.lable}
+                                />
+                                {stateProps.fieldValid && (
+                                    <VnrText style={[styleSheets.text, styleValid]} i18nKey={'HRM_Valid_Char'} />
+                                )}
                             </View>
                         )}
                         {errorMax500 != '' && (
@@ -252,7 +210,7 @@ export default class VnrTextInput extends Component {
                         )}
 
                         <TextInput
-                            ref={(ref) => (this.refInput = ref)}
+                            ref={ref => (this.refInput = ref)}
                             accessibilityLabel={`VnrTextInput-${stateProps.textField ? stateProps.textField : stateProps.lable}`}
                             editable={!disable}
                             placeholder={translate(stateProps.placeHolder)}
@@ -276,8 +234,7 @@ export default class VnrTextInput extends Component {
                                         }
                                     ]
                             }
-                            onBlur={this.onBlur}
-                            onChangeText={(text) => this.onChangeText(text)}
+                            onChangeText={text => this.onChangeText(text)}
                         />
                     </View>
                 )}
@@ -291,7 +248,10 @@ export default class VnrTextInput extends Component {
                 ) : !Vnr_Function.CheckIsNullOrEmpty(stateProps.onClearText) &&
                     typeof stateProps.onClearText == 'function' &&
                     this.props.value !== '' ? (
-                        <TouchableOpacity onPress={() => stateProps.onClearText()} style={styles.styBtnClear}>
+                        <TouchableOpacity
+                            onPress={() => stateProps.onClearText()}
+                            style={styles.styBtnClear}
+                        >
                             <IconCancel
                                 size={Size.iconSize - 2}
                                 color={this.props.iconCloseColor ? this.props.iconCloseColor : Colors.grey}

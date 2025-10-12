@@ -236,7 +236,7 @@ class HreDoneProcessingPostingPlan extends Component {
                     },
                     {
                         TypeView: 'E_COMMON',
-                        Name: 'NumberOfJob',
+                        Name: 'NumberOfRecruitment',
                         DisplayKey: 'HRM_PortalApp_HreProcessingPostingPlan_NumberOfRecruitment',
                         DataType: 'string'
                     }

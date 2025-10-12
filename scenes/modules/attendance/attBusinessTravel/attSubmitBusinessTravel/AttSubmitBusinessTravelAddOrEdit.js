@@ -74,20 +74,6 @@ const initSateDefault = {
         visibleConfig: true,
         visible: true
     },
-    DateStayFrom: {
-        value: null,
-        refresh: false,
-        disable: false,
-        visibleConfig: true,
-        visible: false
-    },
-    DateStayTo: {
-        value: null,
-        refresh: false,
-        disable: false,
-        visibleConfig: true,
-        visible: false
-    },
     HourFrom: {
         value: null,
         refresh: false,
@@ -211,13 +197,6 @@ const initSateDefault = {
         listFile: []
     },
     SumDay: {
-        value: '',
-        refresh: false,
-        disable: true,
-        visibleConfig: true,
-        visible: false
-    },
-    TotalDayStay: {
         value: '',
         refresh: false,
         disable: true,
@@ -381,8 +360,6 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
                 DurationType,
                 DateFrom,
                 DateTo,
-                DateStayFrom,
-                DateStayTo,
                 HourFrom,
                 HourTo,
                 PlaceFrom,
@@ -437,18 +414,6 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
                 value: item.DateTo ? moment(item.DateTo).format('YYYY-MM-DD HH:mm:ss') : null,
                 disable: false,
                 refresh: !DateTo.refresh
-            },
-            DateStayFrom: {
-                ...DateStayFrom,
-                value: item.DateStayFrom ? moment(item.DateStayFrom).format('YYYY-MM-DD HH:mm:ss') : null,
-                disable: false,
-                refresh: !DateStayFrom.refresh
-            },
-            DateStayTo: {
-                ...DateStayTo,
-                value: item.DateStayTo ? moment(item.DateStayTo).format('YYYY-MM-DD HH:mm:ss') : null,
-                disable: false,
-                refresh: !DateStayTo.refresh
             },
             HourFrom: {
                 ...HourFrom,
@@ -1471,76 +1436,16 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
     };
 
     ChangeBusinessTripType = (item, isModify) => {
-        const { DateStayFrom, DateStayTo, TotalDayStay, DateFrom, DateTo } = this.state;
         if (item) {
             VnrLoadingSevices.show();
             HttpService.Post('[URI_HR]//Cat_GetData/GetCatBussinessTravelByID', { id: item.ID }).then((res) => {
                 VnrLoadingSevices.hide();
-                if (res) {
-                    if (res.Location && res.Location != '')
-                    {
-                        this.showHideControlBusinessTravel({
-                            locationType: res.Location,
-                            typeBusinessTrip: item.ID,
-                            isModify
-                        });
-                    }
-                    if (res?.IsAccommodation) { //kiểm tra loại công tác có check lưu trú không
-                        this.setState({
-                            DateStayFrom: {
-                                ...DateStayFrom,
-                                visible: true,
-                                value: !isModify ? DateFrom.value : DateStayFrom.value,
-                                refresh: !DateStayFrom.refresh
-                            },
-                            DateStayTo: {
-                                ...DateStayTo,
-                                visible: true,
-                                value: !isModify ? DateTo.value : DateStayTo.value,
-                                refresh: !DateStayTo.refresh
-                            },
-                            TotalDayStay: {
-                                ...TotalDayStay,
-                                visible: true,
-                                refresh: !TotalDayStay.refresh
-                            }
-                        }, () => {
-                            this.handleCalTotalDayStay();
-                            this.showHideControlBusinessTravel({
-                                locationType: null,
-                                typeBusinessTrip: item.ID,
-                                isModify
-                            });
-                        });
-                    } else {
-                        this.setState({
-                            DateStayFrom: {
-                                ...DateStayFrom,
-                                visible: false,
-                                value: null,
-                                refresh: !DateStayFrom.refresh
-                            },
-                            DateStayTo: {
-                                ...DateStayTo,
-                                visible: false,
-                                value: null,
-                                refresh: !DateStayTo.refresh
-                            },
-                            TotalDayStay: {
-                                ...TotalDayStay,
-                                visible: false,
-                                value: '',
-                                refresh: !TotalDayStay.refresh
-                            }
-                        }, () => {
-                            this.showHideControlBusinessTravel({
-                                locationType: null,
-                                typeBusinessTrip: item.ID,
-                                isModify
-                            });
-                        });
-                    }
-                }
+                if (res && res.Location && res.Location != '')
+                    this.showHideControlBusinessTravel({
+                        locationType: res.Location,
+                        typeBusinessTrip: item.ID,
+                        isModify
+                    });
                 else this.showHideControlBusinessTravel({ locationType: null, typeBusinessTrip: item.ID, isModify });
             });
         } else {
@@ -1693,9 +1598,7 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
             }
         };
 
-        this.setState(nextState, () => {
-            this.readOnlyCtrlBT(false);
-        });
+        this.setState(nextState, () => this.readOnlyCtrlBT(false));
     };
 
     //change DateTo
@@ -1711,74 +1614,6 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
 
         this.setState(nextState, () => this.loadDurationType());
     };
-
-    //change DateFrom
-    onChangeDateStayFrom = (value) => {
-        const { DateStayFrom, DateFrom } = this.state;
-        // Chuyển đổi chuỗi ngày thành đối tượng Date
-        const dateStayFromStr = value.replace(' ', 'T');
-        const dateFromStr = DateFrom.value.replace(' ', 'T');
-        const dateStayFrom = new Date(dateStayFromStr);
-        const dateFrom = new Date(dateFromStr);
-        if (dateStayFrom > dateFrom) {
-            ToasterSevice.showWarning('HRM_PortalApp_StartDateFromTo', 4000);
-        }
-        let nextState = {
-            DateStayFrom: {
-                ...DateStayFrom,
-                value: value,
-                refresh: !DateStayFrom.refresh
-            }
-        };
-
-        this.setState(nextState, () => this.handleCalTotalDayStay());
-    };
-
-    //change DateStayTo
-    onChangeDateStayTo = (value) => {
-        const { DateStayTo, DateTo } = this.state;
-        // Chuyển đổi chuỗi ngày thành đối tượng Date
-        const dateStayToStr = value.replace(' ', 'T');
-        const dateToStr = DateTo.value.replace(' ', 'T');
-        const dateStayTo = new Date(dateStayToStr);
-        const dateTo = new Date(dateToStr);
-        if (dateStayTo < dateTo) {
-            ToasterSevice.showWarning('HRM_PortalApp_EndDateFromTo', 4000);
-        }
-        let nextState = {
-            DateStayTo: {
-                ...DateStayTo,
-                value: value,
-                refresh: !DateStayTo.refresh
-            }
-        };
-
-        this.setState(nextState, () => this.handleCalTotalDayStay());
-    };
-
-    handleCalTotalDayStay = () => {
-        const { DateStayTo, DateStayFrom, TotalDayStay } = this.state;
-        if (!DateStayFrom?.value || !DateStayTo?.value) return;
-        // Chuyển đổi chuỗi ngày thành đối tượng Date
-        const dateFromStr = DateStayFrom.value.replace(' ', 'T');
-        const dateToStr = DateStayTo.value.replace(' ', 'T');
-        const dateFrom = new Date(dateFromStr);
-        const dateTo = new Date(dateToStr);
-
-        // Kiểm tra xem đối tượng Date có hợp lệ không
-        if (isNaN(dateFrom) || isNaN(dateTo)) {
-            return;
-        }
-        // Tính số ngày nghỉ
-        const totalDays = Math.floor((dateTo - dateFrom) / (1000 * 60 * 60 * 24)) + 1;
-        this.setState({
-            TotalDayStay: {
-                ...TotalDayStay,
-                value: !isNaN(totalDays) ? totalDays.toString() : '',
-                refresh: !TotalDayStay.refresh
-            }
-        });
-    }
 
     calculateBusinessDay = () => {
         const { Profile, SumDay, DateFrom, DateTo, DurationType, BusinessTripTypeID } = this.state;
@@ -1989,6 +1824,8 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
             return;
         }
 
+        this.isProcessing = true;
+
         const {
                 ID,
                 Profile,
@@ -2012,27 +1849,10 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
                 UserApproveID3,
                 UserApproveID4,
                 modalErrorDetail,
-                SumDay,
-                TotalDayStay,
-                DateStayFrom,
-                DateStayTo
+                SumDay
             } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig;
-
-        const dateStayTo = new Date(DateStayTo.value.replace(' ', 'T'));
-        const dateTo = new Date(DateTo.value.replace(' ', 'T'));
-        const dateStayFrom = new Date(DateStayFrom.value.replace(' ', 'T'));
-        const dateFrom = new Date(DateFrom.value.replace(' ', 'T'));
-
-        if (dateStayTo < dateTo) {
-            ToasterSevice.showWarning('HRM_PortalApp_EndDateFromTo', 4000);
-            return;
-        }
-        if (dateStayFrom > dateFrom) {
-            ToasterSevice.showWarning('HRM_PortalApp_StartDateFromTo', 4000);
-            return;
-        }
 
         let param = {
             ProfileID: Profile.ID,
@@ -2066,11 +1886,7 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
             ProfileRemoveIDs: this.ProfileRemoveIDs,
             IsRemoveAndContinue: this.IsRemoveAndContinue,
             CacheID: this.CacheID,
-            SumDay: SumDay.value != '' ? SumDay.value : null,
-            TotalDayStay: TotalDayStay.value != '' ? TotalDayStay.value : null,
-            DateStayFrom: DateStayFrom.value,
-            DateStayTo: DateStayTo.value,
-            IsAccommodation: DateStayTo.value ? true : false
+            SumDay: SumDay.value != '' ? SumDay.value : null
         };
 
         if (isSend) {
@@ -2088,11 +1904,10 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
                 ID
             };
         }
-        this.isProcessing = true;
+
         VnrLoadingSevices.show();
         HttpService.Post('[URI_HR]/api/Att_BussinessTravel', param).then((data) => {
             VnrLoadingSevices.hide();
-            this.isProcessing = false;
             if (data) {
                 if (data.ErrorRespone) {
                     if (data.ErrorRespone.IsBlock == true) {
@@ -2392,8 +2207,6 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
                 DurationType,
                 DateFrom,
                 DateTo,
-                DateStayFrom,
-                DateStayTo,
                 HourFrom,
                 HourTo,
                 PlaceFrom,
@@ -2412,8 +2225,7 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
                 modalErrorDetail,
                 fieldValid,
                 listTemplate,
-                SumDay,
-                TotalDayStay
+                SumDay
             } = this.state,
             {
                 textLableInfo,
@@ -2694,75 +2506,6 @@ export default class AttSubmitBusinessTravelAddOrEdit extends Component {
                                             />
                                         </View>
                                     </View>
-                                </View>
-                            </View>
-                        )}
-
-                        {/* Thời gian lưu trú- DateStayFrom, DateStayTo */}
-                        {
-                            DateStayFrom.visibleConfig && DateStayFrom.visible && (
-                                <View style={contentViewControl}>
-                                    <View style={viewLable}>
-                                        <VnrText
-                                            style={[styleSheets.text, textLableInfo]}
-                                            i18nKey={'HRM_Attendance_BusinessTravel_DateStay'}
-                                        />
-
-                                        {/* valid DateStart */}
-                                        {fieldValid.DateStayFrom && <VnrText style={styleValid} i18nKey={'HRM_Valid_Char'} />}
-                                    </View>
-                                    <View style={viewControl}>
-                                        <View style={formDate_To_From}>
-                                            <View style={controlDate_from}>
-                                                <VnrDate
-                                                    response={'string'}
-                                                    format={'DD/MM/YYYY'}
-                                                    value={DateStayFrom.value}
-                                                    refresh={DateStayFrom.refresh}
-                                                    type={'date'}
-                                                    onFinish={(value) => this.onChangeDateStayFrom(value)}
-                                                />
-                                            </View>
-                                            <View style={controlDate_To}>
-                                                <VnrDate
-                                                    disable={DateStayTo.disable}
-                                                    response={'string'}
-                                                    format={'DD/MM/YYYY'}
-                                                    value={DateStayTo.value}
-                                                    refresh={DateStayTo.refresh}
-                                                    type={'date'}
-                                                    onFinish={(value) => this.onChangeDateStayTo(value)}
-                                                />
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            )
-                        }
-
-                        {/* Tổng số ngày -  SumDay */}
-                        {TotalDayStay.visibleConfig && TotalDayStay.visible && (
-                            <View style={contentViewControl}>
-                                <View style={viewLable}>
-                                    <VnrText
-                                        style={[styleSheets.text, textLableInfo]}
-                                        i18nKey={'TotalDayStay'}
-                                    />
-                                </View>
-                                <View style={viewControl}>
-                                    <VnrTextInput
-                                        disable={TotalDayStay.disable}
-                                        refresh={TotalDayStay.refresh}
-                                        value={TotalDayStay.value}
-                                        onChangeText={(text) =>
-                                            this.setState({
-                                                TotalDayStay: {
-                                                    ...TotalDayStay,
-                                                    value: text
-                                                }
-                                            })
-                                        }
-                                    />
                                 </View>
                             </View>
                         )}

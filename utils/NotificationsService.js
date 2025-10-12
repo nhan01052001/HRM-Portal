@@ -209,7 +209,7 @@ export default class NotificationsService {
         if (dataVnrStorage && dataVnrStorage.isNewLayoutV3) {
             HttpService.Get('[URI_CENTER]/api/Sys_Common/GetCountDataDashBoardApp', null, this.fetchContbadges).then(
                 countBaged => {
-                    if (countBaged && countBaged.Data != null && typeof countBaged.Data == 'number') {
+                    if (countBaged && countBaged.Data && typeof countBaged.Data == 'number') {
                         this.setBadgeIcon(countBaged.Data);
                     }
                 }

@@ -524,14 +524,14 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
     };
 
     //promise get config valid
-    getConfigValid = (tblName) => {
+    getConfigValid = tblName => {
         return HttpService.Get('[URI_POR]/Portal/GetConfigValid?tableName=' + tblName);
     };
 
     componentDidMount() {
         //get config validate
         VnrLoadingSevices.show();
-        this.getConfigValid('Att_PregnancyRegister').then((res) => {
+        this.getConfigValid('Att_PregnancyRegister').then(res => {
             VnrLoadingSevices.hide();
             if (res) {
                 try {
@@ -543,7 +543,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
 
                     let nextState = { fieldValid: res };
 
-                    _configField.forEach((fieldConfig) => {
+                    _configField.forEach(fieldConfig => {
                         let _field = this.state[fieldConfig];
                         if (_field && typeof _field === 'object') {
                             _field = {
@@ -583,7 +583,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         });
     }
 
-    initData = (typePrenancySelected) => {
+    initData = typePrenancySelected => {
         const { E_ProfileID, E_FullName } = enumName,
             _profile = { ID: profileInfo[E_ProfileID], ProfileName: profileInfo[E_FullName] },
             { Profile, Type } = this.state;
@@ -615,7 +615,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
 
     getDataType = () => {
         HttpService.Get('[URI_SYS]/Sys_GetData/GetEnumForAtt?text=PregnancyTypeRegister&filterConfig=E_PORTAL').then(
-            (res) => {
+            res => {
                 if (res) {
                     const { Type } = this.state;
                     this.setState({
@@ -638,7 +638,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         if (profileId && type && (type == 'E_NEW_BORN_CHILD' || type == 'E_CHILDCARECOMPENSATION')) {
             VnrLoadingSevices.show();
             HttpService.Post('[URI_HR]/Hre_GetData/GetRelativeChildByProfileID', { ProfileID: profileId }).then(
-                (dataResult) => {
+                dataResult => {
                     VnrLoadingSevices.hide();
 
                     if (dataResult) {
@@ -998,7 +998,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         }
 
         if (valRelativeChild) {
-            valRelativeChild = dataSourceRelativeChild.find((itemChild) => itemChild.RelativeName == item.ChildName);
+            valRelativeChild = dataSourceRelativeChild.find(itemChild => itemChild.RelativeName == item.ChildName);
             // if (!childIsExist) {
             //   dataSourceRelativeChild = [
             //     valRelativeChild,
@@ -1009,7 +1009,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
 
         let valTypePregnancyEarly = [];
         if (item.TypePregnancyEarly) {
-            valTypePregnancyEarly = item.TypePregnancyEarly.split(',').map((item) => {
+            valTypePregnancyEarly = item.TypePregnancyEarly.split(',').map(item => {
                 return { Value: item, Text: translate('PregnancyLeaveEarlyType__' + item) };
             });
         }
@@ -1124,7 +1124,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         };
 
         if (item.PregnancyCycleID && Array.isArray(dataPregnacyProcess)) {
-            dataPregnacyProcess.map((value) => {
+            dataPregnacyProcess.map(value => {
                 if (value.ID === item.PregnancyCycleID) {
                     nextState = {
                         ...nextState,
@@ -1234,7 +1234,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         ];
 
         VnrLoadingSevices.show();
-        HttpService.MultiRequest(arrRequest).then((resAll) => {
+        HttpService.MultiRequest(arrRequest).then(resAll => {
             VnrLoadingSevices.hide();
             try {
                 this.GetRelativeChildByProfileID(_handleSetState, record, resAll);
@@ -1252,7 +1252,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
 
         if (Type == 'E_NEW_BORN_CHILD' || Type == 'E_CHILDCARECOMPENSATION') {
             VnrLoadingSevices.show();
-            HttpService.Post('[URI_HR]/Hre_GetData/GetRelativeChildByProfileID', { ProfileID }).then((data) => {
+            HttpService.Post('[URI_HR]/Hre_GetData/GetRelativeChildByProfileID', { ProfileID }).then(data => {
                 VnrLoadingSevices.hide();
                 if (data) {
                     resAll = [...resAll, data];
@@ -1272,7 +1272,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
             ProfileID: Profile.ID,
             userSubmit: Profile.ID,
             type: 'E_PREGNANCYREGISTER'
-        }).then((result) => {
+        }).then(result => {
             VnrLoadingSevices.hide();
             let nextState = {
                 UserApproveID: { ...UserApproveID },
@@ -1868,7 +1868,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
     };
 
     //picked duyệt đầu
-    onChangeUserApproveID = (item) => {
+    onChangeUserApproveID = item => {
         const { UserApproveID, UserApproveID2, UserApproveID3, UserApproveID4 } = this.state;
         let nextState = {
             UserApproveID: {
@@ -1957,7 +1957,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
     };
 
     //picked duyệt cuối
-    onChangeUserApproveID4 = (item) => {
+    onChangeUserApproveID4 = item => {
         const { UserApproveID, UserApproveID2, UserApproveID3, UserApproveID4 } = this.state;
         let nextState = {
             UserApproveID4: {
@@ -2119,7 +2119,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         this.setState(nextState);
     };
 
-    handlePickerTypeSelect = (item) => {
+    handlePickerTypeSelect = item => {
         const {
             DateStart,
             DateEnd,
@@ -2427,7 +2427,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         const { DateStart } = this.state,
             ID = profileInfo['ProfileID'];
 
-        HttpService.Post('[URI_HR]/Att_GetData/GetDateStartDefault', { profileID: ID }).then((data) => {
+        HttpService.Post('[URI_HR]/Att_GetData/GetDateStartDefault', { profileID: ID }).then(data => {
             if (data) {
                 this.setState({
                     DateStart: {
@@ -2479,7 +2479,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         const { ChildName, DateStart, DateEnd, Type, YearOfLose, ChildCareCompUsedTo, ChildBirthday } = this.state,
             relative = ChildName.value ? ChildName.value.ID : null;
 
-        HttpService.Post('[URI_HR]/Hre_GetData/GetYearOfBirhByRelativeID', { relativeid: relative }).then((data) => {
+        HttpService.Post('[URI_HR]/Hre_GetData/GetYearOfBirhByRelativeID', { relativeid: relative }).then(data => {
             if (data) {
                 let typeRegnancy = Type.value ? Type.value.Value : null,
                     yearoflose = YearOfLose.value,
@@ -2689,7 +2689,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
     };
 
     //change ChildBirthday - Ngày sinh
-    onChangeChildBirthday = (value) => {
+    onChangeChildBirthday = value => {
         const { ChildBirthday } = this.state;
         let nextState = {
             ChildBirthday: {
@@ -2703,7 +2703,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
     };
 
     //change ChildBirthday - Ngày mất
-    onChangeYearOfLose = (value) => {
+    onChangeYearOfLose = value => {
         const { YearOfLose } = this.state;
         let nextState = {
             YearOfLose: {
@@ -2762,7 +2762,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
 
             this.setState(nextState);
         } else if (pregnancytype == 'E_NEW_BORN_CHILD') {
-            HttpService.Post('[URI_HR]/Att_GetData/GetSysAllSettingByName', { Name: tmpChild }).then((data) => {
+            HttpService.Post('[URI_HR]/Att_GetData/GetSysAllSettingByName', { Name: tmpChild }).then(data => {
                 if (data != null) {
                     if (data.Value1 == 'True') {
                         IsAllowChildUnder1YearOld = true;
@@ -2771,7 +2771,9 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                         nextState = {
                             DateEnd: {
                                 ...DateEnd,
-                                value: moment(ChildBirthday.value).add(12, 'month').add(-1, 'day'),
+                                value: moment(ChildBirthday.value)
+                                    .add(12, 'month')
+                                    .add(-1, 'day'),
                                 refresh: !DateEnd.refresh
                             }
                         };
@@ -2784,12 +2786,16 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
             nextState = {
                 DateEnd: {
                     ...DateEnd,
-                    value: moment(ChildBirthday.value).add(12, 'month').add(-1, 'day'),
+                    value: moment(ChildBirthday.value)
+                        .add(12, 'month')
+                        .add(-1, 'day'),
                     refresh: !DateEnd.refresh
                 },
                 ChildCareCompUsedTo: {
                     ...ChildCareCompUsedTo,
-                    value: moment(ChildBirthday.value).add(12, 'month').add(-1, 'day'),
+                    value: moment(ChildBirthday.value)
+                        .add(12, 'month')
+                        .add(-1, 'day'),
                     refresh: !ChildCareCompUsedTo.refresh
                 }
             };
@@ -3016,7 +3022,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
 
         let param = {
             TypePregnancyEarly: TypePregnancyEarly.value
-                ? TypePregnancyEarly.value.map((item) => item.Value).join()
+                ? TypePregnancyEarly.value.map(item => item.Value).join()
                 : null,
             ChildName: ChildName.value ? ChildName.value.RelativeName : null,
             //TypePregnancyEarlyShift: TypePregnancyEarlyShift.value,
@@ -3034,7 +3040,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
             ChildCareCompUsedTo: ChildCareCompUsedTo.value
                 ? Vnr_Function.parseDateTime(ChildCareCompUsedTo.value)
                 : null,
-            DateStart: DateStart.value ? Vnr_Function.parseDateTime(DateStart.value) : null,
+            DateStart: DateStart.value,
             DateEnd: DateEnd.value ? Vnr_Function.parseDateTime(DateEnd.value) : null,
             ProfileID: Profile.ID,
             IsPortal: true,
@@ -3047,7 +3053,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
             UserApproveID4: UserApproveID4.value ? UserApproveID4.value.ID : null,
             Type: Type.value ? Type.value.Value : null,
             UserSubmitID: Profile.ID,
-            FileAttachment: FileAttach.value ? FileAttach.value.map((item) => item.fileName).join(',') : null,
+            FileAttachment: FileAttach.value ? FileAttach.value.map(item => item.fileName).join(',') : null,
             IsContinueSave: this.IsContinueSave,
             ProfileRemoveIDs: this.ProfileRemoveIDs,
             IsRemoveAndContinue: this.IsRemoveAndContinue,
@@ -3068,7 +3074,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         }
 
         VnrLoadingSevices.show();
-        HttpService.Post('[URI_HR]/api/Att_PregnancyRegister', param).then((data) => {
+        HttpService.Post('[URI_HR]/api/Att_PregnancyRegister', param).then(data => {
             VnrLoadingSevices.hide();
 
             //xử lý lại event Save
@@ -3199,11 +3205,11 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         });
     };
 
-    onSaveAndCreate = (navigation) => {
+    onSaveAndCreate = navigation => {
         this.onSave(navigation, true, null);
     };
 
-    onSaveAndSend = (navigation) => {
+    onSaveAndSend = navigation => {
         this.onSave(navigation, null, true);
     };
 
@@ -3218,7 +3224,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         }, {}); // empty object is the initial value for result object
     };
 
-    mappingDataGroup = (dataGroup) => {
+    mappingDataGroup = dataGroup => {
         let dataSource = [];
         let key = '';
         for (key in dataGroup) {
@@ -3262,10 +3268,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                             ]}
                         >
                             <VnrText
-                                style={[
-                                    styleSheets.text,
-                                    { ...CustomStyleSheet.fontWeight('500'), ...CustomStyleSheet.color(Colors.primary) }
-                                ]}
+                                style={[styleSheets.text, { ...CustomStyleSheet.fontWeight('500'), ...CustomStyleSheet.color(Colors.primary) }]}
                                 i18nKey={dataItem['TitleGroup']}
                             />
                         </View>
@@ -3318,11 +3321,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                     );
                 }
 
-                return (
-                    <View key={index} style={styles.styleViewBorderButtom}>
-                        {viewContent}
-                    </View>
-                );
+                return <View key={index} style={styles.styleViewBorderButtom}>{viewContent}</View>;
             });
         } else {
             return <View />;
@@ -3334,7 +3333,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
             { cacheID } = modalErrorDetail;
 
         VnrLoadingSevices.show();
-        HttpService.Post('[URI_HR]/Att_GetData/GetErrorMessageRespone', { cacheID: cacheID }).then((res) => {
+        HttpService.Post('[URI_HR]/Att_GetData/GetErrorMessageRespone', { cacheID: cacheID }).then(res => {
             VnrLoadingSevices.hide();
             if (res && res.Data) {
                 this.setState({
@@ -3372,7 +3371,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         );
     };
 
-    onPickChild = (item) => {
+    onPickChild = item => {
         const { ChildName } = this.state;
         this.setState(
             {
@@ -3489,8 +3488,11 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
         this.setState(nextState);
     };
 
-    getDateEnd = (d) => {
-        return moment(d).add(12, 'M').add(-1, 'd').toDate();
+    getDateEnd = d => {
+        return moment(d)
+            .add(12, 'M')
+            .add(-1, 'd')
+            .toDate();
     };
 
     getPregnacyProcess = () => {
@@ -3501,7 +3503,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                 DateStart: new Date(moment(DateStart.value).format('YYYY/MM/DD')).toDateString(),
                 DateEnd: new Date(moment(DateEnd.value).format('YYYY/MM/DD')).toDateString()
             })
-                .then((res) => {
+                .then(res => {
                     if (res && Array.isArray(res) && res.length > 0) {
                         if (res.length === 1) {
                             this.setState({
@@ -3536,7 +3538,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                         });
                     }
                 })
-                .catch((error) => {
+                .catch(error => {
                     DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
                 });
         }
@@ -3551,10 +3553,10 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                 DateStart: Vnr_Function.formatDateAPI(DateStart.value),
                 DateEnd: Vnr_Function.formatDateAPI(DateEnd.value)
             })
-                .then((res) => {
+                .then(res => {
                     VnrLoadingSevices.hide();
                     if (res && typeof res == 'string' && res.indexOf('MultiplePregnancy') == -1) {
-                        const findValue = Type.data ? Type.data.find((item) => item.Value == res) : null;
+                        const findValue = Type.data ? Type.data.find(item => item.Value == res) : null;
 
                         let keyCreate = 'HRM_Attendance_Pregnancy_AddNew';
                         if (findValue && findValue.Value) {
@@ -3599,25 +3601,26 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                             }
                         );
                     } else {
-                        // this.props.navigation.setParams({
-                        //     title: this.isModify ? 'HRM_Attendance_Pregnancy_Update' : 'HRM_Attendance_Pregnancy_AddNew'
-                        // });
-                        // this.setState(
-                        //     {
-                        //         Type: {
-                        //             ...Type,
-                        //             value: null,
-                        //             visible: true,
-                        //             refresh: !Type.refresh
-                        //         }
-                        //     },
-                        //     () => {
-                        //         this.onPickType(null, true);
-                        //     }
-                        // );
+                        this.props.navigation.setParams({
+                            title: this.isModify ? 'HRM_Attendance_Pregnancy_Update' : 'HRM_Attendance_Pregnancy_AddNew'
+                        });
+
+                        this.setState(
+                            {
+                                Type: {
+                                    ...Type,
+                                    value: null,
+                                    visible: true,
+                                    refresh: !Type.refresh
+                                }
+                            },
+                            () => {
+                                this.onPickType(null, true);
+                            }
+                        );
                     }
                 })
-                .catch((error) => {
+                .catch(error => {
                     DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
                 });
         }
@@ -3649,7 +3652,13 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                 modalErrorDetail,
                 PregnancyCycleID
             } = this.state,
-            { TypePregnancyEarlyShift, IsLateIn, IsEarlyMidOut, IsLateMidIn, IsEarlyOut } = divTypePregnancyEarly,
+            {
+                TypePregnancyEarlyShift,
+                IsLateIn,
+                IsEarlyMidOut,
+                IsLateMidIn,
+                IsEarlyOut
+            } = divTypePregnancyEarly,
             {
                 textLableInfo,
                 contentViewControl,
@@ -3697,8 +3706,8 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                 <View style={styleSheets.container}>
                     <KeyboardAwareScrollView
                         keyboardShouldPersistTaps={'handled'}
-                        contentContainerStyle={{ ...CustomStyleSheet.flexGrow(1), ...CustomStyleSheet.paddingTop(10) }}
-                        ref={(ref) => (this.scrollViewRef = ref)}
+                        contentContainerStyle={ { ...CustomStyleSheet.flexGrow(1), ...CustomStyleSheet.paddingTop(10) }}
+                        ref={ref => (this.scrollViewRef = ref)}
                     >
                         {/* Loại chế độ - Type */}
                         {Type.visibleConfig && Type.visible && (
@@ -3724,7 +3733,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         filter={false}
                                         value={Type.value}
                                         disable={Type.disable}
-                                        onFinish={(item) => this.onPickType(item)}
+                                        onFinish={item => this.onPickType(item)}
                                     />
                                 </View>
                             </View>
@@ -3758,11 +3767,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 onClick={this.onCheckTypePregnancyEarlyShift}
                                             />
                                             <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    textLableInfo,
-                                                    CustomStyleSheet.marginLeft(5)
-                                                ]}
+                                                style={[styleSheets.text, textLableInfo, CustomStyleSheet.marginLeft(5)]}
                                                 i18nKey={TypePregnancyEarlyShift.label}
                                             />
                                             {fieldValid.TypePregnancyEarlyShift && (
@@ -3784,11 +3789,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 onClick={this.onCheckTypeIsLateIn}
                                             />
                                             <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    textLableInfo,
-                                                    CustomStyleSheet.marginLeft(5)
-                                                ]}
+                                                style={[styleSheets.text, textLableInfo, CustomStyleSheet.marginLeft(5)]}
                                                 i18nKey={IsLateIn.label}
                                             />
                                             {fieldValid.IsLateIn && (
@@ -3810,11 +3811,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 onClick={this.onCheckTypeIsEarlyMidOut}
                                             />
                                             <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    textLableInfo,
-                                                    CustomStyleSheet.marginLeft(5)
-                                                ]}
+                                                style={[styleSheets.text, textLableInfo, CustomStyleSheet.marginLeft(5)]}
                                                 i18nKey={IsEarlyMidOut.label}
                                             />
                                             {fieldValid.IsEarlyMidOut && (
@@ -3836,11 +3833,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 onClick={this.onCheckTypeIsLateMidIn}
                                             />
                                             <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    textLableInfo,
-                                                    CustomStyleSheet.marginLeft(5)
-                                                ]}
+                                                style={[styleSheets.text, textLableInfo, CustomStyleSheet.marginLeft(5)]}
                                                 i18nKey={IsLateMidIn.label}
                                             />
                                             {fieldValid.IsLateMidIn && (
@@ -3862,11 +3855,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 onClick={this.onCheckTypeIsEarlyOut}
                                             />
                                             <VnrText
-                                                style={[
-                                                    styleSheets.text,
-                                                    textLableInfo,
-                                                    CustomStyleSheet.marginLeft(5)
-                                                ]}
+                                                style={[styleSheets.text, textLableInfo, CustomStyleSheet.marginLeft(5)]}
                                                 i18nKey={IsEarlyOut.label}
                                             />
                                             {fieldValid.IsEarlyOut && (
@@ -3909,7 +3898,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         filter={true}
                                         filterServer={false}
                                         autoFilter={true}
-                                        onFinish={(item) => {
+                                        onFinish={item => {
                                             this.setState({
                                                 PregnancyCycleID: {
                                                     ...PregnancyCycleID,
@@ -3944,7 +3933,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         textField={TypePregnancyEarly.textField}
                                         valueField={TypePregnancyEarly.valueField}
                                         filter={false}
-                                        onFinish={(items) =>
+                                        onFinish={items =>
                                             this.setState({
                                                 TypePregnancyEarly: {
                                                     ...TypePregnancyEarly,
@@ -3975,7 +3964,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         filter={true}
                                         filterServer={false}
                                         autoFilter={true}
-                                        onFinish={(item) => this.onPickChild(item)}
+                                        onFinish={item => this.onPickChild(item)}
                                     />
                                 </View>
                             </View>
@@ -3998,7 +3987,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         value={DatePregnacy.value}
                                         refresh={DatePregnacy.refresh}
                                         type={'date'}
-                                        onFinish={(value) =>
+                                        onFinish={value =>
                                             this.setState({
                                                 DatePregnacy: {
                                                     ...DatePregnacy,
@@ -4029,7 +4018,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         value={ChildBirthday.value}
                                         refresh={ChildBirthday.refresh}
                                         type={'date'}
-                                        onFinish={(value) => this.onChangeChildBirthday(value)}
+                                        onFinish={value => this.onChangeChildBirthday(value)}
                                     />
                                 </View>
                             </View>
@@ -4050,7 +4039,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         value={YearOfLose.value}
                                         refresh={YearOfLose.refresh}
                                         type={'date'}
-                                        onFinish={(value) => this.onChangeYearOfLose(value)}
+                                        onFinish={value => this.onChangeYearOfLose(value)}
                                     />
                                 </View>
                             </View>
@@ -4076,7 +4065,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         value={ChildCareCompUsedTo.value}
                                         refresh={ChildCareCompUsedTo.refresh}
                                         type={'date'}
-                                        onFinish={(value) =>
+                                        onFinish={value =>
                                             this.setState({
                                                 ChildCareCompUsedTo: {
                                                     ...ChildCareCompUsedTo,
@@ -4109,7 +4098,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 refresh={DateStart.refresh}
                                                 disable={DateStart.disable}
                                                 type={'date'}
-                                                onFinish={(value) =>
+                                                onFinish={value =>
                                                     this.setState(
                                                         {
                                                             DateStart: {
@@ -4134,7 +4123,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 refresh={DateEnd.refresh}
                                                 disable={DateEnd.disable}
                                                 type={'date'}
-                                                onFinish={(value) =>
+                                                onFinish={value =>
                                                     this.setState(
                                                         {
                                                             DateEnd: {
@@ -4173,7 +4162,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         value={Comment.value}
                                         style={[styleSheets.text, viewInputMultiline]}
                                         multiline={true}
-                                        onChangeText={(text) =>
+                                        onChangeText={text =>
                                             this.setState({
                                                 Comment: {
                                                     ...Comment,
@@ -4315,7 +4304,8 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         <View style={viewControl}>
                                             <VnrPicker
                                                 api={{
-                                                    urlApi: '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
+                                                    urlApi:
+                                                        '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
                                                     type: 'E_GET'
                                                 }}
                                                 refresh={UserApproveID.refresh}
@@ -4326,7 +4316,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 filterServer={true}
                                                 filterParams="text"
                                                 disable={UserApproveID.disable}
-                                                onFinish={(item) => this.onChangeUserApproveID(item)}
+                                                onFinish={item => this.onChangeUserApproveID(item)}
                                             />
                                         </View>
                                     </View>
@@ -4349,7 +4339,8 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         <View style={viewControl}>
                                             <VnrPicker
                                                 api={{
-                                                    urlApi: '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
+                                                    urlApi:
+                                                        '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
                                                     type: 'E_GET'
                                                 }}
                                                 value={UserApproveID2.value}
@@ -4360,7 +4351,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 filterServer={true}
                                                 filterParams="text"
                                                 disable={UserApproveID2.disable}
-                                                onFinish={(item) => {
+                                                onFinish={item => {
                                                     this.setState({
                                                         UserApproveID2: {
                                                             ...UserApproveID2,
@@ -4391,7 +4382,8 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         <View style={viewControl}>
                                             <VnrPicker
                                                 api={{
-                                                    urlApi: '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
+                                                    urlApi:
+                                                        '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
                                                     type: 'E_GET'
                                                 }}
                                                 value={UserApproveID3.value}
@@ -4402,7 +4394,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 filterServer={true}
                                                 filterParams="text"
                                                 disable={UserApproveID3.disable}
-                                                onFinish={(item) => {
+                                                onFinish={item => {
                                                     this.setState({
                                                         UserApproveID3: {
                                                             ...UserApproveID3,
@@ -4433,7 +4425,8 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         <View style={viewControl}>
                                             <VnrPicker
                                                 api={{
-                                                    urlApi: '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
+                                                    urlApi:
+                                                        '[URI_SYS]/Sys_GetData/GetMultiUserApproved_E_PREGNANCYREGISTER',
                                                     type: 'E_GET'
                                                 }}
                                                 refresh={UserApproveID4.refresh}
@@ -4444,7 +4437,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                                 value={UserApproveID4.value}
                                                 filterParams="text"
                                                 disable={UserApproveID4.disable}
-                                                onFinish={(item) => this.onChangeUserApproveID4(item)}
+                                                onFinish={item => this.onChangeUserApproveID4(item)}
                                             />
                                         </View>
                                     </View>
@@ -4454,7 +4447,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
 
                         <View
                             style={contentViewControl}
-                            onLayout={(event) => (this.layoutViewUsersApprove = event.nativeEvent.layout)}
+                            onLayout={event => (this.layoutViewUsersApprove = event.nativeEvent.layout)}
                         >
                             <TouchableOpacity style={viewBtnShowHideUser} onPress={this.toggleUsersApprove}>
                                 {isShowUsersApprove ? (
@@ -4489,7 +4482,7 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                                         value={FileAttach.value}
                                         multiFile={true}
                                         uri={'[URI_POR]/New_Home/saveFileFromApp'}
-                                        onFinish={(file) => {
+                                        onFinish={file => {
                                             this.setState({
                                                 FileAttach: {
                                                     ...FileAttach,
@@ -4524,7 +4517,9 @@ export default class AttSubmitPregnancyAddOrEdit extends Component {
                             onBackdropPress={() => this.closeModalErrorDetail()}
                             customBackdrop={
                                 <TouchableWithoutFeedback onPress={() => this.closeModalErrorDetail()}>
-                                    <View style={styleSheets.coatingOpacity05} />
+                                    <View
+                                        style={styleSheets.coatingOpacity05}
+                                    />
                                 </TouchableWithoutFeedback>
                             }
                             style={CustomStyleSheet.margin(0)}

@@ -3,19 +3,12 @@ import { Platform, PermissionsAndroid } from 'react-native';
 import moment from 'moment';
 import { Colors } from '../constants/styleConfig';
 import { translate } from '../i18n/translate';
+import axios from 'axios';
 import { startTask } from '../factories/BackGroundTask';
 import { EnumName, EnumTask } from '../assets/constant';
 import { setdataVnrStorageFromValue } from '../assets/auth/authentication';
 import HttpService from './HttpService';
 import { PermissionForAppMobile } from '../assets/configProject/PermissionForAppMobile';
-
-const arrayStrReplace = [
-    'f384r50',
-    '99ca42',
-    '48h0y4',
-    'o00h00',
-    'fhds7ds4'
-];
 
 export default class Vnr_Services {
     static statusColorForRecruitment = {
@@ -81,10 +74,9 @@ export default class Vnr_Services {
             'E_3DAYS',
             'E_TODAY'
         ], //Màu cam(Chờ duyệt)
-        CodeColor7: ['E_JOBOFFER', 'E_WAITPROPOSE', 'E_HIRE', 'E_CONFIRM', 'E_TRANSFERRED', 'E_POSTING'],
+        CodeColor7: ['E_JOBOFFER', 'E_WAITPROPOSE', 'E_HIRE', 'E_CONFIRM', 'E_TRANSFERRED'],
         CodeColor8: ['E_WAITCONFIRM'],
-        CodeColor9: ['E_FEEDBACK_PROPOSAL', 'E_FEEDBACK', 'E_REQUEST_CHANGE'],
-        CodeColor10: ['E_EXPIRE_POSTING', 'E_STOP_POSTING']
+        CodeColor9: ['E_FEEDBACK_PROPOSAL', 'E_FEEDBACK', 'E_REQUEST_CHANGE']
     };
 
     static colorForRecruitment = {
@@ -206,8 +198,7 @@ export default class Vnr_Services {
                 TypeApprove &&
                 TypeApprove === 'E_APPROVED') ||
             status === 'E_WAITAPPROVE' ||
-            status === 'E_WAIT_APPROVED' ||
-            status === 'E_WAITING_CONFIRM'
+            status === 'E_WAIT_APPROVED'
         ) {
             lstStatus.push('E_APPROVE');
             lstStatus.push('E_REJECT');
@@ -233,7 +224,6 @@ export default class Vnr_Services {
             Status === 'E_WAITAPPROVE' ||
             Status === 'E_WAITINGCONFIRM' ||
             Status === 'E_WAIT_APPROVED' ||
-            Status === 'E_WAITING_CONFIRM' ||
             this.statusColorForRecruitment.CodeColor6.includes(Status)
         ) {
             // Chờ duyệt
@@ -249,12 +239,7 @@ export default class Vnr_Services {
             styleStatusApp.colorStatus = '#FA541C';
             styleStatusApp.borderStatus = Colors.white;
             styleStatusApp.bgStatus = '250, 84, 28, 0.08';
-        } else if (
-            Status == 'E_CANCEL' ||
-            Status === 'E_Overdue' ||
-            Status === 'E_CANCELED' ||
-            this.statusColorForRecruitment.CodeColor10.includes(Status)
-        ) {
+        } else if (Status == 'E_CANCEL' || Status === 'E_Overdue') {
             // Hủy
             styleStatusApp.colorStatus = '#F5222D';
             styleStatusApp.borderStatus = Colors.white;
@@ -358,20 +343,13 @@ export default class Vnr_Services {
         }
     };
 
-    static checkIsTrue = (listTimeLogConfig, timeLogFiles, fileName) => {
-        return (
-            (timeLogFiles[fileName] &&
-                listTimeLogConfig[fileName] &&
-                moment(listTimeLogConfig[fileName]).isBefore(timeLogFiles[fileName])) ||
-            (timeLogFiles[fileName] && listTimeLogConfig[fileName] == undefined)
-        );
-    };
-
-    static startTaskGetDataConfig = (_dataCurrentUser, isHaveData = true) => {
+    static startTaskGetDataConfig = (_dataCurrentUser, isHaveData) => {
         const { currentUser } = _dataCurrentUser,
             { listTimeLogConfig } = currentUser;
         if (currentUser && currentUser.headers) {
-            HttpService.Get('[URI_SYS]/sys_getdata/GetLastChangeTime_PortalApp')
+            HttpService.Get('[URI_SYS]/sys_getdata/GetLastChangeTime_PortalApp', {
+                headers: HttpService.generateHeader(null, null)
+            })
                 .then((timeLogFiles) => {
                     let isGetLang = false,
                         isGetConfigApp = false,
@@ -392,35 +370,67 @@ export default class Vnr_Services {
                     } else if (listTimeLogConfig && timeLogFiles) {
                         // check update Lang
                         if (
-                            this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'Lang_EN_SPEC') &&
+                            timeLogFiles['Lang_EN_SPEC'] &&
+                            listTimeLogConfig['Lang_EN_SPEC'] &&
+                            moment(listTimeLogConfig['Lang_EN_SPEC']).isBefore(timeLogFiles['Lang_EN_SPEC']) &&
                             _dataCurrentUser.languageApp === 'EN'
                         ) {
                             isGetLang = true;
                         } else if (
-                            this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'Lang_VN_SPEC') &&
+                            timeLogFiles['Lang_VN_SPEC'] &&
+                            listTimeLogConfig['Lang_VN_SPEC'] &&
+                            moment(listTimeLogConfig['Lang_VN_SPEC']).isBefore(timeLogFiles['Lang_VN_SPEC']) &&
                             _dataCurrentUser.languageApp === 'VN'
                         ) {
                             isGetLang = true;
                         } else if (
-                            this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'Lang_CN_SPEC') &&
+                            timeLogFiles['Lang_CN_SPEC'] &&
+                            listTimeLogConfig['Lang_CN_SPEC'] &&
+                            moment(listTimeLogConfig['Lang_CN_SPEC']).isBefore(timeLogFiles['Lang_CN_SPEC']) &&
                             _dataCurrentUser.languageApp === 'CN'
                         ) {
                             isGetLang = true;
                         }
 
                         // check update isGetConfigAppByUser
-                        if (this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'ConfigDashboard_SPEC')) {
+                        if (
+                            timeLogFiles['ConfigDashboard_SPEC'] &&
+                            listTimeLogConfig['ConfigDashboard_SPEC'] &&
+                            moment(listTimeLogConfig['ConfigDashboard_SPEC']).isBefore(
+                                timeLogFiles['ConfigDashboard_SPEC']
+                            )
+                        ) {
                             isGetConfigAppByUser = true;
-                        } else if (this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'ConfigDrawer_SPEC')) {
+                        } else if (
+                            timeLogFiles['ConfigDrawer_SPEC'] &&
+                            listTimeLogConfig['ConfigDrawer_SPEC'] &&
+                            moment(listTimeLogConfig['ConfigDrawer_SPEC']).isBefore(timeLogFiles['ConfigDrawer_SPEC'])
+                        ) {
                             isGetConfigAppByUser = true;
                         }
 
                         // check update isGetConfigApp
                         if (
-                            this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'ConfigListDetail_SPEC') ||
-                            this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'ConfigList_SPEC') ||
-                            this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'ConfigField_SPEC') ||
-                            this.checkIsTrue(listTimeLogConfig, timeLogFiles, 'ConfigListFilter_SPEC')
+                            (timeLogFiles['ConfigListDetail_SPEC'] &&
+                                listTimeLogConfig['ConfigListDetail_SPEC'] &&
+                                moment(listTimeLogConfig['ConfigListDetail_SPEC']).isBefore(
+                                    timeLogFiles['ConfigListDetail_SPEC']
+                                )) ||
+                            (timeLogFiles['ConfigList_SPEC'] &&
+                                listTimeLogConfig['ConfigList_SPEC'] &&
+                                moment(listTimeLogConfig['ConfigList_SPEC']).isBefore(
+                                    timeLogFiles['ConfigList_SPEC']
+                                )) ||
+                            (timeLogFiles['ConfigField_SPEC'] &&
+                                listTimeLogConfig['ConfigField_SPEC'] &&
+                                moment(listTimeLogConfig['ConfigField_SPEC']).isBefore(
+                                    timeLogFiles['ConfigField_SPEC']
+                                )) ||
+                            (timeLogFiles['ConfigListFilter_SPEC'] &&
+                                listTimeLogConfig['ConfigListFilter_SPEC'] &&
+                                moment(listTimeLogConfig['ConfigListFilter_SPEC']).isBefore(
+                                    timeLogFiles['ConfigListFilter_SPEC']
+                                ))
                         ) {
                             isGetConfigApp = true;
                         }
@@ -481,34 +491,31 @@ export default class Vnr_Services {
             : false;
     };
 
-    static encryptCode(guid, algorithm) {
-        try {
-            const parts = guid.split('-');
-            const length = parts.length - 1;
+    static getDayOfWeek = (value = null) => {
+        if (!value) return null;
 
-            for (let i = 0; i < length; i++) {
-                const val = algorithm[i];
-                const replacement = arrayStrReplace[val];
-                parts[i] = parts[i] + replacement;
-            }
+        // Chuyển đổi chuỗi thành đối tượng Moment
+        const date = moment(value);
+        // Lấy ngày trong tuần (1 = Thứ Hai, 7 = Chủ Nhật)
+        const weekdayNumber = date.isoWeekday(); // Sử dụng `isoWeekday` nếu bạn muốn tuần bắt đầu từ Thứ Hai
 
-            return parts.join('');
-        } catch (error) {
-            return '';
+        switch (weekdayNumber) {
+            case 1:
+                return translate('HRM_Attendance_RosterGroup_MonShiftID');
+            case 2:
+                return translate('HRM_Attendance_RosterGroup_TueShiftID');
+            case 3:
+                return translate('HRM_Attendance_RosterGroup_WedShiftID');
+            case 4:
+                return translate('HRM_Attendance_RosterGroup_ThuShiftID');
+            case 5:
+                return translate('HRM_Attendance_RosterGroup_FriShiftID');
+            case 6:
+                return translate('HRM_Attendance_RosterGroup_SatShiftID');
+            case 7:
+                return translate('HRM_Attendance_RosterGroup_SunShiftID');
+            default:
+                return null;
         }
-    }
-
-    static decryptCode(qrCode) {
-        try {
-            // eslint-disable-next-line no-unused-vars
-            for (const item of arrayStrReplace) {
-                qrCode = qrCode.replaceAll(item, '-');
-            }
-
-            return qrCode;
-        } catch (error) {
-            // Trả về chính mã QR nếu giải mã thất bại - có thể thay đổi theo yêu cầu
-            return qrCode;
-        }
-    }
+    };
 }

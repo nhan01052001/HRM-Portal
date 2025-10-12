@@ -86,7 +86,7 @@ const navigationOptionsConfigHeaderNull = () => {
     };
 };
 
-const navigationOptionsConfigGoBack = (navigation, Title_Key, gobackFunction = null, isHiddenBorderBottom = false) => {
+const navigationOptionsConfigGoBack = (navigation, Title_Key, gobackFunction = null) => {
     const { params = {} } = navigation.state;
     return {
         tabBarVisible: false,
@@ -101,7 +101,7 @@ const navigationOptionsConfigGoBack = (navigation, Title_Key, gobackFunction = n
             if (routes && routes.length > 0) params = routes[index] ? routes[index]['params'] : null;
             else params = navigation.state ? navigation.state.params : null;
 
-            return params && params.headerLeft ? (
+            return (params && params.headerLeft) ? (
                 params.headerLeft
             ) : (
                 <ButtonGoBack Key={Title_Key} navigation={navigation} gobackFunction={gobackFunction} />
@@ -116,7 +116,7 @@ const navigationOptionsConfigGoBack = (navigation, Title_Key, gobackFunction = n
             },
             elevation: 0,
             borderBottomColor: Colors.gray_5,
-            borderBottomWidth: isHiddenBorderBottom ? 0 : 0.5
+            borderBottomWidth: 0.5
         },
         headerTintColor: Colors.white,
         headerTitleStyle: {
@@ -133,7 +133,7 @@ const navigationOptionsConfigGoBack = (navigation, Title_Key, gobackFunction = n
     };
 };
 
-const navigationOptionsConfigGoBackHone = (navigation, Title_Key, isHiddenBorderBottom = false) => {
+const navigationOptionsConfigGoBackHone = (navigation, Title_Key) => {
     const { params = {} } = navigation.state;
     return {
         tabBarVisible: false,
@@ -148,11 +148,7 @@ const navigationOptionsConfigGoBackHone = (navigation, Title_Key, isHiddenBorder
             if (routes && routes.length > 0) params = routes[index] ? routes[index]['params'] : null;
             else params = navigation.state ? navigation.state.params : null;
 
-            return params && params.headerLeft ? (
-                params.headerLeft
-            ) : (
-                <ButtonGoBackHome Key={Title_Key} navigation={navigation} />
-            );
+            return (params && params.headerLeft) ? params.headerLeft : <ButtonGoBackHome Key={Title_Key} navigation={navigation} />;
         },
         //headerLeft: () => <ButtonGoBackHome Key={Title_Key} navigation={navigation} />,
         headerStyle: {
@@ -164,7 +160,7 @@ const navigationOptionsConfigGoBackHone = (navigation, Title_Key, isHiddenBorder
             },
             elevation: 0,
             borderBottomColor: Colors.gray_5,
-            borderBottomWidth: isHiddenBorderBottom ? 0 : 0.5
+            borderBottomWidth: 0.5
         },
         headerTintColor: Colors.white,
         headerTitleStyle: {
@@ -178,7 +174,7 @@ const navigationOptionsConfigGoBackHone = (navigation, Title_Key, isHiddenBorder
     };
 };
 
-const navigationOptionsTopTab = (Title_Key) => {
+const navigationOptionsTopTab = Title_Key => {
     return {
         title: translate(Title_Key)
     };

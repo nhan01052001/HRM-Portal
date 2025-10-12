@@ -10,7 +10,7 @@ import {
     stylesScreenDetailV3
 } from '../../../../../constants/styleConfig';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
-import { IconCheck, IconChat } from '../../../../../constants/Icons';
+import { IconCheck, IconDate, IconChat } from '../../../../../constants/Icons';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import VnrRenderListItem from '../../../../../componentsV3/VnrRenderList/VnrRenderListItem';
@@ -514,5 +514,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '600',
         color: Colors.blue
+    },
+    AccumulateHour: {
+        width: '100%',
+        paddingRight: 12,
+        marginVertical: 4
     }
 });

@@ -151,7 +151,7 @@ class UnEmploymentInsurance extends Component {
                         <FlatList
                             showsVerticalScrollIndicator={false}
                             data={_configList['UnEmploymentInsurance']}
-                            renderItem={({ item }) => Vnr_Function.formatStringTypeV2(dataInsurance, item, _configList['UnEmploymentInsurance'])}
+                            renderItem={({ item }) => Vnr_Function.formatStringTypeV3(dataInsurance, item, _configList['UnEmploymentInsurance'])}
                             keyExtractor={(item, index) => index}
                             refreshControl={
                                 <RefreshControl

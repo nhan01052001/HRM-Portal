@@ -13,11 +13,7 @@ let enumName = EnumName;
 
 let _this = null,
     _rowActions = [],
-    _rowActionListScreen = [],
     _selected = [];
-
-const { apiConfig } = dataVnrStorage,
-    _uriPor = apiConfig ? apiConfig.uriPor : null;
 
 export const generateRowActionAndSelected = screenName => {
     _rowActions = [];
@@ -27,7 +23,7 @@ export const generateRowActionAndSelected = screenName => {
     if (ConfigList.value != null && ConfigList.value != undefined) {
         const _configList = ConfigList.value[screenName],
             businessAction = _configList[enumName.E_BusinessAction],
-            { E_MODIFY, E_ResourceName, E_Name, E_Rule, E_SENDMAIL, E_DELETE, E_CANCEL, E_REQUEST_CANCEL } = enumName;
+            { E_MODIFY, E_ResourceName, E_Name, E_Rule, E_SENDMAIL, E_DELETE, E_CANCEL } = enumName;
 
         //action edit
         const actionEdit = businessAction ? businessAction.find(action => action.Type === E_MODIFY) : null,
@@ -151,49 +147,6 @@ export const generateRowActionAndSelected = screenName => {
                 }
             ];
         }
-
-        //action Request cancel
-        const actionRequestCancel = businessAction
-                ? businessAction.find(action => action.Type === E_REQUEST_CANCEL)
-                : null,
-            actionRequestCancelResource = actionRequestCancel ? actionRequestCancel[E_ResourceName][E_Name] : null,
-            actionRequestCancelRule = actionRequestCancel ? actionRequestCancel[E_ResourceName][E_Rule] : null,
-            actionRequestCancelPer =
-                actionRequestCancelResource && actionRequestCancelRule
-                    ? permission[actionRequestCancelResource][actionRequestCancelRule]
-                    : null;
-
-        if (actionRequestCancelPer) {
-            _rowActions = [
-                ..._rowActions,
-                {
-                    title: translate('HRM_PortalApp_RequestCancel'),
-                    type: E_REQUEST_CANCEL,
-                    onPress: (item, dataBody) =>
-                        AttSubmitTamScanLogRegisterBusinessFunction.businessRequestCancelRecords(
-                            Array.isArray(item) ? item : [{ ...item }],
-                            dataBody
-                        ),
-                    ...actionRequestCancel
-                }
-            ];
-
-            _selected = [
-                ..._selected,
-                {
-                    title: translate('HRM_PortalApp_RequestCancel'),
-                    type: E_REQUEST_CANCEL,
-                    onPress: (item, dataBody) =>
-                        AttSubmitTamScanLogRegisterBusinessFunction.businessRequestCancelRecords(item, dataBody),
-                    ...actionCancel
-                }
-            ];
-        }
-        const exists = _rowActionListScreen.find(item => item.screenName === screenName);
-        // Nếu không có, thêm screen mới vào _rowActionListScreen
-        if (!exists) {
-            _rowActionListScreen.push({ screenName: screenName, rowActions: _rowActions });
-        }
         return { rowActions: _rowActions, selected: _selected };
     }
 };
@@ -207,8 +160,7 @@ export const AttSubmitTamScanLogRegisterBusinessFunction = {
         AttApproveSubmitTamScanLogRegister: false,
         AttApprovedSubmitTamScanLogRegister: false
     },
-    setThisForBusiness: (dataThis, rowActionsFromScreen = _rowActions) => {
-        _rowActions = rowActionsFromScreen ?? [];
+    setThisForBusiness: dataThis => {
         _this = dataThis;
     },
     //#region [action delete]
@@ -254,13 +206,7 @@ export const AttSubmitTamScanLogRegisterBusinessFunction = {
     },
 
     confirmDelete: objValid => {
-        let actionCancel = _rowActionListScreen
-            .find(
-                (itemScreen) =>
-                    itemScreen.screenName === DrawerServices.getCurrentScreen() ||
-                    DrawerServices.getCurrentScreen().includes('ViewDetail')
-            )
-            ?.rowActions.find(item => item.Type === EnumStatus.E_DELETE),
+        let actionCancel = _rowActions.find(item => item.Type === 'E_DELETE'),
             isConfirm = actionCancel['Confirm'];
 
         if (isConfirm) {
@@ -420,7 +366,7 @@ export const AttSubmitTamScanLogRegisterBusinessFunction = {
                         ToasterSevice.showError('HRM_Common_SendRequest_Error', 4000);
                     }
                 } else if (res && res?.Status == EnumName.E_FAIL) {
-                    ToasterSevice.showError(res?.Message, 4000);
+                    ToasterSevice.showWarning(res?.Message, 4000);
                 } else {
                     ToasterSevice.showError('HRM_Common_SendRequest_Error', 4000);
                 }
@@ -429,13 +375,7 @@ export const AttSubmitTamScanLogRegisterBusinessFunction = {
     },
 
     confirmCancel: (objValid, isNote) => {
-        let actionCancel = _rowActionListScreen
-            .find(
-                (itemScreen) =>
-                    itemScreen.screenName === DrawerServices.getCurrentScreen() ||
-                    DrawerServices.getCurrentScreen().includes('ViewDetail')
-            )
-            ?.rowActions.find(item => item.Type === EnumStatus.E_CANCEL),
+        let actionCancel = _rowActions.find(item => item.Type === 'E_CANCEL'),
             isConfirm = actionCancel['Confirm'];
 
         if (isConfirm) {
@@ -491,159 +431,6 @@ export const AttSubmitTamScanLogRegisterBusinessFunction = {
         });
     },
     //#endregion
-
-    //#region [action  requestcancel]
-    businessRequestCancelRecords: (items, dataBody) => {
-        if (items.length === 0 && !dataBody) {
-            ToasterSevice.showWarning('HRM_Common_Select', 4000);
-        } else {
-            let selectedID = [],
-                ListDataRequestCancel = [];
-            items.forEach(item => {
-                if (item.BusinessAllowAction && item.BusinessAllowAction.indexOf(EnumStatus.E_REQUEST_CANCEL) > -1) {
-                    selectedID.push(item.ID);
-                    ListDataRequestCancel.push({
-                        ID: item.ID,
-                        ProfileID: item?.ProfileID
-                    });
-                }
-            });
-
-            if (selectedID.length == 0) {
-                ToasterSevice.showWarning('HRM_PortalApp_Status_AllowRequestCancel', 4000);
-                return;
-            }
-
-            VnrLoadingSevices.show();
-            HttpService.Post('[URI_CENTER]/api/Att_TAMScanLogRegister/ValidateRequestCancel', {
-                ListRecordID: selectedID,
-                UserLogin: dataVnrStorage.currentUser.headers.userlogin,
-                UserProcessID: dataVnrStorage.currentUser.headers.userid,
-                Host: _uriPor
-            }).then(res => {
-                VnrLoadingSevices.hide();
-                if (res && res.Status == EnumName.E_SUCCESS) {
-                    if (res.Data && res.Data.length > 0) {
-                        let numberRow = items.length == 1 ? '1' : `${res.Data.length}/${items.length}`,
-                            message = '';
-
-                        if (items.length === 1) {
-                            message = translate('HRM_PortalApp_Message_RequestCancelConfirmOneLine').replace(
-                                '[E_NUMBER]',
-                                numberRow
-                            );
-                        } else {
-                            message = translate('HRM_PortalApp_Message_RequestCancelConfirmMultiLine').replace(
-                                '[E_NUMBER]',
-                                numberRow
-                            );
-                        }
-
-                        AttSubmitTamScanLogRegisterBusinessFunction.confirmRequestCancel({
-                            strResultID: res.Data,
-                            message: message,
-                            ListDataRequestCancel
-                        });
-                    } else {
-                        ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 4000);
-                    }
-                } else if (res && res.Status === EnumName.E_FAIL) {
-                    ToasterSevice.showError(res.Message ? res.Message : 'HRM_Common_SendRequest_Error', 4000);
-                } else {
-                    ToasterSevice.showError('HRM_Common_SendRequest_Error', 4000);
-                }
-            });
-        }
-    },
-
-    confirmRequestCancel: objValid => {
-
-        let actionCancel = _rowActionListScreen
-            .find(
-                (itemScreen) =>
-                    itemScreen.screenName === DrawerServices.getCurrentScreen() ||
-                    DrawerServices.getCurrentScreen().includes('ViewDetail')
-            )
-            ?.rowActions.find(item => item.Type === EnumStatus.E_REQUEST_CANCEL),
-            isConfirm = actionCancel['Confirm'];
-
-        if (isConfirm) {
-            let isInputText = isConfirm['isInputText'],
-                isValidInputText = isConfirm['isValidInputText'],
-                isAttachFile = isConfirm['isAttachFile'],
-                isNotNullAttachFile = isConfirm['isNotNullAttachFile'],
-                message = objValid.message && typeof objValid.message === 'string' ? objValid.message : null,
-                placeholder = translate('HRM_PortalApp_Notes'),
-                limit = 500,
-                textLimitFile = translate('HRM_PortalApp_LimitDynamicFile').replace('[E_DYNAMIC]', 3);
-
-            AlertSevice.alert({
-                iconType: EnumIcon.E_CONFIRM,
-                placeholder: placeholder,
-                isValidInputText: isValidInputText,
-                isInputText: isInputText,
-                title: 'HRM_PortalApp_Att_CancelRequestReason',
-                message: message,
-                limit: limit,
-                isAttachFile,
-                isNotNullAttachFile,
-                textLimit: 'HRM_Sytem_Reason_MaxLength500',
-                limitFile: 3,
-                textLimitFile: textLimitFile,
-                onCancel: () => {},
-                onConfirm: (reason, isCheckBox, FileAttachment) => {
-                    if (isValidInputText && (!reason || reason === '')) {
-                        let mesNotEmpty = placeholder + translate('FieldNotAllowNull');
-                        ToasterSevice.showWarning(mesNotEmpty, 4000, null, false);
-                    } else {
-                        AttSubmitTamScanLogRegisterBusinessFunction.setRequestCancel({
-                            ...objValid,
-                            Comment: reason,
-                            FileAttach: FileAttachment
-                        });
-                    }
-                }
-            });
-        } else {
-            AttSubmitTamScanLogRegisterBusinessFunction.setRequestCancel(objValid);
-        }
-    },
-
-    setRequestCancel: objValid => {
-        VnrLoadingSevices.show();
-        HttpService.Post('[URI_CENTER]/api/Att_TAMScanLogRegister/ProcessCreateRequestCancelation', {
-            Comment: objValid.Comment,
-            ListDataRequestCancel: objValid.ListDataRequestCancel,
-            UserLogin: dataVnrStorage.currentUser.headers.userlogin,
-            UserProcessID: dataVnrStorage.currentUser.headers.userid,
-            Host: _uriPor,
-            FileAttachment: Array.isArray(objValid?.FileAttach)
-                ? objValid?.FileAttach.map(item => item.fileName).join(',')
-                : null
-        }).then(res => {
-            VnrLoadingSevices.hide();
-            if (res && res.Status == EnumName.E_SUCCESS) {
-                ToasterSevice.showSuccess(res.Message, 4000);
-                _this.reload('E_KEEP_FILTER', true);
-                AttSubmitTamScanLogRegisterBusinessFunction.checkForReLoadScreen[ScreenName.AttSubmitTamScanLogRegister] = true;
-                AttSubmitTamScanLogRegisterBusinessFunction.checkForReLoadScreen[
-                    ScreenName.AttApproveSubmitTamScanLogRegister
-                ] = true;
-                AttSubmitTamScanLogRegisterBusinessFunction.checkForReLoadScreen[
-                    ScreenName.AttApprovedSubmitTamScanLogRegister
-                ] = true;
-                AttSubmitTamScanLogRegisterBusinessFunction.checkForReLoadScreen[
-                    ScreenName.AttSaveTempSubmitTamScanLogRegister
-                ] = true;
-            } else if (res && res.Message && typeof res.Message == 'string') {
-                ToasterSevice.showError(res.Message, 4000);
-            } else {
-                ToasterSevice.showError('HRM_Common_SendRequest_Error', 4000);
-            }
-        });
-    },
-    //#endregion
-
 
     //#region [modify]
     businessModifyRecord: (item, dataBody, itemRoot) => {

@@ -26,13 +26,6 @@ export default class AttendanceDetailItem extends React.Component {
             viewBtnToDetail = <View />,
             onPressToDetail = null;
 
-        onPressToDetail = () => {
-            DrawerServices.navigate(ScreenName.AttSubmitTakeLeaveDayViewDetail, {
-                screenName: ScreenName.AttSubmitTakeLeaveDay,
-                dataItem: dataItem
-            });
-        };
-
         if (key == 'E_PREGNANT_LEAVE' && dataItem.MonthYear) {
             timeCouse = moment(dataItem.MonthYear).format('MM/YYYY');
             txtLeaveDayHours = `${dataItem.LeaveInMonth} ${typeNumberLeave}`;

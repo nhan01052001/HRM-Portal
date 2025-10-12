@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-raw-text */
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { Colors } from '../../constants/styleConfig';

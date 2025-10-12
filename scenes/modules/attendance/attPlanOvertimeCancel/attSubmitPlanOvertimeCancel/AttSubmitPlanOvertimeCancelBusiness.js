@@ -320,7 +320,7 @@ export const AttSubmitPlanOvertimeCancelBusinessFunction = {
         VnrLoadingSevices.show();
         let selectedIds = objValid.Ids,
             reason = objValid.reason;
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedRequestCancelationOvertimePlan', {
+        HttpService.Post('[URI_POR]/New_Att_RequestCancelationOvertimePlan/RemoveSelected', {
             selectedIds,
             reason
         }).then(res => {

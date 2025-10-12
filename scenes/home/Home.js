@@ -1,6 +1,15 @@
 /* eslint-disable no-console */
 import React, { Component } from 'react';
-import { StatusBar, FlatList, ScrollView, View, StyleSheet, Animated, Platform, RefreshControl } from 'react-native';
+import {
+    StatusBar,
+    FlatList,
+    ScrollView,
+    View,
+    StyleSheet,
+    Animated,
+    Platform,
+    RefreshControl
+} from 'react-native';
 import { Colors, CustomStyleSheet, Size, styleSheets } from '../../constants/styleConfig';
 import HeaderHome from './HeaderHome';
 import ItemMain from '../../components/Main/ItemMain';
@@ -25,11 +34,12 @@ import update from '../../redux/update';
 const PADDING = Size.deviceWidth >= 1024 ? Size.defineSpace : 10;
 
 const TABAR_HEIGHT =
-        Size.deviceWidth <= 320
-            ? Size.deviceheight * 0.09
-            : Platform.OS === 'android'
-                ? Size.deviceheight * 0.08
-                : Size.deviceheight * 0.1,
+    Size.deviceWidth <= 320
+        ? Size.deviceheight * 0.09
+        : Platform.OS === 'android'
+            ? Size.deviceheight * 0.08
+            : Size.deviceheight * 0.1,
+
     HEIGHT_SEARCH = Size.deviceheight >= 1024 ? 57 : 47;
 
 const api = {};
@@ -42,8 +52,7 @@ class HomeScene extends Component {
             dataDashboard: [],
             _topNavigate: dataVnrStorage.topNavigate.slice(0, 4),
             heightAllow: 0,
-            refreshing: false,
-            isShowUpdate: true
+            refreshing: false
         };
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
@@ -100,12 +109,12 @@ class HomeScene extends Component {
         this.requestCountApproveBusiness();
     }
 
-    handleNumberApprove = (dataCount) => {
+    handleNumberApprove = dataCount => {
         const dashboard = ConfigDashboard.value;
 
         if (typeof dataCount == 'object' && Object.keys(dataCount).length > 0) {
-            const dashboardHandle = dashboard.map((group) => {
-                group.listGroup = group.listGroup.map((item) => {
+            const dashboardHandle = dashboard.map(group => {
+                group.listGroup = group.listGroup.map(item => {
                     let valueField = item.countWaitApprove;
                     if (valueField && dataCount[valueField] != null) {
                         item = {
@@ -163,7 +172,7 @@ class HomeScene extends Component {
         }
     };
 
-    handleScroll = (event) => {
+    handleScroll = event => {
         let posY = event.nativeEvent.contentOffset.y;
         if (posY < -20) {
             this.refHeaerSearch && this.refHeaerSearch.focusInputSearch && this.refHeaerSearch.focusInputSearch();
@@ -209,21 +218,27 @@ class HomeScene extends Component {
         }
     };
 
-    renderDashboard = (dashboard) => {
+    renderDashboard = dashboard => {
         let isNewLayoutV3 = false;
-        if (dataVnrStorage.apiConfig?.uriCenter && dataVnrStorage.apiConfig?.uriIdentity) {
+        if (dataVnrStorage.apiConfig.uriCenter && dataVnrStorage.apiConfig.uriIdentity) {
             isNewLayoutV3 = true;
         }
 
         return dashboard.map((item, index) => {
             if (item.type === 'E_GROUP') {
-                if (isNewLayoutV3 == false) item.listGroup = item.listGroup.filter((e) => e.isNewLayoutV3 != true);
+                if (isNewLayoutV3 == false) item.listGroup = item.listGroup.filter(e => e.isNewLayoutV3 != true);
 
                 //check group có item
                 if (item.listGroup && item.listGroup.length) {
                     //retun render Group
                     return (
                         <View key={item.title} style={styleItemGroup.styleViewContainer}>
+                            {/* <TouchableOpacity onPress={() => DrawerServices.navigate('AttNumberOfMeals')}>
+                                <Text>Move Screen AttNumberOfMeals</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => DrawerServices.navigate('AttNumberOfMealsHistory')}>
+                                <Text>Move Screen AttNumberOfMealsHistory</Text>
+                            </TouchableOpacity> */}
                             <View style={styleItemGroup.styleViewItem}>
                                 <View style={styleItemGroup.styleView}>
                                     <View style={styleItemGroup.styleView_TitleGroup}>
@@ -273,7 +288,7 @@ class HomeScene extends Component {
         });
     };
 
-    onLayoutViewScroll = (ev) => {
+    onLayoutViewScroll = ev => {
         if (this.heightContent != null) {
             const heightView = ev.nativeEvent.layout.height - (HEIGHT_SEARCH + TABAR_HEIGHT);
             const HEIGHT_ALLOW_CONTENT = heightView;
@@ -309,17 +324,17 @@ class HomeScene extends Component {
     };
 
     render() {
-        const { dataDashboard, refreshing, isShowUpdate } = this.state;
+        const { dataDashboard, refreshing } = this.state;
         const { status, progress, isUpdateLater, closeupdate } = this.props;
         return (
             <SafeAreaView style={[stylesSearch.contentHome]}>
                 <SafeAreaConsumer>
-                    {(insets) => (
+                    {insets => (
                         <View style={stylesSearch.styViewScoll}>
                             <ScrollView
                                 //bounces={false} // không pulltoRefresh
 
-                                ref={(ref) => (this.refScroll = ref)}
+                                ref={ref => (this.refScroll = ref)}
                                 showsVerticalScrollIndicator={false}
                                 refreshControl={
                                     <RefreshControl
@@ -334,14 +349,6 @@ class HomeScene extends Component {
                                     { paddingBottom: TABAR_HEIGHT - insets.bottom }
                                 ]}
                             >
-                                {isShowUpdate && <View style={styleItemGroup.line} />}
-                                {isUpdateLater && (
-                                    <VnrUpdateAppAtHome
-                                        progress={progress}
-                                        status={status}
-                                        onClose={closeupdate}
-                                    />
-                                )}
                                 {Platform.OS == 'android' && <VnrIndeterminate isVisible={refreshing} />}
                                 {PermissionForAppMobile &&
                                     PermissionForAppMobile.value &&
@@ -350,14 +357,28 @@ class HomeScene extends Component {
                                     <HreEventCalendarHome />
                                 )}
 
-                                <View onLayout={(ev) => (this.heightContent = ev.nativeEvent.layout.height)}>
+                                <View onLayout={ev => (this.heightContent = ev.nativeEvent.layout.height)}>
+                                    {/* {PermissionForAppMobile &&
+                            PermissionForAppMobile.value &&
+                            PermissionForAppMobile.value['New_Attendance_WorkDayDetail_Home_Mobile'] &&
+                            PermissionForAppMobile.value['New_Attendance_WorkDayDetail_Home_Mobile']['View'] && (
+                                <CalendarHome />
+                            )} */}
+                                    {isUpdateLater && (
+                                        <VnrUpdateAppAtHome
+                                            progress={progress}
+                                            status={status}
+                                            onClose={closeupdate}
+                                        />
+                                    )}
                                     {this.renderDashboard(dataDashboard)}
                                 </View>
                             </ScrollView>
                         </View>
                     )}
                 </SafeAreaConsumer>
-                <HeaderHome ref={(refs) => (this.refHeaerSearch = refs)} />
+
+                <HeaderHome ref={refs => (this.refHeaerSearch = refs)} />
             </SafeAreaView>
         );
     }
@@ -388,11 +409,6 @@ const styleItemGroup = StyleSheet.create({
         color: Colors.gray_7,
         fontWeight: Platform.OS == 'android' ? '400' : '600',
         fontSize: Size.text
-    },
-    line: {
-        width: '100%',
-        height: 15,
-        backgroundColor: Colors.gray_3
     }
 });
 
@@ -410,7 +426,7 @@ const stylesSearch = StyleSheet.create({
     }
 });
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
     return {
         reloadScreenName: state.lazyLoadingReducer.reloadScreenName,
         isChange: state.lazyLoadingReducer.isChange,
@@ -423,7 +439,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
     return {
         fetchCountNumberApproveInfo: () => {
             dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
@@ -437,4 +453,7 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScene);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(HomeScene);

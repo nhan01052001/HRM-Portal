@@ -23,7 +23,7 @@ import {
     stylesVnrFilter,
     styleApproveProcessHRE
 } from '../constants/styleConfig';
-import { IconCancel, IconCheck, IconCheckSquare, IconDown, IconStar, IconUnCheckSquare } from '../constants/Icons';
+import { IconCancel, IconCheck, IconCheckSquare, IconDown, IconUnCheckSquare } from '../constants/Icons';
 import Color from 'color';
 import { ToasterSevice } from '../components/Toaster/Toaster';
 import ManageFileSevice from './ManageFileSevice';
@@ -35,11 +35,12 @@ import base64 from 'react-native-base64';
 import { dataVnrStorage, setdataVnrStorageFromValue } from '../assets/auth/authentication';
 import HttpService from './HttpService';
 import Rate, { AndroidMarket } from 'react-native-rate';
+import { SInfoService } from '../factories/LocalData';
 import DeviceInfo from 'react-native-device-info';
 import { PermissionForAppMobile } from '../assets/configProject/PermissionForAppMobile';
 import VnrFormatStringType from '../componentsV3/VnrFormatStringType/VnrFormatStringType';
 import { ConfigListDetail } from '../assets/configProject/ConfigListDetail';
-import VnrFormatStringManyData from '../componentsV3/VnrFormatStringType/VnrFormatStringManyData';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 const sizeImg = 44;
@@ -82,24 +83,20 @@ export default class Vnr_Function {
         });
     }
     static getUnitIdApp() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                if (Platform.OS === 'ios') {
-                    resolve(DeviceInfo.getUniqueId());
-                } else {
-                    resolve(DeviceInfo.getAndroidId());
-                    // 1 số máy andorid không trả ra 1 uni ID nhất định nên tự tạo ID
-                    // const uiniqueId = await SInfoService.getItem('E_SAVE_UNIQUEID_ANDROID');
-                    // if (uiniqueId != null) {
-                    //   resolve(uiniqueId);
-                    // } else {
-                    //   let makeUniqueId = this.MakeId(32);
-                    //   SInfoService.setItem('E_SAVE_UNIQUEID_ANDROID', makeUniqueId);
-                    //   resolve(makeUniqueId);
-                    // }
-                }
-            } catch (error) {
-                reject(error);
+        return new Promise(async (resolve) => {
+            if (Platform.OS === 'ios') {
+                resolve(DeviceInfo.getUniqueId());
+            } else {
+                resolve(DeviceInfo.getAndroidId());
+                // 1 số máy andorid không trả ra 1 uni ID nhất định nên tự tạo ID
+                // const uiniqueId = await SInfoService.getItem('E_SAVE_UNIQUEID_ANDROID');
+                // if (uiniqueId != null) {
+                //   resolve(uiniqueId);
+                // } else {
+                //   let makeUniqueId = this.MakeId(32);
+                //   SInfoService.setItem('E_SAVE_UNIQUEID_ANDROID', makeUniqueId);
+                //   resolve(makeUniqueId);
+                // }
             }
         });
     }
@@ -292,7 +289,9 @@ export default class Vnr_Function {
             }
         } catch (error) {
             console.log(error);
+
         }
+
     }
 
     static MakeId(length) {
@@ -372,13 +371,6 @@ export default class Vnr_Function {
         } catch (error) {
             ToasterSevice.showError('HRM_PortalApp_HRIS_HRMS_Open_Error', 5000);
         }
-    }
-
-    static getOriginFromUrl(urlString) {
-        if (urlString == null) return null;
-
-        const match = urlString.match(/^(https?:\/\/[^\/]+)/);
-        return match ? match[1] : null;
     }
 
     static async downloadFileAttach(path) {
@@ -541,21 +533,17 @@ export default class Vnr_Function {
             E_SHOW_MORE_INFO: 'E_SHOW_MORE_INFO',
             E_NODATA: 'E_NODATA'
         };
-        const configAlign = ConfigListDetail.configAlign;
-        let isAlignLayout = true;
+        const configAlign = ConfigListDetail.configAlign
+        let isAlignLayout = true
         if (configAlign === 'E_LEFT_LAYOUT') {
-            isAlignLayout = false;
+            isAlignLayout = false
         } else if (configAlign === 'E_ALIGN_LAYOUT') {
-            isAlignLayout = true;
+            isAlignLayout = true
         }
 
         const styles = stylesScreenDetailV2;
         const { styTextValueInfo } = styles;
-        let styTextValue = {
-                ...styleSheets.text,
-                ...styTextValueInfo,
-                ...(!isAlignLayout ? { textAlign: 'left' } : {})
-            },
+        let styTextValue = { ...styleSheets.text, ...styTextValueInfo, ...(!isAlignLayout ? { textAlign: 'left' } : {}) },
             styTextLable = { ...styleSheets.lable, ...{ textAlign: 'left' } },
             styHideBorder = {};
         // styTextGroup = {};
@@ -1181,10 +1169,7 @@ export default class Vnr_Function {
                 viewValue = <Text />;
             }
             return (
-                <View
-                    key={col.Label}
-                    style={[styles.styItemContent, styHideBorder, col.isWrapLine && { flexDirection: 'column' }]}
-                >
+                <View key={col.Label} style={[styles.styItemContent, styHideBorder, col.isWrapLine && { flexDirection: 'column' }]}>
                     <View style={[styles.viewLable, !isAlignLayout && styles.viewLableLeft]}>
                         <VnrText
                             style={[styleSheets.lable, styTextLable]}
@@ -1192,13 +1177,11 @@ export default class Vnr_Function {
                             // numberOfLines={1}
                         />
                     </View>
-                    <View
-                        style={[
-                            styles.styViewValue,
-                            !isAlignLayout && styles.styViewValueLeft,
-                            col.isWrapLine && { paddingLeft: 0, paddingTop: Size.defineSpace }
-                        ]}
-                    >
+                    <View style={[
+                        styles.styViewValue,
+                        !isAlignLayout && styles.styViewValueLeft,
+                        col.isWrapLine && { paddingLeft: 0, paddingTop: Size.defineSpace }
+                    ]}>
                         {viewValue}
                         {/* </View> */}
                     </View>
@@ -1207,7 +1190,7 @@ export default class Vnr_Function {
         }
     };
 
-    static renderAvatarCricleByName = (imageAvatar, name, size, isFixSize, isImportant = false) => {
+    static renderAvatarCricleByName = (imageAvatar, name, size, isFixSize) => {
         const randomColor = this.randomColorV3(name ? name : ''),
             { PrimaryColor, SecondaryColor, FirstCharName } = randomColor;
 
@@ -1229,29 +1212,8 @@ export default class Vnr_Function {
 
         return (
             <View style={[styles.styAvatar, { width: size, height: size }]}>
-                {isImportant && (
-                    <View
-                        style={{
-                            position: 'absolute',
-                            right: -8,
-                            top: -8,
-                            zIndex: 100,
-                            elevation: 100
-                        }}
-                    >
-                        <View
-                            style={{
-                                padding: 4,
-                                borderRadius: 100,
-                                backgroundColor: Colors.white
-                            }}
-                        >
-                            <IconStar size={14} color={Colors.yellow} />
-                        </View>
-                    </View>
-                )}
                 <ImageBackground
-                    source={{ uri: imageAvatar ?? 'A' }}
+                    source={{ uri: imageAvatar }}
                     resizeMode="cover"
                     style={[styles.styImgAvatar, { width: size, height: size }]}
                     imageStyle={[styles.styImgAvatar, { width: size, height: size, zIndex: 2, elevation: 2 }]}
@@ -1284,19 +1246,15 @@ export default class Vnr_Function {
     };
 
     static formatStringTypeV3 = (data, col, allConfig) => {
-        const configAlign = ConfigListDetail.configAlign;
-        let isAlignLayout = true;
+        const configAlign = ConfigListDetail.configAlign
+        let isAlignLayout = true
 
         if (configAlign === 'E_LEFT_LAYOUT') {
-            isAlignLayout = false;
+            isAlignLayout = false
         } else if (configAlign === 'E_ALIGN_LAYOUT') {
-            isAlignLayout = true;
+            isAlignLayout = true
         }
         return <VnrFormatStringType isAlignLayout={isAlignLayout} data={data} col={col} allConfig={allConfig} />;
-    };
-
-    static formatStringTypeManyData = (data, allConfig) => {
-        return <VnrFormatStringManyData data={data} allConfig={allConfig} />;
     };
 
     static tranlateCurencyChar(currencyCode) {
@@ -1730,10 +1688,10 @@ export default class Vnr_Function {
                                                         {item?.Content
                                                             ? item?.Content
                                                             : item?.FieldName === 'UserReject'
-                                                              ? translate('HRM_PortalApp_Rejected')
-                                                              : item?.StatusProcess === EnumName.E_success
-                                                                ? translate('HRM_PortalApp_Approved')
-                                                                : ''}
+                                                                ? translate('HRM_PortalApp_Rejected')
+                                                                : item?.StatusProcess === EnumName.E_success
+                                                                    ? translate('HRM_PortalApp_Approved')
+                                                                    : ''}
                                                     </Text>
                                                 </View>
                                                 {sub && item[sub] && (
@@ -1940,12 +1898,4 @@ export default class Vnr_Function {
             }
         });
     };
-
-    static openSettings() {
-        if (Platform.OS === 'ios') {
-            Linking.openURL('app-settings:');
-        } else {
-            Linking.openSettings();
-        }
-    }
 }

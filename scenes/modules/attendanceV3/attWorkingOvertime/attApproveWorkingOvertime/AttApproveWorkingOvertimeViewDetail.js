@@ -255,10 +255,7 @@ export default class AttApproveWorkingOvertimeViewDetail extends Component {
 
                 if (response && response.Status == EnumName.E_SUCCESS) {
                     let data = { ...response.Data, ...response.Data.SingleWordDetail[0] };
-                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(
-                        data.Status,
-                        data?.TypeApprove ?? dataItem?.TypeApprove
-                    );
+                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(data.Status, dataItem?.TypeApprove);
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachment);
                     data.ImagePath = data?.AvatarUserRegister

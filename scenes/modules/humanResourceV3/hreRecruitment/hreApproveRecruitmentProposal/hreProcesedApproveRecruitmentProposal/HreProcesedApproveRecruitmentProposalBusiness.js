@@ -5,7 +5,9 @@ import { EnumName } from '../../../../../../assets/constant';
 
 let enumName = EnumName;
 
-let _rowActions = [],
+let _this = null,
+    _isOnScreenNotification = false,
+    _rowActions = [],
     _selected = [];
 
 export const generateRowActionAndSelected = screenName => {
@@ -128,7 +130,10 @@ export const HreProcesedApproveRecruitmentProposalBusiness = {
         HrePendingProcessingCandidateApplications: false
     },
 
-    setThisForBusiness: () => {
+    setThisForBusiness: (dataThis, isNotification) => {
+        if (isNotification) _isOnScreenNotification = true;
+        else _isOnScreenNotification = false;
 
+        _this = dataThis;
     }
 };

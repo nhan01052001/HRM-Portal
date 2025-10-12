@@ -70,9 +70,10 @@ class AttSubmitShiftChange extends Component {
             });
             // this.AttSubmitShiftChangeAddOrEdit.onChangeDateFromTo({ startDate: '2023-03-11', endDate: '2023-03-14' });
         }
+
     };
 
-    onEdit = (item) => {
+    onEdit = item => {
         if (item) {
             if (this.AttSubmitShiftChangeAddOrEdit && this.AttSubmitShiftChangeAddOrEdit.onShow) {
                 this.AttSubmitShiftChangeAddOrEdit.onShow({
@@ -83,13 +84,12 @@ class AttSubmitShiftChange extends Component {
         }
     };
 
-    reload = (paramsFilter) => {
+    reload = paramsFilter => {
         if (paramsFilter === 'E_KEEP_FILTER') {
             paramsFilter = { ...this.paramsFilter };
         } else {
             this.paramsFilter = { ...paramsFilter };
         }
-        console.log(paramsFilter, this.paramsFilter, 'paramsFilter');
 
         let _paramsDefault = this.storeParamsDefault ? this.storeParamsDefault : this.paramsDefault(),
             _keyQuery = EnumName.E_FILTER;
@@ -139,32 +139,11 @@ class AttSubmitShiftChange extends Component {
                     type: 'POST',
                     pageSize: 20
                 },
-                Row: [
-                    {
-                        TypeView: 'E_COMMON',
-                        Name: 'DateStart',
-                        NameSecond: 'DateEnd',
-                        DisplayKey: 'HRM_PortalApp_ShiftChangeDate',
-                        DataType: 'DateToFrom',
-                        DataFormat: 'DD/MM/YYYY'
-                    },
-                    {
-                        TypeView: 'E_COMMON',
-                        Name: 'ChangeShiftTypeView',
-                        DisplayKey: 'HRM_PortalApp_TypeChangeShift',
-                        DataType: 'string'
-                    }
-                ],
+                Row: [],
                 Order: [
                     {
-                        field: 'TimeLog',
+                        field: 'DateUpdate',
                         dir: 'desc'
-                    }
-                ],
-                Filter: [
-                    {
-                        logic: 'and',
-                        filters: []
                     }
                 ],
                 BusinessAction: [
@@ -213,7 +192,6 @@ class AttSubmitShiftChange extends Component {
         }
 
         const _configList = configList[attSubmitShiftChange],
-            renderRow = _configList[enumName.E_Row],
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
@@ -229,7 +207,6 @@ class AttSubmitShiftChange extends Component {
         return {
             rowActions: dataRowActionAndSelected.rowActions,
             selected: dataRowActionAndSelected.selected,
-            renderRow: renderRow,
             dataBody: _params,
             keyQuery: EnumName.E_PRIMARY_DATA
         };
@@ -326,8 +303,15 @@ class AttSubmitShiftChange extends Component {
     }
 
     render() {
-        const { dataBody, rowActions, selected, isLazyLoading, isRefreshList, keyQuery, dataChange, renderRow } =
-            this.state;
+        const {
+            dataBody,
+            rowActions,
+            selected,
+            isLazyLoading,
+            isRefreshList,
+            keyQuery,
+            dataChange
+        } = this.state;
 
         return (
             <SafeAreaViewDetail style={styleSafeAreaView.style}>
@@ -372,12 +356,13 @@ class AttSubmitShiftChange extends Component {
                                         pageSize: pageSizeList
                                     }}
                                     valueField="ID"
-                                    renderConfig={renderRow}
                                 />
                             )}
                         </View>
 
-                        <AttSubmitShiftChangeAddOrEdit ref={(refs) => (this.AttSubmitShiftChangeAddOrEdit = refs)} />
+                        <AttSubmitShiftChangeAddOrEdit
+                            ref={refs => (this.AttSubmitShiftChangeAddOrEdit = refs)}
+                        />
                     </View>
                 )}
             </SafeAreaViewDetail>
@@ -385,7 +370,7 @@ class AttSubmitShiftChange extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
     return {
         reloadScreenName: state.lazyLoadingReducer.reloadScreenName,
         isChange: state.lazyLoadingReducer.isChange,
@@ -393,4 +378,7 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, null)(AttSubmitShiftChange);
+export default connect(
+    mapStateToProps,
+    null
+)(AttSubmitShiftChange);

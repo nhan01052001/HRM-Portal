@@ -572,13 +572,13 @@ export default class AttSubmitPlanOvertimeCancelAddOrEdit extends Component {
                 userSubmit: ProfileID,
                 type: 'E_REQUESTCANCEL_OVERTIMEPLAN'
             }),
-            HttpService.Post('[URI_HR]/Att_GetData/GetMultiMethodPayment', {}),
+            HttpService.Post('[URI_POR]/New_Att_Overtime/GetMultiMethodPayment', {}),
             HttpService.Get('[URI_HR]/Cat_GetData/GetMultiOvertimeTypeNotInPortal')
         ];
 
         if (screenName == 'AttSubmitPlanOvertime') {
             // Yêu cầu hủy
-            arrRequest.push(HttpService.Get('[URI_HR]/api/Att_OvertimePlan/GetById?ID=' + ID));
+            arrRequest.push(HttpService.Get('[URI_POR]/New_Att_PlanOvertime/GetById?ID=' + ID));
         } else {
             // Chỉnh sửa yêu cầu hủy
             arrRequest.push(HttpService.Get('[URI_HR]/Att_GetData/GetRequestCancelationOTPlanByID?ID=' + ID));
@@ -596,7 +596,7 @@ export default class AttSubmitPlanOvertimeCancelAddOrEdit extends Component {
     };
 
     GetDurationType = () => {
-        HttpService.Get('[URI_HR]/Att_GetData/GetMultiDurationType').then(res => {
+        HttpService.Get('[URI_POR]/New_Att_Overtime/GetMultiDurationType').then(res => {
             if (res) {
                 const { DurationType, WorkDate } = this.state;
                 this.setState({
@@ -726,7 +726,7 @@ export default class AttSubmitPlanOvertimeCancelAddOrEdit extends Component {
     };
 
     GetMethodPayment = () => {
-        HttpService.Post('[URI_HR]/Att_GetData/GetMultiMethodPayment', {}).then(data1 => {
+        HttpService.Post('[URI_POR]/New_Att_Overtime/GetMultiMethodPayment', {}).then(data1 => {
             if (data1) {
                 const { MethodPayment } = this.state;
                 this.setState(

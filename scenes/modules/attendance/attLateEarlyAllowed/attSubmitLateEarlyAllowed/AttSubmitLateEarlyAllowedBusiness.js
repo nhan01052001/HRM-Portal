@@ -457,7 +457,7 @@ export const AttSubmitLateEarlyAllowedBusinessFunction = {
         VnrLoadingSevices.show();
         let selectedIds = objValid.Ids.split(','),
             reason = objValid.reason;
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedLateEarlyAllowed', {
+        HttpService.Post('[URI_POR]/New_Att_LateEarlyAllowed/RemoveSelected', {
             selectedIds,
             reason
         }).then(res => {

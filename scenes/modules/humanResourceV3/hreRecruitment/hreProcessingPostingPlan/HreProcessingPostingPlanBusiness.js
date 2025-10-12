@@ -202,13 +202,7 @@ export const HreProcessingPostingPlanBusiness = {
             let isInputText = isConfirm['isInputText'],
                 isValidInputText = isConfirm['isValidInputText'],
                 message = objValid.message && typeof objValid.message === 'string' ? objValid.message : null,
-                placeholder = translate('HRM_PortalApp_TSLRegister_Comment'),
-                limit = 500,
-                textLimit = translate('HRM_Sytem_Reason_DynamicMaxLength').replace(
-                    '[E_DYNAMIC1]',
-                    `[${translate('HRM_Hre_ApproveWalletConfirmation_ApprovedReason')}]`
-                );
-            textLimit = textLimit.replace('[E_DYNAMIC2]', 500);
+                placeholder = translate('HRM_PortalApp_Message_ErrorDescription');
 
             AlertSevice.alert({
                 title: 'HRM_PortalApp_ApprovalNote',
@@ -217,8 +211,6 @@ export const HreProcessingPostingPlanBusiness = {
                 isValidInputText: isValidInputText,
                 message: message,
                 isInputText: isInputText,
-                limit: limit,
-                textLimit: textLimit,
                 textRightButton: 'HRM_PortalApp_AgreeIsApprove',
                 onCancel: () => { },
                 onConfirm: reason => {
@@ -231,7 +223,8 @@ export const HreProcessingPostingPlanBusiness = {
                         HttpService.Post('[URI_CENTER]/api/Rec_JobPostingPlan/SetApproveJobPostingPlan', {
                             Host: apiConfig.uriPor,
                             ListRecordID: listRecord,
-                            IsExpert: false,
+                            UserLogin: headers.userlogin,
+                            UserProcessID: headers.userid,
                             Comment: reason
                         }).then(res => {
                             VnrLoadingSevices.hide();
@@ -252,9 +245,9 @@ export const HreProcessingPostingPlanBusiness = {
                                         // Đếm lại con số ở Dashboard
                                         store.dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
 
-                                        // // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
-                                        // if (!_isOnScreenNotification)
-                                        //     DrawerServices.navigate('HreDoneProcessingPostingPlan');
+                                        // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
+                                        if (!_isOnScreenNotification)
+                                            DrawerServices.navigate('HreDoneProcessingPostingPlan');
                                     } else if (res.Status === 'Locked') {
                                         ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {
@@ -360,25 +353,17 @@ export const HreProcessingPostingPlanBusiness = {
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
-                isValidInputText = true,
+                isValidInputText = isConfirm['isValidInputText'],
                 message = objValid.message && typeof objValid.message === 'string' ? objValid.message : null,
-                placeholder = translate('Reason'),
-                limit = 500,
-                textLimit = translate('HRM_Sytem_Reason_DynamicMaxLength').replace(
-                    '[E_DYNAMIC1]',
-                    `[${translate('HRM_Hre_ApproveWalletConfirmation_ApprovedReason')}]`
-                );
-            textLimit = textLimit.replace('[E_DYNAMIC2]', 500);
+                placeholder = translate('Reason');
 
             AlertSevice.alert({
-                title: 'DeclineReason',
+                title: 'HRM_PortalApp_PITFinalization_ReasonToRejection',
                 iconType: EnumIcon.E_REJECT,
                 placeholder: placeholder,
                 isValidInputText: isValidInputText,
                 message: message,
                 isInputText: isInputText,
-                limit: limit,
-                textLimit: textLimit,
                 textRightButton: 'HRM_PortalApp_ConfirmRejection',
                 onCancel: () => { },
                 onConfirm: reason => {
@@ -413,8 +398,8 @@ export const HreProcessingPostingPlanBusiness = {
                                         // Đếm lại con số ở Dashboard
                                         store.dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
                                         // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
-                                        // if (!_isOnScreenNotification)
-                                        //     DrawerServices.navigate('HreDoneProcessingPostingPlan');
+                                        if (!_isOnScreenNotification)
+                                            DrawerServices.navigate('HreDoneProcessingPostingPlan');
                                     } else if (res.Status === 'Locked') {
                                         ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {
@@ -519,25 +504,17 @@ export const HreProcessingPostingPlanBusiness = {
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
-                isValidInputText = true,
+                isValidInputText = isConfirm['isValidInputText'],
                 message = objValid.message && typeof objValid.message === 'string' ? objValid.message : null,
-                placeholder = translate('Reason'),
-                limit = 500,
-                textLimit = translate('HRM_Sytem_Reason_DynamicMaxLength').replace(
-                    '[E_DYNAMIC1]',
-                    `[${translate('HRM_Hre_ApproveWalletConfirmation_ApprovedReason')}]`
-                );
-            textLimit = textLimit.replace('[E_DYNAMIC2]', 500);
+                placeholder = translate('Reason');
 
             AlertSevice.alert({
-                title: 'HRM_PortalApp_HreRecruitmentProposalProcessing_ChangeRequest',
+                title: 'HRM_PortalApp_HreRecruitment_ReasonForRequestingChange',
                 iconType: EnumIcon.E_REQUEST_CHANGE,
                 placeholder: placeholder,
                 isValidInputText: isValidInputText,
                 message: message,
                 isInputText: isInputText,
-                limit: limit,
-                textLimit: textLimit,
                 textRightButton: 'HRM_PortalApp_ConfirmChangeRequest',
                 onCancel: () => { },
                 onConfirm: reason => {
@@ -572,8 +549,8 @@ export const HreProcessingPostingPlanBusiness = {
                                         // Đếm lại con số ở Dashboard
                                         store.dispatch(badgesNotification.actions.fetchCountNumberApproveInfo());
                                         // nếu (duyệt/từ chối) ở màn hình notify thì không chuyển hướng.
-                                        // if (!_isOnScreenNotification)
-                                        //     DrawerServices.navigate('HreDoneProcessingPostingPlan');
+                                        if (!_isOnScreenNotification)
+                                            DrawerServices.navigate('HreDoneProcessingPostingPlan');
                                     } else if (res.Status === 'Locked') {
                                         ToasterSevice.showWarning('Hrm_Locked', 5000);
                                     } else {

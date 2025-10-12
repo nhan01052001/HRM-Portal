@@ -25,10 +25,6 @@ class ModalAuthorize extends Component {
         this.canGoback = null;
     }
 
-    shouldComponentUpdate (nextProps, nextState){
-        return nextProps.siteKey !== this.props.siteKey || this.state.show !== nextState.show
-    }
-
     show = () => {
         this.setState({ show: true });
     };

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import styleComonAddOrEdit from '../../../../constants/styleComonAddOrEdit';
 import { Colors, CustomStyleSheet, styleSheets, stylesVnrPickerV3 } from '../../../../constants/styleConfig';
@@ -42,8 +42,6 @@ class AttLeaveDayReplacementComponent extends Component {
             },
             refresh: false
         };
-
-        this.layoutHeightItem = null;
     }
 
     getIsSelect = (value = []) => {
@@ -54,26 +52,8 @@ class AttLeaveDayReplacementComponent extends Component {
         return null;
     }
 
-    selectItem = () => {
-        const { dataItem } = this.props;
-
-        if (Array.isArray(dataItem?.ListDate) && dataItem?.ListDate.length > 0) {
-            dataItem?.ListDate.map((value) => {
-                if (Array.isArray(value?.ListDurationType) && value?.ListDurationType.length > 0) {
-                    if (value?.ListDurationType.length > 1) {
-                        value?.ListDurationType.forEach((element) => {
-                            element.isSelect = element?.Value === 'E_FULLSHIFT';
-                        });
-                    } else {
-                        value.ListDurationType[0].isSelect = true;
-                    }
-                }
-            });
-        }
-    }
-
     render() {
-        const { dataItem, onScrollToInputIOS, index } = this.props;
+        const { dataItem, onScrollToInputIOS } = this.props;
         const { DurationType, Note, replaceLessDays, refresh } = this.state;
 
 
@@ -82,12 +62,7 @@ class AttLeaveDayReplacementComponent extends Component {
 
 
         return (
-            <View style={styles.wrapItem}
-                onLayout={(event) => {
-                    const layout = event.nativeEvent.layout;
-                    this.layoutHeightItem = layout.height;
-                }}
-            >
+            <View style={styles.wrapItem}>
                 {
                     dataItem?.ProfileName && (
                         <View
@@ -107,15 +82,12 @@ class AttLeaveDayReplacementComponent extends Component {
                                 lable={replaceLessDays.lable}
                                 value={replaceLessDays.value}
                                 onFinish={value => {
-                                    if (value)
-                                        this.selectItem();
-
                                     this.setState({
                                         replaceLessDays: {
                                             ...replaceLessDays,
                                             value: value
                                         }
-                                    });
+                                    })
                                 }}
                             />
                         </View>
@@ -125,6 +97,15 @@ class AttLeaveDayReplacementComponent extends Component {
                     isListDate && (
                         ((isListDate && replaceLessDays.value) || !isListDateBigger1) ? (
                             dataItem?.ListDate.map((item, index) => {
+                                if (Array.isArray(item?.ListDurationType) && item?.ListDurationType.length > 0) {
+                                    if (item?.ListDurationType.length > 1) {
+                                        item?.ListDurationType.forEach((element) => {
+                                            element.isSelect = element?.Value === 'E_FULLSHIFT';
+                                        })
+                                    } else {
+                                        item.ListDurationType[0].isSelect = true;
+                                    }
+                                }
                                 return (
                                     <View key={index}
                                         style={[CustomStyleSheet.borderBottomColor(Colors.gray_5), CustomStyleSheet.borderBottomWidth(0.5)]}
@@ -138,13 +119,12 @@ class AttLeaveDayReplacementComponent extends Component {
                                         >
                                             <View style={CustomStyleSheet.flex(1)}>
                                                 <VnrDateFromTo
-                                                    disable={true}
-                                                    styContentPicker={[
-                                                        CustomStyleSheet.height(53),
-                                                        CustomStyleSheet.width('100%'),
-                                                        CustomStyleSheet.borderBottomWidth(0.5),
-                                                        CustomStyleSheet.borderBottomColor(Colors.gray_5)
-                                                    ]}
+                                                    styContentPicker={{
+                                                        height: 53,
+                                                        width: '100%',
+                                                        borderWidth: 0,
+                                                        borderRadius: 0
+                                                    }}
                                                     isHiddenIcon={false}
                                                     refresh={true}
                                                     value={[moment(item?.Date).format('YYYY-MM-DD')]}
@@ -207,12 +187,11 @@ class AttLeaveDayReplacementComponent extends Component {
                                             }}
                                         />
                                     </View>
-                                );
+                                )
                             })
                         ) : isListDate && isListDateBigger1 && !replaceLessDays.value ? (
                             <View>
                                 <VnrDateFromTo
-                                    disable={true}
                                     isHiddenIcon={false}
                                     refresh={true}
                                     value={{
@@ -257,7 +236,8 @@ class AttLeaveDayReplacementComponent extends Component {
                         });
                     }}
                     onFocus={() => {
-                        Platform.OS == 'ios' && onScrollToInputIOS(index + 1, this.layoutHeightItem);
+                        Platform.OS == 'ios' &&
+                            onScrollToInputIOS(1, this.layoutHeightItem);
                     }}
                     refresh={Note.refresh}
                 />

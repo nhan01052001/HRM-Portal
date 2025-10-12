@@ -2,16 +2,8 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import moment from 'moment';
-import { IconDate } from '../../constants/Icons';
-import {
-    Colors,
-    Size,
-    styleSheets,
-    styleSafeAreaView,
-    stylesVnrPicker,
-    CustomStyleSheet,
-    stylesVnrPickerV3
-} from '../../constants/styleConfig';
+import { IconCancel, IconDate, IconTime } from '../../constants/Icons';
+import { Colors, Size, styleSheets, styleSafeAreaView, stylesVnrPicker } from '../../constants/styleConfig';
 import VnrText from '../../components/VnrText/VnrText';
 import Vnr_Function from '../../utils/Vnr_Function';
 import { SafeAreaView } from 'react-navigation';
@@ -96,7 +88,7 @@ export default class VnrMonthYear extends Component {
         });
     };
 
-    changeDisable = (bool) => {
+    changeDisable = bool => {
         const stateProps = { ...this.state.stateProps };
         if (!Vnr_Function.CheckIsNullOrEmpty(stateProps.disable) && typeof stateProps.disable === 'boolean') {
             stateProps.disable = bool;
@@ -104,7 +96,7 @@ export default class VnrMonthYear extends Component {
         }
     };
 
-    onRefreshControl = (nextProps) => {
+    onRefreshControl = nextProps => {
         const valueDate = !Vnr_Function.CheckIsNullOrEmpty(nextProps.value) ? new Date(moment(nextProps.value)) : null;
 
         this.setState({ stateProps: nextProps, valueDate }, () => {
@@ -127,7 +119,7 @@ export default class VnrMonthYear extends Component {
         }
     }
 
-    setDataConfirm = (data) => {
+    setDataConfirm = data => {
         this.dataConfirm = data;
     };
 
@@ -159,8 +151,8 @@ export default class VnrMonthYear extends Component {
         }
 
         const newYears = listLastYear.concat(listNextYear),
-            indexItemSelected = newYears.findIndex((e) => e == valueYear),
-            indexMonthNow = listMonths.findIndex((e) => e == valueMonth);
+            indexItemSelected = newYears.findIndex(e => e == valueYear),
+            indexMonthNow = listMonths.findIndex(e => e == valueMonth);
 
         this.setDataConfirm({
             yearSelect: valueYear,
@@ -217,7 +209,7 @@ export default class VnrMonthYear extends Component {
         }
     }
 
-    onPressItem = (indexItem) => () => {
+    onPressItem = indexItem => () => {
         const { listYears } = this.state;
         let itemScroll = listYears[indexItem];
 
@@ -231,7 +223,7 @@ export default class VnrMonthYear extends Component {
         });
     };
 
-    onPressItemMonth = (indexItem) => () => {
+    onPressItemMonth = indexItem => () => {
         const { listMonths } = this.state;
         let itemScroll = listMonths[indexItem];
 
@@ -245,7 +237,7 @@ export default class VnrMonthYear extends Component {
         });
     };
 
-    scrollToIndex = (index) => {
+    scrollToIndex = index => {
         try {
             this.refScrollView !== null && this.refScrollView.scrollToIndex({ animated: true, index: index });
         } catch (error) {
@@ -253,7 +245,7 @@ export default class VnrMonthYear extends Component {
         }
     };
 
-    scrollToIndexMonths = (index) => {
+    scrollToIndexMonths = index => {
         try {
             this.refScrollViewMonth !== null && this.refScrollViewMonth.scrollToIndex({ animated: true, index: index });
         } catch (error) {
@@ -320,9 +312,11 @@ export default class VnrMonthYear extends Component {
                 isVisibleLoading,
                 indexMonthSelect
             } = this.state,
-            { styViewDrop } = stylesVnrPicker.VnrPicker;
+            {
+                bntPicker, selectPicker, stylePlaceholder,
+                bntPickerDisable, styLableValue, styViewDrop
+            } = stylesVnrPicker.VnrPicker;
 
-        const { isOptionFilterQuicly, layoutFilter, placeHolder, lable } = this.props;
         const language = dataVnrStorage.languageApp;
         const langMonth = LocaleConfig[language ? language : 'VN'];
 
@@ -351,7 +345,7 @@ export default class VnrMonthYear extends Component {
                     <View style={styles.styViewSelected} />
                     <View style={styles.styViewBottom} pointerEvents="none" />
                     <FlatList
-                        ref={(ref) => (this.refScrollViewMonth = ref)}
+                        ref={ref => (this.refScrollViewMonth = ref)}
                         showsVerticalScrollIndicator={false}
                         extraData={this.state.refreshList}
                         data={listMonths}
@@ -388,7 +382,7 @@ export default class VnrMonthYear extends Component {
                     />
 
                     <FlatList
-                        ref={(ref) => (this.refScrollView = ref)}
+                        ref={ref => (this.refScrollView = ref)}
                         showsVerticalScrollIndicator={false}
                         extraData={this.state.refreshList}
                         data={listYears}
@@ -430,68 +424,43 @@ export default class VnrMonthYear extends Component {
         }
 
         return (
-            <View
-                style={[
-                    CustomStyleSheet.width('100%'),
-                    isOptionFilterQuicly === true ? CustomStyleSheet.height('100%') : stylesVnrPickerV3.styContentPicker,
-                    layoutFilter && CustomStyleSheet.height(65)
-                ]}
-            >
-                {layoutFilter && (
-                    <View style={CustomStyleSheet.marginHorizontal(Size.defineSpace)}>
-                        <VnrText
-                            style={[styleSheets.lable, stylesVnrPickerV3.styLableLayoutFilter]}
-                            numberOfLines={1}
-                            i18nKey={lable}
-                        />
-                    </View>
-                )}
-
+            <View style={[selectPicker]}>
                 {displayControl && (
                     <TouchableOpacity
                         onPress={() => (!disable ? this.showDatePicker() : null)}
-                        style={[
-                            stylesVnrPickerV3.styBntPicker,
-                            stateProps.stylePicker,
-                            // isShowErr && stylesVnrPickerV3.styBntPickerError,
-                            disable && stylesVnrPickerV3.bntPickerDisable,
-                            (isOptionFilterQuicly === true || layoutFilter) && CustomStyleSheet.borderBottomWidth(0)
-                        ]}
+                        style={[bntPicker, disable && bntPickerDisable, stateProps.stylePicker]}
                         activeOpacity={!disable ? 0.2 : 1}
                     >
                         <View
-                            style={[stylesVnrPickerV3.styLeftPicker, lable && stylesVnrPickerV3.onlyFlRowSpaceBetween]}
+                            style={styles.styViewPicker}
                         >
-                            {lable && (
-                                <View style={stylesVnrPickerV3.styLbPicker}>
-                                    <IconDate size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_8} />
-
-                                    <VnrText
-                                        style={[
-                                            styleSheets.text,
-                                            stylesVnrPickerV3.styLbNotHaveValuePicker
-                                        ]}
-                                        i18nKey={layoutFilter ? placeHolder : lable}
-                                    />
-                                    {/* {stateProps.fieldValid && (
-                                    <VnrText style={[styleSheets.text, styleValid]} i18nKey={'*'} />
-                                )} */}
-                                </View>
+                            {textValue != null ? (
+                                <Text style={[styleSheets.text, styLableValue, stateProps.styleTextPicker]}>
+                                    {textValue}
+                                </Text>
+                            ) : (
+                                <VnrText
+                                    style={[styleSheets.text, stylePlaceholder, stateProps.styleTextPicker]}
+                                    i18nKey={stateProps.placeHolder ? stateProps.placeHolder : 'SELECT_ITEM'}
+                                />
                             )}
-
-                            <View style={stylesVnrPickerV3.styVlPicker}>
-                                {textValue != null ? (
-                                    <Text style={[styleSheets.text, stylesVnrPickerV3.styLableValue]} numberOfLines={1}>
-                                        {textValue}
-                                    </Text>
-                                ) : (
-                                    <VnrText
-                                        style={[styleSheets.text, stylesVnrPickerV3.stylePlaceholder]}
-                                        i18nKey={placeHolder && !layoutFilter ? placeHolder : 'SELECT_ITEM'}
-                                    />
-                                )}
-                            </View>
                         </View>
+
+                        {/* nút clear */}
+                        {stateProps.clearText == true && textValue != null && (
+                            <TouchableOpacity
+                                onPress={this.clearDate}
+                                style={styles.styBtnClear}
+                            >
+                                <IconCancel size={Size.iconSize - 2} color={Colors.grey} />
+                            </TouchableOpacity>
+                        )}
+
+                        {stateProps.type == 'date' || stateProps.type == undefined ? (
+                            <IconDate size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_8} />
+                        ) : (
+                            <IconTime size={Size.iconSize} color={disable ? Colors.gray_7 : Colors.gray_8} />
+                        )}
                     </TouchableOpacity>
                 )}
 
@@ -502,7 +471,9 @@ export default class VnrMonthYear extends Component {
                     onBackdropPress={() => this.closeModal()}
                     customBackdrop={
                         <TouchableWithoutFeedback onPress={() => null}>
-                            <View style={styViewDrop} />
+                            <View
+                                style={styViewDrop}
+                            />
                         </TouchableWithoutFeedback>
                     }
                 >
@@ -565,6 +536,15 @@ const styles = StyleSheet.create({
         paddingBottom: Size.defineSpace / 2,
         marginBottom: Size.defineSpace / 2,
         position: 'relative'
+    },
+    styViewPicker: {
+        flexDirection: 'row',
+        flex: 1
+    },
+    styBtnClear : {
+        paddingHorizontal: 5,
+        height: '100%',
+        justifyContent: 'center'
     },
     styleViewBntApprove: {
         flexDirection: 'row'

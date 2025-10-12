@@ -412,7 +412,7 @@ export default class ModalAddInOut extends Component {
         };
 
         this.showHideLoading(true);
-        HttpService.Post('[URI_HR]/Att_GetData/SaveAttTamScanLogResHelp', formData, configs).then(
+        HttpService.Post('[URI_POR]/New_Att_TamScanLogRegister/SaveAttTamScanLogResHelp', formData, configs).then(
             (data) => {
                 this.showHideLoading(false);
                 this.isProcessing = false;

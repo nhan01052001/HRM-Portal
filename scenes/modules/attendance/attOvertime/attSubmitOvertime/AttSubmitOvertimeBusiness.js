@@ -382,7 +382,7 @@ export const AttSubmitOvertimeBusinessFunction = {
         let selectedIds = objValid.Ids.split(','),
             reason = objValid.reason;
 
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedOvertimeInApp', {
+        HttpService.Post('[URI_POR]/Att_Overtime/RemoveSelected', {
             selectedIds,
             reason
         }).then(res => {

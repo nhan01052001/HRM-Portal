@@ -8,6 +8,7 @@ import badgesNotification from './badgesNotification';
 import feedback from './feedback';
 import profileAddition from './profileAddition';
 import update from './update';
+
 export const AppReducers = {
     network,
     languageReducer,

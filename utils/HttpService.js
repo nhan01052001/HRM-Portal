@@ -27,7 +27,6 @@ class HttpServiceClass {
         });
 
         // Token management
-        this.idToken = null;
         this.accessToken = null;
         this.refreshToken = null;
         this.tokenExpiryTime = null;
@@ -59,9 +58,6 @@ class HttpServiceClass {
         this.isShowingAuthAlert = false;
         this.lastAuthError = null;
 
-        // Thêm biến kiểm soát curl debug mode
-        this.curlDebugMode = true;
-
         // Khởi tạo interceptors
         this._setupInterceptors();
     }
@@ -85,7 +81,6 @@ class HttpServiceClass {
                     if (this.accessToken) {
                         config.headers.Authorization = `Bearer ${this.accessToken}`;
                     }
-
                     return config;
                 } catch (error) {
                     this._addErrorLog(error, 'TOKEN_ERROR', true);
@@ -101,8 +96,6 @@ class HttpServiceClass {
         // Response interceptor
         this.axiosInstance.interceptors.response.use(
             (response) => {
-
-
                 if (response.status == 200) {
                     // response.status == 200 reset failedRefreshCount
                     this.failedRefreshCount = 0;
@@ -124,10 +117,6 @@ class HttpServiceClass {
             async (error) => {
                 // Log error
                 this._addErrorLog(error, 'RESPONSE_ERROR_401');
-
-                if (error.status == 500) {
-                    this._logCurlCommand(error.config);
-                }
 
                 if (error.response && error.response.status == 401 && this.isAuthen) {
                     if (this.isRefreshing) {
@@ -176,6 +165,7 @@ class HttpServiceClass {
         // Refresh token nếu:
         // 1. Sắp hết hạn (còn < 5 phút)
         // 2. Đã đủ thời gian tối thiểu từ lần refresh trước
+
         if (
             timeUntilExpiry < TOKEN_EXPIRY_BUFFER &&
             (!this.lastRefreshTime || now - this.lastRefreshTime > MIN_REFRESH_INTERVAL)
@@ -194,7 +184,7 @@ class HttpServiceClass {
         if (currentUser?.headers?.tokenportalapp) {
             this.accessToken = currentUser.headers.tokenportalapp;
             this.refreshToken = currentUser.headers.refreshToken;
-            this.idToken = currentUser.headers.idToken;
+
             // Decode và lưu thời gian hết hạn
             const decodedToken = Vnr_Function.jwtDecode(this.accessToken);
             this.tokenExpiryTime = decodedToken.exp * 1000;
@@ -434,7 +424,7 @@ class HttpServiceClass {
                 // Cập nhật tokens
                 this.accessToken = newAuthState.accessToken;
                 this.refreshToken = newAuthState.refreshToken;
-                this.idToken = newAuthState.idToken;
+
                 // Cập nhật expiry time
                 const decodedToken = Vnr_Function.jwtDecode(this.accessToken);
                 this.tokenExpiryTime = decodedToken.exp * 1000;
@@ -517,132 +507,6 @@ class HttpServiceClass {
         }
         return this.accessToken;
     }
-
-    async getFullInfoToken(forceRefresh = false) {
-        await this._ensureValidToken();
-        if (forceRefresh) {
-            await this._refreshToken();
-        }
-        return {
-            accessToken: this.accessToken,
-            refreshToken: this.refreshToken,
-            idToken: this.idToken,
-            HTTP_ACCESSTOKEN: this.accessToken,
-            HTTP_REFRESHTOKEN: this.refreshToken,
-            HTTP_IDTOKEN: this.idToken
-        };
-    }
-
-    async updateToken(newAuthState) {
-        try {
-            if (!newAuthState || !newAuthState.accessToken || !newAuthState.refreshToken) {
-                return false;
-            }
-
-            const _dataVnrStorage = getDataVnrStorage();
-            // Cập nhật tokens
-            this.accessToken = newAuthState.accessToken;
-            this.refreshToken = newAuthState.refreshToken;
-            this.idToken = newAuthState.idToken;
-            // Cập nhật expiry time
-            const decodedToken = Vnr_Function.jwtDecode(this.accessToken);
-            this.tokenExpiryTime = decodedToken.exp * 1000;
-            this.lastRefreshTime = Date.now();
-
-            // Lưu vào storage
-            const { currentUser } = _dataVnrStorage;
-            currentUser.headers.tokenportalapp = this.accessToken;
-            currentUser.headers.refreshToken = this.refreshToken;
-            currentUser.headers.idToken = newAuthState.idToken;
-            await setdataVnrStorageFromValue('currentUser', currentUser);
-            this._addErrorLog(newAuthState, 'UPDATE_SUCCESS_TOKEN');
-
-            return true;
-        } catch (error) {
-            this._addErrorLog(error, 'UPDATE_TOKEN_ERROR');
-            return false;
-        }
-    }
-
-    // ===== CURL DEBUG METHODS =====
-
-    /**
-     * Bật/tắt chế độ debug curl
-     * @param {boolean} enabled - true để bật, false để tắt
-     */
-    setCurlDebugMode(enabled) {
-        this.curlDebugMode = enabled;
-        console.log(`Curl debug mode: ${enabled ? 'ENABLED' : 'DISABLED'}`);
-    }
-
-    /**
-     * Tạo curl command từ axios config
-     * @param {Object} config - Axios request config
-     * @returns {string} - Curl command
-     */
-    _generateCurlCommand(config) {
-        try {
-            const { method = 'GET', url, headers = {}, data } = config;
-
-            let curlCommand = `curl -X ${method.toUpperCase()}`;
-
-            // Thêm URL
-            curlCommand += ` '${url}'`;
-
-            // Thêm headers
-            Object.entries(headers).forEach(([key, value]) => {
-                if (
-                    value &&
-                    key !== 'common' &&
-                    key !== 'delete' &&
-                    key !== 'get' &&
-                    key !== 'head' &&
-                    key !== 'post' &&
-                    key !== 'put' &&
-                    key !== 'patch'
-                ) {
-                    curlCommand += ` \\\n  -H '${key}: ${value}'`;
-                }
-            });
-
-            // Thêm data cho POST/PUT requests
-            if (
-                data &&
-                (method.toUpperCase() === 'POST' || method.toUpperCase() === 'PUT' || method.toUpperCase() === 'PATCH')
-            ) {
-                if (typeof data === 'string') {
-                    curlCommand += ` \\\n  -d '${data}'`;
-                } else if (typeof data === 'object') {
-                    curlCommand += ` \\\n  -d '${JSON.stringify(data)}'`;
-                }
-            }
-
-            return curlCommand;
-        } catch (error) {
-            console.error('Error generating curl command:', error);
-            return 'Error generating curl command';
-        }
-    }
-
-    /**
-     * Log curl command ra console
-     * @param {Object} config - Axios request config
-     */
-    _logCurlCommand(config) {
-
-        console.log(config, 'config');
-
-        if (!this.curlDebugMode) return;
-
-        const curlCommand = this._generateCurlCommand(config);
-        console.log('\n=== CURL DEBUG ===');
-        console.log('URL:', config.url);
-        console.log('Method:', config.method?.toUpperCase() || 'GET');
-        console.log('Curl Command:');
-        console.log(curlCommand);
-        console.log('==================\n');
-    }
-
     // ===== HELPER METHODS =====
     // Thêm error vào mảng log
     _addErrorLog(error, type = 'API_ERROR', isSendLog = false) {
@@ -668,7 +532,7 @@ class HttpServiceClass {
             console.log('addErrorLogerror', this.errorLogs);
 
             // Gửi log lên server
-            //isSendLog && this._sendErrorLog(this.errorLogs);
+            isSendLog && this._sendErrorLog(this.errorLogs);
         } catch (logError) {
             console.error('Error logging failed:', logError);
         }
@@ -709,11 +573,10 @@ class HttpServiceClass {
     getHeader() {
         let _dataVnrStorage = getDataVnrStorage();
         const { currentUser } = _dataVnrStorage;
-        const defaultHeader = { 'Application-Request': 'APP_PORTAL_' + _dataVnrStorage.customerID };
         if (currentUser != null) {
-            return { ...currentUser.headers, ...defaultHeader };
+            return currentUser.headers;
         }
-        return defaultHeader;
+        return null;
     }
 
     generateHeader() {
@@ -875,53 +738,6 @@ class HttpServiceClass {
     }
 
     startRefreshToken() {}
-
-    // ===== PUBLIC CURL METHODS =====
-
-    /**
-     * Bật chế độ debug curl
-     */
-    enableCurlDebug() {
-        this.setCurlDebugMode(true);
-    }
-
-    /**
-     * Tắt chế độ debug curl
-     */
-    disableCurlDebug() {
-        this.setCurlDebugMode(false);
-    }
-
-    /**
-     * Kiểm tra trạng thái curl debug mode
-     * @returns {boolean}
-     */
-    isCurlDebugEnabled() {
-        return this.curlDebugMode;
-    }
-
-    /**
-     * Tạo curl command cho một request cụ thể
-     * @param {string} method - HTTP method
-     * @param {string} url - URL
-     * @param {Object} data - Request data
-     * @param {Object} headers - Request headers
-     * @returns {string} - Curl command
-     */
-    generateCurl(method, url, data = null, headers = {}) {
-        const config = {
-            method,
-            url: this.handelUrl(url),
-            headers: { ...this.getHeader(), ...headers },
-            data
-        };
-
-        if (this.accessToken) {
-            config.headers.Authorization = `Bearer ${this.accessToken}`;
-        }
-
-        return this._generateCurlCommand(config);
-    }
 
     // Thêm vào phương thức destructor để dọn dẹp
     destroy() {

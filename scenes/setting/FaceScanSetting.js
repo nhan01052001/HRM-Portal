@@ -223,7 +223,7 @@ class FaceScanSetting extends Component {
             axios
                 .post('https://api.luxand.cloud/v2/person', formData, {
                     headers: {
-                        token: '65a8971fd7f44e98ab509c65d48423f5',
+                        token: 'e0c414c6d6874a199970bd55d4278759',
                         Accept: 'application/json',
                         'Content-Type': 'multipart/form-data'
                     },

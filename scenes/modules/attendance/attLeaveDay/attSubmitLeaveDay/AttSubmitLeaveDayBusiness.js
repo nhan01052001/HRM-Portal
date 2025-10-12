@@ -513,7 +513,7 @@ export const AttSubmitLeaveDayBusinessFunction = {
 
         VnrLoadingSevices.show();
 
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedLeaveDay', {
+        HttpService.Post('[URI_POR]/Att_Leaveday/RemoveSelected', {
             selectedIds,
             reason
         }).then(res => {

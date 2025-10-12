@@ -1,48 +1,148 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, TouchableWithoutFeedback } from 'react-native';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
 import {
-    Colors,
-    CustomStyleSheet,
-    Size,
-    styleSheets,
-    stylesScreenDetailV3
-} from '../../../../../constants/styleConfig';
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    Image,
+    Platform,
+    Dimensions,
+    TouchableWithoutFeedback
+} from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { Colors, CustomStyleSheet, Size, styleSheets, stylesScreenDetailV3 } from '../../../../../constants/styleConfig';
 import moment from 'moment';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { translate } from '../../../../../i18n/translate';
-import { IconCheck, IconInfo, IconChat, IconDate, IconSwapright } from '../../../../../constants/Icons';
+import {
+    IconCheck,
+    IconInfo,
+    IconSwapright,
+    IconChat,
+    IconDate
+} from '../../../../../constants/Icons';
+import Color from 'color';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
-import VnrRenderListItem from '../../../../../componentsV3/VnrRenderList/VnrRenderListItem';
 
-export default class AttTakeBusinessTripListItemApprove extends VnrRenderListItem {
+export default class AttTakeBusinessTripListItemApprove extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+        this.setRightAction(props);
+        this.Swipe = null;
+    }
+
+    setRightAction = thisProps => {
+        const { dataItem } = thisProps;
+        // dataItem.BusinessAllowAction = ['E_MODIFY', 'E_SENDMAIL', 'E_DELETE', 'E_APPROVE', 'E_REJECT', 'E_CANCEL']
+        this.sheetActions = [
+            {
+                title: translate('HRM_Common_Close'),
+                onPress: null
+            }
+        ];
+        if (!Vnr_Function.CheckIsNullOrEmpty(thisProps.rowActions)) {
+            this.rightListActions = thisProps.rowActions.filter(item => {
+                return (
+                    !Vnr_Function.CheckIsNullOrEmpty(dataItem.BusinessAllowAction) &&
+                    dataItem.BusinessAllowAction.indexOf(item.type) >= 0
+                );
+            });
+        }
+    };
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        if (nextProps.isPullToRefresh !== this.props.isPullToRefresh) {
+            this.setRightAction(nextProps);
+        }
+    }
+
+    shouldComponentUpdate(nextProps) {
+        if (
+            nextProps.isPullToRefresh !== this.props.isPullToRefresh ||
+            nextProps.isSelect !== this.props.isSelect ||
+            nextProps.isOpenAction !== this.props.isOpenAction ||
+            nextProps.isDisable !== this.props.isDisable
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    rightActionsEmpty = () => {
+        return <View style={CustomStyleSheet.width(0)} />;
+    };
+
+    convertTextToColor = value => {
+        const [num1, num2, num3, opacity] = value.split(',');
+        return Color.rgb(parseFloat(num1), parseFloat(num2), parseFloat(num3), parseFloat(opacity));
+    };
+
+    renderAvatar = () => {
+        const { dataItem } = this.props,
+            { ProfileInfo } = dataItem,
+            fullName = ProfileInfo && ProfileInfo.ProfileName ? ProfileInfo.ProfileName : '',
+            randomColor = Vnr_Function.randomColorV3(fullName),
+            { PrimaryColor, SecondaryColor, FirstCharName } = randomColor;
+
+        let imageAvatar = null;
+
+        if (ProfileInfo && ProfileInfo.ImagePath && Vnr_Function.checkIsPath(ProfileInfo.ImagePath)) {
+            imageAvatar = { uri: ProfileInfo.ImagePath };
+        }
+
+        if (imageAvatar) {
+            return <Image source={imageAvatar} style={styles.leftContentIcon} />;
+        } else {
+            return (
+                <View style={[styles.leftContentIcon, { backgroundColor: SecondaryColor }]}>
+                    <Text
+                        style={[
+                            styleSheets.textFontMedium,
+                            {
+                                color: PrimaryColor
+                            }
+                        ]}
+                    >
+                        {FirstCharName}
+                    </Text>
+                </View>
+            );
+        }
+    };
+
     formatPlace = (dataItem) => {
         if (dataItem?.PlaceFrom && dataItem?.PlaceTo) {
             return (
-                <Text style={[styleSheets.lable, styles.styleTextType]} numberOfLines={2}>
-                    {dataItem?.PlaceFrom} <IconSwapright size={Size.iconSize - 8} color={Colors.black} />{' '}
-                    {dataItem?.PlaceTo}
+                <Text style={[styleSheets.lable, styles.styleTextType]}
+                    numberOfLines={2}>
+                    {dataItem?.PlaceFrom} <IconSwapright size={Size.iconSize - 8} color={Colors.black} /> {dataItem?.PlaceTo}
                 </Text>
             );
         } else if (dataItem?.PlaceOutToName) {
-            return (
-                <Text style={[styleSheets.lable, styles.styleTextType]} numberOfLines={2}>
-                    {dataItem?.PlaceOutToName}
-                </Text>
-            );
+            return <Text style={[styleSheets.lable, styles.styleTextType]}
+                numberOfLines={2}>{dataItem?.PlaceOutToName}</Text>;
         }
-        return null;
-    };
+        return null
+    }
 
     render() {
-        const { dataItem, index, listItemOpenSwipeOut, rowActions, isOpenAction, isDisable, handerOpenSwipeOut } =
-            this.props;
+        const {
+            dataItem,
+            index,
+            listItemOpenSwipeOut,
+            rowActions,
+            isOpenAction,
+            isDisable,
+            handerOpenSwipeOut
+        } = this.props;
 
         let textFieldDate = '',
             textFieldPlace = '',
             colorStatusView = null,
             bgStatusView = null,
-            isHaveAvatar = false;
+            isHaveAvatar = false
         textFieldPlace = this.formatPlace(dataItem);
 
         // xử lý color
@@ -96,10 +196,10 @@ export default class AttTakeBusinessTripListItemApprove extends VnrRenderListIte
 
         return (
             <Swipeable
-                ref={(ref) => {
+                ref={ref => {
                     this.Swipe = ref;
                     if (
-                        listItemOpenSwipeOut.findIndex((value) => {
+                        listItemOpenSwipeOut.findIndex(value => {
                             return value['ID'] == index;
                         }) < 0
                     ) {
@@ -120,7 +220,12 @@ export default class AttTakeBusinessTripListItemApprove extends VnrRenderListIte
                 <View style={[styles.swipeableLayout]}>
                     <View style={styles.left_isCheckbox}>
                         {rowActions === null || (Array.isArray(rowActions) && rowActions.length === 0) ? null : (
-                            <View style={[styles.styRadiusCheck, this.props.isSelect && stylesScreenDetailV3.checkAll]}>
+                            <View
+                                style={[
+                                    styles.styRadiusCheck,
+                                    this.props.isSelect && stylesScreenDetailV3.checkAll
+                                ]}
+                            >
                                 {this.props.isSelect && <IconCheck size={Size.iconSize - 10} color={Colors.white} />}
                             </View>
                         )}
@@ -156,31 +261,23 @@ export default class AttTakeBusinessTripListItemApprove extends VnrRenderListIte
                                     <View style={styles.styViewTop}>
                                         {/* Top - left */}
                                         <View style={[CustomStyleSheet.width('70%'), styles.styViewHidden]}>
-                                            <View
-                                                style={[
-                                                    styles.styleFlex1_row_AlignCenter,
-                                                    CustomStyleSheet.marginBottom(4)
-                                                ]}
-                                            >
+                                            <View style={[styles.styleFlex1_row_AlignCenter, CustomStyleSheet.marginBottom(4)]}>
                                                 <Text style={[styleSheets.lable, styles.styleTextViewTop]}>
                                                     {textFieldDate}
                                                 </Text>
-                                                {dataItem?.DataRegister?.BusinessTravelName ? (
-                                                    <View style={styles.wrapNumberLeaveDay}>
-                                                        <Text
-                                                            numberOfLines={1}
-                                                            style={[styleSheets.lable, styles.styleTextNum]}
-                                                        >
-                                                            {dataItem?.DataRegister?.BusinessTravelName
-                                                                ? dataItem?.DataRegister?.BusinessTravelName
-                                                                : ''}
-                                                        </Text>
-                                                    </View>
-                                                ) : null}
+                                                <View style={styles.wrapNumberLeaveDay}>
+                                                    <Text numberOfLines={1} style={[styleSheets.lable, styles.styleTextNum]}>
+                                                        {dataItem?.DataRegister?.BusinessTravelName
+                                                            ? dataItem?.DataRegister?.BusinessTravelName
+                                                            : ''}
+                                                    </Text>
+                                                </View>
                                             </View>
 
                                             <View style={CustomStyleSheet.flex(1)}>
-                                                <View style={styles.styleFlex1_row_AlignCenter}>{textFieldPlace}</View>
+                                                <View style={styles.styleFlex1_row_AlignCenter}>
+                                                    {textFieldPlace}
+                                                </View>
                                             </View>
                                         </View>
 
@@ -190,9 +287,7 @@ export default class AttTakeBusinessTripListItemApprove extends VnrRenderListIte
                                                 style={[
                                                     styles.lineSatus,
                                                     {
-                                                        backgroundColor: bgStatusView
-                                                            ? this.convertTextToColor(bgStatusView)
-                                                            : Colors.white
+                                                        backgroundColor: bgStatusView ? this.convertTextToColor(bgStatusView) : Colors.white
                                                     }
                                                 ]}
                                             >
@@ -230,12 +325,7 @@ export default class AttTakeBusinessTripListItemApprove extends VnrRenderListIte
                                     )}
                                 </View>
                                 <View style={[styles.viewStatusBottom]}>
-                                    <View
-                                        style={[
-                                            styles.leftContent,
-                                            isDisable ? styleSheets.opacity05 : styleSheets.opacity1
-                                        ]}
-                                    >
+                                    <View style={[styles.leftContent, isDisable ? styleSheets.opacity05 : styleSheets.opacity1]}>
                                         {isHaveAvatar
                                             ? Vnr_Function.renderAvatarCricleByName(
                                                 DataStatus.ImagePath,
@@ -403,6 +493,11 @@ const styles = StyleSheet.create({
     },
     styleTextNum: {
         fontSize: Size.text - 1
+    },
+    styleTextType: {
+        fontWeight: Platform.OS == 'android' ? '600' : '500',
+        color: Colors.gray_10,
+        fontSize: Size.text - 2
     },
     viewContentTopRight: {
         // width: '30%',

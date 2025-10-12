@@ -292,7 +292,7 @@ export const AttSubmitPregnancyBusinessFunction = {
         let selectedIds = objValid.Ids.split(','),
             reason = objValid.reason;
 
-        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedPregnancyRegister/', {
+        HttpService.Post('[URI_POR]/New_Att_PregnancyRegister/RemoveSelected/', {
             selectedIds,
             reason
         }).then(res => {

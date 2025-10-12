@@ -202,8 +202,7 @@ export const AttSubmitTakeLeaveDayBusinessFunction = {
         AttApprovedSubmitTakeLeaveDay: false,
         AttRejectSubmitTakeLeaveDay: false
     },
-    setThisForBusiness: (dataThis, rowActionsFromScreen = _rowActions) => {
-        _rowActions = rowActionsFromScreen ?? [];
+    setThisForBusiness: dataThis => {
         _this = dataThis;
     },
     //#region [action delete]
@@ -391,7 +390,7 @@ export const AttSubmitTakeLeaveDayBusinessFunction = {
                 }),
                 HttpService.Get('[URI_CENTER]/api/Att_GetData/GetConfigNoteValidate?business=E_LEAVEDAY')
             ]).then(resAll => {
-                VnrLoadingSevices.hide();
+                VnrLoadingSevices.hide()
                 const [res, configNote] = resAll;
                 let isNote = configNote && configNote.Data && configNote.Data?.IsRequiredCancelNote;
                 if (res && res.Status == EnumName.E_SUCCESS) {
@@ -449,7 +448,7 @@ export const AttSubmitTakeLeaveDayBusinessFunction = {
     setCancel: objValid => {
         VnrLoadingSevices.show();
         HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/ChangeStatusCancelLeaveDayHandle', {
-            Comment: objValid.Comment,
+            //Comment: objValid.Comment,
             ListRecordID: objValid.strResultID,
             UserLogin: dataVnrStorage.currentUser.headers.userlogin,
             UserProcessID: dataVnrStorage.currentUser.headers.userid,

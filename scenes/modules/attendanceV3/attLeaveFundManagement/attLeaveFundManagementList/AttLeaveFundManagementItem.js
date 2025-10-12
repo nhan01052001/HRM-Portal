@@ -6,7 +6,6 @@ import { IconRight } from '../../../../../constants/Icons';
 import { translate } from '../../../../../i18n/translate';
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import DrawerServices from '../../../../../utils/DrawerServices';
-import { EnumName } from '../../../../../assets/constant';
 
 class AttLeaveFundManagementItem extends Component {
     constructor(props) {
@@ -18,26 +17,6 @@ class AttLeaveFundManagementItem extends Component {
         return !Vnr_Function.compare(nextProps?.dataItem, this.props?.dataItem);
     }
 
-    onPressToDetail(dataItem) {
-        if (dataItem?.Type === EnumName.E_SENIORBONUS_LEAVE_DETAIL) {
-            DrawerServices.navigate('AttLeaveFundSeniorBonusViewDetail', {
-                fullData: this.props?.fullData,
-                Type: dataItem?.Type
-            });
-        } else if (dataItem?.Type === EnumName.E_COMPENSATORY_LEAVE_DETAIL) {
-            DrawerServices.navigate('AttLeaveFundCompensatoryViewDetail', {
-                fullData: this.props?.fullData,
-                Type: dataItem?.Type
-            });
-        } else {
-            DrawerServices.navigate('AttLeaveFundManagementViewDetail', {
-                fullData: this.props?.fullData,
-                title: dataItem?.TypeName,
-                Type: dataItem?.Type
-            });
-        }
-    }
-
     render() {
         const { dataItem } = this.props;
         let available = dataItem?.Available !== undefined && dataItem?.Available !== null ? dataItem?.Available : 0,
@@ -46,7 +25,16 @@ class AttLeaveFundManagementItem extends Component {
             progressbar = available > 0 || remain > 0 ? (remain / available) * 100 : 0;
 
         return (
-            <TouchableOpacity style={styles.wrapItem} onPress={() => this.onPressToDetail(dataItem)}>
+            <TouchableOpacity
+                style={styles.wrapItem}
+                onPress={() => {
+                    DrawerServices.navigate('AttLeaveFundManagementViewDetail', {
+                        fullData: this.props?.fullData,
+                        title: dataItem?.TypeName,
+                        Type: dataItem?.Type
+                    });
+                }}
+            >
                 <View>
                     <Text style={[styleSheets.lable, { fontSize: Size.text + 3, color: dataItem?.color }]}>
                         {translate(dataItem?.TypeName)}

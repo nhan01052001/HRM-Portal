@@ -14,7 +14,6 @@ import RightActions from '../../../../../../componentsV3/ListButtonMenuRight/Rig
 import Vnr_Services from '../../../../../../utils/Vnr_Services';
 import VnrRenderListItem from '../../../../../../componentsV3/VnrRenderList/VnrRenderListItem';
 import VnrFormatStringTypeItem from '../../../../../../componentsV3/VnrFormatStringType/VnrFormatStringTypeItem';
-import { translate } from '../../../../../../i18n/translate';
 
 export default class HreProcessingPostingPlanListItem extends VnrRenderListItem {
     renderStatusView = (dataItem, renderConfig) => {
@@ -80,7 +79,6 @@ export default class HreProcessingPostingPlanListItem extends VnrRenderListItem 
                 if (dataItem[item.trim()]) subProfile.push(dataItem[item.trim()]);
             });
         }
-        subProfile[0] = translate('HRM_PortalApp_Employee')
 
         return (
             <View style={styles.styViewTop}>
@@ -90,7 +88,7 @@ export default class HreProcessingPostingPlanListItem extends VnrRenderListItem 
                         <View style={[CustomStyleSheet.justifyContent('center')]}>
                             {subProfile.length > 0 && (
                                 <Text numberOfLines={1} style={styleSheets.text}>
-                                    {dataItem?.NumberOfRecruitment ? dataItem?.NumberOfRecruitment + ' ' + subProfile.join(' - ') : subProfile.join(' - ') }
+                                    {subProfile.join(' - ')}
                                 </Text>
                             )}
                         </View>

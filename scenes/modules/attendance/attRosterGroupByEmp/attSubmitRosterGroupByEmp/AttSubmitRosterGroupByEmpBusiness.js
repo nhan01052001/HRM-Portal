@@ -243,7 +243,7 @@ export const AttSubmitRosterGroupByEmpBusinessFunction = {
                                 ? objValid.strResultID
                                 : '';
 
-                        HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedRosterGroupByEmp', {
+                        HttpService.Post('[URI_POR]/New_Att_RosterGroupByEmp/RemoveSelected', {
                             selectedIds: strId.split(','),
                             reason
                         }).then(res => {
@@ -273,7 +273,7 @@ export const AttSubmitRosterGroupByEmpBusinessFunction = {
 
             VnrLoadingSevices.show();
 
-            HttpService.Post('[URI_HR]/Att_GetData/RemoveSelectedRosterGroupByEmp', {
+            HttpService.Post('[URI_POR]/New_Att_RosterGroupByEmp/RemoveSelected', {
                 selectedIds: strId.split(',')
             }).then(res => {
                 VnrLoadingSevices.hide();

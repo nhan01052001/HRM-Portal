@@ -21,7 +21,6 @@ let configList = null,
     attApproveWorkingOvertime = null,
     attApproveWorkingOvertimeViewDetail = null,
     attApproveWorkingOvertimeKeyTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttApproveWorkingOvertime extends Component {
@@ -47,13 +46,6 @@ class AttApproveWorkingOvertime extends Component {
 
         // ref modal error
         this.refModalError = createRef(null);
-        this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
-            // reload danh sách khi có approve hoặc reject dữ liệu
-            AttApproveWorkingOvertimeBusiness.setThisForBusiness(this, false, dataRowActionAndSelected?.rowActions);
-            if (AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[attApproveWorkingOvertime]) {
-                this.reload();
-            }
-        });
     }
 
     checkDataFormNotify = () => {
@@ -72,8 +64,6 @@ class AttApproveWorkingOvertime extends Component {
 
         let _paramsDefault = this.storeParamsDefault ? this.storeParamsDefault : this.paramsDefault(),
             _keyQuery = EnumName.E_FILTER;
-
-        AttApproveWorkingOvertimeBusiness.checkForReLoadScreen[attApproveWorkingOvertime] = false;
 
         _paramsDefault = {
             ..._paramsDefault,
@@ -157,7 +147,7 @@ class AttApproveWorkingOvertime extends Component {
             dataFromParams = this.checkDataFormNotify(),
             groupField = _configList[enumName.E_Field_Group] ? _configList[enumName.E_Field_Group] : null;
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attApproveWorkingOvertime);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attApproveWorkingOvertime);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -267,12 +257,6 @@ class AttApproveWorkingOvertime extends Component {
         });
     }
 
-    componentWillUnmount() {
-        if (this.willFocusScreen) {
-            this.willFocusScreen.remove();
-        }
-    }
-
     onShowModalError = (data, cacheID) => {
         if (this.refModalError && this.refModalError.show) {
             this.refModalError.show(data, cacheID);
@@ -304,7 +288,6 @@ class AttApproveWorkingOvertime extends Component {
                             }}
                             screenName={attApproveWorkingOvertime}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Overtime_list'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
                         {/* </Animated.View> */}

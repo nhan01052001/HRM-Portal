@@ -178,6 +178,7 @@ class AttWorkDayCalendar extends Component {
                 visible: false,
                 dataWorkdayItem: null
             },
+            isVisibleListProfileTimeSheetMaster: false,
             disableBtnViewDetail: moment().date() !== 1
         };
         this.listItemOpenSwipeOut = {}; //[];
@@ -530,30 +531,6 @@ class AttWorkDayCalendar extends Component {
                 ];
             }
 
-            _rowAction = [
-                ..._rowAction,
-                {
-                    type: 'E_BUSINESS',
-                    title: translate('HRM_PortalApp_TakeBusinessTrip_Title'),
-                    icon: require('../../../../assets/images/GPS/TSCLog.png'),
-                    isSheet: false,
-                    onPress: (items) => {
-                        if (this.AttSubmitTakeBusinessTripAddOrEdit) {
-                            if (items) {
-                                this.AttSubmitTakeBusinessTripAddOrEdit.onShow({
-                                    reload: this.refreshList,
-                                    listItem: Array.isArray(items) ? items : [items]
-                                });
-                            } else {
-                                this.AttSubmitTakeBusinessTripAddOrEdit.onShow({
-                                    reload: this.refreshList
-                                });
-                            }
-                        }
-                    }
-                }
-            ];
-
             // if (
             //     permission['New_Att_Overtime_New_Index_WorkDay_btnCreate'] &&
             //     permission['New_Att_Overtime_New_Index_WorkDay_btnCreate']['View']
@@ -684,7 +661,7 @@ class AttWorkDayCalendar extends Component {
                 listDataLateEarly = { keyTras: 'HRM_PortalApp_Wd_LateEarly_Time', data: [], marked: {} },
                 listDataInvalid = { keyTras: 'HRM_PortalApp_Wd_Asynchronous', data: [], marked: {} },
                 listDataLeaveDay = { keyTras: 'HRM_PortalApp_Wd_LeaveDay', data: [], marked: {} },
-                listDataOvertime = { keyTras: 'HRM_PortalApp_OvertimeHour', data: [], marked: {} },
+                listDataOvertime = { keyTras: 'HRM_PortalApp_Wd_OT', data: [], marked: {} },
                 listDataTravel = { keyTras: 'HRM_PortalApp_Wd_Business', data: [], marked: {} },
                 listDataTamscanlog = { keyTras: 'HRM_PortalApp_Wd_Tamscanlog', data: [], marked: {} };
 
@@ -702,7 +679,9 @@ class AttWorkDayCalendar extends Component {
                     TotalLateEarlyCount: null,
                     StandardWorkdayCount: null,
                     LackWorkCount: null,
-                    isEmptyData: true
+                    isEmptyData: true,
+                    TotalTimeSheetActual: null,
+                    ListProfileTimeSheetMaster: []
                 };
 
             if (res && res.Status == EnumName.E_SUCCESS && res.Data && res.Data.length > 0) {
@@ -745,7 +724,7 @@ class AttWorkDayCalendar extends Component {
                                                 )} (${item.EarlyDuration1}${translate('HRM_PortalApp_Mins')})`;
                                             else
                                                 messageTypeView = `${translate('HRM_PortalApp_Lable_EarlyDuration')} (${item.EarlyDuration1
-                                                    }${translate('HRM_PortalApp_Mins')})`;
+                                                }${translate('HRM_PortalApp_Mins')})`;
 
                                             item.isEarly = true;
                                         }
@@ -761,7 +740,7 @@ class AttWorkDayCalendar extends Component {
                                                 )} (${item.LateDuration1}${translate('HRM_PortalApp_Mins')})`;
                                             else
                                                 messageTypeView = `${translate('HRM_PortalApp_Lable_LateDuration')} (${item.LateDuration1
-                                                    }${translate('HRM_PortalApp_Mins')})`;
+                                                }${translate('HRM_PortalApp_Mins')})`;
 
                                             item.isLate = true;
                                         }
@@ -775,7 +754,7 @@ class AttWorkDayCalendar extends Component {
                                             )} (${item.EarlyDuration1}${translate('HRM_PortalApp_Mins')})`;
                                         else
                                             messageTypeView = `${translate('HRM_PortalApp_Lable_EarlyDuration')} (${item.EarlyDuration1
-                                                }${translate('HRM_PortalApp_Mins')})`;
+                                            }${translate('HRM_PortalApp_Mins')})`;
 
                                         item.isEarly = true;
                                     }
@@ -788,7 +767,7 @@ class AttWorkDayCalendar extends Component {
                                             )} (${item.LateDuration1}${translate('HRM_PortalApp_Mins')})`;
                                         else
                                             messageTypeView = `${translate('HRM_PortalApp_Lable_LateDuration')} (${item.LateDuration1
-                                                }${translate('HRM_PortalApp_Mins')})`;
+                                            }${translate('HRM_PortalApp_Mins')})`;
 
                                         item.isLate = true;
                                     }
@@ -865,23 +844,17 @@ class AttWorkDayCalendar extends Component {
                             data: [item]
                         };
                         // -------add data filter ---------------//
-                        if (item.isLate || item.IsLackWorkday || item.isEarly) {
+                        if (item.isLate || item.isMissIn || item.isMissOut || item.isEarly) {
                             listDataViolate.data.push(dataItem);
                             listDataViolate['dateStart'] = dateTime;
                             if (listMarked[dateTime]) listDataViolate['marked'][dateTime] = { ...listMarked[dateTime] };
-
-                            let dayMissInout = res.Data[0]?.TotalLateEarlyCount ?? 0,
-                                dayLackWork = res.Data[0]?.LackWorkCount ?? 0;
-                            listDataViolate.number = dayMissInout + dayLackWork;
                         }
 
-                        if (item.IsLackWorkday && item.ListDataTamScanLog.length == 0) {
+                        if ((item.isMissIn || item.isMissOut) && item.ListDataTamScanLog.length == 0) {
                             listDataMissInOut.data.push(dataItem);
                             listDataMissInOut['dateStart'] = dateTime;
                             if (listMarked[dateTime])
                                 listDataMissInOut['marked'][dateTime] = { ...listMarked[dateTime] };
-
-                            listDataMissInOut.number = res.Data[0]?.LackWorkCount ?? 0;
                         }
 
                         if (item.isLate || item.isEarly) {
@@ -889,8 +862,6 @@ class AttWorkDayCalendar extends Component {
                             listDataLateEarly['dateStart'] = dateTime;
                             if (listMarked[dateTime])
                                 listDataLateEarly['marked'][dateTime] = { ...listMarked[dateTime] };
-
-                            listDataLateEarly.number = res.Data[0]?.TotalLateEarlyCount ?? 0;
                         }
 
                         if (item.ListDataLeaveday && item.ListDataLeaveday.length > 0) {
@@ -899,8 +870,6 @@ class AttWorkDayCalendar extends Component {
 
                             if (listMarked[dateTime])
                                 listDataLeaveDay['marked'][dateTime] = { ...listMarked[dateTime] };
-
-                            listDataLeaveDay.number = res.Data[0]?.TotalLeaveDays ?? 0;
                         }
 
                         if (item.ListDataOvertime && item.ListDataOvertime.length > 0) {
@@ -908,8 +877,6 @@ class AttWorkDayCalendar extends Component {
                             listDataOvertime['dateStart'] = dateTime;
                             if (listMarked[dateTime])
                                 listDataOvertime['marked'][dateTime] = { ...listMarked[dateTime] };
-
-                            listDataOvertime.number = res.Data[0]?.TotalOvertimeHours ?? 0;
                         }
 
                         if (item.ListDataTamScanLog && item.ListDataTamScanLog.length > 0) {
@@ -917,16 +884,12 @@ class AttWorkDayCalendar extends Component {
                             listDataTamscanlog['dateStart'] = dateTime;
                             if (listMarked[dateTime])
                                 listDataTamscanlog['marked'][dateTime] = { ...listMarked[dateTime] };
-
-                            listDataTamscanlog.number = res.Data[0]?.StandardWorkdayCount ?? 0;
                         }
 
                         if (item.ListDataBusiness && item.ListDataBusiness.length > 0) {
                             listDataTravel.data.push(dataItem);
                             listDataTravel['dateStart'] = dateTime;
                             if (listMarked[dateTime]) listDataTravel['marked'][dateTime] = { ...listMarked[dateTime] };
-
-                            listDataTravel.number = res.Data[0]?.TotalBusinessDays ?? 0;
                         }
                         // ------------------------------//
 
@@ -964,7 +927,9 @@ class AttWorkDayCalendar extends Component {
                                 TotalLateEarlyCount: firstItem.TotalLateEarlyCount, // lần trễ/sớm
                                 StandardWorkdayCount: firstItem.StandardWorkdayCount, // ngày công chuẩn
                                 LackWorkCount: firstItem.LackWorkCount, // Thiếu công
-                                isEmptyData: false
+                                isEmptyData: false,
+                                TotalTimeSheetActual: firstItem?.TotalTimeSheetActual, // TPC: tổng công sản phẩm
+                                ListProfileTimeSheetMaster: firstItem?.ListProfileTimeSheetMaster // TPC: DS tổng công sản phẩm theo phòng ban
                             };
                         }
                     }
@@ -988,7 +953,7 @@ class AttWorkDayCalendar extends Component {
                     this.setState(
                         {
                             ...objTotalWorkDay,
-                            dataFilter: { ...dataFilter, ...objTotalWorkDay },
+                            dataFilter: dataFilter,
                             dataCalendar: listData,
                             dataCalendarBackup: [...listData],
                             listMarked: listMarked,
@@ -1005,7 +970,7 @@ class AttWorkDayCalendar extends Component {
                     let today = new Date();
                     this.setState({
                         ...objTotalWorkDay,
-                        dataFilter: { ...dataFilter, ...objTotalWorkDay },
+                        dataFilter: dataFilter,
                         daySelected: moment(today).format('YYYY-MM-DD'),
                         dataCalendar: [],
                         dataCalendarBackup: [],
@@ -1179,7 +1144,7 @@ class AttWorkDayCalendar extends Component {
     };
 
     renderViewTopWorkDay = () => {
-        const { TotalPaidWorkDays, LackWorkCount, TotalLateEarlyCount, dataFilter } = this.state;
+        const { TotalPaidWorkDays, LackWorkCount, TotalLateEarlyCount, TotalTimeSheetActual, dataFilter } = this.state;
         // Có cấu hình ẩn field thì không hiển thị vùng master
         const _configField = ConfigField && ConfigField.value['Workday'] ? ConfigField.value['Workday']['Hidden'] : [];
 
@@ -1276,6 +1241,34 @@ class AttWorkDayCalendar extends Component {
                             </View>
                         </View>
                     )}
+
+                    {/* Tổng công sản phẩm */}
+                    {
+                        TotalTimeSheetActual ? (
+                            <View style={styles.styBox}>
+                                <TouchableOpacity style={styles.styBoxLableView}
+                                    onPress={() => this.handleVisibleListProfileTimeSheetMaster()}
+                                >
+                                    <VnrText
+                                        style={[styleSheets.lable, styles.styboxLable, styles.textUnderline]}
+                                        i18nKey={'HRM_PortalApp_TotalProductOutput'}
+                                        numberOfLines={1}
+                                    />
+                                </TouchableOpacity>
+                                <View>
+                                    <Text
+                                        style={[
+                                            styleSheets.text,
+                                            styles.styboxValue,
+                                            TotalTimeSheetActual > 0 && { color: Colors.red }
+                                        ]}
+                                    >
+                                        {TotalTimeSheetActual ? Vnr_Function.mathRoundNumber(TotalTimeSheetActual) : 0}
+                                    </Text>
+                                </View>
+                            </View>
+                        ) : null
+                    }
                 </View>
 
                 {this.rowAction && Array.isArray(this.rowAction) && this.rowAction.length > 0 && (
@@ -1410,6 +1403,13 @@ class AttWorkDayCalendar extends Component {
         this.onScrollEnd();
     };
 
+    handleVisibleListProfileTimeSheetMaster = () => {
+        const { isVisibleListProfileTimeSheetMaster } = this.state;
+        this.setState({
+            isVisibleListProfileTimeSheetMaster: !isVisibleListProfileTimeSheetMaster
+        })
+    }
+
     render() {
         const {
                 daySelected,
@@ -1421,7 +1421,9 @@ class AttWorkDayCalendar extends Component {
                 isShowModalSubmit,
                 dataFilter,
                 monthYearRange,
-                disableBtnViewDetail
+                disableBtnViewDetail,
+                isVisibleListProfileTimeSheetMaster,
+                ListProfileTimeSheetMaster
             } = this.state,
             { dataWorkdayItem } = isShowModalSubmit;
 
@@ -1518,11 +1520,9 @@ class AttWorkDayCalendar extends Component {
                         ref={(refs) => (this.AttSubmitTamScanLogRegisterAddOrEdit = refs)}
                     />
                     <AttSubmitTakeLeaveDayAddOrEdit ref={(refs) => (this.AttSubmitTakeLeaveDayAddOrEdit = refs)} />
-
                     <AttSubmitTakeBusinessTripAddOrEdit
                         ref={(refs) => (this.AttSubmitTakeBusinessTripAddOrEdit = refs)}
                     />
-
                     <AttSubmitWorkingOvertimeAddOrEdit
                         ref={(refs) => (this.AttSubmitWorkingOvertimeAddOrEdit = refs)}
                     />
@@ -1551,7 +1551,7 @@ class AttWorkDayCalendar extends Component {
                                                 value={`${translate('HRM_PortalApp_Submit_Work')} ${dataWorkdayItem
                                                     ? moment(dataWorkdayItem.WorkDate).format('DD/MM/YYYY')
                                                     : ''
-                                                    }`}
+                                                }`}
                                             />
                                         </View>
 
@@ -1584,6 +1584,78 @@ class AttWorkDayCalendar extends Component {
                             </View>
                         </Modal>
                     )}
+
+                    {isVisibleListProfileTimeSheetMaster && (
+                        <Modal
+                            onBackButtonPress={() => this.handleVisibleListProfileTimeSheetMaster()}
+                            isVisible={isVisibleListProfileTimeSheetMaster}
+                            onBackdropPress={() => this.handleVisibleListProfileTimeSheetMaster()}
+                            customBackdrop={
+                                <TouchableWithoutFeedback onPress={() => this.handleVisibleListProfileTimeSheetMaster()}>
+                                    <View style={styleSheets.coatingOpacity05} />
+                                </TouchableWithoutFeedback>
+                            }
+                            style={CustomStyleSheet.margin(0)}
+                        >
+                            <View style={[styles.styModalDetailItem, { height: Size.deviceheight / 2 }]}>
+                                <SafeAreaView style={[CustomStyleSheet.paddingTop(0), CustomStyleSheet.flex(1)]}>
+                                    <View style={styles.headerCloseModal}>
+                                        <View style={styles.titleModal}>
+                                            <VnrText
+                                                numberOfLines={1}
+                                                style={[styleSheets.lable, styles.titleModal__text]}
+                                                i18nKey={'HRM_PortalApp_ProductList'}
+                                            />
+                                        </View>
+
+                                        <TouchableOpacity onPress={() => this.handleVisibleListProfileTimeSheetMaster()}>
+                                            <IconCancel size={Size.iconSize} color={Colors.gray_10} />
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View
+                                        style={styles.nameTable}
+                                    >
+                                        <View
+                                            style={styles.columnDepartment}
+                                        >
+                                            <Text style={[styleSheets.lable]}>{translate('HRM_PortalApp_Compliment_Department')}</Text>
+                                        </View>
+                                        <View
+                                            style={styles.columnWorkNumber}
+                                        >
+                                            <Text style={[styleSheets.lable]}>{translate('HRM_PortalApp_WorkNumber')}</Text>
+                                        </View>
+                                    </View>
+                                    <ScrollView style={[styles.styCrBtnSubRest, CustomStyleSheet.flex(1)]}>
+                                        {
+                                            (Array.isArray(ListProfileTimeSheetMaster) && ListProfileTimeSheetMaster.length > 0) && (
+                                                ListProfileTimeSheetMaster.map((item, index) => {
+                                                    if (item?.OrgStructuretTransName)
+                                                        return (
+                                                            <View
+                                                                key={index}
+                                                                style={[styles.wrapItemValue, index === ListProfileTimeSheetMaster.length - 1 && CustomStyleSheet.marginBottom(16)]}
+                                                            >
+                                                                <View
+                                                                    style={styles.valueColumnDepartment}
+                                                                >
+                                                                    <Text numberOfLines={2} style={[styleSheets.lable, CustomStyleSheet.maxWidth('85%')]}>{item?.OrgStructuretTransName}</Text>
+                                                                </View>
+                                                                <View
+                                                                    style={styles.valueColumnWorkNumber}
+                                                                >
+                                                                    <Text style={[styleSheets.lable]}>{item?.TotalWorkdaysTimeSheet ?? '0'}</Text>
+                                                                </View>
+                                                            </View>
+                                                        )
+                                                })
+                                            )
+                                        }
+                                    </ScrollView>
+                                </SafeAreaView>
+                            </View>
+                        </Modal>
+                    )}
                 </View>
             </SafeAreaView>
         );
@@ -1592,7 +1664,7 @@ class AttWorkDayCalendar extends Component {
 
 const sizeBtnAdd = Size.iconSizeHeader + 30;
 
-const HEIGHT_BOTTOM_VIEW = Size.deviceheight * 0.1 + Size.defineHalfSpace;
+const HEIGHT_BOTTOM_VIEW = Size.deviceheight * 0.1 + Size.defineHalfSpace + 12;
 
 const styles = StyleSheet.create({
     styAgenda: {
@@ -1817,6 +1889,50 @@ const styles = StyleSheet.create({
         height: '100%',
         zIndex: 1,
         elevation: 1
+    },
+
+    textUnderline: {
+        color: Colors.blue, textDecorationLine: 'underline'
+    },
+
+    nameTable: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: Colors.gray_3,
+        paddingHorizontal: Size.defineSpace
+    },
+
+    columnDepartment: {
+        flex: 0.8,
+        borderRightColor: Colors.gray_7,
+        borderRightWidth: 0.5,
+        paddingVertical: Size.defineSpace
+    },
+
+    columnWorkNumber: {
+        flex: 0.3,
+        borderLeftColor: Colors.gray_7,
+        borderLeftWidth: 0.5,
+        alignItems: 'flex-end',
+        paddingVertical: Size.defineSpace
+    },
+
+    wrapItemValue: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomColor: Colors.gray_5,
+        borderBottomWidth: 0.5
+    },
+    valueColumnDepartment: {
+        flex: 0.8,
+        paddingVertical: Size.defineHalfSpace
+    },
+
+    valueColumnWorkNumber: {
+        flex: 0.2, alignItems: 'flex-end',
+        paddingVertical: Size.defineHalfSpace
     }
 });
 

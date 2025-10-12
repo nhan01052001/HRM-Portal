@@ -14,7 +14,6 @@ import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 import AttSubmitTakeDailyTaskAddOrEdit from './AttSubmitTakeDailyTaskAddOrEdit';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import SafeAreaViewDetail from '../../../../../components/safeAreaView/SafeAreaViewDetail';
-import { translate } from '../../../../../i18n/translate';
 
 const configDefault = [
     {
@@ -220,9 +219,6 @@ export default class AttSubmitTakeDailyTaskViewDetail extends Component {
                         data.Status,
                         dataItem?.SendEmailStatus ? dataItem?.SendEmailStatus : false
                     );
-                    data.OvertimeTypeID1Name = data?.OvertimeHours1 ? data.OvertimeTypeID1Name + `(${data.OvertimeHours1} ${translate('HRM_PortalApp_Hours_Lowercase')})` : data.OvertimeTypeID1Name
-                    data.OvertimeTypeID2Name = data?.OvertimeHours2 ? data.OvertimeTypeID2Name + `(${data.OvertimeHours2} ${translate('HRM_PortalApp_Hours_Lowercase')})` : data.OvertimeTypeID2Name
-                    data.OvertimeTypeID3Name = data?.OvertimeHours3 ? data.OvertimeTypeID3Name + `(${data.OvertimeHours3} ${translate('HRM_PortalApp_Hours_Lowercase')})` : data.OvertimeTypeID3Name
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttach);
                     data.ImagePath = data?.AvatarUserRegister

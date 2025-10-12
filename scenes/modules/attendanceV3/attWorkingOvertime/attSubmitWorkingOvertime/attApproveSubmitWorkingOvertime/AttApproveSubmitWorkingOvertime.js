@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { View, Animated, DeviceEventEmitter } from 'react-native';
+import { View, Animated } from 'react-native';
 import AttWorkingOvertimeList from '../../attWorkingOvertimeList/AttWorkingOvertimeList';
 import {
     styleSheets,
-    styleSafeAreaView
+    styleSafeAreaView,
+    styleContentFilterDesign,
+    styleContentFilterDesignV3
 } from '../../../../../../constants/styleConfig';
+import VnrFilterCommon from '../../../../../../componentsV3/VnrFilter/VnrFilterCommon';
 import { ConfigList } from '../../../../../../assets/configProject/ConfigList';
 import { ScreenName, EnumName, EnumTask } from '../../../../../../assets/constant';
 import {
@@ -22,7 +25,6 @@ let configList = null,
     attSubmitWorkingOvertime = null,
     attSubmitWorkingOvertimeViewDetail = null,
     attApproveSubmitWorkingOvertimeTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttApproveSubmitWorkingOvertime extends Component {
@@ -51,7 +53,7 @@ class AttApproveSubmitWorkingOvertime extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitWorkingOvertimeBusinessFunction.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttSubmitWorkingOvertimeBusinessFunction.setThisForBusiness(this);
             if (AttSubmitWorkingOvertimeBusinessFunction.checkForReLoadScreen[attApproveSubmitWorkingOvertime]) {
                 this.reload();
             }
@@ -61,10 +63,6 @@ class AttApproveSubmitWorkingOvertime extends Component {
     componentWillUnmount() {
         if (this.willFocusScreen) {
             this.willFocusScreen.remove();
-        }
-        if (this.planResultListener) {
-            this.planResultListener.remove();
-            this.planResultListener = null;
         }
     }
 
@@ -166,19 +164,6 @@ class AttApproveSubmitWorkingOvertime extends Component {
                             isInputText: true,
                             isValidInputText: false
                         }
-                    },
-                    {
-                        Type: 'E_REQUEST_CANCEL',
-                        Resource: {
-                            Name: 'New_Att_OvertimePlan_BtnRequestCancel',
-                            Rule: 'View'
-                        },
-                        Confirm: {
-                            isInputText: true,
-                            isValidInputText: false,
-                            isAttachFile: true,
-                            isNotNullAttachFile: true
-                        }
                     }
                 ]
             };
@@ -188,13 +173,13 @@ class AttApproveSubmitWorkingOvertime extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attApproveSubmitWorkingOvertime);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attApproveSubmitWorkingOvertime);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
             filter: filter,
             pageSize: pageSizeList,
-            Status: 'E_WAIT_APPROVED'
+            Status: 'E_APPROVED1,E_APPROVED2,E_FIRST_APPROVED,E_SUBMIT'
         };
 
         return {
@@ -281,19 +266,6 @@ class AttApproveSubmitWorkingOvertime extends Component {
         this.storeParamsDefault = _paramsDefault;
         this.setState(_paramsDefault);
 
-        // Listen plan/result toggle to reload with status
-        this.planResultListener = DeviceEventEmitter.addListener(
-            'ATT_WO_PLAN_RESULT_CHANGED',
-            ({ isPlan }) => {
-                // merge toggle state into filter and reload
-                const nextFilter = {
-                    ...(this.paramsFilter || {}),
-                    IsPlan: isPlan
-                };
-                this.reload(nextFilter);
-            }
-        );
-
         startTask({
             keyTask: attApproveSubmitWorkingOvertimeTask,
             payload: {
@@ -324,6 +296,17 @@ class AttApproveSubmitWorkingOvertime extends Component {
             <SafeAreaViewDetail style={styleSafeAreaView.style}>
                 {attApproveSubmitWorkingOvertime && attSubmitWorkingOvertimeViewDetail && enumName && (
                     <View style={[styleSheets.containerGrey]}>
+                        <VnrFilterCommon
+                            dataBody={dataBody}
+                            style={{
+                                ...styleContentFilterDesign,
+                                ...styleContentFilterDesignV3
+                            }}
+                            screenName={attSubmitWorkingOvertime}
+                            onSubmitEditing={this.reload}
+                            scrollYAnimatedValue={this.scrollYAnimatedValue}
+                        />
+
                         <View style={[styleSheets.container]}>
                             {keyQuery && (
                                 <AttWorkingOvertimeList

@@ -271,7 +271,6 @@ class AttRejectTakeLateEarlyAllowed extends Component {
                             }}
                             screenName={attApproveTakeLateEarlyAllowed}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Late_Early'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

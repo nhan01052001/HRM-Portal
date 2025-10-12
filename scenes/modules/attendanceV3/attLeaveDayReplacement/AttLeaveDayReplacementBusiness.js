@@ -65,8 +65,7 @@ export const AttLeaveDayReplacementBusiness = {
         AttConfirmedLeaveDayReplacement: false,
         AttWaitConfirmLeaveDayReplacement: false
     },
-    setThisForBusiness: (dataThis, rowActionsFromScreen = _rowActions) => {
-        _rowActions = rowActionsFromScreen ?? [];
+    setThisForBusiness: (dataThis) => {
         _this = dataThis;
     },
     //#region [action approve]
@@ -100,13 +99,13 @@ export const AttLeaveDayReplacementBusiness = {
                         LeaveDayID: item?.ID,
                         ProfileID: item?.ProfileID,
                         ShiftID: item?.ShiftID
-                    });
+                    })
                 });
 
                 dataBody = {
                     ...dataBody,
                     ReplacementItem
-                };
+                }
 
                 VnrLoadingSevices.show();
                 HttpService.Post('[URI_CENTER]/api/Att_LeaveDay/GetDataReplacement', { ...dataBody })

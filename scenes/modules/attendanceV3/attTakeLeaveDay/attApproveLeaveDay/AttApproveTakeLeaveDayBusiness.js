@@ -142,15 +142,14 @@ export const AttApproveTakeLeaveDayBusinessFunction = {
     // Đối tượng checkForReLoadScreen để check có refresh AttApprovedTakeLeaveDay không
     checkForReLoadScreen: {
         [ScreenName.AttApprovedTakeLeaveDay]: false,
-        AttApproveTakeLeaveDay: false,
         AttRejectTakeLeaveDay: false,
         AttCanceledTakeLeaveDay: false,
         AttAllTakeLeaveDay: false
     },
-    setThisForBusiness: (dataThis, isNotification, rowActionsFromScreen = _rowActions) => {
+    setThisForBusiness: (dataThis, isNotification) => {
         if (isNotification) _isOnScreenNotification = true;
         else _isOnScreenNotification = false;
-        _rowActions = rowActionsFromScreen ?? [];
+
         _this = dataThis;
     },
     checkRequireNote: async (field) => {
@@ -248,7 +247,7 @@ export const AttApproveTakeLeaveDayBusinessFunction = {
 
         let actionCancel = _rowActions.find(item => item.Type === 'E_APPROVE'),
             isConfirm = actionCancel['Confirm'];
-        const isNote = await AttApproveTakeLeaveDayBusinessFunction.checkRequireNote('IsRequiredApproveNote');
+        const isNote = await AttApproveTakeLeaveDayBusinessFunction.checkRequireNote('IsRequiredApproveNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -446,7 +445,7 @@ export const AttApproveTakeLeaveDayBusinessFunction = {
     confirmReject: async (objValid) => {
         let actionCancel = _rowActions.find(item => item.Type === 'E_REJECT'),
             isConfirm = actionCancel['Confirm'];
-        const isNote = await AttApproveTakeLeaveDayBusinessFunction.checkRequireNote('IsRequiredRejectNote');
+        const isNote = await AttApproveTakeLeaveDayBusinessFunction.checkRequireNote('IsRequiredRejectNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],
@@ -635,7 +634,7 @@ export const AttApproveTakeLeaveDayBusinessFunction = {
     confirmCancel: async (objValid) => {
         let actionCancel = _rowActions.find(item => item.Type === 'E_CANCEL'),
             isConfirm = actionCancel['Confirm'];
-        const isNote = await AttApproveTakeLeaveDayBusinessFunction.checkRequireNote('IsRequiredCancelNote');
+        const isNote = await AttApproveTakeLeaveDayBusinessFunction.checkRequireNote('IsRequiredCancelNote')
 
         if (isConfirm) {
             let isInputText = isConfirm['isInputText'],

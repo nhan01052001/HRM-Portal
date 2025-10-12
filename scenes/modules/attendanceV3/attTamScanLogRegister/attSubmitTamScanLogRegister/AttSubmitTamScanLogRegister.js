@@ -24,7 +24,6 @@ let configList = null,
     attSubmitTamScanLogRegister = null,
     attSubmitTamScanLogRegisterViewDetail = null,
     attSubmitTamScanLogRegisterKeyTask = null,
-    dataRowActionAndSelected = null,
     pageSizeList = 20;
 
 class AttSubmitTamScanLogRegister extends Component {
@@ -53,7 +52,7 @@ class AttSubmitTamScanLogRegister extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitTamScanLogRegisterBusinessFunction.setThisForBusiness(this, dataRowActionAndSelected?.rowActions);
+            AttSubmitTamScanLogRegisterBusinessFunction.setThisForBusiness(this);
             if (AttSubmitTamScanLogRegisterBusinessFunction.checkForReLoadScreen[attSubmitTamScanLogRegister]) {
                 this.reload();
             }
@@ -195,19 +194,6 @@ class AttSubmitTamScanLogRegister extends Component {
                             isInputText: true,
                             isValidInputText: false
                         }
-                    },
-                    {
-                        Type: 'E_REQUEST_CANCEL',
-                        Resource: {
-                            Name: 'Att_TamScanLogRegister_BtnRequestCancel',
-                            Rule: 'View'
-                        },
-                        Confirm: {
-                            isInputText: true,
-                            isValidInputText: false,
-                            isAttachFile: true,
-                            isNotNullAttachFile: true
-                        }
                     }
                 ]
             };
@@ -217,7 +203,7 @@ class AttSubmitTamScanLogRegister extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTamScanLogRegister);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTamScanLogRegister);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -347,7 +333,6 @@ class AttSubmitTamScanLogRegister extends Component {
                             }}
                             screenName={attSubmitTamScanLogRegister}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Approve_Attendance_Tamscan_Log_List'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

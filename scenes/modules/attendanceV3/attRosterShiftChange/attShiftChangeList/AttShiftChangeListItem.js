@@ -6,8 +6,7 @@ import {
     TouchableOpacity,
     Animated,
     TouchableWithoutFeedback,
-    Dimensions,
-    Platform
+    Dimensions
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Colors, CustomStyleSheet, Size, styleSheets, stylesScreenDetailV3 } from '../../../../../constants/styleConfig';
@@ -17,12 +16,12 @@ import Vnr_Function from '../../../../../utils/Vnr_Function';
 import { translate } from '../../../../../i18n/translate';
 import {
     IconCheck,
-    IconInfo,
+    IconDate,
     IconChat
 } from '../../../../../constants/Icons';
 import Color from 'color';
 import RightActions from '../../../../../componentsV3/ListButtonMenuRight/RightActions';
-import VnrFormatStringTypeItem from '../../../../../componentsV3/VnrFormatStringType/VnrFormatStringTypeItem';
+import { dataConvertDate } from '../attSubmitShiftChange/AttSubmitShiftChangeAddOrEdit';
 
 export default class AttShiftChangeListItem extends React.Component {
     constructor(props) {
@@ -103,47 +102,27 @@ export default class AttShiftChangeListItem extends React.Component {
             rowActions,
             isOpenAction,
             isDisable,
-            handerOpenSwipeOut,
-            renderConfig
+            hiddenFiled,
+            handerOpenSwipeOut
         } = this.props;
 
         let colorStatusView = null,
             textFieldSalary = '',
             bgStatusView = null,
-            isHaveAvatar = false;
+            isHaveAvatar = false,
+            dateChangeShift = null,
+            nameChangeShift = null;
+
+        hiddenFiled &&
+            typeof hiddenFiled == 'object' &&
+            Object.keys(hiddenFiled).forEach(key => {
+                if (!hiddenFiled[key]) {
+                    dataItem[key] = null;
+                }
+            });
 
         const { DataStatus } = dataItem;
         isHaveAvatar = DataStatus?.UserProcessName ? true : false;
-        let _renderConfig = [];
-        if (renderConfig && renderConfig.length > 0)
-            _renderConfig = renderConfig.filter(config => config.TypeView !== 'E_STATUS');
-
-        if (dataItem.Type === 'E_DIFFERENTDAY' ||
-            dataItem.Type === 'E_CHANGE_SHIFT_COMPANSATION' ||
-            dataItem.Type === 'E_SAMEDAY') {
-            _renderConfig = _renderConfig.flatMap(item => {
-                if (item.DataType === 'DateToFrom') {
-                    return [
-                        {
-                            TypeView: 'E_COMMON',
-                            Name: 'DateStart',
-                            DisplayKey: 'HRM_PortalApp_ShiftChangeDate',
-                            DataType: 'DateToFrom',
-                            DataFormat: 'DD/MM/YYYY'
-                        },
-                        {
-                            TypeView: 'E_COMMON',
-                            Name: 'AlternateDate',
-                            DisplayKey: 'HRM_PortalApp_TheReplacementDay',
-                            DataType: 'DateToFrom',
-                            DataFormat: 'DD/MM/YYYY'
-                        }
-                    ];
-                } else {
-                    return item;
-                }
-            });
-        }
 
         // xử lý color
         if (dataItem.itemStatus) {
@@ -174,7 +153,68 @@ export default class AttShiftChangeListItem extends React.Component {
                 ? true
                 : false;
 
-        let isDisableWhenConfig = dataItem?.IsDisable ? true : false;
+        const CHAR = '->';
+        if (dataItem?.StrChangeDate && dataItem?.StrChangeDate.split(CHAR)?.length === 2) {
+            dateChangeShift = <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                allowFontScaling
+                style={[styleSheets.lable, styles.styleTextViewTop]}
+            >
+                <Text style={styles.lineThrough}>
+                    {dataItem?.StrChangeDate.split(CHAR)[0]}
+                </Text>
+                {' '}
+                <Text>
+                    {CHAR}{dataItem?.StrChangeDate.split(CHAR)[1]}
+                </Text>
+            </Text>
+        } else if (dataItem?.DateStart && dataItem?.DateEnd) {
+            dateChangeShift = <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                allowFontScaling
+                style={[styleSheets.lable, styles.styleTextViewTop]}
+            >
+                <Text style={styles.lineThrough}>{moment(dataItem?.DateStart).format('DD/MM/YYYY')}</Text>
+                {' '}
+                <Text>
+                    {CHAR}{moment(dataItem?.DateEnd).format('DD/MM/YYYY')}
+                </Text>
+            </Text>
+        }
+
+        if (dataItem?.ReplacementStaff && dataItem?.ChangeDate && dataItem[`${dataConvertDate[moment(dataItem.ChangeDate).weekday()].split('|')[1]}Name`]) {
+            nameChangeShift = <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                allowFontScaling
+                style={[styleSheets.lable, styles.styleTextViewTop]}
+            >
+                {dataItem[`${dataConvertDate[moment(dataItem.ChangeDate).weekday()].split('|')[1]}Name`]}
+            </Text>
+        } else {
+            for (let i = 0; i < 7; i++) {
+                let itemConvertDate = dataConvertDate[i].split('|'),
+                    shiftName = itemConvertDate[1];
+                if (dataItem[`${shiftName}Name`] && dataItem[`${shiftName}NameBefore`]) {
+                    nameChangeShift = <Text
+                        numberOfLines={2}
+                        adjustsFontSizeToFit
+                        allowFontScaling
+                        style={[styleSheets.lable, styles.styleTextViewTop]}
+                    >
+                        <Text style={styles.lineThrough}>{dataItem[`${shiftName}NameBefore`]}</Text>
+                        {' '}
+                        <Text>
+                            {CHAR} {dataItem[`${shiftName}Name`]}
+                        </Text>
+                    </Text>
+
+                    break;
+                }
+            }
+        }
 
         return (
             <Swipeable
@@ -192,14 +232,14 @@ export default class AttShiftChangeListItem extends React.Component {
                 }}
                 overshootRight={false}
                 renderRightActions={
-                    permissionRightAction && isDisableWhenConfig === false
+                    permissionRightAction
                         ? () => <RightActions rowActions={rowActions} dataItem={dataItem} />
                         : this.rightActionsEmpty
                 }
                 friction={0.6}
                 containerStyle={[styles.swipeable]}
             >
-                <View style={[styles.swipeableLayout, isDisableWhenConfig && styleSheets.opacity05]}>
+                <View style={[styles.swipeableLayout]}>
                     <View style={styles.left_isCheckbox}>
                         {rowActions === null || (Array.isArray(rowActions) && rowActions.length === 0) ? null : (
                             <View
@@ -241,26 +281,8 @@ export default class AttShiftChangeListItem extends React.Component {
                                     {/* top */}
                                     <View style={styles.styViewTop}>
                                         {/* Top - left */}
-                                        <View style={[styles.wh69]}>
-                                            {
-                                                dataItem?.ProfileInfo2?.ProfileName2 && (
-                                                    <View>
-                                                        {Vnr_Function.renderAvatarCricleByName(
-                                                            dataItem?.ProfileInfo2?.ImagePath2,
-                                                            dataItem?.ProfileInfo2?.ProfileName2,
-                                                            38
-                                                        )}
-                                                    </View>
-                                                )
-                                            }
-
-                                            {
-                                                dataItem?.ProfileInfo2?.ProfileName2 && (
-                                                    <View style={[CustomStyleSheet.marginLeft(6), CustomStyleSheet.justifyContent('center')]}>
-                                                        <Text numberOfLines={2} style={[styleSheets.lable, CustomStyleSheet.fontSize(16)]}>{dataItem?.ProfileInfo2?.ProfileName2}</Text>
-                                                    </View>
-                                                )
-                                            }
+                                        <View style={styles.wh69}>
+                                            {dateChangeShift ? dateChangeShift : null}
                                         </View>
 
                                         {/* Top - right */}
@@ -289,16 +311,43 @@ export default class AttShiftChangeListItem extends React.Component {
                                         </View>
                                     </View>
 
-                                    {(_renderConfig.length > 0) && (
-                                        _renderConfig.map((item, index) => {
-                                            return (
-                                                <View style={[CustomStyleSheet.paddingRight(16)]} key={index}>
-                                                    <VnrFormatStringTypeItem key={index} data={dataItem} col={item} allConfig={_renderConfig} />
+                                    {
+                                        nameChangeShift && (
+                                            <View
+                                                style={
+                                                    CustomStyleSheet.marginVertical(2)
+                                                }
+                                            >
+                                                {nameChangeShift}
+                                            </View>
+                                        )
+                                    }
+
+                                    {
+                                        dataItem?.ProfileInfo2?.ProfileName2 && (
+                                            <View
+                                                style={[styles.viewStatusBottom, CustomStyleSheet.paddingRight(0)]}
+                                            >
+                                                <View style={[styles.leftContent, isDisable ? styleSheets.opacity05 : styleSheets.opacity1]}>
+                                                    {Vnr_Function.renderAvatarCricleByName(
+                                                        dataItem?.ProfileInfo2?.ImagePath2,
+                                                        dataItem?.ProfileInfo2?.ProfileName2,
+                                                        20
+                                                    )}
                                                 </View>
-                                            );
-                                        })
-                                    )}
-                                    {dataItem.Comment != null && (
+                                                <View style={styles.styUserApprove}>
+                                                    <Text numberOfLines={1} style={[styleSheets.lable, styles.textProfileName]}>
+                                                        {dataItem?.ProfileInfo2?.ProfileName2
+                                                            ? dataItem?.ProfileInfo2?.ProfileName2
+                                                            : null}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        )
+                                    }
+
+                                    {/* cennter */}
+                                    {!!dataItem?.Comment && (
                                         <View style={styles.wrapContentCenter}>
                                             <View style={styles.styIconMess}>
                                                 <IconChat size={Size.text + 1} color={Colors.gray_8} />
@@ -308,19 +357,19 @@ export default class AttShiftChangeListItem extends React.Component {
                                                     numberOfLines={2}
                                                     style={[styleSheets.text, styles.viewReason_text]}
                                                 >
-                                                    {dataItem.Comment ? `${dataItem.Comment}` : ''}
+                                                    {dataItem.Comment}
                                                 </Text>
                                             </View>
                                         </View>
                                     )}
                                 </View>
-                                <View style={styles.viewStatusBottom}>
+                                <View style={[styles.viewStatusBottom]}>
                                     <View style={[styles.leftContent, isDisable ? styleSheets.opacity05 : styleSheets.opacity1]}>
                                         {isHaveAvatar
                                             ? Vnr_Function.renderAvatarCricleByName(
                                                 DataStatus.ImagePath,
-                                                  DataStatus?.UserProcessName,
-                                                  20
+                                                DataStatus?.UserProcessName,
+                                                20
                                             )
                                             : null}
                                     </View>
@@ -337,18 +386,23 @@ export default class AttShiftChangeListItem extends React.Component {
                                     ) : (
                                         <View style={styles.styUserApprove} />
                                     )}
+
+                                    {dataItem?.DateEnd && (
+                                        <View style={styles.styViewDate}>
+                                            {isHaveAvatar && (
+                                                <Text style={[styleSheets.text, styles.dateTimeSubmit_Text]}>
+                                                    {'|  '}
+                                                </Text>
+                                            )}
+
+                                            <IconDate size={Size.text - 1} color={Colors.gray_7} />
+
+                                            <Text style={[styleSheets.text, styles.dateTimeSubmit_Text]}>
+                                                {moment(dataItem.DateEnd).format('DD/MM/YYYY')}
+                                            </Text>
+                                        </View>
+                                    )}
                                 </View>
-                                {dataItem.WarningViolation && (
-                                    <View style={styles.viewLimitTitle}>
-                                        <IconInfo color={Colors.red} size={Size.text} />
-                                        <Text
-                                            numberOfLines={1}
-                                            style={[styleSheets.lable, styles.viewReasoLimitTitle_text]}
-                                        >
-                                            {translate('HRM_Attendance_Limit_Violation_Title')}
-                                        </Text>
-                                    </View>
-                                )}
                             </View>
                         </View>
                     </TouchableWithoutFeedback>
@@ -362,6 +416,11 @@ const PADDING_DEFINE = Size.defineSpace;
 const styles = StyleSheet.create({
     styUserApprove: {
         flexShrink: 1
+    },
+    styViewDate: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 2
     },
     swipeable: {
         flex: 1
@@ -385,17 +444,9 @@ const styles = StyleSheet.create({
         borderRadius: Size.borderRadiusCircle
         // padding: 4
     },
-    viewLimitTitle: {
-        width: '100%',
-        marginBottom: PADDING_DEFINE / 2,
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row'
-    },
-    viewReasoLimitTitle_text: {
-        fontSize: Size.text - 1,
-        color: Colors.red,
-        marginLeft: 5
+    viewReason_text: {
+        fontSize: Size.textSmall,
+        color: Colors.gray_9
     },
     lineSatus_text: {
         fontSize: Size.text - 3,
@@ -410,6 +461,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    dateTimeSubmit_Text: {
+        fontSize: Size.text - 2,
+        color: Colors.gray_8,
+        marginLeft: 3
+    },
     contentMain: {
         flex: 1,
         paddingTop: Size.defineSpace
@@ -422,6 +478,11 @@ const styles = StyleSheet.create({
     },
     leftContent: {
         marginRight: 5
+    },
+    styleTextViewTop: {
+        // fontWeight: fw,
+        color: Colors.gray_10,
+        fontSize: Size.text + 1
     },
 
     left_isCheckbox: {
@@ -452,18 +513,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingRight: 12
     },
-    textProfileName: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: Colors.blue
-    },
-    wh69: {
-        width: '69%',
-        maxWidth: '69%',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start'
-    },
+
     wrapContentCenter: {
         flex: 1,
         flexDirection: 'row',
@@ -479,8 +529,16 @@ const styles = StyleSheet.create({
         paddingLeft: 6,
         marginTop: 2
     },
-    viewReason_text: {
-        fontSize: Size.textSmall,
-        color: Colors.gray_9
+
+    textProfileName: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: Colors.blue
+    },
+
+    wh69: { width: '69%', maxWidth: '69%' },
+    lineThrough: {
+        textDecorationLine: 'line-through',
+        textDecorationStyle: 'solid'
     }
 });

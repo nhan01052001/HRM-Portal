@@ -889,8 +889,7 @@ export default class AlertComponent extends Component {
             textSecondConfirm,
             limit,
             textLimit,
-            limitFile,
-            colorRightButton
+            limitFile
         } = modal;
 
         let _showConfirm = showConfirm === undefined || showConfirm ? true : false,
@@ -1002,11 +1001,7 @@ export default class AlertComponent extends Component {
                             style={[stylesAlert.bnt_Second, !_showConfirm && CustomStyleSheet.borderRightWidth(0)]}
                         >
                             <VnrText
-                                style={[
-                                    styleSheets.lable,
-                                    stylesAlert.bnt_Ok__text,
-                                    { color: colorRightButton ? colorRightButton : colorConfirm }
-                                ]}
+                                style={[styleSheets.lable, stylesAlert.bnt_Ok__text, { color: colorConfirm }]}
                                 i18nKey={
                                     !Vnr_Function.CheckIsNullOrEmpty(textRightButton) ? textRightButton : keyTextConfirm
                                 }
@@ -1407,8 +1402,7 @@ export default class AlertComponent extends Component {
 
     // #region: modal V3
     renderButtonAlertV3 = (modal) => {
-        const { isValidInputText, textRightButton, id, iconType, limit, textLimit, limitFile } = modal,
-            numRegexTextEmpty = /^\s+$/;
+        const { isValidInputText, textRightButton, id, iconType, limit, textLimit, limitFile } = modal;
 
         let colorConfirm = null,
             keyTextConfirm = '',
@@ -1418,7 +1412,6 @@ export default class AlertComponent extends Component {
                     textLimit &&
                     this.state.inputValue &&
                     this.state.inputValue.length > limit) ||
-                numRegexTextEmpty.test(this.state.inputValue) == true ||
                 (this.state.FileAttachment.isOverLimitFile && this.state.FileAttachment.value.length > limitFile) ||
                 (isValidInputText && this.state.inputValue.length === 0);
 
@@ -1517,21 +1510,8 @@ export default class AlertComponent extends Component {
     };
 
     renderModalV3 = (modal) => {
-        const { inputValue, FileAttachment } = this.state,
-            {
-                iconType,
-                isVisible,
-                title,
-                message,
-                id,
-                autoFocus,
-                placeholder,
-                isValidInputText,
-                isAttachFile,
-                isNotNullAttachFile,
-                limitFile,
-                textLimitFile
-            } = modal;
+        const { inputValue } = this.state,
+            { iconType, isVisible, title, message, id, autoFocus, placeholder, isValidInputText } = modal;
 
         if (autoFocus && autoFocus === true) {
             this.autoFocusInput();
@@ -1607,59 +1587,6 @@ export default class AlertComponent extends Component {
                                         onChangeText={(text) => this.setState({ inputValue: text })}
                                     />
                                 </View>
-                                {isAttachFile && (
-                                    <VnrAttachFile
-                                        ref={(ref) => (this.refVnrAttachFile = ref)}
-                                        fieldValid={isNotNullAttachFile ? isNotNullAttachFile : false}
-                                        lable={FileAttachment.lable}
-                                        refresh={FileAttachment.refresh}
-                                        value={FileAttachment.value}
-                                        multiFile={true}
-                                        style={stylesAlert.styVnrAttach}
-                                        styleUserUpload={CustomStyleSheet.paddingHorizontal(0)}
-                                        uri={'[URI_CENTER]/api/Sys_Common/saveFileFromApp'}
-                                        onFinish={(file) => {
-                                            if (Array.isArray(file) && file.length > limitFile) {
-                                                this.setState({
-                                                    FileAttachment: {
-                                                        ...FileAttachment,
-                                                        refresh: !FileAttachment.refresh,
-                                                        isOverLimitFile: true
-                                                    }
-                                                });
-                                            } else {
-                                                this.setState({
-                                                    FileAttachment: {
-                                                        ...FileAttachment,
-                                                        value: file,
-                                                        refresh: !FileAttachment.refresh,
-                                                        isOverLimitFile: false
-                                                    }
-                                                });
-                                            }
-                                        }}
-                                    >
-                                        <TouchableOpacity
-                                            style={stylesAlert.stylesBtnAttach}
-                                            onPress={() =>
-                                                this.refVnrAttachFile ? this.refVnrAttachFile.showActionSheet() : null
-                                            }
-                                        >
-                                            <VnrText
-                                                style={[styleSheets.text, { color: Colors.white }]}
-                                                i18nKey={FileAttachment.lable}
-                                            />
-                                        </TouchableOpacity>
-                                    </VnrAttachFile>
-                                )}
-
-                                {FileAttachment?.isOverLimitFile ? (
-                                    <View style={CustomStyleSheet.paddingHorizontal(5)}>
-                                        <Text numberOfLines={2} style={CustomStyleSheet.color(Colors.red)}>
-                                            {translate(textLimitFile)}
-                                        </Text>
-                                    </View>
-                                ) : null}
                             </View>
                         </View>
 

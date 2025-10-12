@@ -172,7 +172,7 @@ export default class VisaViewDetail extends Component {
                 return;
             }
 
-            HttpService.Get(`[URI_CENTER]/api/Hre_Personal/GetProfileUniformByProfileID?profileID=${profileID}`).then((res) => {
+            HttpService.Get(`[URI_CENTER]/Hre_Personal/GetProfileUniformByProfileID?profileID=${profileID}`).then((res) => {
                 if (!res) {
                     this.setState({ dataItem: 'EmptyData' });
                     return;
@@ -184,7 +184,7 @@ export default class VisaViewDetail extends Component {
                 this.setState({ configListDetail: _configListDetail, dataItem: res });
             }).catch((error) => {
                 DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
-            });
+            })
         } catch (error) {
             DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
         }

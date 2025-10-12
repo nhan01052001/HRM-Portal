@@ -24,7 +24,6 @@ let configList = null,
     attSubmitTakeDailyTask = null,
     attSubmitTakeDailyTaskViewDetail = null,
     attSubmitTakeDailyTaskKeyTask = null,
-    dataRowActionAndSelected= null,
     pageSizeList = 20;
 
 class AttSubmitTakeDailyTask extends Component {
@@ -53,7 +52,7 @@ class AttSubmitTakeDailyTask extends Component {
 
         this.willFocusScreen = this.props.navigation.addListener('willFocus', () => {
             // Trường hợp goBack từ detail thì phải gán lại this
-            AttSubmitTakeDailyTaskBusiness.setThisForBusiness(this, dataRowActionAndSelected.rowActions);
+            AttSubmitTakeDailyTaskBusiness.setThisForBusiness(this);
             if (AttSubmitTakeDailyTaskBusiness.checkForReLoadScreen[attSubmitTakeDailyTask]) {
                 this.reload();
             }
@@ -197,7 +196,7 @@ class AttSubmitTakeDailyTask extends Component {
             filter = _configList[enumName.E_Filter],
             dataFromParams = this.checkDataFormNotify();
 
-        dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeDailyTask);
+        const dataRowActionAndSelected = generateRowActionAndSelected(attSubmitTakeDailyTask);
         let _params = {
             ...dataFromParams,
             IsPortalNew: true,
@@ -328,7 +327,6 @@ class AttSubmitTakeDailyTask extends Component {
                             }}
                             screenName={attSubmitTakeDailyTask}
                             onSubmitEditing={this.reload}
-                            tblName={'Filter_Register_Daily_Work'}
                             scrollYAnimatedValue={this.scrollYAnimatedValue}
                         />
 

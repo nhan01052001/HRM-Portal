@@ -12,6 +12,7 @@ import ListButtonMenuRight from '../../../../../components/ListButtonMenuRight/L
 import { EnumName, ScreenName } from '../../../../../assets/constant';
 import Vnr_Services from '../../../../../utils/Vnr_Services';
 import SafeAreaViewDetail from '../../../../../components/safeAreaView/SafeAreaViewDetail';
+import ManageFileSevice from '../../../../../utils/ManageFileSevice';
 
 const configDefault = [
     {
@@ -29,12 +30,12 @@ const configDefault = [
     {
         'TypeView': 'E_COMMON',
         'Name': 'TitlePosting',
-        'DisplayKey': 'HRM_PortalApp_PostingPlan_JobPostingTitle',
+        'DisplayKey': 'HRM_PortalApp_HreProcessingPostingPlan_TitlePosting',
         'DataType': 'string'
     },
     {
         'TypeView': 'E_COMMON',
-        'Name': 'JobVacancyNameList',
+        'Name': 'EmployeeTypeName',
         'DisplayKey': 'HRM_PortalApp_HreProcessingPostingPlan_EmployeeTypeName',
         'DataType': 'string'
     },
@@ -81,7 +82,7 @@ const configDefault = [
     {
         'TypeView': 'E_COMMON',
         'Name': 'SubMajorNameList',
-        'DisplayKey': 'HRM_PortalApp_HreProcessingPostingPlan_SubMajorNameList',
+        'DisplayKey': 'HRM_PortalApp_HreProcessingJobPosting_SubMajorNameList',
         'DataType': 'string'
     },
     {
@@ -99,7 +100,7 @@ const configDefault = [
     {
         'TypeView': 'E_COMMON',
         'Name': 'Experience',
-        'DisplayKey': 'HRM_PortalApp_HreProcessingPostingPlan_Experience',
+        'DisplayKey': 'HRM_PortalApp_HreRecruitmentProposalProcessing_Experience',
         'DataType': 'string'
     },
     {
@@ -111,7 +112,7 @@ const configDefault = [
     {
         'TypeView': 'E_COMMON',
         'Name': 'IndustryNameList',
-        'DisplayKey': 'HRM_PortalApp_HreProcessingPostingPlan_IndustryNameList',
+        'DisplayKey': 'HRM_PortalApp_HreProcessingJobPosting_IndustryNameList',
         'DataType': 'string'
     },
     {

@@ -23,11 +23,10 @@ import ListButtonMenuRight from '../../../../../components/ListButtonMenuRight/L
 import DrawerServices from '../../../../../utils/DrawerServices';
 import { EnumName, EnumStatus, ScreenName } from '../../../../../assets/constant';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { IconDelete, IconEdit, IconPlus } from '../../../../../constants/Icons';
+import { IconDelete, IconPlus } from '../../../../../constants/Icons';
 import moment from 'moment';
 import { translate } from '../../../../../i18n/translate';
 import { VnrLoadingSevices } from '../../../../../components/VnrLoading/VnrLoadingPages';
-import { PermissionForAppMobile } from '../../../../../assets/configProject/PermissionForAppMobile';
 
 const configDefault = [
     {
@@ -67,7 +66,6 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
         this.state = {
             dataItem: null,
             configListDetail: null,
-            configListDetailInfoEmployee: null,
             dataRowActionAndSelected: generateRowActionAndSelected(),
             listActions: this.resultListActionHeader()
         };
@@ -111,10 +109,7 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
             const _params = this.props.navigation.state.params,
                 { screenName, dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params),
                 _configListDetail =
-                    ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault,
-                _configListDetailInfoEmployee =
-                    ConfigListDetail.value['SalApprovePaymentCostRegisterViewDetailInfoEmployee'] ?? null;
-
+                    ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
             if (!Vnr_Function.CheckIsNullOrEmpty(dataId) || isReload) {
                 VnrLoadingSevices.show();
                 let _ID = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
@@ -148,7 +143,6 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
 
                 VnrLoadingSevices.hide();
                 this.setState({
-                    configListDetailInfoEmployee: _configListDetailInfoEmployee,
                     configListDetail: _configListDetail,
                     dataItem: {
                         ...dataDetail,
@@ -185,7 +179,6 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
 
                 if (objGroup && Object.keys(objGroup).length > 0) {
                     this.setState({
-                        configListDetailInfoEmployee: _configListDetailInfoEmployee,
                         configListDetail: _configListDetail,
                         dataItem: {
                             ...dataItem,
@@ -196,7 +189,6 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
                     });
                 } else {
                     this.setState({
-                        configListDetailInfoEmployee: _configListDetailInfoEmployee,
                         configListDetail: _configListDetail,
                         dataItem: { ...dataItem }
                     });
@@ -224,13 +216,8 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
         SalSubmitPaymentCostRegisterBusinessFunction.businessDeleteSalPaymentCost([item]);
     };
 
-    onEditFeeCheck = (item, MasterData, fullDataCost) => {
-        SalSubmitPaymentCostRegisterBusinessFunction.businessModifyRecord(item, MasterData, fullDataCost);
-    }
-
-    rightActions = (item, fullDataCost) => {
+    rightActions = (item) => {
         const { dataItem } = this.state;
-
         if (dataItem && dataItem.BusinessAllowAction && dataItem.BusinessAllowAction.indexOf(EnumName.E_MODIFY) > -1) {
             return (
                 <View style={styles.styRightActionView}>
@@ -248,42 +235,6 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
                             />
                         </TouchableOpacity>
                     </View>
-
-                    {
-                        (PermissionForAppMobile.value['New_Sal_ConfirmPaymentCost_New_Index_btnEdit_In_FeeCheck']
-                            && PermissionForAppMobile.value['New_Sal_ConfirmPaymentCost_New_Index_btnEdit_In_FeeCheck']['View'])
-                        && (
-                            <View style={[styles.viewIconDelete, { backgroundColor: Colors.warning }]}>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        const MasterData = {
-                                            ID: dataItem?.ID,
-                                            ProfileID: dataItem?.ProfileID,
-                                            RequestPeriod: dataItem?.RequestPeriod,
-                                            PaymentPeriod: dataItem?.PaymentPeriod,
-                                            UserApproveID: dataItem?.UserApproveID,
-                                            UserApproveID2: dataItem?.UserApproveID2,
-                                            UserApproveID3: dataItem?.UserApproveID3,
-                                            UserApproveID4: dataItem?.UserApproveID4,
-                                            IsPortal: true,
-                                            UserSubmit: dataItem?.UserSubmitID,
-                                            UserSubmitID: dataItem?.UserSubmitID,
-                                            Status: dataItem?.Status
-                                        };
-
-                                        this.onEditFeeCheck(item, MasterData, fullDataCost);
-                                    }}
-                                    style={styles.styBtnDelete}
-                                >
-                                    <IconEdit size={Size.iconSize} color={Colors.white} />
-                                    <VnrText
-                                        style={[styleSheets.text, styles.styBtnDeleteText]}
-                                        i18nKey={'HRM_System_Resource_Sys_Edit'}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                        )
-                    }
                 </View>
             );
         } else {
@@ -296,7 +247,7 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
         this.getDataItem();
     }
 
-    initLableValue = (item, fullDataCost) => {
+    initLableValue = (item) => {
         const { styViewValue, viewLable, styTextValueInfo } = stylesScreenDetailV2;
         let styTextValue = { ...styleSheets.text, ...styTextValueInfo },
             styTextLable = { ...styleSheets.lable, ...{ textAlign: 'left' } };
@@ -325,7 +276,7 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
         }
 
         return (
-            <Swipeable overshootRight={false} renderRightActions={() => this.rightActions(item, fullDataCost)} friction={0.6}>
+            <Swipeable overshootRight={false} renderRightActions={() => this.rightActions(item)} friction={0.6}>
                 <View style={styles.styContentData}>
                     <View style={styles.styItemData}>
                         <View style={viewLable}>
@@ -337,10 +288,11 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
                         <View style={styViewValue}>
                             <VnrText
                                 style={styTextLable}
-                                value={`${(item.TotalAmount != null && item.TotalAmount != '') || item.TotalAmount == 0
-                                    ? Vnr_Function.formatNumber(item.TotalAmount)
-                                    : ''
-                                    } `}
+                                value={`${
+                                    (item.TotalAmount != null && item.TotalAmount != '') || item.TotalAmount == 0
+                                        ? Vnr_Function.formatNumber(item.TotalAmount)
+                                        : ''
+                                } `}
                             />
                         </View>
                     </View>
@@ -357,8 +309,9 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
                         <View style={[styViewValue, CustomStyleSheet.minWidth(130)]}>
                             <VnrText
                                 style={[styTextValue, styles.styTextValueCus]}
-                                value={`${translate('QuantityCalculate')}: ${item.Quantity ? item.Quantity : ''} ${item.UnitView ? item.UnitView : ''
-                                    }`}
+                                value={`${translate('QuantityCalculate')}: ${item.Quantity ? item.Quantity : ''} ${
+                                    item.UnitView ? item.UnitView : ''
+                                }`}
                             />
                         </View>
                     </View>
@@ -368,8 +321,9 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
                         <View style={styViewValue}>
                             <VnrText
                                 style={[styTextValue, styles.styTextValueCus]}
-                                value={`${translate('HRM_Category_PaymentAmount_Specification')}: ${item.Specification ? item.Specification : ''
-                                    }`}
+                                value={`${translate('HRM_Category_PaymentAmount_Specification')}: ${
+                                    item.Specification ? item.Specification : ''
+                                }`}
                             />
                         </View>
                     </View>
@@ -379,26 +333,14 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
     };
 
     render() {
-        const { dataItem, configListDetail, listActions, configListDetailInfoEmployee } = this.state,
+        const { dataItem, configListDetail, listActions } = this.state,
             { styTextGroup, containerItemDetail } = stylesScreenDetailV2;
-
 
         let contentViewDetail = <VnrLoading size={'large'} />;
         if (dataItem && dataItem.listDataCost && configListDetail) {
             contentViewDetail = (
                 <View style={styleSheets.containerGrey}>
                     <ScrollView style={styles.styScrollDeteil}>
-                        {
-                            (configListDetailInfoEmployee
-                                && this.props.navigation.state.params?.screenName !== ScreenName.SalSubmitPaymentCostRegister)
-                            && (
-                                <View style={containerItemDetail}>
-                                    {configListDetailInfoEmployee.map((e) => {
-                                        return Vnr_Function.formatStringTypeV2(dataItem, e);
-                                    })}
-                                </View>
-                            )
-                        }
                         {Object.keys(dataItem.listDataCost).map((key, index) => (
                             <View key={index} style={styles.styBlock}>
                                 <View style={styles.styTopTitle}>
@@ -428,7 +370,7 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
 
                                 <View style={styles.styViewData}>
                                     {dataItem.listDataCost[key] &&
-                                        dataItem.listDataCost[key].map((e) => this.initLableValue(e, dataItem.listDataCost[key]))}
+                                        dataItem.listDataCost[key].map((e) => this.initLableValue(e))}
                                 </View>
 
                                 {dataItem.listDataTotalCost[key] && (
@@ -456,11 +398,12 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
 
                             <VnrText
                                 style={[styleSheets.lable, styTextGroup, styles.styTextGroupTotal]}
-                                value={`${(dataItem.TotalAmount != null && dataItem.TotalAmount != '') ||
+                                value={`${
+                                    (dataItem.TotalAmount != null && dataItem.TotalAmount != '') ||
                                     dataItem.TotalAmount == 0
-                                    ? Vnr_Function.formatNumber(dataItem.TotalAmount)
-                                    : ''
-                                    } ${dataItem.Specification ? dataItem.Specification : ''}`}
+                                        ? Vnr_Function.formatNumber(dataItem.TotalAmount)
+                                        : ''
+                                } ${dataItem.Specification ? dataItem.Specification : ''}`}
                             />
                         </View>
 
@@ -490,11 +433,12 @@ export default class SalSubmitPaymentCostRegisterViewDetail extends Component {
 
                             <VnrText
                                 style={[styleSheets.lable, styTextGroup]}
-                                value={`${(dataItem.TotalAmount != null && dataItem.TotalAmount != '') ||
+                                value={`${
+                                    (dataItem.TotalAmount != null && dataItem.TotalAmount != '') ||
                                     dataItem.TotalAmount == 0
-                                    ? Vnr_Function.formatNumber(dataItem.TotalAmount)
-                                    : ''
-                                    } ${dataItem.Specification ? dataItem.Specification : ''}`}
+                                        ? Vnr_Function.formatNumber(dataItem.TotalAmount)
+                                        : ''
+                                } ${dataItem.Specification ? dataItem.Specification : ''}`}
                             />
                         </View>
 

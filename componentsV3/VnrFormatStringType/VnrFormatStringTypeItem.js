@@ -397,17 +397,17 @@ const styles = StyleSheet.create({
         paddingVertical: 5
     },
     styViewValue: {
-        flex: 8,
+        flexShrink: 1,
         justifyContent: 'center',
         alignItems: 'flex-end',
         paddingLeft: Size.defineSpace,
         minWidth: 160 - Size.defineSpace * 2
     },
     viewLable: {
-        flex: 2,
+        flexShrink: 1,
         justifyContent: 'center',
         alignItems: 'flex-start',
-        minWidth: 160 - Size.defineSpace * 2
+        minWidth: 160
     },
     styTextLableInfo: {
         fontSize: Size.text - 1,

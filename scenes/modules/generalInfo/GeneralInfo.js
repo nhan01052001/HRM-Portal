@@ -40,7 +40,6 @@ import ProfileAdditonComponent from './profileInfo/profileAddition/ProfileAddito
 import GradeComponent from './gradeInfo/GradeComponent';
 import VisaComponent from './profileInfo/visa/VisaComponent';
 import LoanComponent from './profileInfo/loan/LoanComponent';
-import PassportComponent from './profileInfo/passport/PassportComponent';
 
 class GeneralInfo extends Component {
     constructor(props) {
@@ -418,7 +417,59 @@ class GeneralInfo extends Component {
                     {PermissionForAppMobile &&
                         PermissionForAppMobile.value['HR_Passport_Portal'] &&
                         PermissionForAppMobile.value['HR_Passport_Portal']['View'] && (
-                        <PassportComponent styles={styles} initLableValue={this.initLableValue} />
+                        <View style={styles.styBlock}>
+                            <View style={styles.styTopTitle}>
+                                <View style={styles.styWrap}>
+                                    <VnrText
+                                        style={[styleSheets.lable, styles.styTitle]}
+                                        i18nKey={'ProfilePersonalInfoToInput__E_Passport'}
+                                        numberOfLines={1}
+                                    />
+                                </View>
+
+                                <TouchableOpacity
+                                    style={styles.styWrapRight}
+                                    onPress={() => DrawerServices.navigate('TopTabPassportInfo')}
+                                >
+                                    <VnrText
+                                        style={[styleSheets.text, styles.styTextDetail]}
+                                        i18nKey={'HRM_Common_ViewMore'}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.styViewData}>
+                                {isShowNoPassport &&
+                                        this.initLableValue(profile, {
+                                            Name: 'PassportNo',
+                                            DisplayKey: 'HRM_HR_Profile_PassportNo',
+                                            DataType: 'string'
+                                        })}
+
+                                {isShowPlacePassport &&
+                                        this.initLableValue(profile, {
+                                            Name: 'PassportPlaceNew',
+                                            DisplayKey: 'HRM_HR_Profile_PassportPlaceOfIssue',
+                                            DataType: 'string'
+                                        })}
+
+                                {isShowDatePassport &&
+                                        this.initLableValue(profile, {
+                                            Name: 'PassportDateOfIssue',
+                                            DisplayKey: 'HRM_HR_Profile_PassportDateOfIssue',
+                                            DataType: 'DateTime',
+                                            DataFormat: 'DD/MM/YYYY'
+                                        })}
+
+                                {isShowDateExpirationPassport &&
+                                        this.initLableValue(profile, {
+                                            Name: 'PassportDateOfExpiry',
+                                            DisplayKey: 'HRM_HR_Profile_PassportDateOfExpiry',
+                                            DataType: 'DateTime',
+                                            DataFormat: 'DD/MM/YYYY'
+                                        })}
+                            </View>
+                        </View>
                     )}
 
                     {/* Visa */}

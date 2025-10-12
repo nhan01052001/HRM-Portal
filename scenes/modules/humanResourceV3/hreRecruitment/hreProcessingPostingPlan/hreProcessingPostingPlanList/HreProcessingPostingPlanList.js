@@ -55,6 +55,7 @@ export default class HreProcessingPostingPlanList extends VnrRenderList {
                         } else if (res && Array.isArray(res)) {
                             data = [...res];
                         }
+                        console.log(data, 'data');
 
 
                         data.map(item => {
