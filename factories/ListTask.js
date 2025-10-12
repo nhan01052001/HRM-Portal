@@ -4006,7 +4006,8 @@ export default {
                         HttpService.Post(
                             '[URI_HR]/Por_GetData/GetConfigByKey',
                             dataBodyGetConfigPhoto
-                        )
+                        ),
+                        HttpService.Post('[URI_HR]/Por_GetData/NewPortal_GetProfile'),
                         // HttpService.Post(
                         //     '[URI_HR]/Por_GetData/Get_TAMScanLogOrderTimeLogDesc',
                         //     { ProfileID: dataVnrStorage.currentUser.info.ProfileID },

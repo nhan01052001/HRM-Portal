@@ -125,5 +125,7 @@ export default {
     HRM_PortalApp_TotalGuestMeal: 'Tổng suất ăn khách',
     HRM_PortalApp_MealHistory: 'Lịch sử suất ăn',
     HRM_PortalApp_GuestMeal: 'suất khách',
-    HRM_PortalApp_OTMeal: 'suất ăn OT'
+    HRM_PortalApp_OTMeal: 'suất ăn OT',
+
+    HRM_PortalApp_CheckinGPS_StopWorking: 'Nhân viên đã nghỉ việc ngày E_DATE. Không thể chấm công.'
 };

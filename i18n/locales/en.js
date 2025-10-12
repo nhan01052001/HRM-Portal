@@ -139,5 +139,7 @@ export default {
     HRM_PortalApp_TotalGuestMeal: 'Total guest meals',
     HRM_PortalApp_MealHistory: 'Meal history',
     HRM_PortalApp_GuestMeal: 'guest meals',
-    HRM_PortalApp_OTMeal: 'OT meals'
+    HRM_PortalApp_OTMeal: 'OT meals',
+
+    HRM_PortalApp_CheckinGPS_StopWorking: 'Employee was terminated on E_DATE. Cannot perform timekeeping.'
 };

@@ -114,7 +114,8 @@ class GoogleMaps extends Component {
             },
             typeRequestData: null,
             networkInfo: props.detailsNetwork,
-            appState: AppState.currentState
+            appState: AppState.currentState,
+            dateStopWorking: null
         };
 
         this.ResMapViewComponent = null;
@@ -224,8 +225,8 @@ class GoogleMaps extends Component {
                 this.isShowAlert = false;
                 Platform.OS === 'ios'
                     ? DrawerServices.navigate(
-                        dataVnrStorage.languageApp === 'VN' ? 'TutorialGPSiOS' : 'TutorialGPSiOSEn'
-                    )
+                          dataVnrStorage.languageApp === 'VN' ? 'TutorialGPSiOS' : 'TutorialGPSiOSEn'
+                      )
                     : AndroidOpenSettings.locationSourceSettings();
             }
         });
@@ -621,8 +622,8 @@ class GoogleMaps extends Component {
                             let listTimeRequest = checkIn.listTimeRequest
                                 ? checkIn.listTimeRequest
                                 : checkOut.listTimeRequest
-                                    ? checkOut.listTimeRequest
-                                    : [];
+                                  ? checkOut.listTimeRequest
+                                  : [];
 
                             //#region đánh giá app sau khi chấm công thành công và tốc độ cao = Chỉ làm check out
                             // if (_dataVnrStorage.isFinishedRateApp == false) {
@@ -788,7 +789,8 @@ class GoogleMaps extends Component {
         this.isConfirmMACAdressNotMatch = false;
         this.isConfirmCoodinateNotMatch = false;
         VnrLoadingSevices.hide();
-        if (error && error != EnumName.E_REQUEST_NO_RESPONSE) DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
+        if (error && error != EnumName.E_REQUEST_NO_RESPONSE)
+            DrawerServices.navigate('ErrorScreen', { ErrorDisplay: error });
     };
 
     requestGetCoondinateInBeforce = () => {
@@ -892,7 +894,15 @@ class GoogleMaps extends Component {
                 const res1 = resAll[0],
                     resWorkPlace = resAll[1],
                     resCheckingByCoordinates = resAll[2],
-                    resConstraintPhoto = resAll[3];
+                    resConstraintPhoto = resAll[3],
+                    resProfile = resAll[4];
+                let nextState = {};
+
+                if (moment().isSameOrAfter(moment(parseInt(resProfile?.DateQuit.match(/\d+/)[0])))) {
+                    nextState = {
+                        dateStopWorking: resProfile?.DateQuit
+                    };
+                }
 
                 let resDataInOut = null;
                 if (isReloadData && _TimeLogCheckIn) {
@@ -1002,6 +1012,7 @@ class GoogleMaps extends Component {
                         checkIn = { ...resDataInOut, ...{ isCheck: true } };
                         this.setState(
                             {
+                                ...nextState,
                                 checkIn,
                                 checkOut,
                                 imageCamera: null,
@@ -1032,6 +1043,7 @@ class GoogleMaps extends Component {
                         }
                         this.setState(
                             {
+                                ...nextState,
                                 checkIn,
                                 checkOut,
                                 imageCamera: null,
@@ -1061,6 +1073,7 @@ class GoogleMaps extends Component {
                     }
                     this.setState(
                         {
+                            ...nextState,
                             checkIn,
                             checkOut,
                             imageCamera: null,
@@ -1582,7 +1595,8 @@ class GoogleMaps extends Component {
             configConstraintInOut,
             configLoadWorkPlace,
             isloading,
-            configConstraintDistanceWithRadious
+            configConstraintDistanceWithRadious,
+            dateStopWorking
         } = this.state;
 
         const coordinate = { latitude: latitude, longitude: longitude };
@@ -1649,21 +1663,21 @@ class GoogleMaps extends Component {
                                 checkIn.TimeLog != undefined &&
                                 checkIn.TimeLog != null &&
                                 configConstraintInOut && (
-                                <View style={styles.viewAddressTime}>
-                                    <View style={styles.viewAddressTime_Left}>
-                                        <VnrText i18nKey={'InTime'} />
-                                        <Text style={[styleSheets.lable, styles.viewAddressTime_TimeIn]}>
-                                            {moment(checkIn.TimeLog).format('hh:mm A')}
-                                        </Text>
+                                    <View style={styles.viewAddressTime}>
+                                        <View style={styles.viewAddressTime_Left}>
+                                            <VnrText i18nKey={'InTime'} />
+                                            <Text style={[styleSheets.lable, styles.viewAddressTime_TimeIn]}>
+                                                {moment(checkIn.TimeLog).format('hh:mm A')}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.viewAddressTime_right}>
+                                            <TimeWork
+                                                TimeCheckIn={checkIn.TimeLog}
+                                                style={styles.viewAddressTime_Countdown}
+                                            />
+                                        </View>
                                     </View>
-                                    <View style={styles.viewAddressTime_right}>
-                                        <TimeWork
-                                            TimeCheckIn={checkIn.TimeLog}
-                                            style={styles.viewAddressTime_Countdown}
-                                        />
-                                    </View>
-                                </View>
-                            )}
+                                )}
                             <View style={styles.viewAddressTime}>
                                 <IconMap color={Colors.black} size={Size.text + 2} />
                                 <Text
@@ -1689,7 +1703,19 @@ class GoogleMaps extends Component {
                         <View style={styles.viewButton}>
                             <TouchableOpacity
                                 style={styles.viewButton_circle}
-                                onPress={() => this.checkConstraintPhotoSaveInOut('E_IN')}
+                                onPress={() => {
+                                    if (dateStopWorking) {
+                                        ToasterSevice.showWarning(
+                                            `${translate('HRM_PortalApp_CheckinGPS_StopWorking')}`.replace(
+                                                'E_DATE',
+                                                moment(dateStopWorking).format('DD/MM/YYYY')
+                                            )
+                                        );
+                                        return;
+                                    }
+
+                                    this.checkConstraintPhotoSaveInOut('E_IN');
+                                }}
                             >
                                 <IconFinger
                                     color={Colors.white}
@@ -1703,7 +1729,18 @@ class GoogleMaps extends Component {
                         <View style={styles.viewButton}>
                             <TouchableOpacity
                                 style={styles.button_End}
-                                onPress={() => this.checkConstraintPhotoSaveInOut('E_OUT')}
+                                onPress={() => {
+                                    if (dateStopWorking) {
+                                        ToasterSevice.showWarning(
+                                            `${translate('HRM_PortalApp_CheckinGPS_StopWorking')}`.replace(
+                                                'E_DATE',
+                                                moment(dateStopWorking).format('DD/MM/YYYY')
+                                            )
+                                        );
+                                        return;
+                                    }
+                                    this.checkConstraintPhotoSaveInOut('E_OUT');
+                                }}
                             >
                                 <IconTime color={Colors.white} size={Size.iconSize} />
                                 <VnrText
@@ -1719,7 +1756,18 @@ class GoogleMaps extends Component {
                     <View style={styles.viewButtonCheckInOut}>
                         <TouchableOpacity
                             style={styles.bntCheckIn}
-                            onPress={() => this.checkConstraintPhotoSaveInOut('E_IN')}
+                            onPress={() => {
+                                if (dateStopWorking) {
+                                    ToasterSevice.showWarning(
+                                        `${translate('HRM_PortalApp_CheckinGPS_StopWorking')}`.replace(
+                                            'E_DATE',
+                                            moment(dateStopWorking).format('DD/MM/YYYY')
+                                        )
+                                    );
+                                    return;
+                                }
+                                this.checkConstraintPhotoSaveInOut('E_IN');
+                            }}
                         >
                             <VnrText
                                 i18nKey={'HRM_Common_CheckIn'}
@@ -1733,7 +1781,18 @@ class GoogleMaps extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.bntCheckOut}
-                            onPress={() => this.checkConstraintPhotoSaveInOut('E_OUT')}
+                            onPress={() => {
+                                if (dateStopWorking) {
+                                    ToasterSevice.showWarning(
+                                        `${translate('HRM_PortalApp_CheckinGPS_StopWorking')}`.replace(
+                                            'E_DATE',
+                                            moment(dateStopWorking).format('DD/MM/YYYY')
+                                        )
+                                    );
+                                    return;
+                                }
+                                this.checkConstraintPhotoSaveInOut('E_OUT');
+                            }}
                         >
                             <VnrText
                                 i18nKey={'HRM_Common_CheckOut'}
@@ -1757,8 +1816,8 @@ class GoogleMaps extends Component {
                             styles.viewMap,
                             configConstraintDistanceWithRadious &&
                                 configConstraintDistanceWithRadious.listCoordinatesView && {
-                                backgroundColor: Colors.gray_2
-                            }
+                                    backgroundColor: Colors.gray_2
+                                }
                         ]}
                     >
                         {viewMapcomponentWithAdress}
