@@ -180,7 +180,7 @@ export default class AttApproveTakeBusinessTripViewDetail extends Component {
         try {
             const _params = this.props.navigation.state.params,
                 { screenName, dataId, dataItem } = typeof _params == 'object' ? _params : JSON.parse(_params),
-                _configListDetail = ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
+                _configListDetail = configDefault;//ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
 
             let id = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
 

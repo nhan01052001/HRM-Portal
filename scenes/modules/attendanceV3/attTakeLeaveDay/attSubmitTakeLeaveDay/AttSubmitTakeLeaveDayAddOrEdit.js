@@ -869,7 +869,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         }
                     };
 
-                    this.setState(nextState, () => { });
+                    this.setState(nextState, () => {});
                 }
             });
         }
@@ -940,10 +940,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove,
                 value: response.UserApproveID
                     ? {
-                        UserInfoName: response.UserApproveName,
-                        ID: response.UserApproveID,
-                        AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
-                    }
+                          UserInfoName: response.UserApproveName,
+                          ID: response.UserApproveID,
+                          AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove.refresh
@@ -952,10 +952,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove3,
                 value: response.UserApproveID3
                     ? {
-                        UserInfoName: response.UserApproveName3,
-                        ID: response.UserApproveID3,
-                        AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
-                    }
+                          UserInfoName: response.UserApproveName3,
+                          ID: response.UserApproveID3,
+                          AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove3.refresh
@@ -964,10 +964,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove4,
                 value: response.UserApproveID4
                     ? {
-                        UserInfoName: response.UserApproveName4,
-                        ID: response.UserApproveID4,
-                        AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
-                    }
+                          UserInfoName: response.UserApproveName4,
+                          ID: response.UserApproveID4,
+                          AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove4.refresh
@@ -976,10 +976,10 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                 ...UserApprove2,
                 value: response.UserApproveID
                     ? {
-                        UserInfoName: response.UserApproveName2,
-                        ID: response.UserApproveID2,
-                        AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
-                    }
+                          UserInfoName: response.UserApproveName2,
+                          ID: response.UserApproveID2,
+                          AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
+                      }
                     : null,
                 disable: true,
                 refresh: !UserApprove2.refresh
@@ -1061,7 +1061,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnReset',
             message: 'HRM_PortalApp_OnReset_Message',
-            onCancel: () => { },
+            onCancel: () => {},
             onConfirm: () => {
                 const { DateFromTo, SimilarRegistration } = this.state;
                 if (DateFromTo.value && DateFromTo.value.length > 0) {
@@ -1131,7 +1131,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
             iconType: EnumIcon.E_WARNING,
             title: 'HRM_PortalApp_OnDeleteItemDay',
             textRightButton: 'Confirm',
-            onCancel: () => { },
+            onCancel: () => {},
             onConfirm: () => {
                 const { DateFromTo } = this.state;
                 if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 1) {
@@ -1157,32 +1157,41 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         const { DateFromTo, SimilarRegistration } = this.state;
         if (DateFromTo.value && Array.isArray(DateFromTo.value) && DateFromTo.value.length > 0) {
             if (SimilarRegistration.value) {
-                this.setState({
+                this.setState(
+                    {
+                        DateFromTo: {
+                            ...DateFromTo,
+                            value: date,
+                            refresh: !DateFromTo.refresh
+                        }
+                    },
+                    () => this.getApprovalProcess()
+                );
+            } else {
+                if (DateFromTo.value[index]) DateFromTo.value[index] = moment(new Date(date)).format('YYYY-MM-DD');
+
+                this.setState(
+                    {
+                        DateFromTo: {
+                            ...DateFromTo,
+                            value: DateFromTo.value,
+                            refresh: !DateFromTo.refresh
+                        }
+                    },
+                    () => this.getApprovalProcess()
+                );
+            }
+        } else if (date.endDate && date.startDate) {
+            this.setState(
+                {
                     DateFromTo: {
                         ...DateFromTo,
                         value: date,
                         refresh: !DateFromTo.refresh
                     }
-                }, () => this.getApprovalProcess());
-            } else {
-                if (DateFromTo.value[index]) DateFromTo.value[index] = moment(new Date(date)).format('YYYY-MM-DD');
-
-                this.setState({
-                    DateFromTo: {
-                        ...DateFromTo,
-                        value: DateFromTo.value,
-                        refresh: !DateFromTo.refresh
-                    }
-                }, () => this.getApprovalProcess());
-            }
-        } else if (date.endDate && date.startDate) {
-            this.setState({
-                DateFromTo: {
-                    ...DateFromTo,
-                    value: date,
-                    refresh: !DateFromTo.refresh
-                }
-            }, () => this.getApprovalProcess());
+                },
+                () => this.getApprovalProcess()
+            );
         }
     };
 
@@ -1240,13 +1249,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
     onSave = (isSend, isconfirm) => {
         if (this.isProcessing) return;
         let lstLeaveDayItem = [];
-        const {
-                DateFromTo,
-                Profile,
-                modalErrorDetail,
-                params,
-                SimilarRegistration
-            } = this.state,
+        const { DateFromTo, Profile, modalErrorDetail, params, SimilarRegistration } = this.state,
             { apiConfig } = dataVnrStorage,
             { uriPor } = apiConfig,
             { record } = params;
@@ -1398,7 +1401,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                                 this.onSave(isSend);
                                             },
                                             //đóng
-                                            onCancel: () => { },
+                                            onCancel: () => {},
                                             //chi tiết lỗi
                                             textRightButton: translate('Button_Detail'),
                                             onConfirm: () => {
@@ -1425,7 +1428,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             ),
                                             textRightButton: translate('Button_Detail'),
                                             //đóng popup
-                                            onCancel: () => { },
+                                            onCancel: () => {},
                                             //chi tiết lỗi
                                             onConfirm: () => {
                                                 this.setState(
@@ -1459,7 +1462,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                             this.onSave(isSend);
                                         },
                                         //đóng
-                                        onCancel: () => { },
+                                        onCancel: () => {},
                                         //chi tiết lỗi
                                         textRightButton: translate('Button_Detail'),
                                         onConfirm: () => {
@@ -1497,7 +1500,7 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     iconType: EnumIcon.E_CONFIRM,
                     title: 'HRM_PortalApp_OnSave_Temp',
                     message: 'HRM_PortalApp_OnSave_Temp_Message',
-                    onCancel: () => { },
+                    onCancel: () => {},
                     onConfirm: () => {
                         callSave();
                         AttSubmitTakeLeaveDayBusinessFunction.checkForReLoadScreen[ScreenName.AttSubmitTakeLeaveDay] =
@@ -1632,16 +1635,21 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
         const { Profile } = this.state;
         HttpService.Get(`[URI_CENTER]/api/Att_LeaveDay/GetLeaveDayFundsRemaining?profileID=${Profile.ID}`).then(
             (resGetRemaining) => {
-
                 let nextState = {};
                 if (
                     resGetRemaining?.Status === 'SUCCESS' &&
                     Array.isArray(resGetRemaining?.Data) &&
                     resGetRemaining?.Data.length > 0
                 ) {
+                    // Cộng tất cả LeaveDaysRegister
+                    const totalLeaveDays = resGetRemaining?.Data.reduce((sum, item) => {
+                        const text = item?.FundsRemainingDetail?.LeaveDaysRegister || '0';
+                        const num = parseFloat(text); // parse "1.00 Ngày" → 1.00
+                        return sum + (isNaN(num) ? 0 : num);
+                    }, 0);
                     nextState = {
                         ...nextState,
-                        totalRemain: resGetRemaining?.Data.reduce((sum, item) => sum + (item.Remain || 0), 0),
+                        totalRemain: totalLeaveDays,
                         listRemainingLeaveFunds: [...resGetRemaining?.Data],
                         isConfigRemainLeavefunds: true,
                         isLoadingGetRemain: false
@@ -1684,7 +1692,8 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 
                     <View>
                         <Text style={[CustomStyleSheet.fontSize(14), CustomStyleSheet.fontWeight('700')]}>
-                            {translate('HRM_PortalApp_LeaveDay_TotalLeaveDaysTaken')}: {totalRemain} {translate('HRM_PortalApp_TSLRegister_day')}
+                            {translate('HRM_PortalApp_LeaveDay_TotalLeaveDaysTaken')}: {totalRemain}{' '}
+                            {translate('HRM_PortalApp_TSLRegister_day')}
                         </Text>
                     </View>
                 </View>
@@ -1804,7 +1813,16 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
                         ListFooterComponent={() => {
-                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                            return (
+                                <VnrApprovalProcess
+                                    ref={(ref) => (this.refApproval = ref)}
+                                    ToasterSevice={() => this.ToasterSeviceCallBack()}
+                                    isEdit={
+                                        PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']
+                                    }
+                                    data={dataApprovalProcess}
+                                />
+                            );
                         }}
                         ListHeaderComponent={this.renderRemain}
                     />
@@ -1845,7 +1863,16 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                         keyExtractor={(item, index) => index}
                         ItemSeparatorComponent={() => <View style={styles.separate} />}
                         ListFooterComponent={() => {
-                            return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                            return (
+                                <VnrApprovalProcess
+                                    ref={(ref) => (this.refApproval = ref)}
+                                    ToasterSevice={() => this.ToasterSeviceCallBack()}
+                                    isEdit={
+                                        PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']
+                                    }
+                                    data={dataApprovalProcess}
+                                />
+                            );
                         }}
                         ListHeaderComponent={this.renderRemain}
                     />
@@ -1887,7 +1914,14 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                     keyExtractor={(item, index) => index}
                     ItemSeparatorComponent={() => <View style={styles.separate} />}
                     ListFooterComponent={() => {
-                        return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={() => this.ToasterSeviceCallBack()} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                        return (
+                            <VnrApprovalProcess
+                                ref={(ref) => (this.refApproval = ref)}
+                                ToasterSevice={() => this.ToasterSeviceCallBack()}
+                                isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']}
+                                data={dataApprovalProcess}
+                            />
+                        );
                     }}
                     ListHeaderComponent={this.renderRemain}
                 />
@@ -2106,27 +2140,29 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
 
         this.showLoading(true);
         const payload = {
-            'ProfileID': Profile.ID,
-            'WorkDate': Array.isArray(DateFromTo.value) ? moment(DateFromTo.value[0]).format('YYYY/MM/DD') : moment(DateFromTo.value).format('YYYY/MM/DD'),
-            'BusinessType': 'E_LEAVEDAY'
+            ProfileID: Profile.ID,
+            WorkDate: Array.isArray(DateFromTo.value)
+                ? moment(DateFromTo.value[0]).format('YYYY/MM/DD')
+                : moment(DateFromTo.value).format('YYYY/MM/DD'),
+            BusinessType: 'E_LEAVEDAY'
         };
 
-        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload).then((res) => {
-            this.showLoading(false);
-            if (res?.Status === EnumName.E_SUCCESS) {
-                this.setState({
-                    dataApprovalProcess: res.Data
-                });
-            } else {
+        HttpService.Post('[URI_CENTER]/api/Sys_Common/GetDataApproveByProfileID', payload)
+            .then((res) => {
+                this.showLoading(false);
+                if (res?.Status === EnumName.E_SUCCESS) {
+                    this.setState({
+                        dataApprovalProcess: res.Data
+                    });
+                } else {
+                    this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
+                }
+            })
+            .catch(() => {
+                this.showLoading(false);
                 this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
-            }
-
-        }).catch(() => {
-            this.showLoading(false);
-            this.ToasterSevice.showError('HRM_PortalApp_CannotFetchApprovalProcess');
-        });
-
-    }
+            });
+    };
 
     render() {
         const {
@@ -2213,17 +2249,17 @@ class AttSubmitTakeLeaveDayAddOrEdit extends React.Component {
                                 DateFromTo.value &&
                                 Array.isArray(DateFromTo.value) &&
                                 DateFromTo.value.length > 1 && (
-                                <View>
-                                    <VnrSwitch
-                                        lable={'HRM_PortalApp_TakeLeave_Similar'}
-                                        subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
-                                        value={SimilarRegistration.value}
-                                        onFinish={(value) => {
-                                            this.onChangeSimilarRegistration(value);
-                                        }}
-                                    />
-                                </View>
-                            )}
+                                    <View>
+                                        <VnrSwitch
+                                            lable={'HRM_PortalApp_TakeLeave_Similar'}
+                                            subLable={'HRM_PortalApp_TakeLeave_Similar_Detail'}
+                                            value={SimilarRegistration.value}
+                                            onFinish={(value) => {
+                                                this.onChangeSimilarRegistration(value);
+                                            }}
+                                        />
+                                    </View>
+                                )}
 
                             <KeyboardAvoidingView
                                 scrollEnabled={true}

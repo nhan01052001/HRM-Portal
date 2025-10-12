@@ -6,17 +6,16 @@ import { ConfigListDetail } from '../../../../../assets/configProject/ConfigList
 import Vnr_Function from '../../../../../utils/Vnr_Function';
 import {
     generateRowActionAndSelected,
-    AttSubmitTakeBusinessTripBusinessFunction
-} from './AttSubmitTakeBusinessTripBusiness';
+    AttApproveBackWorkBeforeMaternityBusinessFunction
+} from './AttApproveBackWorkBeforeMaternityBusiness';
 import VnrLoading from '../../../../../components/VnrLoading/VnrLoading';
 import EmptyData from '../../../../../components/EmptyData/EmptyData';
 import HttpService from '../../../../../utils/HttpService';
-import DrawerServices from '../../../../../utils/DrawerServices';
 import ListButtonMenuRight from '../../../../../components/ListButtonMenuRight/ListButtonMenuRight';
-import Vnr_Services from '../../../../../utils/Vnr_Services';
 import { EnumName } from '../../../../../assets/constant';
+import Vnr_Services from '../../../../../utils/Vnr_Services';
 import ManageFileSevice from '../../../../../utils/ManageFileSevice';
-import AttSubmitTakeBusinessTripAddOrEdit from './AttSubmitTakeBusinessTripAddOrEdit';
+import { ScreenName } from '../../../../../assets/constant';
 
 const configDefault = [
     {
@@ -86,49 +85,31 @@ const configDefault = [
     },
     {
         TypeView: 'E_GROUP',
-        DisplayKey: 'HRM_PortalApp_Leaveinformation',
+        DisplayKey: 'HRM_PortalApp_BackWorkBeforeMaternity_Leaveinformation',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
         Name: 'RegisterDate',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_WorkDate',
+        DisplayKey: 'HRM_PortalApp_BackWorkBeforeMaternity_WorkDate',
         DataType: 'DateToFrom',
         DataFormat: 'DD/MM/YYYY'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'TimeHours',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Time',
+        Name: 'BackWorkReasonName',
+        DisplayKey: 'HRM_PortalApp_BackWorkBeforeMaternity_Reason',
         DataType: 'string'
     },
     {
         TypeView: 'E_COMMON',
-        Name: 'WorkPlaceBussinessName',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Location',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'ContactInfo',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_ContactInfo',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'Content',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Content',
-        DataType: 'string'
-    },
-    {
-        TypeView: 'E_COMMON',
-        Name: 'PreparationWork',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_PreparationWork',
+        Name: 'Note',
+        DisplayKey: 'HRM_PortalApp_BackWorkBeforeMaternity_Note',
         DataType: 'string'
     },
     {
         TypeView: 'E_GROUP',
-        DisplayKey: 'HRM_PortalApp_TakeBusinessTrip_Attachments',
+        DisplayKey: 'HRM_PortalApp_BackWorkBeforeMaternity_Attachments',
         DataType: 'string'
     },
     {
@@ -144,29 +125,16 @@ const configDefault = [
     }
 ];
 
-export default class AttSubmitTakeBusinessTripViewDetail extends Component {
+export default class AttApproveBackWorkBeforeMaternityViewDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
             dataItem: null,
             configListDetail: null,
-            dataRowActionAndSelected: generateRowActionAndSelected(),
+            dataRowActionAndSelected: generateRowActionAndSelected(ScreenName.AttApproveBackWorkBeforeMaternity),
             listActions: this.resultListActionHeader()
         };
-
-        this.AttSubmitTakeBusinessTripAddOrEdit = null;
     }
-
-    onEdit = (item) => {
-        if (item) {
-            if (this.AttSubmitTakeBusinessTripAddOrEdit && this.AttSubmitTakeBusinessTripAddOrEdit.onShow) {
-                this.AttSubmitTakeBusinessTripAddOrEdit.onShow({
-                    reload: this.reload,
-                    record: item
-                });
-            }
-        }
-    };
 
     resultListActionHeader = () => {
         const _params = this.props.navigation.state.params;
@@ -176,14 +144,14 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
         return [];
     };
 
-    rowActionsHeaderRight = (dataItem) => {
+    rowActionsHeaderRight = dataItem => {
         let _listActions = [];
         const { rowActions } = this.state.dataRowActionAndSelected;
         if (
             !Vnr_Function.CheckIsNullOrEmpty(rowActions) &&
             !Vnr_Function.CheckIsNullOrEmpty(dataItem.BusinessAllowAction)
         ) {
-            _listActions = rowActions.filter((item) => {
+            _listActions = rowActions.filter(item => {
                 return dataItem.BusinessAllowAction.indexOf(item.type) >= 0;
             });
         }
@@ -197,25 +165,24 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
                 _configListDetail = configDefault;//ConfigListDetail.value[screenName] != null ? ConfigListDetail.value[screenName] : configDefault;
 
             let id = !Vnr_Function.CheckIsNullOrEmpty(dataId) ? dataId : dataItem.ID;
+
             if (id) {
                 const response = await HttpService.Get(
-                    `[URI_CENTER]/api/Att_BussinessTravel/GetDetailBusinessTripById?ID=${id}`
+                    `[URI_CENTER]/api/Att_BackWorkBeforeMaternity/GetDetailBackWorkBeforeMaternityById?ID=${id}`
                 );
 
                 const getDetailConfig = await Vnr_Function.HandleConfigListDetailATT(
                     _configListDetail,
-                    'Detail_List_Business'
+                    'Detail_Approve_BackWorkBeforeMaternity'
                 );
 
                 if (response && response.Status == EnumName.E_SUCCESS) {
                     let data = response.Data;
                     data = { ...data, ...data.SingleWordDetail[0] };
-                    data.BusinessAllowAction = Vnr_Services.handleStatus(
-                        data.Status,
-                        dataItem?.SendEmailStatus ? dataItem?.SendEmailStatus : false
-                    );
+                    data.BusinessAllowAction = Vnr_Services.handleStatusApprove(data.Status, data?.TypeApprove);
                     data.itemStatus = Vnr_Services.formatStyleStatusApp(data.Status);
                     data.FileAttachment = ManageFileSevice.setFileAttachApp(data.FileAttachment);
+
                     const _listActions = await this.rowActionsHeaderRight(data);
                     this.setState({ configListDetail: getDetailConfig, dataItem: data, listActions: _listActions });
                 } else {
@@ -229,40 +196,27 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
         }
     };
 
-    reload = (E_KEEP_FILTER, actionIsDelete) => {
+    reload = () => {
         const { reloadScreenList } = this.props.navigation.state.params;
-
         !Vnr_Function.CheckIsNullOrEmpty(reloadScreenList) && reloadScreenList('E_KEEP_FILTER');
-
-        //nếu action = Delete => back về danh sách
-        if (actionIsDelete) {
-            DrawerServices.navigate('AttSubmitBusiness');
-        } else {
-            this.setState({ dataItem: null }, () => {
-                this.getDataItem(true);
-            });
-        }
+        //this.getDataItem(true);
     };
 
     componentDidMount() {
-        AttSubmitTakeBusinessTripBusinessFunction.setThisForBusiness(this);
+        AttApproveBackWorkBeforeMaternityBusinessFunction.setThisForBusiness(this);
         this.getDataItem();
     }
 
     render() {
         const { dataItem, configListDetail, listActions } = this.state,
             { containerItemDetail, bottomActions } = styleScreenDetail;
-
         let contentViewDetail = <VnrLoading size={'large'} />;
         if (dataItem && configListDetail) {
             contentViewDetail = (
                 <View style={styleSheets.container}>
-                    <AttSubmitTakeBusinessTripAddOrEdit
-                        ref={(refs) => (this.AttSubmitTakeBusinessTripAddOrEdit = refs)}
-                    />
                     <ScrollView style={CustomStyleSheet.flexGrow(1)}>
                         <View style={containerItemDetail}>
-                            {configListDetail.map((e) => {
+                            {configListDetail.map(e => {
                                 if (e.TypeView != 'E_COMMON_PROFILE')
                                     return Vnr_Function.formatStringTypeV3(dataItem, e, configListDetail);
                             })}
@@ -286,3 +240,5 @@ export default class AttSubmitTakeBusinessTripViewDetail extends Component {
         );
     }
 }
+
+

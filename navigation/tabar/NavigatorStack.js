@@ -605,6 +605,13 @@ import AttSubmitTakeBusinessTripViewDetail from '../../scenes/modules/attendance
 import AttApproveTakeBusinessTripViewDetail from '../../scenes/modules/attendanceV3/attTakeBusinessTrip/attApproveTakeBusinessTrip/AttApproveTakeBusinessTripViewDetail';
 //#endregion
 
+//#region [module/attendanceV3/attBackWorkBeforeMaternity
+import TopTabAttSubmitBackWorkBeforeMaternity from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/TopTabAttSubmitBackWorkBeforeMaternity.js';
+import TopTabAttApproveBackWorkBeforeMaternity from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/TopTabAttApproveBackWorkBeforeMaternity.js';
+import AttSubmitBackWorkBeforeMaternityViewDetail from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/attSubmitBackWorkBeforeMaternity/AttSubmitBackWorkBeforeMaternityViewDetail';
+import AttApproveBackWorkBeforeMaternityViewDetail from '../../scenes/modules/attendanceV3/attBackWorkBeforeMaternity/attApproveBackWorkBeforeMaternity/AttApproveBackWorkBeforeMaternityViewDetail';
+//#endregion
+
 // V3
 // #region [module/attendanceV3/attWokringOvertime
 // import AttSubmitWorkingOvertime from '../../scenes/modules/attendanceV3/attWorkingOvertime/attSubmitWorkingOvertime/AttSubmitWorkingOvertime';
@@ -2488,6 +2495,29 @@ let objStack = {
         screen: AttApproveTakeBusinessTripViewDetail,
         navigationOptions: ({ navigation }) =>
             FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_TakeBusinessTrip_TitleDetail')
+    },
+    //#endregion
+
+    //#region [module/attendanceV3/attBackWorkBeforeMaternity
+    TopTabAttSubmitBackWorkBeforeMaternity: {
+        screen: TopTabAttSubmitBackWorkBeforeMaternity,
+        navigationOptions: ({ navigation }) =>
+            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_BackWorkBeforeMaternity_Title')
+    },
+    TopTabAttApproveBackWorkBeforeMaternity: {
+        screen: TopTabAttApproveBackWorkBeforeMaternity,
+        navigationOptions: ({ navigation }) =>
+            FunctionCommon.navigationOptionsConfigGoBackHone(navigation, 'HRM_PortalApp_BackWorkBeforeMaternityApprove_Title')
+    },
+    AttSubmitBackWorkBeforeMaternityViewDetail: {
+        screen: AttSubmitBackWorkBeforeMaternityViewDetail,
+        navigationOptions: ({ navigation }) =>
+            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_BackWorkBeforeMaternity_TitleDetail')
+    },
+    AttApproveBackWorkBeforeMaternityViewDetail: {
+        screen: AttApproveBackWorkBeforeMaternityViewDetail,
+        navigationOptions: ({ navigation }) =>
+            FunctionCommon.navigationOptionsConfigGoBack(navigation, 'HRM_PortalApp_BackWorkBeforeMaternity_TitleDetail')
     },
     //#endregion
 

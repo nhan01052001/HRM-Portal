@@ -869,7 +869,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
     };
 
     handleSetState = async (response) => {
-        const { DateFromTo, UserApprove, UserApprove3, UserApprove4, UserApprove2, SimilarRegistration } = this.state;
+        const { DateFromTo, SimilarRegistration } = this.state;
         this.levelApprove = response.ProcessApproval ? response.ProcessApproval.length - 1 : 4;
 
         let nextState = {
@@ -891,123 +891,15 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                 ID: response.ProfileID,
                 ProfileName: response.ProfileName
             },
-
-            UserApprove: {
-                ...UserApprove,
-                value: response.UserApproveID
-                    ? {
-                        UserInfoName: response.UserApproveName,
-                        ID: response.UserApproveID,
-                        AvatarURI: response.AvatarUserApprove1 ? response.AvatarUserApprove1 : null
-                    }
-                    : null,
-                disable: true,
-                refresh: !UserApprove.refresh
-            },
-            UserApprove3: {
-                ...UserApprove3,
-                value: response.UserApproveID2
-                    ? {
-                        UserInfoName: response.UserApproveName2,
-                        ID: response.UserApproveID2,
-                        AvatarURI: response.AvatarUserApprove2 ? response.AvatarUserApprove2 : null
-                    }
-                    : null,
-                disable: true,
-                refresh: !UserApprove3.refresh
-            },
-            UserApprove4: {
-                ...UserApprove4,
-                value: response.UserApproveID3
-                    ? {
-                        UserInfoName: response.UserApproveName3,
-                        ID: response.UserApproveID3,
-                        AvatarURI: response.AvatarUserApprove3 ? response.AvatarUserApprove3 : null
-                    }
-                    : null,
-                disable: true,
-                refresh: !UserApprove4.refresh
-            },
-            UserApprove2: {
-                ...UserApprove2,
-                value: response.UserApproveID4
-                    ? {
-                        UserInfoName: response.UserApproveName4,
-                        ID: response.UserApproveID4,
-                        AvatarURI: response.AvatarUserApprove4 ? response.AvatarUserApprove4 : null
-                    }
-                    : null,
-                disable: true,
-                refresh: !UserApprove2.refresh
-            }
+            // dataApprovalProcess: response?.ProcessApproval ?? []
         };
 
-        if (this.levelApprove == 4) {
-            nextState = {
-                ...nextState,
-                UserApprove: {
-                    ...nextState.UserApprove,
-                    levelApproval: 1
-                },
-                UserApprove3: {
-                    ...nextState.UserApprove3,
-                    visible: true,
-                    levelApproval: 2
-                },
-                UserApprove4: {
-                    ...nextState.UserApprove4,
-                    visible: true,
-                    levelApproval: 3
-                },
-                UserApprove2: {
-                    ...nextState.UserApprove2,
-                    levelApproval: 4
-                }
-            };
-        } else if (this.levelApprove == 3) {
-            nextState = {
-                ...nextState,
-                UserApprove: {
-                    ...nextState.UserApprove,
-                    levelApproval: 1
-                },
-                UserApprove3: {
-                    ...nextState.UserApprove3,
-                    visible: true,
-                    levelApproval: 2
-                },
-                UserApprove4: {
-                    ...nextState.UserApprove4,
-                    visible: false
-                },
-                UserApprove2: {
-                    ...nextState.UserApprove2,
-                    levelApproval: 3
-                }
-            };
-        } else {
-            nextState = {
-                ...nextState,
-                UserApprove: {
-                    ...nextState.UserApprove,
-                    levelApproval: 1
-                },
-                UserApprove3: {
-                    ...nextState.UserApprove3,
-                    visible: false
-                },
-                UserApprove4: {
-                    ...nextState.UserApprove4,
-                    visible: false
-                },
-                UserApprove2: {
-                    ...nextState.UserApprove2,
-                    levelApproval: 2
-                }
-            };
-        }
-
-        this.setState(nextState, () => this.getApprovalProcess());
+        this.setState(nextState, () => {
+            // if(Array.isArray(response?.ProcessApproval) && response?.ProcessApproval.length === 0 || !Array.isArray(response?.ProcessApproval)) {
+            //     this.getApprovalProcess();
+            // }
+            this.getApprovalProcess();
+        });
     };
 
     refreshForm = () => {
@@ -1025,7 +917,7 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
 
                     if (!record) {
                         // nếu bấm refresh lấy lại cấp duyệt
-                        this.getHighSupervisor();
+                        this.getApprovalProcess();
                     } else {
                         // Nếu bấm refresh khi Chỉnh sửa
                         this.isModify = true;
@@ -1836,7 +1728,10 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
                     )}
                     keyExtractor={(item, index) => index}
                     ItemSeparatorComponent={() => <View style={styles.separate} />}
-                    ListFooterComponent={this.renderApprove}
+                    ListFooterComponent={() => {
+                        const { dataApprovalProcess } = this.state;
+                        return <VnrApprovalProcess ref={(ref) => (this.refApproval = ref)} ToasterSevice={this.ToasterSeviceCallBack} isEdit={PermissionForAppMobile.value?.['Sys_ProcessApprove_ChangeProcess']?.['View']} data={dataApprovalProcess} />;
+                    }}
                 />
             );
         }
@@ -2049,11 +1944,6 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
         const {
             DateFromTo,
             isShowModal,
-            isShowModalApprove,
-            UserApprove,
-            UserApprove3,
-            UserApprove4,
-            UserApprove2,
             SimilarRegistration,
             /// lỗi chi tiết
             modalErrorDetail
@@ -2159,133 +2049,6 @@ class AttSubmitTakeBusinessTripAddOrEdit extends React.Component {
 
                             {/* button */}
                             <ListButtonRegister listActions={listActions} />
-
-                            {/* modal cấp duyệt */}
-                            {isShowModalApprove ? (
-                                <View style={styles.wrapModalApproval}>
-                                    <TouchableOpacity
-                                        style={[styles.bgOpacity]}
-                                        onPress={() => {
-                                            this.setState({
-                                                isShowModalApprove: false
-                                            });
-                                        }}
-                                    />
-                                    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
-                                        <SafeAreaView style={styles.wrapContentModalApproval}>
-                                            <View style={styles.wrapTitileHeaderModalApprovaLevel}>
-                                                <VnrText
-                                                    style={[styleSheets.text, styles.styRegister, styles.fS16fW600]}
-                                                    i18nKey={'HRM_PortalApp_Approval_Process'}
-                                                />
-                                                <VnrText
-                                                    style={[styleSheets.text, styles.styApproveProcessTitle]}
-                                                    i18nKey={`${this.levelApprove} ${translate(
-                                                        'HRM_PortalApp_Approval_Level'
-                                                    )}`}
-                                                />
-                                            </View>
-                                            <View style={styles.wrapLevelApproval}>
-                                                <View style={styles.h90}>
-                                                    <VnrLoadApproval
-                                                        api={API_APPROVE}
-                                                        refresh={UserApprove.refresh}
-                                                        textField="UserInfoName"
-                                                        valueField="ID"
-                                                        nameApprovalLevel={UserApprove.label}
-                                                        levelApproval={UserApprove.levelApproval}
-                                                        filter={true}
-                                                        filterServer={true}
-                                                        filterParams={'Text'}
-                                                        autoFilter={true}
-                                                        status={UserApprove.status}
-                                                        value={UserApprove.value}
-                                                        disable={UserApprove.disable}
-                                                        onFinish={(item) => this.onChangeUserApprove(item)}
-                                                    />
-                                                </View>
-
-                                                {UserApprove3.visible && UserApprove3.visibleConfig && (
-                                                    <View style={styles.h90}>
-                                                        <VnrLoadApproval
-                                                            api={API_APPROVE}
-                                                            refresh={UserApprove3.refresh}
-                                                            textField="UserInfoName"
-                                                            nameApprovalLevel={UserApprove3.label}
-                                                            levelApproval={UserApprove3.levelApproval}
-                                                            valueField="ID"
-                                                            filter={true}
-                                                            filterServer={true}
-                                                            filterParams={'Text'}
-                                                            autoFilter={true}
-                                                            status={UserApprove3.status}
-                                                            value={UserApprove3.value}
-                                                            disable={UserApprove3.disable}
-                                                            onFinish={(item) => {
-                                                                this.setState({
-                                                                    UserApprove3: {
-                                                                        ...UserApprove3,
-                                                                        value: item,
-                                                                        refresh: !UserApprove3.refresh
-                                                                    }
-                                                                });
-                                                            }}
-                                                        />
-                                                    </View>
-                                                )}
-
-                                                {UserApprove4.visible && UserApprove4.visibleConfig && (
-                                                    <View style={styles.h90}>
-                                                        <VnrLoadApproval
-                                                            api={API_APPROVE}
-                                                            refresh={UserApprove4.refresh}
-                                                            textField="UserInfoName"
-                                                            nameApprovalLevel={UserApprove4.label}
-                                                            levelApproval={UserApprove4.levelApproval}
-                                                            valueField="ID"
-                                                            filter={true}
-                                                            filterServer={true}
-                                                            filterParams={'Text'}
-                                                            autoFilter={true}
-                                                            status={UserApprove4.status}
-                                                            value={UserApprove4.value}
-                                                            disable={UserApprove4.disable}
-                                                            onFinish={(item) => {
-                                                                this.setState({
-                                                                    UserApprove4: {
-                                                                        ...UserApprove4,
-                                                                        value: item,
-                                                                        refresh: !UserApprove4.refresh
-                                                                    }
-                                                                });
-                                                            }}
-                                                        />
-                                                    </View>
-                                                )}
-
-                                                <View style={styles.h90}>
-                                                    <VnrLoadApproval
-                                                        api={API_APPROVE}
-                                                        refresh={UserApprove2.refresh}
-                                                        textField="UserInfoName"
-                                                        nameApprovalLevel={UserApprove2.label}
-                                                        levelApproval={UserApprove2.levelApproval}
-                                                        valueField="ID"
-                                                        filter={true}
-                                                        filterServer={true}
-                                                        filterParams={'Text'}
-                                                        autoFilter={true}
-                                                        status={UserApprove2.status}
-                                                        value={UserApprove2.value}
-                                                        disable={UserApprove2.disable}
-                                                        onFinish={(item) => this.onChangeUserApprove2(item)}
-                                                    />
-                                                </View>
-                                            </View>
-                                        </SafeAreaView>
-                                    </View>
-                                </View>
-                            ) : null}
                         </SafeAreaView>
                         {modalErrorDetail.isModalVisible && (
                             <Modal animationType="slide" transparent={true} isVisible={true}>

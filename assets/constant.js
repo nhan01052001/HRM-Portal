@@ -513,6 +513,26 @@ export const ScreenName = {
     AttCanceledTakeBusinessTrip: 'AttCanceledTakeBusinessTrip',
     AttAllTakeBusinessTrip: 'AttAllTakeBusinessTrip',
 
+    // Region: AttBackWorkBeforeMaternity V3
+    AttSubmitBackWorkBeforeMaternity: 'AttSubmitBackWorkBeforeMaternity',
+    AttSubmitBackWorkBeforeMaternityViewDetail: 'AttSubmitBackWorkBeforeMaternityViewDetail',
+    AttSubmitBackWorkBeforeMaternityAddOrEdit: 'AttSubmitBackWorkBeforeMaternityAddOrEdit',
+    AttApproveSubmitBackWorkBeforeMaternity: 'AttApproveSubmitBackWorkBeforeMaternity',
+    AttApprovedSubmitBackWorkBeforeMaternity: 'AttApprovedSubmitBackWorkBeforeMaternity',
+    AttSaveTempSubmitBackWorkBeforeMaternity: 'AttSaveTempSubmitBackWorkBeforeMaternity',
+    AttRejectSubmitBackWorkBeforeMaternity: 'AttRejectSubmitBackWorkBeforeMaternity',
+    AttCanceledSubmitBackWorkBeforeMaternity: 'AttCanceledSubmitBackWorkBeforeMaternity',
+
+    AttApproveBackWorkBeforeMaternity: 'AttApproveBackWorkBeforeMaternity',
+    AttApproveBackWorkBeforeMaternityViewDetail: 'AttApproveBackWorkBeforeMaternityViewDetail',
+
+    AttApprovedBackWorkBeforeMaternity: 'AttApprovedBackWorkBeforeMaternity',
+    AttApprovedBackWorkBeforeMaternityViewDetail: 'AttApprovedBackWorkBeforeMaternityViewDetail',
+
+    AttRejectBackWorkBeforeMaternity: 'AttRejectBackWorkBeforeMaternity',
+    AttCanceledBackWorkBeforeMaternity: 'AttCanceledBackWorkBeforeMaternity',
+    AttAllBackWorkBeforeMaternity: 'AttAllBackWorkBeforeMaternity',
+
     //Region: WorkingOvertime V3
     AttSubmitWorkingOvertime: 'AttSubmitWorkingOvertime',
     AttSubmitWorkingOvertimeAddOrEdit: 'AttSubmitWorkingOvertimeAddOrEdit',
@@ -1306,6 +1326,19 @@ export const EnumTask = {
     KT_AttRejectTakeBusinessTrip: 'KT_AttRejectTakeBusinessTrip',
     KT_AttCanceledTakeBusinessTrip: 'KT_AttCanceledTakeBusinessTrip',
     KT_AttAllTakeBusinessTrip: 'KT_AttAllTakeBusinessTrip',
+
+    // V3 BackWorkBeforeMaternity
+    KT_AttSubmitBackWorkBeforeMaternity: 'KT_AttSubmitBackWorkBeforeMaternity',
+    KT_AttRejectSubmitBackWorkBeforeMaternity: 'KT_AttRejectSubmitBackWorkBeforeMaternity',
+    KT_AttCanceledSubmitBackWorkBeforeMaternity: 'KT_AttCanceledSubmitBackWorkBeforeMaternity',
+    KT_AttSaveTempSubmitBackWorkBeforeMaternity: 'KT_AttSaveTempSubmitBackWorkBeforeMaternity',
+    KT_AttApproveSubmitBackWorkBeforeMaternity: 'KT_AttApproveSubmitBackWorkBeforeMaternity',
+    KT_AttApprovedSubmitBackWorkBeforeMaternity: 'KT_AttApprovedSubmitBackWorkBeforeMaternity',
+    KT_AttApproveBackWorkBeforeMaternity: 'KT_AttApproveBackWorkBeforeMaternity',
+    KT_AttApprovedBackWorkBeforeMaternity: 'KT_AttApprovedBackWorkBeforeMaternity',
+    KT_AttRejectBackWorkBeforeMaternity: 'KT_AttRejectBackWorkBeforeMaternity',
+    KT_AttCanceledBackWorkBeforeMaternity: 'KT_AttCanceledBackWorkBeforeMaternity',
+    KT_AttAllBackWorkBeforeMaternity: 'KT_AttAllBackWorkBeforeMaternity',
 
     // V3 WorkingOvertime
     KT_AttSubmitWorkingOvertime: 'KT_AttSubmitWorkingOvertime',
